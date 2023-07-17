@@ -210,7 +210,7 @@ exports.forgetPassword = async (req, res) => {
 
     // Create the password reset email
     // const resetUrl = `http://localhost:3000/resetpassword/${resetToken}`;
-    const resetUrl = `${req.protocol}://${req.get("host")}/resetpassword/${resetToken}`;
+    const resetUrl = `${req.protocol}://${req.headers.host}/resetpassword/${resetToken}`;
 
     const receiver = email;
     const subject = "Password Reset Request";
