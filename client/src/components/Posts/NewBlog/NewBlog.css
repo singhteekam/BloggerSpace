@@ -1,0 +1,37 @@
+.newblogpage{
+    margin-top: 70px;
+    margin-bottom: 70px;
+}
+
+.new-blog-heading {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.editor-wrapper {
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.editor-content {
+    min-height: 200px;
+    padding: 10px;
+    border: none;
+}
+
+.editor-toolbar {
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.submit-newblog {
+    margin-top: 10px;
+}
+
+.newblogfields {
+    margin-top: 10px;
+}

@@ -1,0 +1,130 @@
+[
+  {
+    "value": "App Development",
+    "label": "App Development"
+  },
+  {
+    "value": "Artificial Intelligence",
+    "label": "Artificial Intelligence"
+  },
+  {
+    "value": "Augmented Reality",
+    "label": "Augmented Reality"
+  },
+  {
+    "value": "Big Data",
+    "label": "Big Data"
+  },
+  {
+    "value": "Blockchain",
+    "label": "Blockchain"
+  },
+  {
+    "value": "C",
+    "label": "C"
+  },
+  {
+    "value": "C#",
+    "label": "C#"
+  },
+  {
+    "value": "C++",
+    "label": "C++"
+  },
+  {
+    "value": "Cloud Computing",
+    "label": "Cloud Computing"
+  },
+  {
+    "value": "CSS",
+    "label": "CSS"
+  },
+  {
+    "value": "Cybersecurity",
+    "label": "Cybersecurity"
+  },
+  {
+    "value": "Dart",
+    "label": "Dart"
+  },
+  {
+    "value": "Data Analytics",
+    "label": "Data Analytics"
+  },
+  {
+    "value": "Data Science",
+    "label": "Data Science"
+  },
+  {
+    "value": "DevOps",
+    "label": "DevOps"
+  },
+  {
+    "value": "Firebase",
+    "label": "Firebase"
+  },
+  {
+    "value": "HTML",
+    "label": "HTML"
+  },
+  {
+    "value": "Hosting",
+    "label": "Hosting"
+  },
+  {
+    "value": "Internet of Things",
+    "label": "Internet of Things"
+  },
+  {
+    "value": "Java",
+    "label": "Java"
+  },
+  {
+    "value": "Javascript",
+    "label": "Javascript"
+  },
+  {
+    "value": "Machine Learning",
+    "label": "Machine Learning"
+  },
+  {
+    "value": "Mobile Development",
+    "label": "Mobile Development"
+  },
+  {
+    "value": "MongoDB",
+    "label": "MongoDB"
+  },
+  {
+    "value": "Node.js",
+    "label": "Node.js"
+  },
+  {
+    "value": "Progressive web app",
+    "label": "Progressive web app"
+  },
+  {
+    "value": "Python",
+    "label": "Python"
+  },
+  {
+    "value": "React.js",
+    "label": "React.js"
+  },
+  {
+    "value": "UI/UX Design",
+    "label": "UI/UX Design"
+  },
+  {
+    "value": "Virtual Reality",
+    "label": "Virtual Reality"
+  },
+  {
+    "value": "Web Development",
+    "label": "Web Development"
+  },
+  {
+    "value": "Other",
+    "label": "Other"
+  }
+]
