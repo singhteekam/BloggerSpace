@@ -17,11 +17,10 @@ const {
   updateUserPersonalDetails,
 } = require("../controllers/userscontroller");
 
-const authenticate= require("../middlewares/authenticate");
-const multer= require("multer");
+const authenticate = require("../middlewares/authenticate");
+const multer = require("multer");
 const { checkUserName } = require("../utils/checkUsername");
 const { discardBlogFromDB } = require("../utils/discardBlog");
-
 
 // Route for verifying the user account
 router.post("/verify-account", verifyAccount);
@@ -52,12 +51,16 @@ router.post("/forgotpassword", forgetPassword);
 router.post("/resetpassword", resetPassword);
 
 //Change Password
-router.post("/changepassword",authenticate, changePassword)
+router.post("/changepassword", authenticate, changePassword);
 
 //Update Profil pic
 const storage = multer.memoryStorage(); // Use memory storage for storing the uploaded file
 const upload = multer({ storage });
-router.post("/uploadprofilepicture",upload.single("profilePicture"), uploadProfilePicture);
+router.post(
+  "/uploadprofilepicture",
+  upload.single("profilePicture"),
+  uploadProfilePicture
+);
 
 // User Info
 router.get("/userinfo", loggedInUserInfo);
@@ -73,4 +76,4 @@ router.patch("/updateusername", authenticate, updateUserPersonalDetails);
 
 router.post("/discard/blog/:id", authenticate, discardBlogFromDB);
 
-module.exports = router; 
+module.exports = router;

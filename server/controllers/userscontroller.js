@@ -8,7 +8,6 @@ const Blogs = require("../models/Blog");
 const sendEmail = require("../services/mailer");
 const validateUsername = require("../utils/validateUsername");
 
-
 // verifyAccount controller
 exports.verifyAccount = async (req, res) => {
   const { email } = req.body;
@@ -148,7 +147,7 @@ exports.login = async (req, res) => {
       isVerified: user.isVerified,
     };
 
-    req.session.user= user;  // Will remove in future
+    req.session.user = user; // Will remove in future
     req.session.userId = user._id;
     req.session.token = token;
     req.session.email = user.email;
@@ -212,15 +211,19 @@ exports.forgetPassword = async (req, res) => {
     // Create the password reset email
     // const resetUrl = `http://localhost:3000/resetpassword/${resetToken}`;
     const resetUrl = `${req.protocol}://${req.get("host")}/resetpassword/${resetToken}`;
-    const mailOptions = {
-      from: process.env.EMAIL,
-      to: email,
-      subject: "Password Reset Request",
-      text: `You are receiving this email because you (or someone else) has requested to reset the password for your account.\n\nPlease click on the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
-    };
 
-    // Send the password reset email
-    await transporter.sendMail(mailOptions);
+    const receiver = email;
+    const subject = "Password Reset Request";
+    const html ="<p>You are receiving this email because you (or someone else) has requested to reset the password for your account.\n\nPlease click on the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n</p>";
+    sendEmail(receiver, subject, html)
+      .then((response) => {
+        console.log(`Email sent to ${receiver}:`, response);
+        // Handle success
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+        // Handle error
+      });
 
     // Email sent successfully
     return res.status(200).json({ message: "Password reset email sent" });
@@ -347,7 +350,7 @@ exports.uploadProfilePicture = async (req, res) => {
     res.status(500).json({ error: "Failed to upload profile picture" });
   }
 };
- 
+
 // User Info
 exports.loggedInUserInfo = async (req, res) => {
   try {
@@ -422,8 +425,6 @@ exports.userProfile = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 
 exports.updateUserPersonalDetails = async (req, res) => {
   try {
