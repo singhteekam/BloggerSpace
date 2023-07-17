@@ -214,7 +214,7 @@ exports.forgetPassword = async (req, res) => {
 
     const receiver = email;
     const subject = "Password Reset Request";
-    const html ="<p>You are receiving this email because you (or someone else) has requested to reset the password for your account.\n\nPlease click on the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n</p>";
+    const html =`<p>You are receiving this email because you (or someone else) has requested to reset the password for your account.\n\nPlease click on the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n</p>`;
     sendEmail(receiver, subject, html)
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);
