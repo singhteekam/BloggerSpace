@@ -169,7 +169,7 @@ exports.createNewBlog = async (req, res) => {
 
     // Sending mail to admin
     // const blogLink = `http://localhost:3000/api/blogs/${slug}`;
-    const blogLink = `${req.protocol}://${req.get("host")}/${slug}`;
+    const blogLink = `${process.env.FRONTEND_URL}/${slug}`;
     const receiver2 = process.env.EMAIL;
     const subject2 = "New Blog available for review";
     const html2 = `
