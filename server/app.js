@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const cors= require("cors");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const mongoose = require("mongoose");
+const MongoStore = require("connect-mongo")(session);
 
 
 require("dotenv").config(); // Load environment variables from .env file
@@ -29,9 +31,14 @@ app.use(
   })
 );
 
+// Assuming you have already connected to your MongoDB database using Mongoose
+// Get the default connection
+const dbConnection = mongoose.connection;
+
 app.use(cookieParser());
 app.use(
   session({
+    store: new MongoStore({ mongooseConnection: dbConnection }), // Use connect-mongo
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
