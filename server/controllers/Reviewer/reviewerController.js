@@ -241,7 +241,7 @@ exports.userDetails = async (req, res) => {
     console.log("Tokn: " + req.session.currenttoken);
 
     if (!userId && !token) {
-      return res.status(404).json({ error: "Please login!!" });
+      return res.status(404).json({ error: "Please login!!....." });
     }
     if (userId && token && role === "Admin") {
       const user = await Admin.findById({

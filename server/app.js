@@ -21,7 +21,13 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 connectDB();
 
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
+
+app.use(
+  cors({
+    origin: [process.env.BLOGGERSPACE1, process.env.BLOGGERSPACE2, process.env.PANEL2BLOGGERSPACE1],
+  })
+);
 
 app.use(cookieParser());
 app.use(
