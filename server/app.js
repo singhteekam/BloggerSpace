@@ -57,7 +57,7 @@ app.use("/api/blogs", blogs);
 app.use("/api/reviewer/", reviewerRouted);
 
 //Admin Panel
-app.use("/api/admin/", adminRoutes)
+app.use("/api/admin/", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log("Server started at " + PORT));

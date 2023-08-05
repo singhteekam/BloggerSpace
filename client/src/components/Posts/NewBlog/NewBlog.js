@@ -14,16 +14,28 @@ const NewBlog = () => {
   const [authorEmail, setAuthorEmail] = useState("");
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [alert, setAlert] = useState(null);
   const [otherCategory, setOtherCategory]= useState(null);
-  const [saveAsDraft, setSaveAsDraft]= useState(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [tags, setTags] = useState([]);
+  const [isUniqueTitle, setIsUniqueTitle] = useState(null);
 
-  
+
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("token");
+
+  useEffect(() => {
+    axios.post("/api/blogs/isuniquetitle", {title}).then((response)=>{
+      const res= response.data;
+      console.log("isuniquetitle: " + res);
+      if(res==="Available")
+        setIsUniqueTitle(true);
+      else
+        setIsUniqueTitle(false);
+    }).catch((error)=>{
+      console.error("Error fetching isuniquetitle information:", error);
+    })
+  },[title]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -59,6 +71,10 @@ const NewBlog = () => {
     if (!isLoggedIn) {
       navigate("/login");
       return null; // or display a loading indicator while redirecting
+    } 
+    if(!isUniqueTitle){
+      setAlert({ type: "danger", message: "Title already exists" });
+      return null;
     }
 
     try {
@@ -71,8 +87,7 @@ const NewBlog = () => {
       });
       console.log(response.data);
 
-      setSuccess("New blog created with pending review status!!");
-      setError("");
+      setAlert({ type: "success", message: "New blog created with pending review status!!" });
 
       // Redirect to the homepage
       setTimeout(() => {
@@ -81,14 +96,17 @@ const NewBlog = () => {
 
       // Handle success or redirect to a different page
     } catch (error) {
-      setSuccess("");
-      setError("Error occured..");
+      setAlert({ type: "danger", message: "Error occured.." });
       console.error("Error creating new blog:", error);
       // Handle error
     }
   };
 
   const handleSaveAsDraft= async ()=>{
+    if (!isUniqueTitle) {
+      setAlert({ type: "danger", message: "Title already exists" });
+      return null;
+    }
     try {
       const response = await axios.post("/api/blogs/saveasdraft", {
         slug,
@@ -99,16 +117,14 @@ const NewBlog = () => {
       });
       console.log(response.data);
 
-      setSuccess("New blog saved as draft!!");
-      setError("");
+      setAlert({ type: "success", message: "New blog saved as draft!!" });
 
       // Redirect to the homepage
       setTimeout(() => {
         navigate("/");
       }, 2000);
     } catch (error) {
-      setSuccess("");
-      setError("Error occured..");
+      setAlert({ type: "danger", message: "Error occured.." });
       console.error("Error saving blog:", error);
       // Handle error
     }
@@ -141,8 +157,11 @@ const NewBlog = () => {
   return (
     <Container className="newblogpage">
       <h2 className="new-blog-heading">New Blog</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
-      {success && <Alert variant="success">{success}</Alert>}
+      {alert && (
+        <Alert variant={alert.type} onClose={() => setAlert(null)} dismissible>
+          {alert.message}
+        </Alert>
+      )}
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="blogTitle" className="newblogfields">
           <Form.Label>Title:</Form.Label>
@@ -151,11 +170,19 @@ const NewBlog = () => {
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
-              setSlug(slugify(e.target.value));
+              // setSlug(slugify(e.target.value));
+              setSlug(slugify(title.trim()));
             }}
             placeholder="Enter blog title"
             required
           />
+          {title.trim().length!==0 && isUniqueTitle !== null ? (
+            isUniqueTitle === true ? (
+              <Alert variant="success">Title Available</Alert>
+            ) : (
+              <Alert variant="danger">Title already exists</Alert>
+            )
+          ) : null}
         </Form.Group>
         <Form.Group controlId="blogAuthor" className="newblogfields">
           <Form.Label>Author:</Form.Label>
@@ -231,7 +258,10 @@ const NewBlog = () => {
           {tags.map((tag) => (
             <Badge key={tag} pill bg="secondary">
               {tag}
-              <CloseButton variant="white" onClick={() => handleTagDismiss(tag)}></CloseButton>
+              <CloseButton
+                variant="white"
+                onClick={() => handleTagDismiss(tag)}
+              ></CloseButton>
             </Badge>
           ))}
         </Form.Group>

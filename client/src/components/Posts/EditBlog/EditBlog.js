@@ -30,8 +30,23 @@ const EditBlog = () => {
   const [otherCategory, setOtherCategory] = useState(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [tags, setTags] = useState([]);
+  const [isUniqueTitle, setIsUniqueTitle] = useState([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios
+      .post("/api/blogs/isuniquetitle", { title })
+      .then((response) => {
+        const res = response.data;
+        console.log("isuniquetitle: " + res);
+        if (res === "Available") setIsUniqueTitle(true);
+        else setIsUniqueTitle(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching isuniquetitle information:", error);
+      });
+  }, [title]);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -60,6 +75,11 @@ const EditBlog = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!isUniqueTitle) {
+      setAlert({ type: "danger", message: "Title already exists" });
+      return null;
+    }
+
     try {
       const response = await axios.put(`/api/blogs/editblog/save/${id}`, {
         slug,
@@ -82,11 +102,15 @@ const EditBlog = () => {
       console.error("Error updating blog:", error);
       // Handle error
       // Show error alert
-      setAlert({ type: "error", message: "Failed to update blog" });
+      setAlert({ type: "danger", message: "Failed to update blog" });
     }
   };
 
   const handleSaveAsDraft = async () => {
+    if (!isUniqueTitle) {
+      setAlert({ type: "danger", message: "Title already exists" });
+      return null;
+    }
     try {
       const response = await axios.post("/api/blogs/saveasdraft", {
         id,
@@ -105,7 +129,7 @@ const EditBlog = () => {
         navigate(-1);
       }, 2000);
     } catch (error) {
-      setAlert({ type: "error", message: "Failed to save blog" });
+      setAlert({ type: "danger", message: "Failed to save blog" });
       console.error("Error saving blog:", error);
       // Handle error
     }

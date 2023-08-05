@@ -15,6 +15,8 @@ const {
   loggedInUserInfo,
   userProfile,
   updateUserPersonalDetails,
+  incrementVisitCount,
+  getVisitorCount,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -75,5 +77,9 @@ router.post("/checkusername", checkUserName);
 router.patch("/updateusername", authenticate, updateUserPersonalDetails);
 
 router.post("/discard/blog/:id", authenticate, discardBlogFromDB);
+
+// Visitors
+router.get("/visitors", getVisitorCount);
+router.post("/addvisitor",incrementVisitCount);
 
 module.exports = router;

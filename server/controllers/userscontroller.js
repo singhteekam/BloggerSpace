@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const Blogs = require("../models/Blog");
 const sendEmail = require("../services/mailer");
 const validateUsername = require("../utils/validateUsername");
+const Visit= require("../models/Visitor");
 
 // verifyAccount controller
 exports.verifyAccount = async (req, res) => {
@@ -447,5 +448,28 @@ exports.updateUserPersonalDetails = async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occurred while updating the username" });
+  }
+};
+
+exports.getVisitorCount = async (req, res) => {
+  try {
+    const visit = await Visit.findOne();
+    res.status(200).json({ count: visit ? visit.count : 0 });
+  } catch (error) {
+    res.status(500).json({ error: "Error getting visit count." });
+  }
+};
+
+exports.incrementVisitCount = async (req, res) => {
+  try {
+    const visit = await Visit.findOne();
+    if (visit) {
+      visit.count++;
+      await visit.save();
+    } else {
+      await Visit.create({});
+    }
+  } catch (error) {
+    console.error("Error incrementing visit count:", error);
   }
 };

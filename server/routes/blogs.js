@@ -19,6 +19,7 @@ const {
   saveAsDraftBlog,
   blogLikes,
   blogCommentLikes,
+  isUniqueTitle,
 } = require("../controllers/blogsController");
 
 router.get("/", blogsHomepage);
@@ -28,6 +29,8 @@ router.get("/:blogSlug", viewBlogRoute);
 router.post("/saveasdraft", saveAsDraftBlog);
 
 router.post("/newblog", authenticate, createNewBlog);
+
+router.post("/isuniquetitle", isUniqueTitle);
 
 router.get("/editblog/:id", authenticate, editBlog);
 

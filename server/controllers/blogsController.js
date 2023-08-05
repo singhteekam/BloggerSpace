@@ -118,6 +118,22 @@ exports.saveAsDraftBlog= async (req, res)=>{
   }
 }
 
+exports.isUniqueTitle= async (req, res)=>{
+  try {
+    const {title}= req.body;
+    const blog= await Blog.findOne({ title: title});
+    if(!blog){
+      return res.json("Available");
+    }
+    else{
+      return res.json("Already exists");
+    }
+  } catch (error) {
+    console.error("Error checking isuniquetitle: ", error);
+    res.status(500).json({ error: "An error occurred while checking isuniquetitle" });
+  }
+}
+
 exports.createNewBlog = async (req, res) => {
   try {
     const { slug, title, content, category, tags } = req.body;
