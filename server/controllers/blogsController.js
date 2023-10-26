@@ -82,6 +82,18 @@ exports.saveAsDraftBlog= async (req, res)=>{
       "base64"
     );
 
+    console.log(
+      "Original content size:",
+      Buffer.byteLength(content, "utf8") / 1024,
+      " KB"
+    );
+    // Log the size of the compressed content
+    console.log(
+      "Compressed content size:",
+      Buffer.byteLength(compressedContent, "utf8") / 1024,
+      " KB"
+    );
+
     const blog = await Blog.findById({
     _id: new mongoose.Types.ObjectId(req.body.id),
   });

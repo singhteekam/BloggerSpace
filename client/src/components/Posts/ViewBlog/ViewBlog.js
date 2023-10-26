@@ -230,7 +230,11 @@ const ViewBlog = () => {
                       className="avatar-icon"
                       style={{ width: "30px", height: "30px" }}
                     />
-                    <Link to={`/profile/${comment.userName}`} target="_blank">
+                    <Link
+                      to={`/profile/${comment.userName}`}
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
                       <b className="mx-3">{comment.userName}</b>
                     </Link>
                   </div>
@@ -242,12 +246,17 @@ const ViewBlog = () => {
                       className="avatar-icon"
                       style={{ width: "30px", height: "30px" }}
                     />
-                    <Link to={`/profile/${comment.userName}`} target="_blank">
-                      <i className="mx-3">{comment.userName}</i>
+                    <Link
+                      to={`/profile/${comment.userName}`}
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <b className="mx-3">{comment.userName}</b>
                     </Link>
                   </div>
                 )}
                 <p className="comment-content">{comment.content}</p>
+
                 {/* <div>
                   <i
                     className={`fa-${commentThumbColor} fa-thumbs-up fa-xl`}
@@ -268,7 +277,9 @@ const ViewBlog = () => {
         {userInfo && userInfo?.isVerified ? (
           <form onSubmit={handleCommentSubmit}>
             <div className="form-group">
-              <label htmlFor="commentContent">Add Comment</label>
+              <label htmlFor="commentContent">
+                <b>Add Comment:</b>
+              </label>
               <textarea
                 id="commentContent"
                 className="form-control"

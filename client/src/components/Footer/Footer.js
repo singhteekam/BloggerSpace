@@ -11,6 +11,7 @@ import {
 import "./Footer.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const [visitCount, setVisitCount] = useState(0);
@@ -59,7 +60,9 @@ const Footer = () => {
           <Col md={6} className="text-md-left text-center">
             {/* <p>&copy; 2023 Your Company. All rights reserved.</p> */}
             <p>
-              Made by <i>Teekam Singh</i>
+              <Link to={"/aboutdeveloper"}>
+                Made by <i>Teekam Singh</i>
+              </Link>
             </p>
           </Col>
           <Col md={6} className="text-md-right text-center">

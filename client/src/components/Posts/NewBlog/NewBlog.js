@@ -107,6 +107,7 @@ const NewBlog = () => {
       setAlert({ type: "danger", message: "Title already exists" });
       return null;
     }
+    console.log("Content: "+ content);
     try {
       const response = await axios.post("/api/blogs/saveasdraft", {
         slug,

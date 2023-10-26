@@ -19,6 +19,7 @@ import blogTags from "../../../utils/blogTags.json";
 const EditBlog = () => {
   const { id } = useParams();
   // const [blog, setBlog] = useState(null);
+  const [titleOrig, setTitleOrig] = useState("");
   const [title, setTitle] = useState("");
   const [authorDetails, setAuthorDetails] = useState(null);
   const [content, setContent] = useState("");
@@ -35,17 +36,19 @@ const EditBlog = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .post("/api/blogs/isuniquetitle", { title })
-      .then((response) => {
-        const res = response.data;
-        console.log("isuniquetitle: " + res);
-        if (res === "Available") setIsUniqueTitle(true);
-        else setIsUniqueTitle(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching isuniquetitle information:", error);
-      });
+    if(titleOrig!== title){
+      axios
+        .post("/api/blogs/isuniquetitle", { title })
+        .then((response) => {
+          const res = response.data;
+          console.log("isuniquetitle: " + res);
+          if (res === "Available") setIsUniqueTitle(true);
+          else setIsUniqueTitle(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching isuniquetitle information:", error);
+        });
+    }
   }, [title]);
 
   useEffect(() => {
@@ -56,6 +59,7 @@ const EditBlog = () => {
           response.data;
         setSlug(slug);
         setTitle(title);
+        setTitleOrig(title);
         setAuthorDetails(authorDetails);
         setContent(content);
         setCategory(category);
