@@ -32,11 +32,12 @@ const EditBlog = () => {
   const [selectedTag, setSelectedTag] = useState("");
   const [tags, setTags] = useState([]);
   const [isUniqueTitle, setIsUniqueTitle] = useState([]);
+  const [contentSize, setContentSize] = useState(0);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(titleOrig!== title){
+    if (titleOrig !== title) {
       axios
         .post("/api/blogs/isuniquetitle", { title })
         .then((response) => {
@@ -55,8 +56,15 @@ const EditBlog = () => {
     const fetchBlog = async () => {
       try {
         const response = await axios.get(`/api/blogs/editblog/${id}`);
-        const { slug, title, content, authorDetails, category, feedbackToAuthor, tags } =
-          response.data;
+        const {
+          slug,
+          title,
+          content,
+          authorDetails,
+          category,
+          feedbackToAuthor,
+          tags,
+        } = response.data;
         setSlug(slug);
         setTitle(title);
         setTitleOrig(title);
@@ -76,6 +84,16 @@ const EditBlog = () => {
     fetchBlog();
   }, [id, navigate]);
 
+  //  Size of the content
+  useEffect(() => {
+    const findContentSize = (content) => {
+      setContentSize(
+        (new TextEncoder().encode(content).length / 1024).toFixed(4)
+      );
+    };
+    findContentSize(content);
+  }, [content]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -90,7 +108,7 @@ const EditBlog = () => {
         title,
         content,
         category,
-        tags
+        tags,
       });
       console.log(response.data);
       // Handle success or redirect to a different page
@@ -101,7 +119,6 @@ const EditBlog = () => {
       setTimeout(() => {
         navigate("/");
       }, 2000);
-
     } catch (error) {
       console.error("Error updating blog:", error);
       // Handle error
@@ -122,7 +139,7 @@ const EditBlog = () => {
         title,
         content,
         category: category === "Other" ? otherCategory : category,
-        tags
+        tags,
       });
       console.log(response.data);
 
@@ -279,6 +296,8 @@ const EditBlog = () => {
           <Form.Label>Content:</Form.Label>
           <QuillEditor content={content} onContentChange={setContent} />
         </Form.Group>
+
+        <h6>Content size: {contentSize} KB</h6>
 
         <h6>Feedbacks:</h6>
         <ul>

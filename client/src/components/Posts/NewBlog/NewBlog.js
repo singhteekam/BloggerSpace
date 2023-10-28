@@ -15,27 +15,28 @@ const NewBlog = () => {
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
   const [alert, setAlert] = useState(null);
-  const [otherCategory, setOtherCategory]= useState(null);
+  const [otherCategory, setOtherCategory] = useState(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [tags, setTags] = useState([]);
   const [isUniqueTitle, setIsUniqueTitle] = useState(null);
-
+  const [contentSize, setContentSize] = useState(0);
 
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("token");
 
   useEffect(() => {
-    axios.post("/api/blogs/isuniquetitle", {title}).then((response)=>{
-      const res= response.data;
-      console.log("isuniquetitle: " + res);
-      if(res==="Available")
-        setIsUniqueTitle(true);
-      else
-        setIsUniqueTitle(false);
-    }).catch((error)=>{
-      console.error("Error fetching isuniquetitle information:", error);
-    })
-  },[title]);
+    axios
+      .post("/api/blogs/isuniquetitle", { title })
+      .then((response) => {
+        const res = response.data;
+        console.log("isuniquetitle: " + res);
+        if (res === "Available") setIsUniqueTitle(true);
+        else setIsUniqueTitle(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching isuniquetitle information:", error);
+      });
+  }, [title]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -62,8 +63,17 @@ const NewBlog = () => {
         console.error("Error fetching user information:", error);
         // Handle the error
       });
-  }, [isLoggedIn,navigate, author]);
-  
+  }, [isLoggedIn, navigate, author]);
+
+  //  Size of the content
+  useEffect(() => {
+    const findContentSize = (content) => {
+      setContentSize(
+        (new TextEncoder().encode(content).length / 1024).toFixed(4)
+      );
+    };
+    findContentSize(content);
+  }, [content]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,8 +81,8 @@ const NewBlog = () => {
     if (!isLoggedIn) {
       navigate("/login");
       return null; // or display a loading indicator while redirecting
-    } 
-    if(!isUniqueTitle){
+    }
+    if (!isUniqueTitle) {
       setAlert({ type: "danger", message: "Title already exists" });
       return null;
     }
@@ -87,7 +97,10 @@ const NewBlog = () => {
       });
       console.log(response.data);
 
-      setAlert({ type: "success", message: "New blog created with pending review status!!" });
+      setAlert({
+        type: "success",
+        message: "New blog created with pending review status!!",
+      });
 
       // Redirect to the homepage
       setTimeout(() => {
@@ -102,19 +115,19 @@ const NewBlog = () => {
     }
   };
 
-  const handleSaveAsDraft= async ()=>{
+  const handleSaveAsDraft = async () => {
     if (!isUniqueTitle) {
       setAlert({ type: "danger", message: "Title already exists" });
       return null;
     }
-    console.log("Content: "+ content);
+    console.log("Content: " + content);
     try {
       const response = await axios.post("/api/blogs/saveasdraft", {
         slug,
         title,
         content,
-        category: category==="Other"?otherCategory:category,
-        tags
+        category: category === "Other" ? otherCategory : category,
+        tags,
       });
       console.log(response.data);
 
@@ -129,7 +142,7 @@ const NewBlog = () => {
       console.error("Error saving blog:", error);
       // Handle error
     }
-  }
+  };
 
   const handleSelectedTag = (e) => {
     setSelectedTag(e.target.value);
@@ -154,7 +167,6 @@ const NewBlog = () => {
       .replace(/\s+/g, "-");
   };
 
-
   return (
     <Container className="newblogpage">
       <h2 className="new-blog-heading">New Blog</h2>
@@ -178,7 +190,7 @@ const NewBlog = () => {
             placeholder="Enter blog title"
             required
           />
-          {title.trim().length!==0 && isUniqueTitle !== null ? (
+          {title.trim().length !== 0 && isUniqueTitle !== null ? (
             isUniqueTitle === true ? (
               <Alert variant="success">Title Available</Alert>
             ) : (
@@ -272,6 +284,7 @@ const NewBlog = () => {
           <Form.Label>Content:</Form.Label>
           <QuillEditor content={content} onContentChange={setContent} />
         </Form.Group>
+        <h6>Content size: {contentSize} KB</h6>
         <Button
           variant="secondary"
           className="submit-newblog"

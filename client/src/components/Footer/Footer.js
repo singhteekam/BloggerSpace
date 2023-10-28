@@ -79,7 +79,8 @@ const Footer = () => {
               </li>
               <li className="list-inline-item mx-2">
                 <a href="#">
-                  <i className="fab fa-facebook fa-lg"></i>
+                  {/* <i className="fab fa-facebook fa-lg"></i> */}
+                  <i className="fa fa-envelope fa-lg"></i>
                 </a>
               </li>
               <li className="list-inline-item mx-2">

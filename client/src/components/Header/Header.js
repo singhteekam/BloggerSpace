@@ -85,6 +85,9 @@ function Header() {
                 <Nav.Link href="/newblog">New Post</Nav.Link>
               </>
             )}
+            <Nav.Link href="https://reviewbloggerspace.singhteekam.in/" target="_blank">
+              Reviewer Panel
+            </Nav.Link>
           </Nav>
           <Form className="d-flex">
             <Button
