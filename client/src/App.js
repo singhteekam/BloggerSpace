@@ -18,6 +18,7 @@ import MyProfilePage from "./components/MyProfile/MyProfilePage.js";
 import UserProfile from "./components/UserProfilePage/UserProfile.js";
 import MyBlogs from "./components/Posts/MyBlogs/MyBlogs.js";
 import AboutDeveloper from "./components/AboutDeveloper/AboutDeveloper.js";
+import WritingGuidelines from "./components/WritingGuidelines/WritingGuidelines.js";
 
 const App = () => {
 
@@ -46,6 +47,8 @@ const App = () => {
             <Route path="/changepassword" element={<ChangePasswordPage />} />
             <Route path="/myblogs" element={<MyBlogs />} />
             <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
+            <Route path="/guidelines" element={<WritingGuidelines />} />
+            
 
 
           </Routes>

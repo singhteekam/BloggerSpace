@@ -41,6 +41,12 @@ exports.viewBlogRoute = async (req, res) => {
       to: "string",
     });
 
+    console.log(
+      "Content size:",
+      Buffer.byteLength(blog.content, "utf8") / 1024,
+      " KB"
+    );
+
     // Assuming `content` is the original content string
     // console.log(
     //   "Compressed size from db:",

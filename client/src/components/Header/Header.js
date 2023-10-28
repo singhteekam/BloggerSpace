@@ -117,6 +117,9 @@ function Header() {
                 <NavDropdown.Item href="/changepassword">
                   <i className="fas fa-key"></i> Change Password
                 </NavDropdown.Item>
+                <NavDropdown.Item href="/guidelines">
+                  <i className="fas fa-book"></i> Writing Guidelines
+                </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item onClick={handleLogout}>
                   <i className="fas fa-sign-out"></i> Signout

@@ -165,6 +165,7 @@ const NewBlog = () => {
       )}
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="blogTitle" className="newblogfields">
+          {/* <Form.Label>This article url after publish: {slug}</Form.Label> <br /> */}
           <Form.Label>Title:</Form.Label>
           <Form.Control
             type="text"

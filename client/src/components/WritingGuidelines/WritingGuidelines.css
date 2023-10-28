@@ -1,0 +1,12 @@
+.guidelines-page {
+    padding: 80px 10px;
+    min-height: 100vh;
+}
+
+.guidelines-heading {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
