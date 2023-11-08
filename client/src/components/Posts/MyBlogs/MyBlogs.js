@@ -192,6 +192,8 @@ const MyBlogs = () => {
                         </b>
                         <p>
                           <i>Current Reviewer: {blog.currentReviewer}</i>
+                          <br />
+                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
                         </p>
                       </div>
 
@@ -256,6 +258,8 @@ const MyBlogs = () => {
                         </b>
                         <p>
                           <i>Current Reviewer: {blog.currentReviewer}</i>
+                          <br />
+                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
                         </p>
                       </div>
 
@@ -311,6 +315,8 @@ const MyBlogs = () => {
                         </b>
                         <p>
                           <i>Current Reviewer: {blog.currentReviewer}</i>
+                          <br />
+                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
                         </p>
                       </div>
                     </div>
@@ -349,6 +355,8 @@ const MyBlogs = () => {
                         </b>
                         <p>
                           <i>Current Reviewer: {blog.currentReviewer}</i>
+                          <br />
+                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
                         </p>
                       </div>
 
@@ -412,9 +420,7 @@ const MyBlogs = () => {
                           {++m}. {blog.title}
                         </b>
                         <p>
-                          <i>
-                            Last updated: {blog.lastUpdatedAt?.slice(0, 10)}
-                          </i>
+                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
                         </p>
                       </div>
 

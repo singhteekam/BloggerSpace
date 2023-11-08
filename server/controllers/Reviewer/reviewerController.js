@@ -176,7 +176,7 @@ exports.editPendingBlog = async (req, res) => {
 exports.saveEditedPendingBlog = async (req, res) => {
   try {
     // const { id } = req.params;
-    const { slug, title, content, category, tags } = req.body;
+    const { slug, title, content, category, rating, tags } = req.body;
 
     // Find the blog by ID
     const blog = await Blog.findById({
@@ -200,7 +200,11 @@ exports.saveEditedPendingBlog = async (req, res) => {
     blog.category = category;
     blog.currentReviewer = "";
     blog.status = "IN_REVIEW";
-    blog.reviewedBy.push(req.session.currentemail);
+    // blog.reviewedBy.push(req.session.currentemail);
+    blog.reviewedBy.push({
+      ReviewedBy: req.session.currentemail,
+      Rating: rating
+    });
     blog.lastUpdatedAt = Date.now();
     blog.tags= tags;
 
@@ -322,7 +326,7 @@ exports.feedbackToAuthor = async (req, res) => {
     await blog.save();
 
     // Sending mail
-    const receiver1 = blog.authorEmail;
+    const receiver1 = blog.authorDetails.email;
     const receiver2 = req.session.currentemail;
     const subject = "Blog status updated- AWAITING_AUTHOR";
     const html = `Hi,
