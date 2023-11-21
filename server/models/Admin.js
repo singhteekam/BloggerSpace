@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const IST_OFFSET = 330;
+
 const adminSchema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -22,9 +24,9 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  role:{
+  role: {
     type: String,
-    default: "Admin"
+    default: "Admin",
   },
 
   isVerified: {
@@ -35,7 +37,8 @@ const adminSchema = new mongoose.Schema({
   resetTokenExpiration: Date, // Field for storing the token expiration date
   createdAt: {
     type: Date,
-    default: Date.now,
+    // default: Date.now,
+    default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
   },
 });
 

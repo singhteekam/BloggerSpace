@@ -193,7 +193,10 @@ const MyBlogs = () => {
                         <p>
                           <i>Current Reviewer: {blog.currentReviewer}</i>
                           <br />
-                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
+                          <i>
+                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                            {blog.lastUpdatedAt.slice(0, 10)}
+                          </i>
                         </p>
                       </div>
 
@@ -204,7 +207,6 @@ const MyBlogs = () => {
                         >
                           Edit
                         </Link>
-                       
                       </div>
                       <div className="col-auto">
                         <Button
@@ -259,7 +261,10 @@ const MyBlogs = () => {
                         <p>
                           <i>Current Reviewer: {blog.currentReviewer}</i>
                           <br />
-                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
+                          <i>
+                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                            {blog.lastUpdatedAt.slice(0, 10)}
+                          </i>
                         </p>
                       </div>
 
@@ -316,7 +321,10 @@ const MyBlogs = () => {
                         <p>
                           <i>Current Reviewer: {blog.currentReviewer}</i>
                           <br />
-                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
+                          <i>
+                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                            {blog.lastUpdatedAt.slice(0, 10)}
+                          </i>
                         </p>
                       </div>
                     </div>
@@ -356,7 +364,10 @@ const MyBlogs = () => {
                         <p>
                           <i>Current Reviewer: {blog.currentReviewer}</i>
                           <br />
-                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
+                          <i>
+                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                            {blog.lastUpdatedAt.slice(0, 10)}
+                          </i>
                         </p>
                       </div>
 
@@ -367,7 +378,6 @@ const MyBlogs = () => {
                         >
                           Edit
                         </Link>
-
                       </div>
                       <div className="col-auto">
                         <Button
@@ -420,7 +430,10 @@ const MyBlogs = () => {
                           {++m}. {blog.title}
                         </b>
                         <p>
-                          <i>Last Updated at: {blog.lastUpdatedAt.slice(11,19)}, {blog.lastUpdatedAt.slice(0,10)}</i>
+                          <i>
+                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                            {blog.lastUpdatedAt.slice(0, 10)}
+                          </i>
                         </p>
                       </div>
 
@@ -432,7 +445,6 @@ const MyBlogs = () => {
                         >
                           View
                         </Link>
-
                       </div>
                     </div>
                   </ListGroup.Item>

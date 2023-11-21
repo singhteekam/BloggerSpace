@@ -7,6 +7,27 @@ exports.blogsHomepage = async (req, res) => {
   // console.log("Current user: "+ req.session.currentemail);
   // console.log("Homepage- User info: " + req.session.userId);
   // console.log("Email- User info: " + req.session.email);
+
+  // TO UPDATE ANY COLUMN FIELD VALUES. THIS QUERY WILL REMOVE reviewedBy field from every document
+  // Blog.updateMany({}, { $unset: { reviewedBy: 1 }})
+  //   .then((result) => {
+  //     console.log("Documents updated successfully:", result);
+  //   })
+  //   .catch((err) => {
+  //     console.error("Error updating documents:", err);
+  //   });
+
+  // TO UPDATE ANY COLUMN FIELD VALUES. THIS QUERY WILL add reviewedBy field in every document
+  // Blog.updateMany({}, { $set: { reviewedBy: [] }})
+  //   .then((result) => {
+  //     console.log("Documents updated successfully:", result);
+  //   })
+  //   .catch((err) => {
+  //     console.error("Error updating documents:", err);
+  //   });
+
+  console.log("Date:  "+ new Date().toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}));
+
   try {
     const blogs = await Blog.find({ status: "PUBLISHED" })
       .populate("authorDetails") // Populate the author field with the User document
@@ -108,7 +129,7 @@ exports.saveAsDraftBlog= async (req, res)=>{
         blog.title=title;
         blog.content = compressedContent;
         blog.category= category;
-        blog.lastUpdatedAt=Date.now();
+        blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
         blog.tags= tags;
         await blog.save();
 
@@ -122,8 +143,8 @@ exports.saveAsDraftBlog= async (req, res)=>{
       category,
       authorDetails: req.session.userId,
       status: "DRAFT",
-      lastUpdatedAt: Date.now(),
-      tags
+      lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
+      tags,
     });
     const savedBlog = await newPost.save();
 
@@ -181,7 +202,8 @@ exports.createNewBlog = async (req, res) => {
       content: compressedContent,
       category,
       authorDetails: req.session.userId,
-      lastUpdatedAt: Date.now(),
+      // lastUpdatedAt: Date.now(),
+      lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
       tags,
     });
     const savedBlog = await newPost.save();

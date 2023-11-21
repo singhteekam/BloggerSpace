@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const IST_OFFSET = 330;
+
 const reviewerSchema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -38,17 +40,19 @@ const reviewerSchema = new mongoose.Schema({
       slug: {
         type: String,
       },
-      time:{
+      time: {
         type: Date,
-        default: Date.now
-      }
-    }
+        // default: Date.now
+        default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
+      },
+    },
   ],
   resetToken: String, // Field for storing the reset token
   resetTokenExpiration: Date, // Field for storing the token expiration date
   createdAt: {
     type: Date,
-    default: Date.now,
+    // default: Date.now,
+    default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
   },
 });
 

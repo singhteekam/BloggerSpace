@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const { commentSchema } = require("./Comment");
 const User= require("./User");
 
+const IST_OFFSET = 330;
+
 const blogSchema = new mongoose.Schema({
   slug: {
     type: String,
@@ -47,10 +49,12 @@ const blogSchema = new mongoose.Schema({
   ],
   reviewedBy: {
     type: Array,
+    default: []
   },
   createdAt: {
     type: Date,
-    default: Date.now,
+    // default: Date.now,
+    default: () => new Date(new Date().getTime() + IST_OFFSET * 60000)   ,
   },
   lastUpdatedAt: {
     type: Date,

@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 
+const IST_OFFSET = 330;
+
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -35,7 +37,8 @@ const userSchema = new mongoose.Schema({
   resetTokenExpiration: Date, // Field for storing the token expiration date
   createdAt: {
     type: Date,
-    default: Date.now,
+    // default: Date.now,
+    default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
   },
 });
 
