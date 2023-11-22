@@ -142,6 +142,8 @@ const MyBlogs = () => {
     );
   }
 
+  
+
   return (
     <Container className="myblogs-page col-lg-7">
       <h2 className="myblogs-heading">My Blogs</h2>

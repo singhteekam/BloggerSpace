@@ -207,7 +207,8 @@ const EditBlog = () => {
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
-              setSlug(slugify(e.target.value));
+              // setSlug(slugify(title.trim()));
+              setSlug(slugify(e.target.value.trim()));
             }}
             placeholder="Enter blog title"
           />

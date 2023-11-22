@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Button, Alert, Badge, CloseButton } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Button,
+  Alert,
+  Badge,
+  CloseButton,
+} from "react-bootstrap";
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
 import axios from "axios";
 import "./NewBlog.css";
 import { useNavigate } from "react-router-dom";
 import blogCategory from "../../../utils/blogCategory.json";
-import blogTags from "../../../utils/blogTags.json"
+import blogTags from "../../../utils/blogTags.json";
 
 const NewBlog = () => {
   const [title, setTitle] = useState("");
@@ -184,8 +191,8 @@ const NewBlog = () => {
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
-              // setSlug(slugify(e.target.value));
-              setSlug(slugify(title.trim()));
+              setSlug(slugify(e.target.value.trim()));
+              // setSlug(slugify(title.trim()));
             }}
             placeholder="Enter blog title"
             required

@@ -26,7 +26,7 @@ exports.blogsHomepage = async (req, res) => {
   //     console.error("Error updating documents:", err);
   //   });
 
-  console.log("Date:  "+ new Date().toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}));
+  // console.log("Date:  "+ new Date().toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}));
 
   try {
     const blogs = await Blog.find({ status: "PUBLISHED" })
@@ -423,7 +423,7 @@ exports.authorSavedDraftBlogs = async (req, res) => {
       authorDetails: req.session.userId,
       status: "DRAFT",
     }).populate("authorDetails").exec();
-    console.log(blogs);
+    // console.log(blogs);
 
     res.json(blogs);
   } catch (error) {
@@ -440,7 +440,7 @@ exports.authorPendingReviewBlogs = async (req, res) => {
       authorDetails: req.session.userId,
       status: "PENDING_REVIEW",
     }).populate("authorDetails").exec();
-    console.log(blogs);
+    // console.log(blogs);
 
     res.json(blogs);
   } catch (error) {
@@ -457,7 +457,7 @@ exports.authorUnderReviewBlogs = async (req, res) => {
       authorDetails: req.session.userId,
       status: "UNDER_REVIEW",
     }).populate("authorDetails").exec();
-    console.log(blogs);
+    // console.log(blogs);
 
     res.json(blogs);
   } catch (error) {
@@ -476,7 +476,7 @@ exports.awaitingAuthorBlogs = async (req, res) => {
       authorDetails: req.session.userId,
       status: "AWAITING_AUTHOR",
     }).populate("authorDetails").exec();
-    console.log(blogs);
+    // console.log(blogs);
 
     res.json(blogs);
   } catch (error) {
@@ -493,7 +493,7 @@ exports.authorPublishedBlogs = async (req, res) => {
       authorDetails: req.session.userId,
       status: "PUBLISHED",
     }).populate("authorDetails").exec();
-    console.log(blogs);
+    // console.log(blogs);
 
     res.json(blogs);
   } catch (error) {
