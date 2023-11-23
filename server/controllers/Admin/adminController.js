@@ -160,7 +160,8 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     blog.currentReviewer = "";
     blog.status = "PUBLISHED";
     blog.reviewedBy.push(req.session.currentemail);
-    blog.lastUpdatedAt= Date.now();
+    // blog.lastUpdatedAt= Date.now();
+    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     blog.tags=tags;
 
     // Save the updated blog
@@ -245,7 +246,8 @@ exports.updateReviewerAssignment = async (req, res) => {
     // Update the assignedUser field of the blog
     blog.currentReviewer = assignedUser;
     blog.status= "UNDER_REVIEW";
-    blog.lastUpdatedAt= Date.now();
+    // blog.lastUpdatedAt= Date.now();
+    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     await blog.save();
 
     return res.json({ message: "Blog assigned successfully" });

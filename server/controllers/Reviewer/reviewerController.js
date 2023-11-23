@@ -202,10 +202,13 @@ exports.saveEditedPendingBlog = async (req, res) => {
     blog.status = "IN_REVIEW";
     // blog.reviewedBy.push(req.session.currentemail);
     blog.reviewedBy.push({
+      // ReviewedBy: req.session.currentemail,
       ReviewedBy: req.session.currentemail,
-      Rating: rating
+      Rating: rating,
+      LastUpdatedAt: new Date(new Date().getTime() + 330 * 60000)
     });
-    blog.lastUpdatedAt = Date.now();
+    // blog.lastUpdatedAt = Date.now();
+    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     blog.tags= tags;
 
     // Save the updated blog
@@ -318,7 +321,8 @@ exports.feedbackToAuthor = async (req, res) => {
       _id: new mongoose.Types.ObjectId(blogId),
     });
     blog.status = "AWAITING_AUTHOR";
-    blog.lastUpdatedAt = Date.now();
+    // blog.lastUpdatedAt = Date.now();
+    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     blog.feedbackToAuthor.push({
       feedback: feedback,
       reviewer: currentReviewer,
@@ -398,7 +402,8 @@ exports.discardQueueBlog = async (req, res) => {
       return res.status(404).json({ error: "Blog not found." });
     }
     blog.status = "DISCARD_QUEUE";
-    blog.lastUpdatedAt = Date.now();
+    // blog.lastUpdatedAt = Date.now();
+    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
 
     await blog.save();
 

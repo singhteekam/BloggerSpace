@@ -14,12 +14,10 @@ const commentSchema = new mongoose.Schema(
       ref: User,
       required: true,
     },
-    likes: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: User,
-      },
-    ],
+    likes: {
+      type: Array,
+      default: [],
+    },
     createdAt: {
       type: Date,
       default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),

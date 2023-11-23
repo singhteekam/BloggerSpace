@@ -49,12 +49,12 @@ const blogSchema = new mongoose.Schema({
   ],
   reviewedBy: {
     type: Array,
-    default: []
+    default: [],
   },
   createdAt: {
     type: Date,
     // default: Date.now,
-    default: () => new Date(new Date().getTime() + IST_OFFSET * 60000)   ,
+    default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
   },
   lastUpdatedAt: {
     type: Date,

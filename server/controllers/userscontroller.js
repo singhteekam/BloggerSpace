@@ -206,7 +206,8 @@ exports.forgetPassword = async (req, res) => {
 
     // Save the reset token and its expiration date in the user's document
     user.resetToken = resetToken;
-    user.resetTokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
+    // user.resetTokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
+    user.resetTokenExpiration = new Date(new Date().getTime() + 330 * 60000) + 3600000; // Token valid for 1 hour
     await user.save();
 
     // Create the password reset email
@@ -259,7 +260,8 @@ exports.resetPassword = (req, res) => {
   // Find the user by reset token and check if it exists
   User.findOne({
     resetToken: resetToken,
-    resetTokenExpiration: { $gt: Date.now() },
+    // resetTokenExpiration: { $gt: Date.now() },
+    resetTokenExpiration: { $gt: new Date(new Date().getTime() + 330 * 60000) },
   })
     .then((user) => {
       if (!user) {

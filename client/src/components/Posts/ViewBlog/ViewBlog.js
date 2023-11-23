@@ -256,7 +256,7 @@ const ViewBlog = () => {
                   </div>
                 )}
                 <p className="comment-content">{comment.content}</p>
-
+  
                 {/* <div>
                   <i
                     className={`fa-${commentThumbColor} fa-thumbs-up fa-xl`}
