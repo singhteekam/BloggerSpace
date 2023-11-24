@@ -13,7 +13,7 @@ function AboutDeveloper() {
           <div className="profile-section">
             <div className="profile-picture">
               <img
-                src="https://img.freepik.com/free-icon/user_318-159711.jpg"
+                src="https://scontent.fdel27-1.fna.fbcdn.net/v/t39.30808-1/387805322_3529854184009562_6613907963940194751_n.jpg?stp=dst-jpg_p320x320&_nc_cat=111&ccb=1-7&_nc_sid=5f2048&_nc_ohc=iT7udbG14xUAX_gsD_y&_nc_ht=scontent.fdel27-1.fna&oh=00_AfCBtKXio621hGXC7IZ6-FT6ayNFqDDzKs-sGBQQmRWjcw&oe=65668350"
                 alt="Profile"
               />
               <h4>Teekam Singh</h4>
@@ -30,6 +30,8 @@ function AboutDeveloper() {
                 <Badge bg="secondary">Firebase</Badge>
                 <Badge bg="secondary">React.js</Badge>
                 <Badge bg="secondary">Node.js</Badge>
+              </Stack>
+              <Stack direction="horizontal" className="mx-5" gap={2}>
                 <Badge bg="secondary">MongoDB</Badge>
                 <Badge bg="secondary">Java</Badge>
                 <Badge bg="secondary">C++</Badge>
@@ -37,30 +39,38 @@ function AboutDeveloper() {
               <br />
               <p>
                 <ul className="list-inline">
-                <strong>Connect on: </strong>
+                  <strong>Connect on: </strong>
                   <li className="list-inline-item mx-2">
-                    <a href="#">
+                    <a
+                      target="_blank"
+                      href="https://in.linkedin.com/in/teekam-singh-26476a185"
+                    >
                       <i className="fab fa-linkedin fa-lg"></i>
                     </a>
                   </li>
                   <li className="list-inline-item mx-2">
-                    <a href="#">
+                    <a target="_blank" href="https://github.com/singhteekam">
                       <i className="fab fa-github fa-lg"></i>
                     </a>
                   </li>
                   <li className="list-inline-item mx-2">
-                    <a href="#">
+                    <a
+                      target="_blank"
+                      href="https://www.facebook.com/teekam.singh.9480/"
+                    >
                       <i className="fab fa-facebook fa-lg"></i>
                     </a>
                   </li>
                   <li className="list-inline-item mx-2">
-                    <a href="#">
+                    <a
+                      target="_blank"
+                      href="https://www.instagram.com/singh__teekam/"
+                    >
                       <i className="fab fa-instagram fa-lg"></i>
                     </a>
                   </li>
                 </ul>
               </p>
-              
             </div>
           </div>
         </Card.Body>

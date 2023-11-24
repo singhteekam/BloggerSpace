@@ -265,6 +265,7 @@ const MyProfilePage = () => {
                       </Button>
                     )}
                   </div>
+
                   <Button
                     variant="primary"
                     className="goback-editedblog"
@@ -284,8 +285,8 @@ const MyProfilePage = () => {
           <Modal.Title>Personal Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        {showError && <Alert variant="danger">{showError}</Alert>}
-        {showSuccess && <Alert variant="success">{showSuccess}</Alert>}
+          {showError && <Alert variant="danger">{showError}</Alert>}
+          {showSuccess && <Alert variant="success">{showSuccess}</Alert>}
           <b>Full Name:</b>
           <FormControl
             type="text"

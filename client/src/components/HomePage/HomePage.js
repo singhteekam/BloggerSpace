@@ -73,10 +73,13 @@ function HomePage() {
                             </Badge>
                           ))}
                         <p>
-                          <i className="text-muted">Author: {blog.authorDetails.userName}</i>
+                          <i className="text-muted">
+                            Author: {blog.authorDetails.userName}
+                          </i>
                           <br />
                           <i className="text-muted">
-                            Last updated: {blog.lastUpdatedAt?.slice(0, 19)}
+                            Last Updated: {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                            {blog.lastUpdatedAt.slice(0, 10)}
                           </i>
                         </p>
                       </div>

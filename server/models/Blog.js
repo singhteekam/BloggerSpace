@@ -7,6 +7,10 @@ const User= require("./User");
 const IST_OFFSET = 330;
 
 const blogSchema = new mongoose.Schema({
+  blogId: {
+    type: Number,
+    default:()=> (new Date().getTime() + IST_OFFSET * 60000)+Math.floor(Math.random() * (90) + 10).toString(),
+  },
   slug: {
     type: String,
     required: false,
@@ -66,9 +70,9 @@ const blogSchema = new mongoose.Schema({
   //     ref: User,
   //   }
   // ],
-  blogLikes:{
+  blogLikes: {
     type: Array,
-    default:[]
+    default: [],
   },
   comments: [commentSchema],
 });

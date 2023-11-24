@@ -49,7 +49,7 @@ const UserProfile = () => {
       <Card>
         <Card.Body>
           <Card.Title>{fullName}</Card.Title>
-          <Card.Text>Email: {email}</Card.Text>
+          <Card.Text>Email: {email.slice(0,4)+"*****"+email.slice(email.indexOf("@"))}</Card.Text>
         </Card.Body>
       </Card>
 
