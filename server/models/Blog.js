@@ -60,12 +60,16 @@ const blogSchema = new mongoose.Schema({
     type: Date,
     default: "",
   },
-  likes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: User,
-    },
-  ],
+  // likes: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: User,
+  //   }
+  // ],
+  blogLikes:{
+    type: Array,
+    default:[]
+  },
   comments: [commentSchema],
 });
 

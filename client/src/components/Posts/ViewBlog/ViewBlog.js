@@ -96,7 +96,8 @@ const ViewBlog = () => {
       setThumbColor(response.data.newThumbColor);
       setBlog((prevBlog) => ({
         ...prevBlog,
-        likes: response.data.newLikes,
+        // likes: response.data.newLikes,
+        blogLikes: response.data.newLikes,
       }));
       setDisableLikeButton(false);
       // window.location.reload();
@@ -177,7 +178,8 @@ const ViewBlog = () => {
             className={`fa-${thumbColor} fa-thumbs-up fa-xl`}
             onClick={disableLikeButton === false ? handleBlogLikes : null}
           ></i>{" "}
-          {blog?.likes.length}
+          {/* {blog?.likes.length} */}
+          {blog?.blogLikes.length}
         </div>
         <div>
           <Button size="sm" variant="secondary">

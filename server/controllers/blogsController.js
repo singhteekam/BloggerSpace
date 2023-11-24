@@ -47,7 +47,8 @@ exports.viewBlogRoute = async (req, res) => {
       slug: req.params.blogSlug,
       status: "PUBLISHED",
     }).populate("authorDetails")
-      .populate("likes")
+      // .populate("likes")
+      .populate("blogLikes")
       .populate("comments")
       .exec();
 
@@ -83,10 +84,16 @@ exports.viewBlogRoute = async (req, res) => {
 
     blog.content = decompressedContent;
     
+    // console.log(
+    //   blog.likes.findIndex((like) => like._id.toString()===(req.session.userId))
+    // );
+    // const alreadyLiked = blog.likes.findIndex((like) =>
+    //   like._id.toString()===(req.session.userId)
+    // )!==-1?true:false;
     console.log(
-      blog.likes.findIndex((like) => like._id.toString()===(req.session.userId))
+      blog.blogLikes.map(e=>e.userId).findIndex((like) => like._id.toString()===(req.session.userId))
     );
-    const alreadyLiked = blog.likes.findIndex((like) =>
+    const alreadyLiked = blog.blogLikes.map(e=>e.userId).findIndex((like) =>
       like._id.toString()===(req.session.userId)
     )!==-1?true:false;
 
@@ -506,6 +513,48 @@ exports.authorPublishedBlogs = async (req, res) => {
 
 
 exports.blogLikes=async (req,res)=>{
+  let thumbColor = req.body.thumbColor;
+  try {
+    const blog= await Blog.findById({
+      _id: new mongoose.Types.ObjectId(req.params.id)
+    })
+    if (!blog) {
+      return res.status(404).json({ error: "blog not found" });
+    }
+    // if (blog.likes.findIndex((like) => like._id.toString() === req.session.userId) !== -1){
+    //   return res.status(404).json({ error: "blog already liked" });
+    // }
+      var newThumbColor;
+    if(thumbColor==="regular"){
+      // blog.likes.push(req.session.userId);
+      blog.blogLikes.push({
+        userId: new mongoose.Types.ObjectId(req.session.userId),
+        likedTime: new Date(new Date().getTime() + 330 * 60000),
+      });
+      newThumbColor = "solid";
+    }
+    else if(thumbColor==="solid"){
+      // blog.likes.splice(blog.likes.indexOf(req.session.userId),1);
+      blog.blogLikes.splice(blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.session.userId)),1);
+      newThumbColor = "regular";
+    }
+    // blog.likes=[];
+    await blog.save();
+    
+    console.log("blogLiked: "+blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.session.userId)));
+    console.log(req.session.userId);
+    // console.log(blog.likes.indexOf(req.session.userId));
+    // console.log(blog.likes[1].toString());
+
+    const newLikes= blog.blogLikes;
+    res.json({newThumbColor, newLikes});
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred..." });
+  }
+}
+
+//Original
+exports.blogLikes99=async (req,res)=>{
   let thumbColor = req.body.thumbColor;
   try {
     const blog= await Blog.findById({
