@@ -41,16 +41,20 @@ const blogSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  feedbackToAuthor: [
-    {
-      reviewer: {
-        type: String,
-      },
-      feedback: {
-        type: String,
-      },
-    },
-  ],
+  // feedbackToAuthor: [
+  //   {
+  //     reviewer: {
+  //       type: String,
+  //     },
+  //     feedback: {
+  //       type: String,
+  //     },
+  //   },
+  // ],
+  feedbackToAuthor: {
+    type: Array,
+    default: []
+  },
   reviewedBy: {
     type: Array,
     default: [],

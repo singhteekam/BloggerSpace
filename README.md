@@ -1,5 +1,6 @@
 # BloggerSpace
-Blogging website using MERN
+Blogging website using MERN(Under development- adding new features). 
+Please try and give me the feedback. Your valuable feedback will help me to improve this website.
 
 ### Link: [https://bloggerspace.singhteekam.in](https://bloggerspace.singhteekam.in/)
 

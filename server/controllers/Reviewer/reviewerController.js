@@ -176,7 +176,7 @@ exports.editPendingBlog = async (req, res) => {
 exports.saveEditedPendingBlog = async (req, res) => {
   try {
     // const { id } = req.params;
-    const { slug, title, content, category, rating, tags } = req.body;
+    const { slug, title, content, category, rating, reviewRemarks, tags } = req.body;
 
     // Find the blog by ID
     const blog = await Blog.findById({
@@ -203,9 +203,15 @@ exports.saveEditedPendingBlog = async (req, res) => {
     // blog.reviewedBy.push(req.session.currentemail);
     blog.reviewedBy.push({
       // ReviewedBy: req.session.currentemail,
-      ReviewedBy: req.session.currentemail,
+      ReviewedBy: {
+        Id: new mongoose.Types.ObjectId(req.session.currentuserId),
+        Email: req.session.currentemail,
+        Role: req.session.currentrole,
+      },
       Rating: rating,
-      LastUpdatedAt: new Date(new Date().getTime() + 330 * 60000)
+      Remarks: reviewRemarks,
+      statusTransition: "UNDERREVIEW-INREVIEW",
+      LastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
     });
     // blog.lastUpdatedAt = Date.now();
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
@@ -216,8 +222,10 @@ exports.saveEditedPendingBlog = async (req, res) => {
 
     // Add to the reviewer array
     const reviewedBlog = {
-      title,
-      slug,
+      BlogObjectId: blog._id,
+      BlogId: blog.blogId,
+      BlogTitle: title,
+      BlogSlug: slug,
     };
     const user = await Reviewer.findById(req.session.currentuserId);
     user.reviewedBlogs.push(reviewedBlog);
@@ -245,7 +253,7 @@ exports.userDetails = async (req, res) => {
     const userId = req.session.currentuserId; // Assuming you're using sessions
     const token = req.session.currenttoken; // Assuming you're using sessions
     const role = req.session.currentrole;
-    console.log("Tokn: " + req.session.currenttoken);
+    // console.log("Tokn: " + req.session.currenttoken);
 
     if (!userId && !token) {
       return res.status(404).json({ error: "Please login!!....." });
@@ -324,8 +332,10 @@ exports.feedbackToAuthor = async (req, res) => {
     // blog.lastUpdatedAt = Date.now();
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     blog.feedbackToAuthor.push({
-      feedback: feedback,
-      reviewer: currentReviewer,
+      ReviewerId: new mongoose.Types.ObjectId(req.session.currentuserId),
+      ReviewerEmail: currentReviewer,
+      Feedback: feedback,
+      LastUpdated: new Date(new Date().getTime() + 330 * 60000)
     });
     await blog.save();
 
@@ -392,6 +402,8 @@ exports.changeUsername = async (req, res) => {
 exports.discardQueueBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
+    const reviewRemarks= req.body.reviewRemarks;
+    const rating= req.body.rating;
     const blog = await Blog.findById({
       _id: new mongoose.Types.ObjectId(req.params.id),
     });
@@ -403,6 +415,18 @@ exports.discardQueueBlog = async (req, res) => {
     }
     blog.status = "DISCARD_QUEUE";
     // blog.lastUpdatedAt = Date.now();
+    blog.reviewedBy.push({
+      // ReviewedBy: req.session.currentemail,
+      ReviewedBy: {
+        Id: new mongoose.Types.ObjectId(req.session.currentuserId),
+        Email: req.session.currentemail,
+        Role: req.session.currentrole,
+      },
+      Rating: rating,
+      Remarks: reviewRemarks,
+      statusTransition: "UNDERREVIEW-DISCARDQUEUE",
+      LastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
+    });
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
 
     await blog.save();

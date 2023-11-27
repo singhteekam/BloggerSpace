@@ -135,7 +135,8 @@ exports.editInReviewBlog = async (req, res) => {
 exports.saveEditedInReviewBlog = async (req, res) => {
   try {
     // const { id } = req.params;
-    const { slug, title, content, category,tags } = req.body;
+    const { slug, title, content, category, rating, reviewRemarks, tags } =
+      req.body;
 
     // Find the blog by ID
     const blog = await Blog.findById({
@@ -159,7 +160,19 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     blog.category = category;
     blog.currentReviewer = "";
     blog.status = "PUBLISHED";
-    blog.reviewedBy.push(req.session.currentemail);
+    // blog.reviewedBy.push(req.session.currentemail);
+    blog.reviewedBy.push({
+      // ReviewedBy: req.session.currentemail,
+      ReviewedBy: {
+        Id: new mongoose.Types.ObjectId(req.session.currentuserId),
+        Email: req.session.currentemail,
+        Role: req.session.currentrole,
+      },
+      Rating: rating,
+      Remarks: reviewRemarks,
+      statusTransition: "INREVIEW-PUBLISHED",
+      LastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
+    });
     // blog.lastUpdatedAt= Date.now();
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     blog.tags=tags;
@@ -228,7 +241,6 @@ exports.allPendingBlogsfromDB = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch Pending Blogs" });
   }
 }; 
-
 
 
 exports.updateReviewerAssignment = async (req, res) => {

@@ -58,3 +58,13 @@ router.post("/bloglikes/:id",authenticate, blogLikes);
 router.post("/blogcommentlike/:id", authenticate, blogCommentLikes);
 
 module.exports = router;
+
+
+/* TRANSITION STATUSES:
+UNDERREVIEW-INREVIEW
+INREVIEW-PUBLISHED
+INREVIEW-UNDERREVIEW
+UNDERREVIEW-AWAITINGAUTHOR
+UNDERREVIEW-DISCARDQUEUE
+
+*/

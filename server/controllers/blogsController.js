@@ -554,41 +554,41 @@ exports.blogLikes=async (req,res)=>{
 }
 
 //Original
-exports.blogLikes99=async (req,res)=>{
-  let thumbColor = req.body.thumbColor;
-  try {
-    const blog= await Blog.findById({
-      _id: new mongoose.Types.ObjectId(req.params.id)
-    })
-    if (!blog) {
-      return res.status(404).json({ error: "blog not found" });
-    }
-    // if (blog.likes.findIndex((like) => like._id.toString() === req.session.userId) !== -1){
-    //   return res.status(404).json({ error: "blog already liked" });
-    // }
-      var newThumbColor;
-    if(thumbColor==="regular"){
-      blog.likes.push(req.session.userId);
-      newThumbColor = "solid";
-    }
-    else if(thumbColor==="solid"){
-      // console.log(blog.likes.indexOf(req.session.userId));
-      blog.likes.splice(blog.likes.indexOf(req.session.userId),1);
-      newThumbColor = "regular";
-    }
-    // blog.likes=[];
-    await blog.save();
+// exports.blogLikes99=async (req,res)=>{
+//   let thumbColor = req.body.thumbColor;
+//   try {
+//     const blog= await Blog.findById({
+//       _id: new mongoose.Types.ObjectId(req.params.id)
+//     })
+//     if (!blog) {
+//       return res.status(404).json({ error: "blog not found" });
+//     }
+//     // if (blog.likes.findIndex((like) => like._id.toString() === req.session.userId) !== -1){
+//     //   return res.status(404).json({ error: "blog already liked" });
+//     // }
+//       var newThumbColor;
+//     if(thumbColor==="regular"){
+//       blog.likes.push(req.session.userId);
+//       newThumbColor = "solid";
+//     }
+//     else if(thumbColor==="solid"){
+//       // console.log(blog.likes.indexOf(req.session.userId));
+//       blog.likes.splice(blog.likes.indexOf(req.session.userId),1);
+//       newThumbColor = "regular";
+//     }
+//     // blog.likes=[];
+//     await blog.save();
 
-    // console.log(req.session.userId);
-    // console.log(blog.likes.indexOf(req.session.userId));
-    // console.log(blog.likes[1].toString());
+//     // console.log(req.session.userId);
+//     // console.log(blog.likes.indexOf(req.session.userId));
+//     // console.log(blog.likes[1].toString());
 
-    const newLikes= blog.likes;
-    res.json({newThumbColor, newLikes});
-  } catch (error) {
-    res.status(500).json({ error: "An error occurred..." });
-  }
-}
+//     const newLikes= blog.likes;
+//     res.json({newThumbColor, newLikes});
+//   } catch (error) {
+//     res.status(500).json({ error: "An error occurred..." });
+//   }
+// }
 
 exports.blogCommentLikes = async (req, res) => {
   let commentId= req.body.commentId;

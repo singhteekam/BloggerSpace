@@ -32,21 +32,25 @@ const reviewerSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  reviewedBlogs: [
-    {
-      title: {
-        type: String,
-      },
-      slug: {
-        type: String,
-      },
-      time: {
-        type: Date,
-        // default: Date.now
-        default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
-      },
-    },
-  ],
+  // reviewedBlogs: [
+  //   {
+  //     title: {
+  //       type: String,
+  //     },
+  //     slug: {
+  //       type: String,
+  //     },
+  //     time: {
+  //       type: Date,
+  //       // default: Date.now
+  //       default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
+  //     },
+  //   },
+  // ],
+  reviewedBlogs: {
+    type: Array,
+    default: [],
+  },
   resetToken: String, // Field for storing the reset token
   resetTokenExpiration: Date, // Field for storing the token expiration date
   createdAt: {
