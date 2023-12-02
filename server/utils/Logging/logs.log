@@ -1,0 +1,28 @@
+[2023-12-02T12:05:39.161Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:05:39.385Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:05:46.650Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:05:46.887Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:05:48.076Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:05:48.645Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:05:50.166Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:05:50.632Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:06:53.948Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:06:54.153Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:06:55.974Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:06:56.492Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:06:56.492Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:06:57.263Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:06:57.263Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:06:57.748Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:06:58.675Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:06:58.675Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:06:59.166Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:06:59.166Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-02T12:06:59.828Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:07:00.310Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-02T12:08:52.977Z] [LOG] [INFO] - Content fetched
+[2023-12-02T12:08:52.977Z] [LOG] [INFO] - Content fetched
+[2023-12-02T12:08:52.983Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-02T12:08:53.485Z] [LOG] [INFO] - Content fetched
+[2023-12-02T12:08:53.485Z] [LOG] [INFO] - Content fetched
+[2023-12-02T12:08:53.489Z] [LOG] [DEBUG] - Inside viewBlogRoute function.

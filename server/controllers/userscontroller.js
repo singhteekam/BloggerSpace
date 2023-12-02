@@ -361,7 +361,7 @@ exports.loggedInUserInfo = async (req, res) => {
     const userId = req.session.userId; // Assuming you're using sessions
     const token = req.session.token; // Assuming you're using sessions
 
-    console.log("Tokn: " + req.session.token);
+    // console.log("Tokn: " + req.session.token);
     console.log("userId: " + req.session.userId);
 
     if (!userId && !token) {

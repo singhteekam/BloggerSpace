@@ -22,7 +22,7 @@ function HomePage() {
       }
     };
     fetchBlogs();
-  }, [isLoggedIn, navigate, blogs]);
+  }, [isLoggedIn, blogs]);
 
   if (isLoading) {
     return (

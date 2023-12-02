@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
 const pako = require("pako");
 const sendEmail = require("../services/mailer");
+const logger= require("./../utils/Logging/logs.js");
 
 exports.blogsHomepage = async (req, res) => {
   // console.log("Current user: "+ req.session.currentemail);
@@ -36,7 +37,8 @@ exports.blogsHomepage = async (req, res) => {
     // console.log(decompressedblogs);
     res.json(blogs);
   } catch (error) {
-    console.error("Error fetching blog blogs:", error);
+    logger.error("Error fetching blogs:"+ error);
+    console.error("Error fetching blogs:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -53,6 +55,7 @@ exports.viewBlogRoute = async (req, res) => {
       .exec();
 
     if (!blog) {
+      logger.error("blog not found");
       return res.status(404).json({ error: "blog not found" });
     }
     // console.log(blog);
@@ -98,9 +101,11 @@ exports.viewBlogRoute = async (req, res) => {
     )!==-1?true:false;
 
     console.log("Liked? :"+ alreadyLiked);
+    logger.debug("Inside viewBlogRoute function.");
     res.json({blog, alreadyLiked});
   } catch (error) {
-    console.error("Error fetching blog blog:", error);
+    logger.error("Error fetching blog in viewBlogRoute:"+ error);
+    console.error("Error fetching blog:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -140,6 +145,7 @@ exports.saveAsDraftBlog= async (req, res)=>{
         blog.tags= tags;
         await blog.save();
 
+      logger.debug("Blog saved as draft.")
       return res.json(blog);
     }
 
@@ -155,8 +161,10 @@ exports.saveAsDraftBlog= async (req, res)=>{
     });
     const savedBlog = await newPost.save();
 
+    logger.debug("New Blog saved as draft..")
     res.json(savedBlog);
   } catch (error) {
+    logger.debug("Error creating new post:", error);
     console.error("Error creating new post:", error);
     res
       .status(500)
@@ -169,12 +177,15 @@ exports.isUniqueTitle= async (req, res)=>{
     const {title}= req.body;
     const blog= await Blog.findOne({ title: title});
     if(!blog){
+      logger.debug("Topic is available!")
       return res.json("Available");
     }
     else{
+      logger.error("Topic is not avaialable.")
       return res.json("Already exists");
     }
   } catch (error) {
+    logger.error("Error checking isuniquetitle: "+ error);
     console.error("Error checking isuniquetitle: ", error);
     res.status(500).json({ error: "An error occurred while checking isuniquetitle" });
   }
