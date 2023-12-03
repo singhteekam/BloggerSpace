@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  savedBlogs:{
+    type: Array,
+    default:[]
+  },
   resetToken: String, // Field for storing the reset token
   resetTokenExpiration: Date, // Field for storing the token expiration date
   createdAt: {

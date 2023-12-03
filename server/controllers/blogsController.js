@@ -45,6 +45,7 @@ exports.blogsHomepage = async (req, res) => {
 
 exports.viewBlogRoute = async (req, res) => {
   try {
+    logger.debug("Searching for blog: "+ req.params.blogSlug);
     const blog = await Blog.findOne({
       slug: req.params.blogSlug,
       status: "PUBLISHED",
@@ -55,7 +56,7 @@ exports.viewBlogRoute = async (req, res) => {
       .exec();
 
     if (!blog) {
-      logger.error("blog not found");
+      logger.error("blog not found. Slug: "+req.params.blogSlug);
       return res.status(404).json({ error: "blog not found" });
     }
     // console.log(blog);
@@ -71,6 +72,7 @@ exports.viewBlogRoute = async (req, res) => {
       Buffer.byteLength(blog.content, "utf8") / 1024,
       " KB"
     );
+    logger.info("Blog: "+ blog.title+" fetched. Content size is: "+Buffer.byteLength(blog.content, "utf8") / 1024+" KB")
 
     // Assuming `content` is the original content string
     // console.log(
@@ -145,7 +147,7 @@ exports.saveAsDraftBlog= async (req, res)=>{
         blog.tags= tags;
         await blog.save();
 
-      logger.debug("Blog saved as draft.")
+      logger.debug("Blog saved as draft. Title: "+title);
       return res.json(blog);
     }
 
@@ -161,7 +163,7 @@ exports.saveAsDraftBlog= async (req, res)=>{
     });
     const savedBlog = await newPost.save();
 
-    logger.debug("New Blog saved as draft..")
+    logger.debug("New Blog saved as draft. Title: "+ title)
     res.json(savedBlog);
   } catch (error) {
     logger.debug("Error creating new post:", error);
@@ -177,11 +179,11 @@ exports.isUniqueTitle= async (req, res)=>{
     const {title}= req.body;
     const blog= await Blog.findOne({ title: title});
     if(!blog){
-      logger.debug("Topic is available!")
+      logger.debug("Topic is available: "+ title)
       return res.json("Available");
     }
     else{
-      logger.error("Topic is not avaialable.")
+      logger.error("Topic is not avaialable: "+ title);
       return res.json("Already exists");
     }
   } catch (error) {
@@ -225,6 +227,7 @@ exports.createNewBlog = async (req, res) => {
       tags,
     });
     const savedBlog = await newPost.save();
+    logger.debug("New blog created in Pending status. Title: "+ title);
 
     // Sending mail to author
     const receiver = req.session.email;
@@ -234,10 +237,12 @@ exports.createNewBlog = async (req, res) => {
     sendEmail(receiver, subject, html)
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);
+        logger.debug("Email sent to writer:"+ response);
         // Handle success
       })
       .catch((error) => {
         console.error("Error sending email:", error);
+        logger.error("Error sending email:"+ error);
         // Handle error
       });
 
@@ -264,6 +269,7 @@ exports.createNewBlog = async (req, res) => {
     res.json(savedBlog);
   } catch (error) {
     console.error("Error creating new post:", error);
+    logger.error("Error creating new post:"+ error);
     res
       .status(500)
       .json({ error: "An error occurred while creating the post" });
@@ -279,6 +285,7 @@ exports.editBlog = async (req, res) => {
     }).populate("authorDetails").exec();
 
     if (!blog) {
+      logger.error("The requested blog can't open in editable mode because it doesn't exist. ")
       return res.status(404).json({ error: "blog not found" });
     }
 
@@ -288,10 +295,12 @@ exports.editBlog = async (req, res) => {
       to: "string",
     });
     blog.content = decompressedContent;
+    logger.debug("Blog opened in Edit mode. Blog title: "+ blog.title);
 
     res.json(blog);
   } catch (error) {
     console.error("Error fetching blog blog:", error);
+    logger.error("Error fetching blog blog:"+ error);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -307,6 +316,7 @@ exports.saveEditedBlog = async (req, res) => {
     });
 
     if (!blog) {
+      logger.error("The blog: "+title+ " is not saved because it doesn't exist.")
       return res.status(404).json({ error: "blog not found" });
     }
 
@@ -328,10 +338,12 @@ exports.saveEditedBlog = async (req, res) => {
 
     // Save the updated blog
     await blog.save();
+    logger.debug("Blog updated successfully. Title: "+ blog.title);
 
     res.json({ message: "blog updated successfully" });
   } catch (error) {
     console.error("Error updating blog:", error);
+    logger.error("Error updating blog:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -344,6 +356,7 @@ exports.postNewBlogComment = async (req, res) => {
     const blog = await Blog.findOne({ slug: blogSlug });
 
     if (!blog) {
+      logger.error("Blog not found  with blog: "+ blogSlug);
       return res.status(404).json({ message: "blog not found" });
     }
 
@@ -376,9 +389,11 @@ exports.postNewBlogComment = async (req, res) => {
       userProfilePic: addedComment.user.profilePicture
     };
 
+    logger.debug("New comment added in blog: "+ blogSlug);
     res.json(responseComment);
   } catch (error) {
     console.error("Error adding comment:", error);
+    logger.error("Error adding comment: "+ error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -390,6 +405,7 @@ exports.viewBlogComments = async (req, res) => {
       .exec();
 
     if (!blog) {
+      logger.error("Blog not found to view comment. Blog: "+ req.params.blogSlug);
       return res.status(404).json({ message: "blog not found" });
     }
 
@@ -404,6 +420,7 @@ exports.viewBlogComments = async (req, res) => {
     res.json(comments);
   } catch (error) {
     console.error("Error fetching comments:", error);
+    logger.error("Error fetching comments: "+ error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -429,6 +446,7 @@ exports.searchBlogsFromDB = async (req, res) => {
     res.json(blogs);
   } catch (error) {
     console.error("Error searching blogs:", error);
+    logger.error("Error searching blogs: "+ error);
     res.status(500).json({ error: "An error occurred while searching blogs." });
   }
 };
@@ -446,6 +464,7 @@ exports.authorSavedDraftBlogs = async (req, res) => {
     res.json(blogs);
   } catch (error) {
     console.error("Error searching published blogs:", error);
+    logger.error("Error searching published blogs: "+ error);
     res
       .status(500)
       .json({ error: "An error occurred while searching published blogs." });
@@ -462,7 +481,8 @@ exports.authorPendingReviewBlogs = async (req, res) => {
 
     res.json(blogs);
   } catch (error) {
-    console.error("Error searching published blogs:", error);
+    console.error("Error searching pending review blogs:", error);
+    logger.error("Error searching pending review blogs: "+ error);
     res
       .status(500)
       .json({ error: "An error occurred while searching published blogs." });
@@ -479,7 +499,8 @@ exports.authorUnderReviewBlogs = async (req, res) => {
 
     res.json(blogs);
   } catch (error) {
-    console.error("Error searching published blogs:", error);
+    console.error("Error searching under review blogs:", error);
+    logger.error("Error searching under review blogs: "+ error);
     res
       .status(500)
       .json({ error: "An error occurred while searching published blogs." });
@@ -498,7 +519,8 @@ exports.awaitingAuthorBlogs = async (req, res) => {
 
     res.json(blogs);
   } catch (error) {
-    console.error("Error searching blogs:", error);
+    console.error("Error searching awaiting author blogs:", error);
+    logger.error("Error searching awaiting author blogs: "+ error);
     res.status(500).json({ error: "An error occurred while searching blogs." });
   }
 };
@@ -516,6 +538,7 @@ exports.authorPublishedBlogs = async (req, res) => {
     res.json(blogs);
   } catch (error) {
     console.error("Error searching published blogs:", error);
+    logger.error("Error searching published blogs:"+ error);
     res
       .status(500)
       .json({ error: "An error occurred while searching published blogs." });
@@ -560,6 +583,7 @@ exports.blogLikes=async (req,res)=>{
     const newLikes= blog.blogLikes;
     res.json({newThumbColor, newLikes});
   } catch (error) {
+    logger.error("Error occured when fetching blog likes.")
     res.status(500).json({ error: "An error occurred..." });
   }
 }
@@ -647,6 +671,7 @@ exports.blogCommentLikes = async (req, res) => {
     // const newCommentLikes = blog.comments.likes;
     res.json({ newCommentThumbColor, updatedComments });
   } catch (error) {
+    logger.error("Error occured when fetching comment likes of the blog.")
     res.status(500).json({ error: "An error occurred..." });
   }
 };

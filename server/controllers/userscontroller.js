@@ -8,6 +8,7 @@ const Blogs = require("../models/Blog");
 const sendEmail = require("../services/mailer");
 const validateUsername = require("../utils/validateUsername");
 const Visit= require("../models/Visitor");
+const logger= require("./../utils/Logging/logs");
 
 // verifyAccount controller
 exports.verifyAccount = async (req, res) => {
@@ -18,10 +19,12 @@ exports.verifyAccount = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
+      logger.error("User not found with given email");
       return res.status(404).json({ message: "User not found" });
     }
 
     if (user.isVerified) {
+      logger.info("Given user is already verified");
       return res.status(400).json({ message: "User is already verified" });
     }
 
@@ -45,11 +48,13 @@ exports.verifyAccount = async (req, res) => {
     sendEmail(receiver, subject, html)
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);
+        logger.debug("Verification emails sent successfully.");
         // Handle success
         return res.status(200).json({ message: "Verification email sent" });
       })
       .catch((error) => {
         console.error("Error sending email:", error);
+        logger.error("Error sending verification emails to receivers. Error: "+error);
         // Handle error
         return res
           .status(500)
@@ -57,6 +62,7 @@ exports.verifyAccount = async (req, res) => {
       });
   } catch (error) {
     console.error("Error sending verification email:", error);
+    logger.error("Error sending verification email:"+ error);
     res.status(500).json({ message: "Failed to send verification email" });
   }
 };
@@ -70,6 +76,7 @@ exports.verifyAccountget = async (req, res) => {
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
+      logger.error("Invalid verification token");
       // No user found with the provided token
       return res.status(400).send("Invalid verification token");
     }
@@ -79,9 +86,11 @@ exports.verifyAccountget = async (req, res) => {
     user.verificationToken = null;
     await user.save();
     // Redirect the user to the success page or any other page of your choice
+    logger.debug("Account verified successfully. redirecting to the verification success page.")
     res.redirect("/api/users/verification-success");
   } catch (error) {
     console.error("Failed to verify account:", error);
+    logger.error("Failed to verify account: "+ error.message);
     res.status(500).send("Failed to verify account");
   }
 };
@@ -94,6 +103,7 @@ exports.signup = async (req, res) => {
     const existingUser = await User.findOne({ email });
     console.log(existingUser);
     if (existingUser) {
+      logger.error("User already exists with given email.");
       return res.status(400).json({ message: "User already exists" });
     }
 
@@ -112,8 +122,10 @@ exports.signup = async (req, res) => {
 
     await newUser.save();
 
+    logger.debug("New user added. Signup successful.")
     res.status(201).json({ message: "Signup successful" });
   } catch (error) {
+    logger.error("Signup failed. Error: "+ error.message);
     res.status(500).json({ message: "Signup failed", error: error.message });
   }
 };
@@ -127,12 +139,14 @@ exports.login = async (req, res) => {
     // Check if the user exists
     const user = await User.findOne({ email });
     if (!user) {
+      logger.error("User not found with given email.");
       return res.status(404).json({ message: "User not found" });
     }
 
     // Compare the password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      logger.error("The password is invalid.")
       return res.status(401).json({ message: "Invalid password" });
     }
 
@@ -154,8 +168,10 @@ exports.login = async (req, res) => {
     req.session.email = user.email;
     console.log("userId: " + req.session.userId);
 
+    logger.debug("New user logged in: "+ user.fullName);
     res.status(200).json({ message: "Login successful", token, userDetails });
   } catch (error) {
+    logger.error("Login failed: "+ error.message)
     res.status(500).json({ message: "Login failed", error: error.message });
   }
 };
@@ -165,6 +181,7 @@ exports.logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error("Error destroying session:", err);
+      logger.error("Error destroying session: "+ err);
       return res.status(500).json({ message: "Logout failed" });
     }
     res.clearCookie("sid"); // Clear the session cookie
@@ -185,6 +202,7 @@ exports.deleteAccount = async (req, res) => {
   } catch (error) {
     // Handle any errors
     console.error("Account deletion failed:", error);
+    logger.error("Account deletion failed: "+ error.message);
     res.status(500).json({ error: "Failed to delete the account" });
   }
 };
@@ -198,6 +216,7 @@ exports.forgetPassword = async (req, res) => {
 
     if (!user) {
       // User not found, return an error message
+      logger.error("In forget password route. User is not found with given details. Returning with 404 status")
       return res.status(404).json({ error: "User not found" });
     }
 
@@ -207,7 +226,7 @@ exports.forgetPassword = async (req, res) => {
     // Save the reset token and its expiration date in the user's document
     user.resetToken = resetToken;
     // user.resetTokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
-    user.resetTokenExpiration = new Date(new Date().getTime() + 330 * 60000) + 3600000; // Token valid for 1 hour
+    user.resetTokenExpiration = new Date(new Date().getTime() + 330 * 60000 + 300000) ; // Token valid for 5 minutes
     await user.save();
 
     // Create the password reset email
@@ -220,18 +239,22 @@ exports.forgetPassword = async (req, res) => {
     sendEmail(receiver, subject, html)
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);
+        logger.debug("Sending Password Reset url Email sent to receiver.")
         // Handle success
       })
       .catch((error) => {
         console.error("Error sending email:", error);
+        logger.error("Error sending email: "+ error.message);
         // Handle error
       });
 
+      logger.debug("Password reset email sent successfully.")
     // Email sent successfully
     return res.status(200).json({ message: "Password reset email sent" });
   } catch (error) {
     // An error occurred, return an error message
     console.error(error);
+    logger.error("Error sending foreget password reset email. Error: "+ error.message);
     return res
       .status(500)
       .json({ error: "Failed to send password reset email" });
@@ -256,6 +279,7 @@ function generateResetToken() {
 // Resetting password
 exports.resetPassword = (req, res) => {
   const { resetToken, password } = req.body;
+  logger.info("Inside resetPassword function.");
 
   // Find the user by reset token and check if it exists
   User.findOne({
@@ -265,6 +289,7 @@ exports.resetPassword = (req, res) => {
   })
     .then((user) => {
       if (!user) {
+        logger.error("Invalid or expired reset token. Error: ");
         return res
           .status(400)
           .json({ error: "Invalid or expired reset token" });
@@ -273,6 +298,7 @@ exports.resetPassword = (req, res) => {
       // Hash the new password
       bcrypt.hash(password, 10, (err, hashedPassword) => {
         if (err) {
+          logger.error(req.session.userId+": Failed to reset password. Error: "+ err);
           return res.status(500).json({ error: "Failed to reset password" });
         }
 
@@ -285,14 +311,17 @@ exports.resetPassword = (req, res) => {
         user
           .save()
           .then(() => {
+            logger.debug(user.fullName+": Password reset successfully");
             res.status(200).json({ message: "Password reset successfully" });
           })
           .catch((err) => {
+            logger.debug(user.fullName+ ": Failed to reset password. Error: "+ err);
             res.status(500).json({ error: "Failed to reset password" });
           });
       });
     })
     .catch((err) => {
+      logger.error("Failed to reset password");
       res.status(500).json({ error: "Failed to reset password" });
     });
 };
@@ -307,11 +336,18 @@ exports.changePassword = async (req, res) => {
     const user = await User.findById({
       _id: new mongoose.Types.ObjectId(userId),
     });
+
+    if (!user) {
+      // User not found, return an error message
+      logger.error("Inside change password route. User not found");
+      return res.status(404).json({ error: "User not found" });
+    }
     console.log("user: " + user);
 
     // Verify the old password
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid) {
+      logger.error(user.fullName+": Invalid old password");
       return res.status(401).json({ error: "Invalid old password" });
     }
 
@@ -323,9 +359,11 @@ exports.changePassword = async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
+    logger.debug(user.fullName+": Password changed successfully");
     res.json({ message: "Password changed successfully" });
   } catch (error) {
-    console.error("Error changing password:", error);
+    // console.error("Error changing password:", error);
+    logger.error("Error changing password:"+error);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -347,9 +385,11 @@ exports.uploadProfilePicture = async (req, res) => {
     user.profilePicture = profilePictureData;
     await user.save();
 
+    logger.debug(user.fullName+": Profile picture uploaded successfully.");
     res.status(200).json({ message: "Profile picture uploaded successfully" });
   } catch (error) {
-    console.error("Error uploading profile picture:", error);
+    // console.error("Error uploading profile picture:", error);
+    logger.error("Error uploading profile picture: "+ error);
     res.status(500).json({ error: "Failed to upload profile picture" });
   }
 };
@@ -362,9 +402,11 @@ exports.loggedInUserInfo = async (req, res) => {
     const token = req.session.token; // Assuming you're using sessions
 
     // console.log("Tokn: " + req.session.token);
-    console.log("userId: " + req.session.userId);
+    // console.log("userId: " + req.session.userId);
+    // logger.info("logged in User info: " + req.session.userId);
 
     if (!userId && !token) {
+      logger.error("You are not logged in. Please login!!");
       return res.status(404).json({ error: "Please login!!" });
     }
 
@@ -382,10 +424,12 @@ exports.loggedInUserInfo = async (req, res) => {
       isVerified: user.isVerified,
       profilePicture: user.profilePicture,
     };
-    console.log("LoggedIn user details fetched");
+    // console.log("LoggedIn user details fetched");
+    logger.debug("LoggedIn user details fetched. Name: "+user.fullName);
     res.json(userDetails);
   } catch (error) {
-    console.error("Error fetching user information:", error);
+    // console.error("Error fetching user information:", error);
+    logger.error("Error fetching user information: "+ error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -396,6 +440,7 @@ exports.userProfile = async (req, res) => {
     const user = await User.findOne({ userName });
 
     if (!user) {
+      logger.error("The requested User not found of username: "+ userName);
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -422,9 +467,11 @@ exports.userProfile = async (req, res) => {
       blogs: userBlogs,
     };
 
+    logger.info("Returning from user profile route with data.");
     res.json(userProfile);
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    // console.error("Error fetching user profile:", error);
+    logger.error("Error fetching user profile: "+ error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -434,6 +481,7 @@ exports.updateUserPersonalDetails = async (req, res) => {
     const { fullName, userName } = req.body;
     const validationError = validateUsername(userName);
     if (validationError) {
+      logger.error("Error when validating user. returning with status code 400.")
       return res.status(400).json({ error: validationError });
     }
 
@@ -444,9 +492,11 @@ exports.updateUserPersonalDetails = async (req, res) => {
     updatedUser.userName = userName;
     await updatedUser.save();
 
+    logger.debug("Information updated succesfully for user: "+ userName);
     res.json({ message: "Username updated successfully", user: updatedUser });
   } catch (error) {
-    console.error("Error updating username:", error);
+    // console.error("Error updating username:", error);
+    logger.error("Error updating username:"+ error);
     res
       .status(500)
       .json({ error: "An error occurred while updating the username" });
@@ -458,6 +508,7 @@ exports.getVisitorCount = async (req, res) => {
     const visit = await Visit.findOne();
     res.status(200).json({ count: visit ? visit.count : 0 });
   } catch (error) {
+    logger.error("Error getting visit count.");
     res.status(500).json({ error: "Error getting visit count." });
   }
 };
@@ -472,6 +523,7 @@ exports.incrementVisitCount = async (req, res) => {
       await Visit.create({});
     }
   } catch (error) {
+    logger.error("Error incrementing visit count: "+ error);
     console.error("Error incrementing visit count:", error);
   }
 };

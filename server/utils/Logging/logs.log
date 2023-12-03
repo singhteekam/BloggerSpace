@@ -26,3 +26,226 @@
 [2023-12-02T12:08:53.485Z] [LOG] [INFO] - Content fetched
 [2023-12-02T12:08:53.485Z] [LOG] [INFO] - Content fetched
 [2023-12-02T12:08:53.489Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T15:20:59.315Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:20:59.387Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:01.828Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:02.294Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-03T15:21:02.294Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-03T15:21:02.294Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-03T15:21:03.832Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:04.290Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:04.660Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:05.264Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:05.649Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:06.155Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:06.759Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:07.390Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:07.551Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:07.782Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:08.390Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:08.595Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:08.676Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:08.886Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:09.407Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:09.660Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:10.028Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:21:22.946Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T15:21:22.946Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T15:21:22.995Z] [LOG] [DEBUG] - New blog created in Pending status. Title: newbloglog1
+[2023-12-03T15:21:26.101Z] [LOG] [DEBUG] - Email sent to writer:
+[2023-12-03T15:24:31.288Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:31.465Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:32.532Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:32.786Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-03T15:24:32.786Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-03T15:24:32.786Z] [LOG] [ERROR] - Topic is not avaialable.
+[2023-12-03T15:24:33.898Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:34.433Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:34.585Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:34.741Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:34.989Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:36.260Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:36.375Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:36.517Z] [LOG] [DEBUG] - Topic is available!
+[2023-12-03T15:24:48.288Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T15:24:48.288Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T15:24:48.357Z] [LOG] [DEBUG] - New blog created in Pending status. Title: qwblog2log
+[2023-12-03T15:24:52.278Z] [LOG] [DEBUG] - Email sent to writer:250 2.0.0 OK  1701597290 jg9-20020a17090326c900b001cfc6838e30sm2109383plb.308 - gsmtp
+[2023-12-03T15:36:02.515Z] [LOG] [DEBUG] - Searching for blog: cx-xvb
+[2023-12-03T15:36:02.653Z] [LOG] [DEBUG] - Blog: cx xvb fetched. Content size is: 0.02734375 KB
+[2023-12-03T15:36:02.660Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T15:36:03.023Z] [LOG] [DEBUG] - Searching for blog: cx-xvb
+[2023-12-03T15:36:03.098Z] [LOG] [DEBUG] - Blog: cx xvb fetched. Content size is: 0.02734375 KB
+[2023-12-03T15:36:03.100Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T15:48:35.975Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T15:48:35.975Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T16:11:50.205Z] [LOG] [DEBUG] - Searching for blog: cx-xvb
+[2023-12-03T16:11:50.326Z] [LOG] [DEBUG] - Blog: cx xvb fetched. Content size is: 0.02734375 KB
+[2023-12-03T16:11:50.331Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T16:11:50.702Z] [LOG] [DEBUG] - Searching for blog: cx-xvb
+[2023-12-03T16:11:50.777Z] [LOG] [DEBUG] - Blog: cx xvb fetched. Content size is: 0.02734375 KB
+[2023-12-03T16:11:50.778Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T16:12:08.763Z] [LOG] [DEBUG] - Searching for blog: qw
+[2023-12-03T16:12:08.916Z] [LOG] [DEBUG] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T16:12:08.925Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T16:12:09.295Z] [LOG] [DEBUG] - Searching for blog: qw
+[2023-12-03T16:12:09.360Z] [LOG] [DEBUG] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T16:12:09.361Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T17:00:02.130Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.130Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.162Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.162Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.381Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.381Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.392Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.392Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.470Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.470Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.604Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.604Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.913Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.913Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.939Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:02.939Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:03.073Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:03.073Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:03.078Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T17:00:03.078Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T18:09:01.865Z] [LOG] [INFO] - Inside resetPassword function.
+[2023-12-03T18:09:01.865Z] [LOG] [INFO] - Inside resetPassword function.
+[2023-12-03T18:09:02.430Z] [LOG] [DEBUG] - undefined: Password reset successfully
+[2023-12-03T18:12:43.073Z] [LOG] [INFO] - Inside resetPassword function.
+[2023-12-03T18:12:43.073Z] [LOG] [INFO] - Inside resetPassword function.
+[2023-12-03T18:12:43.281Z] [LOG] [DEBUG] - Teekam Singh: Password reset successfully
+[2023-12-03T19:12:06.353Z] [LOG] [ERROR] - The password is invalid.
+[2023-12-03T19:12:06.353Z] [LOG] [ERROR] - The password is invalid.
+[2023-12-03T19:12:06.353Z] [LOG] [ERROR] - The password is invalid.
+[2023-12-03T19:12:08.315Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2023-12-03T19:12:11.145Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:11.145Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:11.184Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:17.237Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:17.237Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:17.282Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:17.352Z] [LOG] [DEBUG] - Topic is available: 
+[2023-12-03T19:12:17.628Z] [LOG] [DEBUG] - Topic is available: 
+[2023-12-03T19:12:17.705Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:17.705Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:17.738Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:17.823Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:17.823Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:17.856Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:18.281Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:18.281Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:18.320Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:18.526Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:18.526Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:18.562Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:26.103Z] [LOG] [DEBUG] - Topic is available: e
+[2023-12-03T19:12:26.510Z] [LOG] [DEBUG] - Topic is available: ef
+[2023-12-03T19:12:26.774Z] [LOG] [DEBUG] - Topic is available: ef2
+[2023-12-03T19:12:50.022Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:50.022Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:50.125Z] [LOG] [DEBUG] - New blog created in Pending status. Title: ef2
+[2023-12-03T19:12:54.733Z] [LOG] [DEBUG] - Email sent to writer:250 2.0.0 OK  1701610973 q12-20020a056a00150c00b006cde542bbbbsm1604007pfu.32 - gsmtp
+[2023-12-03T19:12:56.260Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:56.260Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:56.305Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:56.316Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.316Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.338Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.338Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.589Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.589Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.604Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.604Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.652Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.652Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:56.877Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:56.877Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:56.915Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:57.095Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.095Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.126Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.126Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.319Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.319Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.413Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.413Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.779Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:57.779Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:57.800Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.800Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:12:57.836Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:12:58.342Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:58.342Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:12:58.381Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:32.044Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:32.044Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:32.125Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:32.576Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:32.576Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:32.628Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:35.443Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:35.443Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:35.489Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:35.503Z] [LOG] [DEBUG] - Searching for blog: qw
+[2023-12-03T19:34:35.603Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:34:35.603Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:34:35.605Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T19:34:35.936Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:35.936Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:35.983Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:36.123Z] [LOG] [DEBUG] - Searching for blog: qw
+[2023-12-03T19:34:36.206Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:34:36.206Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:34:36.208Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T19:34:36.399Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:36.399Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:36.448Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:36.858Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:36.858Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:36.904Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:38.319Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:34:38.319Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:34:39.857Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:34:39.857Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:34:45.210Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:34:45.210Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:34:45.365Z] [LOG] [DEBUG] - New comment added in blog: qw
+[2023-12-03T19:34:46.653Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:46.653Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:46.807Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:46.815Z] [LOG] [DEBUG] - Searching for blog: qw
+[2023-12-03T19:34:47.057Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:34:47.057Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:34:47.058Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T19:34:47.357Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:47.357Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:47.406Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:47.419Z] [LOG] [DEBUG] - Searching for blog: qw
+[2023-12-03T19:34:47.511Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:34:47.511Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:34:47.512Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T19:34:47.828Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:47.828Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:47.866Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:34:48.279Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:48.279Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:34:48.337Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:35:28.944Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:35:28.944Z] [LOG] [INFO] - Authentication successful!!
+[2023-12-03T19:36:46.428Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2023-12-03T19:36:49.273Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:36:49.273Z] [LOG] [INFO] - logged in User info: 647e219a875e5d529248af00
+[2023-12-03T19:36:49.319Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:38:00.734Z] [LOG] [DEBUG] - Searching for blog: qw
+[2023-12-03T19:38:00.794Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:38:00.871Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:38:00.871Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:38:00.880Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2023-12-03T19:38:01.253Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2023-12-03T19:38:01.331Z] [LOG] [DEBUG] - Searching for blog: qw
+[2023-12-03T19:38:01.408Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:38:01.408Z] [LOG] [INFO] - Blog: qw fetched. Content size is: 0.02734375 KB
+[2023-12-03T19:38:01.410Z] [LOG] [DEBUG] - Inside viewBlogRoute function.

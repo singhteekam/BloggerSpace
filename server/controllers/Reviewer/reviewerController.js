@@ -226,10 +226,11 @@ exports.saveEditedPendingBlog = async (req, res) => {
       BlogId: blog.blogId,
       BlogTitle: title,
       BlogSlug: slug,
+      BlogReviewedTime: new Date(new Date().getTime() + 330 * 60000)
     };
     const user = await Reviewer.findById(req.session.currentuserId);
     user.reviewedBlogs.push(reviewedBlog);
-    user.reviewedBlogs = removeDuplicates(user.reviewedBlogs, "slug");
+    // user.reviewedBlogs = removeDuplicates(user.reviewedBlogs, "slug");
     await user.save();
 
     // Sending mail
@@ -237,7 +238,7 @@ exports.saveEditedPendingBlog = async (req, res) => {
     const subject = "Blog status updated- IN_REVIEW";
     const html = `Hi,
               <p>Blog status updated: IN_REVIEW</p>
-              <p>Blog: ${blog.slug}</p>
+              <p>Blog Title: ${blog.title}</p>
                 `;
     res.json({ message: "blog updated successfully" });
     await sendEmail(receiver, subject, html);
@@ -327,7 +328,7 @@ exports.feedbackToAuthor = async (req, res) => {
     // Find the blog by ID
     const blog = await Blog.findById({
       _id: new mongoose.Types.ObjectId(blogId),
-    });
+    }).populate("authorDetails");
     blog.status = "AWAITING_AUTHOR";
     // blog.lastUpdatedAt = Date.now();
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
@@ -338,6 +339,8 @@ exports.feedbackToAuthor = async (req, res) => {
       LastUpdated: new Date(new Date().getTime() + 330 * 60000)
     });
     await blog.save();
+    // console.log("Blog feedback given");
+    // console.log("Author email: "+blog.authorDetails?.email)
 
     // Sending mail
     const receiver1 = blog.authorDetails.email;
