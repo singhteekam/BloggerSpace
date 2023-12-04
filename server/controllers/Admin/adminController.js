@@ -326,3 +326,43 @@ exports.fetchAwaitingAuthorFromDB = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch AWAITING_AUTHOR Blogs" });
   }
 }; 
+
+exports.fetchAllVerifiedReviewers= async(req, res)=>{
+  try {
+    const allVerifiedReviewers = await Reviewer.find({ isVerified : true});
+    res.json(allVerifiedReviewers);
+  } catch (error) {
+    console.log("Error fetching verified reviewers")
+    res.status(500).json({ error: "Failed to fetch All verified reviewers" });
+  }
+}
+
+exports.fetchAllPendingRequestReviewers= async(req, res)=>{
+  try {
+    const allPendingRequestReviewers = await Reviewer.find({ isVerified : false});
+    res.json(allPendingRequestReviewers);
+  } catch (error) {
+    console.log("Error fetching pending request reviewers")
+    res.status(500).json({ error: "Failed to fetch pending request reviewers" });
+  }
+}
+
+exports.approveReviewerRequest= async(req, res)=>{
+  const {id}= req.params;
+  try {
+    const reviewer= await Reviewer.findById(id);
+    reviewer.isVerified=true;
+    await reviewer.save();
+
+    const receiver = reviewer.email;
+    const subject = "Congratulations! Your request is approved";
+    const html = `Hi ${reviewer.fullName},
+              <p>Your reviewer request is approved. You can now review the assiged blogs. </p>
+                `;
+
+    res.json({ message: "Reviewer verified successfully" });
+    await sendEmail(receiver, subject, html);
+  } catch (error) {
+    console.log("Error when approving request of the reviewer");
+  }
+}

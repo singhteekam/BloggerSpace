@@ -13,7 +13,10 @@ const {
   updateReviewerAssignment,
   allUnderReviewBlogsfromDB,
   fetchDiscardQueueBlogsFromDB,
-  fetchAwaitingAuthorFromDB
+  fetchAwaitingAuthorFromDB,
+  fetchAllVerifiedReviewers,
+  fetchAllPendingRequestReviewers,
+  approveReviewerRequest
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -43,5 +46,11 @@ router.get("/discardqueueblogs", adminMiddleware, fetchDiscardQueueBlogsFromDB);
 router.post("/discard/blog/:id", adminMiddleware, discardBlogFromDB);
 
 router.get("/awaitingauthorblogs", fetchAwaitingAuthorFromDB);
+
+router.get("/dashboard/verifiedreviewers", adminMiddleware, fetchAllVerifiedReviewers);
+
+router.get("/dashboard/pendingrequests", adminMiddleware, fetchAllPendingRequestReviewers);
+
+router.patch("/dashboard/approvereviewer/:id", adminMiddleware, approveReviewerRequest);
 
 module.exports = router;
