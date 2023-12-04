@@ -59,6 +59,10 @@ const blogSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  reportBlog: {
+    type: Array,
+    default: [],
+  },
   createdAt: {
     type: Date,
     // default: Date.now,
