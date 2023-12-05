@@ -16,7 +16,10 @@ const {
   fetchAwaitingAuthorFromDB,
   fetchAllVerifiedReviewers,
   fetchAllPendingRequestReviewers,
-  approveReviewerRequest
+  approveReviewerRequest,
+  removeFromReviewerRole,
+  fetchAllUsers,
+  deleteUserAccount
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -52,5 +55,11 @@ router.get("/dashboard/verifiedreviewers", adminMiddleware, fetchAllVerifiedRevi
 router.get("/dashboard/pendingrequests", adminMiddleware, fetchAllPendingRequestReviewers);
 
 router.patch("/dashboard/approvereviewer/:id", adminMiddleware, approveReviewerRequest);
+
+router.patch("/dashboard/removefromreviewer/:id", adminMiddleware, removeFromReviewerRole);
+
+router.get("/dashboard/allusers", adminMiddleware, fetchAllUsers);
+
+router.delete("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
 
 module.exports = router;

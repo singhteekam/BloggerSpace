@@ -41,8 +41,15 @@ exports.reviewerSignup = async (req, res) => {
               <p>New user is signed up as reviewer. Please verify and approve the request.</p>
                 `;
 
+    const receiver2 = email;
+    const subject2 = "Signup successful!!";
+    const html2 = `Hi ${fullName},
+              <p>Thank you so much for signup on reviewer panel. Your request will be approved by the admin soon.</p>
+                `;
+
     res.status(201).json({ message: "Signup successful" });
     await sendEmail(receiver, subject, html);
+    await sendEmail(receiver2, subject2, html2);
   } catch (error) {
     res.status(500).json({ message: "Signup failed", error: error.message });
   }

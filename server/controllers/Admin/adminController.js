@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const Admin= require("../../models/Admin");
 const Reviewer= require("../../models/Reviewer");
+const User= require("../../models/User");
 const jwt = require("jsonwebtoken");
 const Blog = require("../../models/Blog");
 const mongoose = require("mongoose");
@@ -211,7 +212,7 @@ exports.allReviewersFromDB = async (req, res) => {
   try {
     if (req.session.currentemail) {
       // Query the Blog model for pending blogs assigned to the reviewer
-      const allReviewers = await Reviewer.find();
+      const allReviewers = await Reviewer.find({isVerified:true});
 
       res.json(allReviewers);
     } else {
@@ -366,3 +367,51 @@ exports.approveReviewerRequest= async(req, res)=>{
     console.log("Error when approving request of the reviewer");
   }
 }
+
+exports.removeFromReviewerRole= async(req, res)=>{
+  const {id}= req.params;
+  try {
+    const reviewer= await Reviewer.findById(id);
+    reviewer.isVerified=false;
+    await reviewer.save();
+
+    const receiver = reviewer.email;
+    const subject = "Sorry to say Goodbye!";
+    const html = `Hi ${reviewer.fullName},
+              <p>You are no longer reviewer now. If you wish to re-apply for reviewer then send reminder again to verify your account. </p>
+                `;
+
+    res.json({ message: "Reviewer removed successfully" });
+    await sendEmail(receiver, subject, html);
+  } catch (error) {
+    console.log("Error when removing the reviewer");
+  }
+}
+
+exports.fetchAllUsers= async(req, res)=>{
+  try {
+    const allUsers = await User.find({});
+    res.json(allUsers);
+  } catch (error) {
+    console.log("Error fetching all users")
+    res.status(500).json({ error: "Failed to fetch all users" });
+  }
+}
+
+exports.deleteUserAccount = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await User.findByIdAndDelete(id);
+
+    const receiver = req.body.email;
+    const subject = "Sorry to say Goodbye!";
+    const html = `Hi,
+              <p>Your account is deleted by admin. If you have any query then please mail to the below email id.\nEmail:${process.env.EMAIL}</p>
+                `;
+
+    res.json({ message: "User Account deleted by admin successfully" });
+    await sendEmail(receiver, subject, html);
+  } catch (error) {
+    console.log("Error when deleting user account by admin");
+  }
+};
