@@ -4,6 +4,10 @@
     "label": "App Development"
   },
   {
+    "value": "Array",
+    "label": "Array"
+  },
+  {
     "value": "Artificial Intelligence",
     "label": "Artificial Intelligence"
   },
@@ -56,8 +60,16 @@
     "label": "Data Science"
   },
   {
+    "value": "Data Structures and Algorithms",
+    "label": "Data Structures and Algorithms"
+  },
+  {
     "value": "DevOps",
     "label": "DevOps"
+  },
+  {
+    "value": "Dynamic Programming",
+    "label": "Dynamic Programming"
   },
   {
     "value": "Firebase",
@@ -76,6 +88,10 @@
     "label": "Internet of Things"
   },
   {
+    "value": "Interview Experience",
+    "label": "Interview Experience"
+  },
+  {
     "value": "Java",
     "label": "Java"
   },
@@ -84,8 +100,16 @@
     "label": "Javascript"
   },
   {
+    "value": "Linked List",
+    "label": "Linked List"
+  },
+  {
     "value": "Machine Learning",
     "label": "Machine Learning"
+  },
+  {
+    "value": "MERN Stack",
+    "label": "MERN Stack"
   },
   {
     "value": "Mobile Development",
@@ -108,8 +132,28 @@
     "label": "Python"
   },
   {
+    "value": "Queue",
+    "label": "Queue"
+  },
+  {
     "value": "React.js",
     "label": "React.js"
+  },
+  {
+    "value": "React Native",
+    "label": "React Native"
+  },
+  {
+    "value": "SQL",
+    "label": "SQL"
+  },
+  {
+    "value": "Stack",
+    "label": "Stack"
+  },
+  {
+    "value": "String",
+    "label": "String"
   },
   {
     "value": "UI/UX Design",

@@ -64,6 +64,7 @@ function Header() {
     <Navbar bg="light" expand="lg" fixed="top" className="mb-4">
       <Container>
         <Navbar.Brand href="/" className="fw-bold">
+          <img src="/favicon2.ico" height={25} className="mx-2"></img>
           BloggerSpace
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />

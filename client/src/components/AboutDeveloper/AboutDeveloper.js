@@ -13,7 +13,7 @@ function AboutDeveloper() {
           <div className="profile-section">
             <div className="profile-picture">
               <img
-                src="https://scontent.fdel27-1.fna.fbcdn.net/v/t39.30808-1/387805322_3529854184009562_6613907963940194751_n.jpg?stp=dst-jpg_p320x320&_nc_cat=111&ccb=1-7&_nc_sid=5f2048&_nc_ohc=iT7udbG14xUAX_gsD_y&_nc_ht=scontent.fdel27-1.fna&oh=00_AfCBtKXio621hGXC7IZ6-FT6ayNFqDDzKs-sGBQQmRWjcw&oe=65668350"
+                src="https://avatars.githubusercontent.com/u/55067104?s=400&u=804fb40a8cbd314f8ec4bb37c4091946780b1ac2&v=4"
                 alt="Profile"
               />
               <h4>Teekam Singh</h4>
@@ -21,20 +21,20 @@ function AboutDeveloper() {
             <div className="profile-details">
               <p>
                 Hello, I’m Teekam Singh currently working in Tata Consultancy
-                Services(TCS) having 1 year of Experience and completed by
+                Services(TCS) having 1.5 years of Experience and completed my
                 B.Tech from ABES Engineering College, Ghaziabad.
               </p>
               <Stack direction="horizontal" gap={2}>
                 <b>Skills: </b>
-                <Badge bg="secondary">Flutter</Badge>
-                <Badge bg="secondary">Firebase</Badge>
                 <Badge bg="secondary">React.js</Badge>
                 <Badge bg="secondary">Node.js</Badge>
+                <Badge bg="secondary">MongoDB</Badge>
+                <Badge bg="secondary">Flutter</Badge>
               </Stack>
               <Stack direction="horizontal" className="mx-5" gap={2}>
-                <Badge bg="secondary">MongoDB</Badge>
-                <Badge bg="secondary">Java</Badge>
+                <Badge bg="secondary">Firebase</Badge>
                 <Badge bg="secondary">C++</Badge>
+                <Badge bg="secondary">Java</Badge>
               </Stack>
               <br />
               <p>
