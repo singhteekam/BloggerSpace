@@ -7,6 +7,7 @@ const Blog = require("../../models/Blog");
 const mongoose = require("mongoose");
 const pako = require("pako");
 const sendEmail = require("../../services/mailer");
+const generateSitemap = require('../../utils/generateSitemap');
 
 exports.adminSignup = async (req, res) => {
   try {
@@ -25,7 +26,7 @@ exports.adminSignup = async (req, res) => {
     // Create a new user
     const newAdmin = new Admin({
       fullName,
-      userName: "admin"+email.substring(0, email.indexOf("@")),
+      userName: "admin"+email.substring(0, email.indexOf("@")).replace(/[^a-zA-Z0-9 ]/g, ""),
       email,
       password: hashedPassword,
     });
@@ -180,6 +181,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
 
     // Save the updated blog
     await blog.save();
+    await generateSitemap();
 
     res.json({ message: "blog updated successfully" });
   } catch (error) {

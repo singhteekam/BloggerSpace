@@ -22,12 +22,13 @@ function HomePage() {
       }
     };
     fetchBlogs();
-  }, [isLoggedIn, blogs]);
+  // }, [isLoggedIn, blogs]);
+  }, [blogs]);
 
   if (isLoading) {
     return (
       <Container className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="primary" />
+        <Spinner animation="border" variant="primary" /> 
       </Container>
     );
   }

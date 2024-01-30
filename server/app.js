@@ -15,6 +15,29 @@ const authRoutes = require("./routes/users");
 
 const reviewerRouted= require("./routes/Reviewer/reviewerRoute")
 const adminRoutes= require("./routes/Admin/adminRoute");
+
+const sitemapRouter = require('./routes/sitemap');
+
+app.use('/api', sitemapRouter);
+
+// const generateSitemap = require('./utils/generateSitemap');
+
+// app.get('/sitemap.xml', async (req, res) => {
+//   try {
+//     await generateSitemap();
+
+//     // You may choose to serve the generated sitemap.xml directly in the response
+//     // or you can save it to a file and then send the file as a response
+
+//     res.header('Content-Type', 'application/xml');
+//     res.sendFile('/sitemap.xml');
+//   } catch (error) {
+//     console.error('Error serving sitemap:', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// });
+
+
 // Increase the payload limit to 10MB
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));

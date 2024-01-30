@@ -113,7 +113,7 @@ exports.signup = async (req, res) => {
     // Create a new user
     const newUser = new User({
       fullName,
-      userName: email.substring(0, email.indexOf("@")),
+      userName: email.substring(0, email.indexOf("@")).replace(/[^a-zA-Z0-9 ]/g, ""),
       email,
       password: hashedPassword,
     });

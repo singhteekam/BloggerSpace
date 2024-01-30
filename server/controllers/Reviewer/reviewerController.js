@@ -26,7 +26,7 @@ exports.reviewerSignup = async (req, res) => {
     // Create a new user
     const newReviewer = new Reviewer({
       fullName,
-      userName: "reviewer" + email.substring(0, email.indexOf("@")),
+      userName: "reviewer" + email.substring(0, email.indexOf("@")).replace(/[^a-zA-Z0-9 ]/g, ""),
       email,
       password: hashedPassword,
     });
