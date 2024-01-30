@@ -12,16 +12,16 @@ async function generateSitemap() {
 
     const sitemapStream = new SitemapStream({ hostname: 'https://bloggerspace.singhteekam.in' });
 
-    console.log("Sitemap file content starts:");
+    // console.log("Sitemap file content starts:");
     blogs.forEach((blog) => {
       sitemapStream.write({
         url: `/${blog.slug}`, // Adjust the URL based on your blog URL structure
         // changefreq: 'weekly',
         // priority: 0.8,
       });
-      console.log( `https://bloggerspace.singhteekam.in/${blog.slug}`);
+      // console.log( `https://bloggerspace.singhteekam.in/${blog.slug}`);
     });
-    console.log("Sitemap content end");
+    // console.log("Sitemap content end");
 
     sitemapStream.end();
     const sitemapXML = await streamToPromise(sitemapStream);

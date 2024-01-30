@@ -18,7 +18,7 @@ const adminRoutes= require("./routes/Admin/adminRoute");
 
 const sitemapRouter = require('./routes/sitemap');
 
-app.use('/api', sitemapRouter);
+app.use('/', sitemapRouter);
 
 // const generateSitemap = require('./utils/generateSitemap');
 
