@@ -13,7 +13,7 @@ router.get('/sitemap.xml', async (req, res) => {
     console.log("Sitemap file updated at: "+ new Date(new Date().getTime()));
 
     res.header('Content-Type', 'application/xml');
-    res.sendFile('/sitemap.xml');
+    res.sendFile('/opt/render/project/src/sitemap.xml');
   } catch (error) {
     console.error('Error serving sitemap:', error);
     res.status(500).send('Internal Server Error');

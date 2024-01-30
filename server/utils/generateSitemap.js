@@ -27,8 +27,8 @@ async function generateSitemap() {
     const sitemapXML = await streamToPromise(sitemapStream);
 
     // Save the sitemap to the root of the project
-    // const sitemapFilePath = path.join(__dirname, '../../', 'sitemap.xml');
-    const sitemapFilePath = path.join('sitemap.xml');
+    const sitemapFilePath = path.join(__dirname, '../../', 'sitemap.xml');
+    // const sitemapFilePath = path.join(__dirname,'sitemap.xml');
     await fs.writeFile(sitemapFilePath, sitemapXML, 'utf-8');
 
     console.log('Sitemap saved to:', sitemapFilePath);
