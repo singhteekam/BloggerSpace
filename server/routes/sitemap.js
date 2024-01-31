@@ -2,10 +2,11 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const generateSitemap = require('../utils/generateSitemap');
 
 router.get('/sitemap.xml', async (req, res) => {
     try {
-    // await generateSitemap();
+    await generateSitemap();
 
     // You may choose to serve the generated sitemap.xml directly in the response
     // or you can save it to a file and then send the file as a response
