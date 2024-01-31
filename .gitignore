@@ -1,4 +1,4 @@
 /server/.env
 node_modules
-robots.txt
+# robots.txt
 sitemap.xml
