@@ -6,6 +6,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo")(session);
+const path = require('path');
 
 
 require("dotenv").config(); // Load environment variables from .env file
@@ -18,24 +19,17 @@ const adminRoutes= require("./routes/Admin/adminRoute");
 
 const sitemapRouter = require('./routes/sitemap');
 
-app.use('/api', sitemapRouter);
+app.use('/', sitemapRouter);
 
-// const generateSitemap = require('./utils/generateSitemap');
-
-// app.get('/sitemap.xml', async (req, res) => {
-//   try {
-//     await generateSitemap();
-
-//     // You may choose to serve the generated sitemap.xml directly in the response
-//     // or you can save it to a file and then send the file as a response
-
-//     res.header('Content-Type', 'application/xml');
-//     res.sendFile('/sitemap.xml');
-//   } catch (error) {
-//     console.error('Error serving sitemap:', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
+app.get('/robots.txt', async (req, res) => {
+  try {
+    console.log(path.join(__dirname,"../", 'robots.txt'))
+  res.sendFile(path.join(__dirname,"../", 'robots.txt'));
+} catch (error) {
+  console.error('Error getting robots.txt:', error);
+  res.status(500).send('Internal Server Error');
+}}
+);
 
 
 // Increase the payload limit to 10MB

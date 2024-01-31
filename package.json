@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "path": "^0.12.7"
   }
 }
