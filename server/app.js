@@ -72,5 +72,9 @@ app.get("/api/logs", (req, res)=>{
   res.json("Logs uploaded to GitHub: "+ new Date(new Date().getTime() + 330 * 60000).toISOString())
 });
 
+app.get("/api/viewlogs", (req, res)=>{
+  res.sendFile(path.join(__dirname, "/utils/Logging/", "logs.log"));
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log("Server started at " + PORT));
