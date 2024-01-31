@@ -252,7 +252,7 @@ exports.updateReviewerAssignment = async (req, res) => {
 
   try {
     // Assuming you have a database model/schema for blogs
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findById(id).populate("authorDetails").exec();
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
@@ -265,6 +265,20 @@ exports.updateReviewerAssignment = async (req, res) => {
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     await blog.save();
 
+    const receiver = blog.authorDetails.email;
+    const subject = "New blog assigned to you for review";
+    const html = `Hi ${blog.authorDetails.fullName},
+              <p>New blog is assigned to you for review. Please review it within 3 days.\nBlog Title: ${blog.title} </p>
+                `;
+
+    
+    sendEmail(receiver, subject, html)
+    .then((response) => {
+      console.log(`Email sent to ${receiver}:`, response);
+    })
+    .catch((error) => {
+      console.error("Error sending email:", error);
+    });
     return res.json({ message: "Blog assigned successfully" });
   } catch (error) {
     console.error("Error assigning blog:", error);

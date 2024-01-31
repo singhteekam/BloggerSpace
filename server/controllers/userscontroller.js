@@ -153,7 +153,7 @@ exports.login = async (req, res) => {
     // You can generate a JWT token here if you want to implement authentication
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token expiration time
+      expiresIn: "15m", // Token expiration time
     });
     // console.log(token);
     const userDetails = {

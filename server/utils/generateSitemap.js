@@ -10,7 +10,7 @@ async function generateSitemap() {
 
     console.log("Saving sitemap...")
 
-    const sitemapStream = new SitemapStream({ hostname: 'https://bloggerspace.singhteekam.in' });
+    const sitemapStream = new SitemapStream({ hostname: process.env.BLOGGERSPACE1 });  // link
 
     // console.log("Sitemap file content starts:");
     blogs.forEach((blog) => {
@@ -19,7 +19,6 @@ async function generateSitemap() {
         // changefreq: 'weekly',
         // priority: 0.8,
       });
-      // console.log( `https://bloggerspace.singhteekam.in/${blog.slug}`);
     });
     // console.log("Sitemap content end");
 
@@ -28,7 +27,6 @@ async function generateSitemap() {
 
     // Save the sitemap to the root of the project
     const sitemapFilePath = path.join(__dirname, '../../', 'sitemap.xml');
-    // const sitemapFilePath = path.join(__dirname,'sitemap.xml');
     await fs.writeFile(sitemapFilePath, sitemapXML, 'utf-8');
 
     console.log('Sitemap saved to:', sitemapFilePath);
