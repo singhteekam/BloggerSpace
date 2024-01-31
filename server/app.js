@@ -19,17 +19,17 @@ const adminRoutes= require("./routes/Admin/adminRoute");
 
 const sitemapRouter = require('./routes/sitemap');
 
-app.use('/', sitemapRouter);
+app.use('/api', sitemapRouter);
 
-app.get('/robots.txt', async (req, res) => {
-  try {
-    console.log(path.join(__dirname,"../", 'robots.txt'))
-  res.sendFile(path.join(__dirname,"../", 'robots.txt'));
-} catch (error) {
-  console.error('Error getting robots.txt:', error);
-  res.status(500).send('Internal Server Error');
-}}
-);
+// app.get('/robots.txt', async (req, res) => {
+//   try {
+//     console.log(path.join(__dirname,"../", 'robots.txt'))
+//   res.sendFile(path.join(__dirname,"../", 'robots.txt'));
+// } catch (error) {
+//   console.error('Error getting robots.txt:', error);
+//   res.status(500).send('Internal Server Error');
+// }}
+// );
 
 
 // Increase the payload limit to 10MB
