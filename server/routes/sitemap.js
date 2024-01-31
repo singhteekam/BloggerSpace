@@ -6,7 +6,7 @@ const generateSitemap = require('../utils/generateSitemap');
 
 router.get('/sitemap.xml', async (req, res) => {
     try {
-    await generateSitemap();
+    // await generateSitemap();
 
     // You may choose to serve the generated sitemap.xml directly in the response
     // or you can save it to a file and then send the file as a response
@@ -22,6 +22,16 @@ router.get('/sitemap.xml', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+router.get("/updatesitemap", async (req, res)=>{
+  try {
+    await generateSitemap();
+    res.send("Sitemap file is updated at: "+ new Date(new Date().getTime()));
+  } catch (error) {
+    console.error('Error updating sitemap:', error);
+    res.status(500).send('Error updating sitemap file');
+  }
+})
 
 
 module.exports = router;
