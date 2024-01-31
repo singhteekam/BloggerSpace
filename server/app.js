@@ -21,17 +21,6 @@ const sitemapRouter = require('./routes/sitemap');
 
 app.use('/api', sitemapRouter);
 
-// app.get('/robots.txt', async (req, res) => {
-//   try {
-//     console.log(path.join(__dirname,"../", 'robots.txt'))
-//   res.sendFile(path.join(__dirname,"../", 'robots.txt'));
-// } catch (error) {
-//   console.error('Error getting robots.txt:', error);
-//   res.status(500).send('Internal Server Error');
-// }}
-// );
-
-
 // Increase the payload limit to 10MB
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
