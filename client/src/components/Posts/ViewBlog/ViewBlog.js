@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Container, Card,Button, Spinner, Badge, Image } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from 'react-helmet';
 import "./ViewBlog.css";
 import LoginPageModal from "../../../utils/LoginPageModal";
 
@@ -20,6 +21,18 @@ const ViewBlog = () => {
   const [disableCommentLikeButton, setDisableCommentLikeButton] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Get the current page URL
+    const currentUrl = window.location.href;
+
+    // Update the canonical URL dynamically
+    const canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (canonicalLink) {
+      canonicalLink.href = currentUrl;
+    }
+  }, []); // Empty dependency array ensures the effect runs only once on mount
+
 
   useEffect(()=>{
     const fetchoggedInUser= async()=>{
@@ -145,8 +158,15 @@ const ViewBlog = () => {
   //   );
   // }
 
+  
+
   return (
-    <Container className="view-blog-container">
+    <div>
+      <Helmet>
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+
+      <Container className="view-blog-container">
       <h2 className="view-blog-heading">View Blog</h2>
       <Card className="view-blog-card">
         <Card.Body>
@@ -305,6 +325,8 @@ const ViewBlog = () => {
         )}
       </div>
     </Container>
+
+    </div>
   );
 };
 

@@ -14,7 +14,6 @@ const accessToken = process.env.GITHUBACCESSTOKEN;
 const filePath = path.join(__dirname, "/Logging/", "logs.log");
 // const filePath = "./utils/Logging/logs.log";
 
-
 // Read the file content
 const fileContent = fs.readFileSync(filePath, "utf8");
 
@@ -31,7 +30,7 @@ const headers = {
 };
 
 // Create or update the file on GitHub
-const uploadToGitHub=async ()=> {
+const uploadLogsToGitHub=async ()=> {
   // Check if the file content is empty
   if (fileContent.trim() === "") {
     console.log("File content is empty. Skipping upload to GitHub.");
@@ -174,4 +173,4 @@ const fetchSitemapFile= async ()=>{
 }
 
 // module.exports = uploadToGitHub;
-module.exports = {uploadToGitHub, fetchLogsFile, uploadSitemapToGitHub, fetchSitemapFile};
+module.exports = {uploadLogsToGitHub, fetchLogsFile, uploadSitemapToGitHub, fetchSitemapFile};
