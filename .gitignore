@@ -1,5 +1,5 @@
 /server/.env
 node_modules
-# sitemap.xml
+sitemap.xml
 robots.txt
 /server/utils/Logging/logs.log
