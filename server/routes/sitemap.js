@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const generateSitemap = require('../utils/generateSitemap');
+const {fetchSitemapFile}= require('./../utils/uploadToGitHub');
 
 router.get('/sitemap.xml', async (req, res) => {
     try {
@@ -15,8 +16,13 @@ router.get('/sitemap.xml', async (req, res) => {
 
     // res.header('Content-Type', 'application/xml');
     // res.sendFile('/opt/render/project/src/sitemap.xml');
-    // res.sendFile('D:/MERN Projects/BlogWebsite/MyBlogWebsite/sitemap.xml');
-    res.sendFile(path.join(__dirname, '../../', 'sitemap.xml'));
+    // res.sendFile(path.join(__dirname, '../../', 'sitemap.xml'));
+    const sitemapContent = await fetchSitemapFile();
+
+    // Send the sitemap content in the response
+    res.header('Content-Type', 'application/xml');
+    // console.log("Displayingg.....")
+    res.send(sitemapContent);
   } catch (error) {
     console.error('Error serving sitemap:', error);
     res.status(500).send('Internal Server Error');

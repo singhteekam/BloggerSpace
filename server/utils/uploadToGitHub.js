@@ -84,4 +84,71 @@ const uploadToGitHub=async ()=> {
 
 // uploadToGitHub();
 
-module.exports = uploadToGitHub;
+// Create or update the file on GitHub
+const uploadSitemapToGitHub=async ()=> {
+
+  const sitemapFilepath= "./../sitemap.xml";
+  const sitemapFileContent = fs.readFileSync(sitemapFilepath, "utf8");
+
+  const apiUrl2 = `https://api.github.com/repos/${owner}/${repo}/contents/sitemap.xml`;
+
+  try {
+    // Check if the file already exists by fetching its current SHA
+    const response = await axios.get(apiUrl2, { headers });
+    const sha = response.data.sha;
+
+    // Update the file
+    await axios.put(
+      apiUrl2,
+      {
+        message: "Update sitemap file via API",
+        content: Buffer.from(sitemapFileContent).toString("base64"),
+        sha: sha,
+        branch: branch,
+      },
+      { headers }
+    );
+
+    console.log("Sitemap File updated on GitHub.");
+  } catch (error) {
+    // If the file doesn't exist, create a new file
+    if (error.response.status === 404) {
+      await axios.put(
+        apiUrl2,
+        {
+          message: "Create sitemap file via API",
+          content: Buffer.from(sitemapFileContent).toString("base64"),
+          branch: branch,
+        },
+        { headers }
+      );
+
+      console.log("sitemap File created on GitHub.");
+    } else {
+      console.error("Error uploading sitemap file to GitHub:", error.message);
+    }
+  }
+}
+
+const fetchSitemapFile= async ()=>{
+  try {
+
+    // Replace 'your-github-username', 'your-repository-name', 'path/to/your/file.xml', and 'your-access-token'
+    const apiUrl3 = `https://raw.githubusercontent.com/${owner}/${repo}/main/sitemap.xml`;
+
+    const response = await axios.get(apiUrl3, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log("Sitemap fetching status:"+response.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching XML:', error.message);
+    return "";
+  }
+}
+
+// module.exports = uploadToGitHub;
+module.exports = {uploadToGitHub, uploadSitemapToGitHub, fetchSitemapFile};

@@ -268,8 +268,12 @@ exports.updateReviewerAssignment = async (req, res) => {
     const receiver = assignedUser;
     const subject = "New blog assigned to you for review";
     const html = `Hi,
-              <p>New blog is assigned to you for review. Please review it within 3 days.\n
-              Blog Title: ${blog.title}\n
+              <p>New blog is assigned to you for review. Please review it within 3 days.
+              </p>
+              <p>
+              Blog Title: ${blog.title}
+              </p>
+              <p>
               <b>BloggerSpace Reviewer panel:</b> ${process.env.REVIEWER_PANEL_URL}
               </p>
                 `;

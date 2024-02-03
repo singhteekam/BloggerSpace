@@ -3,6 +3,7 @@ const { SitemapStream, streamToPromise } = require('sitemap');
 const fs = require('fs').promises; // Import the 'fs' module for file operations
 const path = require('path');
 const Blog = require('../models/Blog');
+const {fetchSitemapFile, uploadSitemapToGitHub}= require('./../utils/uploadToGitHub');
 
 async function generateSitemap() {
   try {
@@ -28,6 +29,8 @@ async function generateSitemap() {
     // Save the sitemap to the root of the project
     const sitemapFilePath = path.join(__dirname, '../../', 'sitemap.xml');
     await fs.writeFile(sitemapFilePath, sitemapXML, 'utf-8');
+
+    await uploadSitemapToGitHub();
 
     console.log('Sitemap saved to:', sitemapFilePath);
   } catch (error) {

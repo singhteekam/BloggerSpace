@@ -67,7 +67,7 @@ app.use("/api/admin/", adminRoutes);
 
 
 //For capturing logs
-const uploadToGitHub= require("./utils/uploadToGitHub");
+const {uploadToGitHub}= require("./utils/uploadToGitHub");
 app.get("/api/logs", (req, res)=>{
   uploadToGitHub();
   res.json("Logs uploaded to GitHub: "+ new Date(new Date().getTime() + 330 * 60000).toISOString())
