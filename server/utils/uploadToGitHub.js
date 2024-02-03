@@ -1,5 +1,6 @@
 const fs = require("fs");
 const axios = require("axios");
+const path = require('path');
 
 // GitHub repository details
 const owner = process.env.GITHUBOWNER;
@@ -10,7 +11,8 @@ const branch = process.env.GITHUBBRANCH; //the branch we want to upload to
 const accessToken = process.env.GITHUBACCESSTOKEN;
 
 // The path to the file we want to upload
-const filePath = "./Logging/logs.log";
+const filePath = path.join(__dirname, "/Logging/", "logs.log");
+// const filePath = "./utils/Logging/logs.log";
 
 // Read the file content
 const fileContent = fs.readFileSync(filePath, "utf8");
