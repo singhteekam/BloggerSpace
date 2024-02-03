@@ -82,9 +82,29 @@ const uploadToGitHub=async ()=> {
   }
 }
 
+const fetchLogsFile= async ()=>{
+  try {
+
+    // Replace 'your-github-username', 'your-repository-name', 'path/to/your/file.xml', and 'your-access-token'
+    const apiViewLogsURL = `https://raw.githubusercontent.com/${owner}/${repo}/main/${fileName}`;
+
+    const response = await axios.get(apiViewLogsURL, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log("View Logs fetching status:"+response.status);
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching logs:', error.message);
+    return "";
+  }
+}
+
 // uploadToGitHub();
 
-// Create or update the file on GitHub
+// Create or update the sitemap file on GitHub
 const uploadSitemapToGitHub=async ()=> {
 
   const sitemapFilepath= "./../sitemap.xml";
@@ -151,4 +171,4 @@ const fetchSitemapFile= async ()=>{
 }
 
 // module.exports = uploadToGitHub;
-module.exports = {uploadToGitHub, uploadSitemapToGitHub, fetchSitemapFile};
+module.exports = {uploadToGitHub, fetchLogsFile, uploadSitemapToGitHub, fetchSitemapFile};

@@ -67,14 +67,17 @@ app.use("/api/admin/", adminRoutes);
 
 
 //For capturing logs
-const {uploadToGitHub}= require("./utils/uploadToGitHub");
+const {uploadToGitHub, fetchLogsFile}= require("./utils/uploadToGitHub");
 app.get("/api/logs", (req, res)=>{
   uploadToGitHub();
   res.json("Logs uploaded to GitHub: "+ new Date(new Date().getTime() + 330 * 60000).toISOString())
 });
 
-app.get("/api/viewlogs", (req, res)=>{
-  res.sendFile(path.join(__dirname, "/utils/Logging/", "logs.log"));
+app.get("/api/viewlogs", async (req, res)=>{
+  const viewLogFile= await fetchLogsFile();
+  res.header('Content-Type', 'application/json');
+  res.send(viewLogFile);
+  // res.sendFile(path.join(__dirname, "/utils/Logging/", "logs.log"));
 });
 
 const PORT = process.env.PORT || 5000;
