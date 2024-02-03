@@ -78,7 +78,7 @@ app.get("/api/viewlogs", async (req, res)=>{
   res.header('Content-Type', 'application/json');
   res.send(viewLogFile);
   // res.sendFile(path.join(__dirname, "/utils/Logging/", "logs.log"));
-});
+});  
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log("Server started at " + PORT));
