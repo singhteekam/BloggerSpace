@@ -17,9 +17,13 @@ const authRoutes = require("./routes/users");
 const reviewerRouted= require("./routes/Reviewer/reviewerRoute")
 const adminRoutes= require("./routes/Admin/adminRoute");
 
-const sitemapRouter = require('./routes/sitemap');
+////////////////////////////////////////////////////
+// SITEMAP
+const {sitemapRouter, updatesitemap} = require('./routes/sitemap');
 
-app.use('/api', sitemapRouter);
+app.get('/sitemap.xml', sitemapRouter);
+app.get('/updatesitemap', updatesitemap);
+/////////////////////////////////////////////
 
 // Increase the payload limit to 10MB
 app.use(bodyParser.json({ limit: '10mb' }));

@@ -163,10 +163,12 @@ const ViewBlog = () => {
   return (
     <div>
       <Helmet>
+        {/* Canonical URL */}
         <link rel="canonical" href={window.location.href} />
       </Helmet>
 
       <Container className="view-blog-container">
+      {/* <h4>{window.location.href}</h4> */}
       <h2 className="view-blog-heading">View Blog</h2>
       <Card className="view-blog-card">
         <Card.Body>
