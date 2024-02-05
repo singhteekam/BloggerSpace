@@ -19,13 +19,55 @@ import UserProfile from "./components/UserProfilePage/UserProfile.js";
 import MyBlogs from "./components/Posts/MyBlogs/MyBlogs.js";
 import AboutDeveloper from "./components/AboutDeveloper/AboutDeveloper.js";
 import WritingGuidelines from "./components/WritingGuidelines/WritingGuidelines.js";
+import PageNotFound from "./components/PageNotFound/PageNotFound.js";
+import { Helmet } from "react-helmet";
+import Sitemap from "./components/Sitemap/Sitemap.js";
 
 const App = () => {
-
   return (
     <>
       <BrowserRouter>
         <Header />
+
+        <Helmet>
+          <meta
+            name="description"
+            content="A blogging website where anyone can signup and start writing blogs on any topic. Features: Create new blog, save as draft the blog, Change password, Email verification for new
+    users, View public profile of any user, Change username, like and comment, visitors count, admin dashboard. This website is developed by Teekam Singh"
+          />
+
+          <meta
+            name="keywords"
+            content="blogging, blogs, technicalblogs, teekam, singhteekam, singh_teekam, singh__teekam, bloggerspace, bloggingwebsite, articles "
+          />
+          <meta name="apple-mobile-web-app-title" content="BloggerSpace" />
+
+          <meta property="og:title" content="BloggerSpace" />
+          <meta
+            property="og:description"
+            content="A blogging website where anyone can signup and start writing blogs on any topic. Features: Create new blog, save as draft the blog, Change password, Email verification for new
+    users, View public profile of any user, Change username, like and comment, visitors count, admin dashboard. This website is developed by Teekam Singh"
+          />
+          <meta property="og:image" content="%PUBLIC_URL%/BLOGGERSPACE.png" />
+          <meta
+            property="og:url"
+            content={window.location.href}
+          />
+          <meta property="og:type" content="website" />
+
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content="BloggerSpace" />
+          <meta
+            name="twitter:description"
+            content="A blogging website where anyone can signup and start writing blogs on any topic. Features: Create new blog, save as draft the blog, Change password, Email verification for new
+    users, View public profile of any user, Change username, like and comment, visitors count, admin dashboard. This website is developed by Teekam Singh"
+          />
+          <meta name="twitter:image" content="%PUBLIC_URL%/BLOGGERSPACE.png" />
+          <meta name="twitter:site" content="@singh__teekam" />
+
+          <link rel="canonical" href={window.location.href} />
+        </Helmet>
+
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} exact />
@@ -48,9 +90,9 @@ const App = () => {
             <Route path="/myblogs" element={<MyBlogs />} />
             <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
             <Route path="/guidelines" element={<WritingGuidelines />} />
-            
+            <Route path="/sitemap" element={<Sitemap />} />
 
-
+            <Route element={<PageNotFound />} />
           </Routes>
         </main>
         <Footer />

@@ -37,7 +37,8 @@ router.get("/updatesitemap", async (req, res)=>{
     console.error('Error updating sitemap:', error);
     res.status(500).send('Error updating sitemap file');
   }
-})
+});
+
 
 
 module.exports = router;

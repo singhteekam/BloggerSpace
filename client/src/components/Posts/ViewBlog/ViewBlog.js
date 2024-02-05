@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from 'react-helmet';
 import "./ViewBlog.css";
 import LoginPageModal from "../../../utils/LoginPageModal";
+import PageNotFound from "../../PageNotFound/PageNotFound";
 
 const ViewBlog = () => {
   const { blogSlug } = useParams();
@@ -19,19 +20,20 @@ const ViewBlog = () => {
 
   const [commentThumbColor, setCommentThumbColor] = useState("regular");
   const [disableCommentLikeButton, setDisableCommentLikeButton] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Get the current page URL
-    const currentUrl = window.location.href;
+  // useEffect(() => {
+  //   // Get the current page URL
+  //   const currentUrl = window.location.href;
 
-    // Update the canonical URL dynamically
-    const canonicalLink = document.querySelector('link[rel="canonical"]');
-    if (canonicalLink) {
-      canonicalLink.href = currentUrl;
-    }
-  }, []); // Empty dependency array ensures the effect runs only once on mount
+  //   // Update the canonical URL dynamically
+  //   const canonicalLink = document.querySelector('link[rel="canonical"]');
+  //   if (canonicalLink) {
+  //     canonicalLink.href = currentUrl;
+  //   }
+  // }, []); // Empty dependency array ensures the effect runs only once on mount
 
 
   useEffect(()=>{
@@ -60,6 +62,7 @@ const ViewBlog = () => {
       } catch (error) {
         console.error("Error fetching blog Blog:", error);
         setLoading(false);
+        setNotFound(true);
       }
     };
 
@@ -158,14 +161,38 @@ const ViewBlog = () => {
   //   );
   // }
 
+  if (notFound) {
+    // Render the PageNotFound component when an error occurs
+    console.log("blog not found")
+    return <PageNotFound />;
+  }
+
+  function stripHtmlTags(html) {
+    // Create a temporary div element
+    const tempDiv = document.createElement('div');
   
+    // Set the innerHTML of the div to your HTML content
+    tempDiv.innerHTML = html;
+  
+    // Retrieve the text content without HTML tags
+    const textContent = tempDiv.textContent || tempDiv.innerText;
+  
+    return textContent;
+  }
+
 
   return (
     <div>
       <Helmet>
-        {/* Canonical URL */}
-        <link rel="canonical" href={window.location.href} />
-      </Helmet>
+        <meta name="description" content={stripHtmlTags(blog?.content)} />
+        <title>{blog?.title}</title>
+
+        <meta property="og:title" content={blog?.title} />
+        <meta property="og:description" content={stripHtmlTags(blog?.content)} />
+
+        <meta name="twitter:title" content={blog?.title} />
+        <meta name="twitter:description" content={stripHtmlTags(blog?.content)} />
+       </Helmet>
 
       <Container className="view-blog-container">
       {/* <h4>{window.location.href}</h4> */}
