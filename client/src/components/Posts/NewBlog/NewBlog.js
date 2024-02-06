@@ -6,11 +6,14 @@ import {
   Alert,
   Badge,
   CloseButton,
+  Modal,
+  ListGroup,
+  Accordion,
 } from "react-bootstrap";
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
 import axios from "axios";
 import "./NewBlog.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import blogCategory from "../../../utils/blogCategory.json";
 import blogTags from "../../../utils/blogTags.json";
 
@@ -27,6 +30,9 @@ const NewBlog = () => {
   const [tags, setTags] = useState([]);
   const [isUniqueTitle, setIsUniqueTitle] = useState(null);
   const [contentSize, setContentSize] = useState(0);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [searchTitleResults, setTitleSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("token");
@@ -174,6 +180,19 @@ const NewBlog = () => {
       .replace(/\s+/g, "-");
   };
 
+  async function searchSimilarTitles(searchQuery) {
+    try {
+      setLoading(true);
+      const response = await axios.get(`/api/blogs/searchblogs/${searchQuery}`);
+      console.log(response.data);
+      setTitleSearchResults(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error searching similar blogs:", error);
+      setLoading(false);
+    }
+  }
+
   return (
     <Container className="newblogpage">
       <h2 className="new-blog-heading">New Blog</h2>
@@ -192,6 +211,7 @@ const NewBlog = () => {
             onChange={(e) => {
               setTitle(e.target.value);
               setSlug(slugify(e.target.value.trim()));
+              searchSimilarTitles(e.target.value);
               // setSlug(slugify(title.trim()));
             }}
             placeholder="Enter blog title"
@@ -205,6 +225,30 @@ const NewBlog = () => {
             )
           ) : null}
         </Form.Group>
+
+        <Accordion defaultActiveKey="0">
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>
+              Published Blogs with Similar title:
+            </Accordion.Header>
+            <Accordion.Body>
+              <ListGroup>
+                {searchTitleResults.map((blog) => (
+                  <ListGroup.Item key={blog._id} className="">
+                    <Link
+                      to={`/${blog.slug}`}
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <h6>{blog.title}</h6>
+                    </Link>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
+
         <Form.Group controlId="blogAuthor" className="newblogfields">
           <Form.Label>Author:</Form.Label>
           <Form.Control
@@ -295,14 +339,48 @@ const NewBlog = () => {
         <Button
           variant="secondary"
           className="submit-newblog"
+          onClick={() => setShowConfirmModal(true)}
+        >
+          Preview Blog
+        </Button>
+        {/* <div dangerouslySetInnerHTML={{ __html: content }} /> */}
+
+        <Button
+          variant="secondary"
+          className="submit-newblog mx-2"
           onClick={handleSaveAsDraft}
         >
           Save Draft
         </Button>
-        <Button variant="primary" type="submit" className="submit-newblog mx-2">
+        <Button variant="primary" type="submit" className="submit-newblog">
           Submit
         </Button>
       </Form>
+
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Preview Blog</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Title: {title}
+          <br />
+          Slug: {slug}
+          <br />
+          <br />
+          Content: <br />
+          <div dangerouslySetInnerHTML={{ __html: content }} />
+          <h6>Content size: {contentSize} KB</h6>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

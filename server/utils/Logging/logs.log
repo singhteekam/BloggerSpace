@@ -2325,3 +2325,545 @@
 [2024-02-06T20:08:49.508Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2024-02-06T20:19:09.703Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2024-02-06T20:19:10.173Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:11:17.562Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-02-06T22:11:20.674Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:11:23.115Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:11:23.195Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:11:23.402Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:11:23.577Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:11:24.024Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:11:24.165Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:11:24.458Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:17:41.178Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:17:41.180Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:17:41.427Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:17:41.685Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:17:42.112Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:18:27.186Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:18:27.189Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:18:27.444Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:18:27.638Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:18:28.099Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:19:23.270Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:19:23.294Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:19:24.138Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:19:24.179Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:19:26.138Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:19:26.214Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:19:28.141Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:19:28.400Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:19:37.159Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:19:37.170Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:20:41.137Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:20:41.251Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:20:42.111Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:20:42.138Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:21:41.244Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:21:41.281Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:22:22.156Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:22:22.161Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:22:26.144Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:22:26.146Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:22:34.160Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:22:34.422Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:22:49.180Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:22:49.187Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:22:51.149Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:22:51.151Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:22:53.137Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:22:53.144Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:22:57.135Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:22:57.182Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:23:02.148Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:23:02.151Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:23:07.146Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:23:07.150Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:23:32.165Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:23:32.167Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:23:35.153Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:23:35.176Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:24:43.174Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:24:43.176Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:24:58.207Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:24:58.237Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:25:05.563Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:25:05.573Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:25:05.780Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:25:05.986Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:25:06.128Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:25:06.627Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:25:06.782Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:25:56.192Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:25:56.204Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:25:56.442Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:25:56.643Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:25:57.094Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:25:58.172Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:25:58.461Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:26:54.824Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:26:54.826Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:26:55.031Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:26:55.250Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:26:55.668Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:27:12.329Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:27:12.404Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:27:13.130Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:27:13.434Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:28:28.177Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:28:28.186Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:28:28.435Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:28:28.616Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:28:29.052Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:29:58.172Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:29:58.174Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:30:06.169Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:30:06.199Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:30:10.141Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:30:10.146Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:31:31.155Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:31:31.157Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:31:38.168Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:31:38.183Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:32:02.169Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:32:02.173Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:32:11.107Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:32:11.111Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:32:11.351Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:32:11.462Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:32:11.747Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:32:11.864Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:32:11.975Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:33:40.133Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:33:40.150Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:33:46.131Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:33:46.250Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:33:57.254Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:33:57.257Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:33:57.505Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:33:57.681Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:33:57.795Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:33:57.907Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:33:58.339Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:34:30.174Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:34:30.178Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:34:40.219Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:34:40.221Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:34:40.455Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:34:40.638Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:34:41.074Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:35:20.595Z] [LOG] [DEBUG] - Topic is available: hv
+[2024-02-06T22:35:20.603Z] [LOG] [DEBUG] - Topic is available: h
+[2024-02-06T22:35:20.669Z] [LOG] [DEBUG] - Topic is available: hvj
+[2024-02-06T22:35:20.781Z] [LOG] [DEBUG] - Topic is available: hvjj
+[2024-02-06T22:35:20.806Z] [LOG] [DEBUG] - Topic is available: hvjjhv
+[2024-02-06T22:35:20.808Z] [LOG] [DEBUG] - Topic is available: hvjjh
+[2024-02-06T22:35:21.268Z] [LOG] [DEBUG] - Topic is available: hvjjhv 
+[2024-02-06T22:35:21.523Z] [LOG] [DEBUG] - Topic is available: hvjjhv h
+[2024-02-06T22:35:21.630Z] [LOG] [DEBUG] - Topic is available: hvjjhv hg
+[2024-02-06T22:35:21.759Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgk
+[2024-02-06T22:35:21.918Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkj
+[2024-02-06T22:35:22.007Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjv
+[2024-02-06T22:35:22.239Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk
+[2024-02-06T22:35:22.311Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-
+[2024-02-06T22:35:22.958Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-h
+[2024-02-06T22:35:22.962Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hi
+[2024-02-06T22:35:23.182Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj
+[2024-02-06T22:35:23.192Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hib
+[2024-02-06T22:35:23.255Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj 
+[2024-02-06T22:35:24.431Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj  
+[2024-02-06T22:35:24.532Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj   
+[2024-02-06T22:35:24.562Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    
+[2024-02-06T22:35:24.644Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj     h
+[2024-02-06T22:35:24.680Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj     
+[2024-02-06T22:35:24.922Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj     hv
+[2024-02-06T22:35:25.152Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj     hvj
+[2024-02-06T22:39:04.132Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj     hvj
+[2024-02-06T22:39:04.149Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:39:14.214Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj
+[2024-02-06T22:39:26.427Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj 
+[2024-02-06T22:39:26.774Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj -
+[2024-02-06T22:39:27.253Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj --
+[2024-02-06T22:39:27.589Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj --j
+[2024-02-06T22:39:27.985Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj --jb
+[2024-02-06T22:39:28.076Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj --jbv
+[2024-02-06T22:39:28.139Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj --jbvj
+[2024-02-06T22:39:28.204Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj --jbvjk
+[2024-02-06T22:39:28.298Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj --jbvjkv
+[2024-02-06T22:39:28.453Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj --jbvjkvk
+[2024-02-06T22:40:08.272Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj    hvj -jbvjkvk
+[2024-02-06T22:40:30.049Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj:    hvj -jbvjkvk
+[2024-02-06T22:40:40.563Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj:    hvj jbvjkvk
+[2024-02-06T22:41:00.152Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:41:00.158Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj:    hvj jbvjkvk
+[2024-02-06T22:42:37.155Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj:    hj jbvjkvk
+[2024-02-06T22:43:21.139Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:43:21.142Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj:    hj jbvjkvk
+[2024-02-06T22:43:31.138Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:43:31.141Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj:    hj jbvjkvk
+[2024-02-06T22:43:33.162Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:43:33.165Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj:    hj jbvjkvk
+[2024-02-06T22:43:35.178Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:43:35.181Z] [LOG] [DEBUG] - Topic is available: hvjjhv hgkjvk-hibj:    hj jbvjkvk
+[2024-02-06T22:44:27.980Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:44:27.993Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:44:28.240Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:44:28.379Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:44:28.640Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:44:28.762Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:44:28.892Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:44:51.452Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:44:51.503Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:44:52.068Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:44:52.410Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:45:00.687Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:45:00.827Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:45:05.336Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:45:05.462Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:46:08.857Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:46:08.863Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:46:09.086Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:46:09.153Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:46:09.309Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:46:09.483Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:46:09.633Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:54:05.159Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:54:05.362Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:54:05.406Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:54:05.478Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:54:05.595Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:54:06.422Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:54:06.466Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:54:30.148Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:54:30.151Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:54:35.250Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:54:35.553Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:54:36.079Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:54:36.405Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:57:50.704Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:57:50.728Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:57:54.737Z] [LOG] [DEBUG] - Topic is available: e
+[2024-02-06T22:57:54.994Z] [LOG] [DEBUG] - Topic is available: ew
+[2024-02-06T22:57:55.389Z] [LOG] [DEBUG] - Topic is available: ewk
+[2024-02-06T22:57:57.279Z] [LOG] [DEBUG] - Topic is available: ew
+[2024-02-06T22:57:58.440Z] [LOG] [DEBUG] - Topic is available: e
+[2024-02-06T22:58:03.527Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T22:58:03.560Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T22:58:03.560Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T22:58:03.560Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T22:58:03.573Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:58:25.499Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:58:25.519Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:58:26.796Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T22:58:26.944Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:58:31.031Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T22:58:52.139Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:58:52.146Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T22:58:54.150Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T22:58:54.178Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:59:16.142Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T22:59:16.178Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:59:20.451Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T22:59:20.594Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:59:27.453Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:59:27.456Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T22:59:29.131Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T22:59:29.496Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:59:56.191Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T22:59:56.194Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:00:01.165Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:00:01.169Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:00:20.124Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:00:20.144Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:00:42.286Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:00:42.458Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:00:53.344Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:00:53.359Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:05.074Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:05.101Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:25.240Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:25.242Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:26.166Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:26.180Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:28.140Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:28.410Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:38.212Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:38.221Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:42.455Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:42.458Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:44.146Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:44.400Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:48.250Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:48.281Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:54.141Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:01:54.156Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:59.158Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:01:59.161Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:02:00.147Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:02:00.207Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:02:26.630Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:02:26.644Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:02:30.031Z] [LOG] [DEBUG] - Topic is available: uh
+[2024-02-06T23:02:32.058Z] [LOG] [DEBUG] - Topic is available: uhj
+[2024-02-06T23:02:32.306Z] [LOG] [DEBUG] - Topic is available: uhjb
+[2024-02-06T23:02:33.257Z] [LOG] [DEBUG] - Topic is available: uhj
+[2024-02-06T23:02:33.442Z] [LOG] [DEBUG] - Topic is available: uh
+[2024-02-06T23:02:33.567Z] [LOG] [DEBUG] - Topic is available: u
+[2024-02-06T23:02:33.650Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:02:33.685Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:33.685Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:33.685Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:33.707Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:02:35.015Z] [LOG] [DEBUG] - Topic is available: i
+[2024-02-06T23:02:35.142Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:02:35.176Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:35.176Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:35.176Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:35.435Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:02:40.302Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:02:40.321Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:02:40.587Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:02:40.694Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:02:40.943Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:02:41.064Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:02:41.183Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:02:42.797Z] [LOG] [DEBUG] - Topic is available: p
+[2024-02-06T23:02:44.627Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:02:44.662Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:44.662Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:44.662Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:44.930Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:02:49.538Z] [LOG] [DEBUG] - Topic is available: q
+[2024-02-06T23:02:50.690Z] [LOG] [DEBUG] - Topic is available: q=
+[2024-02-06T23:02:51.205Z] [LOG] [DEBUG] - Topic is available: q=a
+[2024-02-06T23:02:51.913Z] [LOG] [DEBUG] - Topic is available: q=a\
+[2024-02-06T23:02:52.064Z] [LOG] [DEBUG] - Topic is available: q=a\\
+[2024-02-06T23:02:52.199Z] [LOG] [DEBUG] - Topic is available: q=a\\\
+[2024-02-06T23:02:52.389Z] [LOG] [DEBUG] - Topic is available: q=a\\\\
+[2024-02-06T23:02:52.500Z] [LOG] [DEBUG] - Topic is available: q=a\\\
+[2024-02-06T23:02:52.855Z] [LOG] [DEBUG] - Topic is available: q=a\\
+[2024-02-06T23:02:53.263Z] [LOG] [DEBUG] - Topic is available: q=a
+[2024-02-06T23:02:53.283Z] [LOG] [DEBUG] - Topic is available: q=
+[2024-02-06T23:02:53.316Z] [LOG] [DEBUG] - Topic is available: q=a\
+[2024-02-06T23:02:53.655Z] [LOG] [DEBUG] - Topic is available: q
+[2024-02-06T23:02:53.696Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:02:53.727Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:53.727Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:53.727Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:53.749Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:02:53.802Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:02:54.933Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:02:54.964Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:54.964Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:54.964Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:02:54.973Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:20.169Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:20.416Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:03:20.798Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:21.118Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:03:23.859Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:23.879Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:03:24.129Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:24.168Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:03:24.326Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:03:24.516Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:03:24.644Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:03:24.885Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:03:26.270Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:03:26.302Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:26.302Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:26.302Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:26.312Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:30.823Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:03:30.854Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:30.854Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:30.854Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:31.111Z] [LOG] [DEBUG] - Topic is available:  
+[2024-02-06T23:03:32.269Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:03:32.303Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:32.303Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:32.303Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:32.310Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:32.899Z] [LOG] [DEBUG] - Topic is available: n
+[2024-02-06T23:03:33.677Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:03:33.721Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:33.721Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:33.721Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:33.753Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:35.689Z] [LOG] [DEBUG] - Topic is available: p
+[2024-02-06T23:03:36.028Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:03:36.064Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:36.064Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:36.064Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:36.137Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:37.202Z] [LOG] [DEBUG] - Topic is available: l
+[2024-02-06T23:03:37.765Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:03:37.800Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:37.800Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:37.800Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:38.082Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:39.644Z] [LOG] [DEBUG] - Topic is available: p
+[2024-02-06T23:03:40.621Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:03:40.655Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:40.655Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:40.655Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:03:40.911Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:03:49.165Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:03:49.170Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:04:11.158Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:04:11.160Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:04:14.146Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:04:14.167Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:04:17.153Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:04:17.155Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:31.129Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:31.385Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:31.461Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:31.625Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:31.711Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:31.849Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:31.855Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:32.175Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:32.282Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:32.433Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:32.578Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:06:32.627Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:32.627Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:32.627Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:32.689Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:32.696Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:32.733Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:06:32.763Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:32.763Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:32.763Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:33.083Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:33.257Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:33.740Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:33.973Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:47.745Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:06:47.776Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:47.776Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:47.776Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:47.782Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:47.795Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:47.881Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:06:48.021Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:48.030Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:48.030Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:48.030Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:48.221Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:48.776Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:48.902Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:49.479Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:06:50.117Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:06:52.105Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:52.114Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:06:52.148Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:52.148Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:52.148Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:56.979Z] [LOG] [DEBUG] - Topic is available: h
+[2024-02-06T23:06:57.213Z] [LOG] [DEBUG] - Topic is available: hv
+[2024-02-06T23:06:57.923Z] [LOG] [DEBUG] - Topic is available: h
+[2024-02-06T23:06:58.396Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:06:58.426Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:06:58.458Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:58.458Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:06:58.458Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:07:13.452Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:07:13.482Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:08:14.128Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:08:14.144Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:08:56.242Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:08:56.268Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:03.168Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:03.180Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:09.150Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:09.165Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:11.124Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:11.321Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:38.139Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:38.144Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:42.171Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:42.193Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:45.131Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:45.154Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:51.203Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:51.241Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:55.228Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:55.353Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:09:59.208Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:09:59.440Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:10:07.465Z] [LOG] [DEBUG] - Topic is available: n
+[2024-02-06T23:10:09.305Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:10:09.574Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:10:09.609Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:09.609Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:09.609Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:10.292Z] [LOG] [DEBUG] - Topic is available: k
+[2024-02-06T23:10:10.532Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:10:10.566Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:10.566Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:10.566Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:10.874Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:10:12.207Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:10:17.220Z] [LOG] [DEBUG] - Topic is available: ah
+[2024-02-06T23:10:19.154Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:10:20.179Z] [LOG] [DEBUG] - Topic is available: aa
+[2024-02-06T23:10:21.739Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:10:21.898Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:10:21.930Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:21.930Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:21.930Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:21.996Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:10:22.191Z] [LOG] [DEBUG] - Topic is available: p
+[2024-02-06T23:10:23.646Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:10:23.675Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:10:23.677Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:23.677Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:23.677Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:10:24.386Z] [LOG] [DEBUG] - Topic is available: l
+[2024-02-06T23:11:21.306Z] [LOG] [DEBUG] - Searching for blog: the-evolution-of-artificial-intelligence-past-present-and-future
+[2024-02-06T23:11:21.387Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:11:21.401Z] [LOG] [INFO] - Blog: The Evolution of Artificial Intelligence: Past, Present, and @ Future fetched. Content size is: 2.73046875 KB
+[2024-02-06T23:11:21.401Z] [LOG] [INFO] - Blog: The Evolution of Artificial Intelligence: Past, Present, and @ Future fetched. Content size is: 2.73046875 KB
+[2024-02-06T23:11:21.404Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-06T23:11:21.652Z] [LOG] [DEBUG] - Searching for blog: the-evolution-of-artificial-intelligence-past-present-and-future
+[2024-02-06T23:11:21.733Z] [LOG] [INFO] - Blog: The Evolution of Artificial Intelligence: Past, Present, and @ Future fetched. Content size is: 2.73046875 KB
+[2024-02-06T23:11:21.733Z] [LOG] [INFO] - Blog: The Evolution of Artificial Intelligence: Past, Present, and @ Future fetched. Content size is: 2.73046875 KB
+[2024-02-06T23:11:21.734Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-06T23:11:21.823Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:11:22.099Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:11:22.324Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:11:28.327Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:11:28.329Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:11:28.545Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:11:28.605Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:11:28.783Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:11:28.933Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:11:29.092Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:13:06.071Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:13:06.074Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:13:06.323Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:13:06.362Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:13:06.523Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:13:06.673Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:13:06.801Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-06T23:13:09.748Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:13:11.325Z] [LOG] [DEBUG] - Topic is available: as
+[2024-02-06T23:13:18.965Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:13:19.943Z] [LOG] [DEBUG] - Topic is available: aa
+[2024-02-06T23:13:21.009Z] [LOG] [DEBUG] - Topic is available: aas
+[2024-02-06T23:13:22.053Z] [LOG] [DEBUG] - Topic is available: aa
+[2024-02-06T23:13:22.286Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:13:22.625Z] [LOG] [DEBUG] - Topic is available: ae
+[2024-02-06T23:13:23.998Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:13:24.101Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:13:24.131Z] [LOG] [DEBUG] - Topic is available: 
+[2024-02-06T23:13:24.133Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:13:24.133Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:13:24.133Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:38:51.408Z] [LOG] [DEBUG] - Topic is available: a
+[2024-02-06T23:38:57.157Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-06T23:38:57.190Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:38:57.190Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:38:57.190Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-06T23:38:57.449Z] [LOG] [DEBUG] - Topic is available: 
