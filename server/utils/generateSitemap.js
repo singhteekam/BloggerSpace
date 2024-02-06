@@ -13,12 +13,19 @@ async function generateSitemap() {
 
     const sitemapStream = new SitemapStream({ hostname: process.env.BLOGGERSPACE1 });  // link
 
+    sitemapStream.write({
+      url: process.env.BLOGGERSPACE1, // Adjust the URL based on your blog URL structure
+      // changefreq: 'weekly',
+      // lastmod:1,
+      priority: 1.00,
+    });
+
     // console.log("Sitemap file content starts:");
     blogs.forEach((blog) => {
       sitemapStream.write({
         url: `/${blog.slug}`, // Adjust the URL based on your blog URL structure
         // changefreq: 'weekly',
-        // priority: 0.8,
+        priority: 0.80,
       });
     });
     // console.log("Sitemap content end");
