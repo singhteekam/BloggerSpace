@@ -5,7 +5,7 @@ const path = require('path');
 const generateSitemap = require('../utils/generateSitemap');
 const {fetchSitemapFile}= require('./../utils/uploadToGitHub');
 
-const sitemapRouter= async (req, res) => {
+router.get('/sitemap.xml', async (req, res) => {
     try {
     // await generateSitemap();
 
@@ -27,9 +27,9 @@ const sitemapRouter= async (req, res) => {
     console.error('Error serving sitemap:', error);
     res.status(500).send('Internal Server Error');
   }
-};
+});
 
-const updateSitemap= async (req, res)=>{
+router.get("/updatesitemap", async (req, res)=>{
   try {
     await generateSitemap();
     res.send("Sitemap file is updated at: "+ new Date(new Date().getTime()));
@@ -37,8 +37,7 @@ const updateSitemap= async (req, res)=>{
     console.error('Error updating sitemap:', error);
     res.status(500).send('Error updating sitemap file');
   }
-};
+});
 
 
-
-module.exports = {sitemapRouter, updateSitemap};
+module.exports = router;
