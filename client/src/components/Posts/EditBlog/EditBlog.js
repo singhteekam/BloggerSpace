@@ -8,6 +8,9 @@ import {
   Spinner,
   Badge,
   CloseButton,
+  Modal,
+  ListGroup,
+  Accordion
 } from "react-bootstrap";
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
 import axios from "axios";
@@ -33,6 +36,9 @@ const EditBlog = () => {
   const [tags, setTags] = useState([]);
   const [isUniqueTitle, setIsUniqueTitle] = useState([]);
   const [contentSize, setContentSize] = useState(0);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [searchTitleResults, setTitleSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -191,6 +197,19 @@ const EditBlog = () => {
       .replace(/\s+/g, "-");
   };
 
+  async function searchSimilarTitles(searchQuery) {
+    try {
+      setLoading(true);
+      const response = await axios.get(`/api/blogs/searchblogs/${searchQuery}`);
+      console.log(response.data);
+      setTitleSearchResults(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error searching similar blogs:", error);
+      setLoading(false);
+    }
+  }
+
   return (
     <Container className="editblogpage">
       <h2 className="edit-blog-heading">Edit Blog</h2>
@@ -209,10 +228,35 @@ const EditBlog = () => {
               setTitle(e.target.value);
               // setSlug(slugify(title.trim()));
               setSlug(slugify(e.target.value.trim()));
+              searchSimilarTitles(e.target.value);
             }}
             placeholder="Enter blog title"
           />
         </Form.Group>
+
+        <Accordion defaultActiveKey="0">
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>
+              Published Blogs with Similar title:
+            </Accordion.Header>
+            <Accordion.Body>
+              <ListGroup>
+                {searchTitleResults.map((blog) => (
+                  <ListGroup.Item key={blog._id} className="">
+                    <Link
+                      to={`/${blog.slug}`}
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <h6>{blog.title}</h6>
+                    </Link>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
+
         <Form.Group controlId="blogAuthor" className="editblogfields">
           <Form.Label>Author:</Form.Label>
           <Form.Control
@@ -314,6 +358,14 @@ const EditBlog = () => {
 
         <Button
           variant="secondary"
+          className="submit-editedblog"
+          onClick={() => setShowConfirmModal(true)}
+        >
+          Preview Blog
+        </Button>
+
+        <Button
+          variant="secondary"
           className="submit-editedblog mx-2"
           onClick={handleSaveAsDraft}
         >
@@ -330,6 +382,31 @@ const EditBlog = () => {
           Go Back
         </Button>
       </Form>
+
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Preview Blog</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Title: {title}
+          <br />
+          Slug: {slug}
+          <br />
+          <br />
+          Content: <br />
+          <div dangerouslySetInnerHTML={{ __html: content }} />
+          <h6>Content size: {contentSize} KB</h6>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowConfirmModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

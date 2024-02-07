@@ -6,6 +6,15 @@ const Blog = require('../models/Blog');
 const {fetchSitemapFile, uploadSitemapToGitHub}= require('./../utils/uploadToGitHub');
 
 async function generateSitemap() {
+  const Links=[
+    "https://bloggerspace.singhteekam.in/login",
+    "https://bloggerspace.singhteekam.in/signup",
+    "https://bloggerspace.singhteekam.in/sitemap",
+    "https://bloggerspace.singhteekam.in/guidelines",
+    "https://bloggerspace.singhteekam.in/aboutdeveloper",
+    "https://bloggerspace.singhteekam.in/forgotpassword"
+  ];
+
   try {
     const blogs = await Blog.find({ status: "PUBLISHED" }); // Fetch your published blogs from the database
 
@@ -18,6 +27,9 @@ async function generateSitemap() {
       // changefreq: 'weekly',
       // lastmod:1,
       priority: 1.00,
+    });
+    Links.forEach((link)=>{
+      sitemapStream.write({url: link, priority: 0.80,});
     });
 
     // console.log("Sitemap file content starts:");
