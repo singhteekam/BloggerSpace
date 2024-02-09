@@ -4,6 +4,7 @@ import { Button, Alert, Spinner } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import "./VerifyAccountPage.css";
 
 function VerifyAccountPage() {
@@ -88,44 +89,49 @@ function VerifyAccountPage() {
   };
 
   return (
-    <div className="verify-account-page">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-sm-8">
-            <div className="verify-account-form">
-              <h2 className="text-center mb-4">Verify Account</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
-              {verificationSuccess && (
-                <Alert variant="success">
-                  Account verification link sent to {email}! Please verify your
-                  account by clicking the link.
-                </Alert>
-              )}
-              {verificationLater && (
-                <Alert variant="info">Account Verification pending..</Alert>
-              )}
+    <div>
+      <Helmet>
+        <title>Verify account - BloggerSpace</title>
+      </Helmet>
+      <div className="verify-account-page">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-6 col-sm-8">
+              <div className="verify-account-form">
+                <h2 className="text-center mb-4">Verify Account</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+                {verificationSuccess && (
+                  <Alert variant="success">
+                    Account verification link sent to {email}! Please verify
+                    your account by clicking the link.
+                  </Alert>
+                )}
+                {verificationLater && (
+                  <Alert variant="info">Account Verification pending..</Alert>
+                )}
 
-              <div className="text-center">
-                <Button
-                  variant="primary"
-                  onClick={handleVerification}
-                  className="verify-button"
-                >
-                  {isSendingVerification ? (
-                    <Spinner animation="border" role="status" size="sm" />
-                  ) : (
-                    "Send Verification Link"
-                  )}
-                </Button>
-              </div>
-              <div className="text-center">
-                <Button
-                  variant="secondary"
-                  onClick={handleVerificationLater}
-                  className="verify-button"
-                >
-                  Verify later
-                </Button>
+                <div className="text-center">
+                  <Button
+                    variant="primary"
+                    onClick={handleVerification}
+                    className="verify-button"
+                  >
+                    {isSendingVerification ? (
+                      <Spinner animation="border" role="status" size="sm" />
+                    ) : (
+                      "Send Verification Link"
+                    )}
+                  </Button>
+                </div>
+                <div className="text-center">
+                  <Button
+                    variant="secondary"
+                    onClick={handleVerificationLater}
+                    className="verify-button"
+                  >
+                    Verify later
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

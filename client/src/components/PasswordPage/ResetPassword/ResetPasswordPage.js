@@ -3,6 +3,7 @@ import { Form, Button, Alert } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import "./ResetPasswordPage.css";
 
 function ResetPasswordPage() {
@@ -70,47 +71,52 @@ function ResetPasswordPage() {
   };
 
   return (
-    <div className="password-reset-page">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-sm-8">
-            <div className="password-reset-form">
-              <h2 className="text-center mb-4">Reset Password</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
-              {success && <Alert variant="success">{success}</Alert>}
-              <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="password">
-                  <Form.Label>New Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter new password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </Form.Group>
+    <div>
+      <Helmet>
+        <title>Reset Password - BloggerSpace</title>
+      </Helmet>
+      <div className="password-reset-page">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-6 col-sm-8">
+              <div className="password-reset-form">
+                <h2 className="text-center mb-4">Reset Password</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+                {success && <Alert variant="success">{success}</Alert>}
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group controlId="password">
+                    <Form.Label>New Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="Enter new password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                  </Form.Group>
 
-                <Form.Group controlId="confirmPassword">
-                  <Form.Label>Confirm Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Confirm new password"
-                    value={confirmPassword}
-                    onChange={handleConfirmPasswordChange}
-                    required
-                  />
-                </Form.Group>
+                  <Form.Group controlId="confirmPassword">
+                    <Form.Label>Confirm Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="Confirm new password"
+                      value={confirmPassword}
+                      onChange={handleConfirmPasswordChange}
+                      required
+                    />
+                  </Form.Group>
 
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="password-reset-button"
-                  block
-                  disabled={loading}
-                >
-                  {loading ? "Resetting Password..." : "Reset Password"}
-                </Button>
-              </Form>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="password-reset-button"
+                    block
+                    disabled={loading}
+                  >
+                    {loading ? "Resetting Password..." : "Reset Password"}
+                  </Button>
+                </Form>
+              </div>
             </div>
           </div>
         </div>

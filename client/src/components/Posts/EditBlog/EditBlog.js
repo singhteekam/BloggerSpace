@@ -10,12 +10,13 @@ import {
   CloseButton,
   Modal,
   ListGroup,
-  Accordion
+  Accordion,
 } from "react-bootstrap";
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
 import axios from "axios";
 import "./EditBlog.css";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import blogCategory from "../../../utils/blogCategory.json";
 import blogTags from "../../../utils/blogTags.json";
 
@@ -211,203 +212,215 @@ const EditBlog = () => {
   }
 
   return (
-    <Container className="editblogpage">
-      <h2 className="edit-blog-heading">Edit Blog</h2>
-      {alert && (
-        <Alert variant={alert.type} onClose={() => setAlert(null)} dismissible>
-          {alert.message}
-        </Alert>
-      )}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="blogTitle" className="editblogfields">
-          <Form.Label>Title: </Form.Label>
-          <Form.Control
-            type="text"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              // setSlug(slugify(title.trim()));
-              setSlug(slugify(e.target.value.trim()));
-              searchSimilarTitles(e.target.value);
-            }}
-            placeholder="Enter blog title"
-          />
-        </Form.Group>
-
-        <Accordion defaultActiveKey="0">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>
-              Published Blogs with Similar title:
-            </Accordion.Header>
-            <Accordion.Body>
-              <ListGroup>
-                {searchTitleResults.map((blog) => (
-                  <ListGroup.Item key={blog._id} className="">
-                    <Link
-                      to={`/${blog.slug}`}
-                      target="_blank"
-                      style={{ textDecoration: "none" }}
-                    >
-                      <h6>{blog.title}</h6>
-                    </Link>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-
-        <Form.Group controlId="blogAuthor" className="editblogfields">
-          <Form.Label>Author:</Form.Label>
-          <Form.Control
-            type="text"
-            value={authorDetails.userName}
-            // onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Enter author name"
-            disabled
-          />
-        </Form.Group>
-
-        <Form.Group controlId="blogCategory" className="editblogfields">
-          <Form.Label>Category:</Form.Label>
-          <Form.Control
-            as="select"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            placeholder="Select category"
-            required
+    <div>
+      <Helmet>
+        <title>Edit Blog - {title}</title>
+      </Helmet>
+      <Container className="editblogpage">
+        <h2 className="edit-blog-heading">Edit Blog</h2>
+        {alert && (
+          <Alert
+            variant={alert.type}
+            onClose={() => setAlert(null)}
+            dismissible
           >
-            {/* <option value="">Select Category</option> */}
-            {blogCategory.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-            {/* Add more category options as needed */}
-          </Form.Control>
-        </Form.Group>
-
-        {category === "Other" ? (
-          <Form.Group controlId="otherCategory" className="newblogfields">
-            <Form.Label>Specify other category:</Form.Label>
+            {alert.message}
+          </Alert>
+        )}
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="blogTitle" className="editblogfields">
+            <Form.Label>Title: </Form.Label>
             <Form.Control
               type="text"
-              value={otherCategory}
+              value={title}
               onChange={(e) => {
-                setOtherCategory(e.target.value);
+                setTitle(e.target.value);
+                // setSlug(slugify(title.trim()));
+                setSlug(slugify(e.target.value.trim()));
+                searchSimilarTitles(e.target.value);
               }}
-              placeholder="Enter category"
-              required
+              placeholder="Enter blog title"
             />
           </Form.Group>
-        ) : null}
 
-        <Form.Group controlId="blogCategory" className="newblogfields">
-          <Form.Label>Tags:</Form.Label>
-          <Form.Control
-            as="select"
-            value={selectedTag}
-            onChange={handleSelectedTag}
-            placeholder="Select tag"
-          >
-            <option value="">Select Tag</option>
-            {blogTags.map((tag) => (
-              <option key={tag} value={tag}>
+          <Accordion defaultActiveKey="0">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>
+                Published Blogs with Similar title:
+              </Accordion.Header>
+              <Accordion.Body>
+                <ListGroup>
+                  {searchTitleResults.map((blog) => (
+                    <ListGroup.Item key={blog._id} className="">
+                      <Link
+                        to={`/${blog.slug}`}
+                        target="_blank"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <h6>{blog.title}</h6>
+                      </Link>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+
+          <Form.Group controlId="blogAuthor" className="editblogfields">
+            <Form.Label>Author:</Form.Label>
+            <Form.Control
+              type="text"
+              value={authorDetails.userName}
+              // onChange={(e) => setAuthor(e.target.value)}
+              placeholder="Enter author name"
+              disabled
+            />
+          </Form.Group>
+
+          <Form.Group controlId="blogCategory" className="editblogfields">
+            <Form.Label>Category:</Form.Label>
+            <Form.Control
+              as="select"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="Select category"
+              required
+            >
+              {/* <option value="">Select Category</option> */}
+              {blogCategory.map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+              {/* Add more category options as needed */}
+            </Form.Control>
+          </Form.Group>
+
+          {category === "Other" ? (
+            <Form.Group controlId="otherCategory" className="newblogfields">
+              <Form.Label>Specify other category:</Form.Label>
+              <Form.Control
+                type="text"
+                value={otherCategory}
+                onChange={(e) => {
+                  setOtherCategory(e.target.value);
+                }}
+                placeholder="Enter category"
+                required
+              />
+            </Form.Group>
+          ) : null}
+
+          <Form.Group controlId="blogCategory" className="newblogfields">
+            <Form.Label>Tags:</Form.Label>
+            <Form.Control
+              as="select"
+              value={selectedTag}
+              onChange={handleSelectedTag}
+              placeholder="Select tag"
+            >
+              <option value="">Select Tag</option>
+              {blogTags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            </Form.Control>
+            <Button
+              variant="success"
+              size="sm"
+              onClick={handleTagAdd}
+              className="my-2"
+            >
+              Add Tag
+            </Button>
+            <br />
+            {tags.map((tag) => (
+              <Badge key={tag} pill bg="secondary">
                 {tag}
-              </option>
+                <CloseButton
+                  variant="white"
+                  onClick={() => handleTagDismiss(tag)}
+                ></CloseButton>
+              </Badge>
             ))}
-          </Form.Control>
-          <Button
-            variant="success"
-            size="sm"
-            onClick={handleTagAdd}
-            className="my-2"
-          >
-            Add Tag
-          </Button>
-          <br />
-          {tags.map((tag) => (
-            <Badge key={tag} pill bg="secondary">
-              {tag}
-              <CloseButton
-                variant="white"
-                onClick={() => handleTagDismiss(tag)}
-              ></CloseButton>
-            </Badge>
-          ))}
-        </Form.Group>
+          </Form.Group>
 
-        <Form.Group controlId="blogContent" className="editblogfields">
-          <Form.Label>Content:</Form.Label>
-          <QuillEditor content={content} onContentChange={setContent} />
-        </Form.Group>
+          <Form.Group controlId="blogContent" className="editblogfields">
+            <Form.Label>Content:</Form.Label>
+            <QuillEditor content={content} onContentChange={setContent} />
+          </Form.Group>
 
-        <h6>Content size: {contentSize} KB</h6>
-
-        <h6>Feedbacks:</h6>
-        <ul>
-          {feedbackComments.map((comment, index) => (
-            <li key={index}>
-              <p className="comment-content">{comment.feedback}</p>
-              <p className="comment-user">
-                <strong>Feedback by:</strong> {comment.reviewer}
-              </p>
-            </li>
-          ))}
-        </ul>
-
-        <Button
-          variant="secondary"
-          className="submit-editedblog"
-          onClick={() => setShowConfirmModal(true)}
-        >
-          Preview Blog
-        </Button>
-
-        <Button
-          variant="secondary"
-          className="submit-editedblog mx-2"
-          onClick={handleSaveAsDraft}
-        >
-          Save Draft
-        </Button>
-        <Button variant="primary" type="submit" className="submit-editedblog">
-          Save
-        </Button>
-        <Button
-          variant="primary"
-          className="goback-editedblog"
-          onClick={() => navigate(-1)}
-        >
-          Go Back
-        </Button>
-      </Form>
-
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Preview Blog</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Title: {title}
-          <br />
-          Slug: {slug}
-          <br />
-          <br />
-          Content: <br />
-          <div dangerouslySetInnerHTML={{ __html: content }} />
           <h6>Content size: {contentSize} KB</h6>
-        </Modal.Body>
 
-        <Modal.Footer>
+          <h6>Feedbacks:</h6>
+          <ul>
+            {feedbackComments.map((comment, index) => (
+              <li key={index}>
+                <p className="comment-content">{comment.feedback}</p>
+                <p className="comment-user">
+                  <strong>Feedback by:</strong> {comment.reviewer}
+                </p>
+              </li>
+            ))}
+          </ul>
+
           <Button
             variant="secondary"
-            onClick={() => setShowConfirmModal(false)}
+            className="submit-editedblog"
+            onClick={() => setShowConfirmModal(true)}
           >
-            Cancel
+            Preview Blog
           </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+
+          <Button
+            variant="secondary"
+            className="submit-editedblog mx-2"
+            onClick={handleSaveAsDraft}
+          >
+            Save Draft
+          </Button>
+          <Button variant="primary" type="submit" className="submit-editedblog">
+            Save
+          </Button>
+          <Button
+            variant="primary"
+            className="goback-editedblog"
+            onClick={() => navigate(-1)}
+          >
+            Go Back
+          </Button>
+        </Form>
+
+        <Modal
+          show={showConfirmModal}
+          onHide={() => setShowConfirmModal(false)}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Preview Blog</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Title: {title}
+            <br />
+            Slug: {slug}
+            <br />
+            <br />
+            Content: <br />
+            <div dangerouslySetInnerHTML={{ __html: content }} />
+            <h6>Content size: {contentSize} KB</h6>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Container>
+    </div>
   );
 };
 

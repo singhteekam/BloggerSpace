@@ -10,9 +10,10 @@ import {
   Spinner,
   Tab,
   Tabs,
-  Badge
+  Badge,
 } from "react-bootstrap";
 import axios from "axios";
+import { Helmet } from "react-helmet";
 import "./MyBlogs.css";
 
 const MyBlogs = () => {
@@ -27,7 +28,11 @@ const MyBlogs = () => {
 
   const token = localStorage.getItem("token");
 
-  var i = 0,j=0,k=0,l=0,m=0;
+  var i = 0,
+    j = 0,
+    k = 0,
+    l = 0,
+    m = 0;
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -43,9 +48,7 @@ const MyBlogs = () => {
 
     const fetchSavedDraftBlogs = async () => {
       try {
-        const response = await axios.get(
-          "/api/blogs/myblogs/saveddraft"
-        );
+        const response = await axios.get("/api/blogs/myblogs/saveddraft");
         setSavedDraftBlogs(response.data);
         console.log(savedDraftBlogs);
       } catch (error) {
@@ -55,9 +58,7 @@ const MyBlogs = () => {
 
     const fetchPendingReviewBlogs = async () => {
       try {
-        const response = await axios.get(
-          "/api/blogs/myblogs/pendingreview"
-        );
+        const response = await axios.get("/api/blogs/myblogs/pendingreview");
         setPendingReviewBlogs(response.data);
         console.log(pendingReviewBlogs);
       } catch (error) {
@@ -67,9 +68,7 @@ const MyBlogs = () => {
 
     const fetchUnderReviewBlogs = async () => {
       try {
-        const response = await axios.get(
-          "/api/blogs/myblogs/underreview"
-        );
+        const response = await axios.get("/api/blogs/myblogs/underreview");
         setUnderReviewBlogs(response.data);
         console.log(underReviewBlogs);
       } catch (error) {
@@ -115,13 +114,10 @@ const MyBlogs = () => {
     );
     if (confirmDiscard) {
       try {
-        const response = await axios.post(
-          `/api/users/discard/blog/${blogId}`,
-          {
-            authorEmail,
-            slug,
-          }
-        );
+        const response = await axios.post(`/api/users/discard/blog/${blogId}`, {
+          authorEmail,
+          slug,
+        });
         // Handle the response
         setAlert({ type: "success", message: "blog discarded successfully" });
         setTimeout(() => {
@@ -142,321 +138,333 @@ const MyBlogs = () => {
     );
   }
 
-  
-
   return (
-    <Container className="myblogs-page col-lg-7">
-      <h2 className="myblogs-heading">My Blogs</h2>
+    <div>
+      <Helmet>
+        <title>My Blogs - BloggerSpace</title>
+      </Helmet>
+      <Container className="myblogs-page col-lg-7">
+        <h2 className="myblogs-heading">My Blogs</h2>
 
-      {alert && (
-        <Alert variant={alert.type} onClose={() => setAlert(null)} dismissible>
-          {alert.message}
-        </Alert>
-      )}
-      {/* <Card>
+        {alert && (
+          <Alert
+            variant={alert.type}
+            onClose={() => setAlert(null)}
+            dismissible
+          >
+            {alert.message}
+          </Alert>
+        )}
+        {/* <Card>
         <Card.Body>
           <Card.Title>{userProfile?.fullName}</Card.Title>
           <Card.Text>Email: {userProfile?.email}</Card.Text>
         </Card.Body>
       </Card> */}
 
-      <Tabs
-        defaultActiveKey="pending"
-        id="justify-tab-example"
-        className="mb-3"
-        justify
-      >
-        <Tab
-          eventKey="saveddraft"
-          title={
-            <React.Fragment>
-              Draft
-              <Badge variant="light" className="mx-1">
-                {savedDraftBlogs?.length}
-              </Badge>
-            </React.Fragment>
-          }
+        <Tabs
+          defaultActiveKey="pending"
+          id="justify-tab-example"
+          className="mb-3"
+          justify
         >
-          <h5 className="mt-4">
-            <b>Saved Draft Blogs:</b>
-          </h5>
-          {savedDraftBlogs?.length === 0 ? (
-            <div>No saved draft Blogs found</div>
-          ) : (
-            <>
-              <ListGroup>
-                {savedDraftBlogs?.map((blog) => (
-                  <ListGroup.Item key={blog.slug}>
-                    <div className="row align-items-center">
-                      <div className="col">
-                        <b>
-                          {++i}. {blog.title}
-                        </b>
-                        <p>
-                          <i>Current Reviewer: {blog.currentReviewer}</i>
-                          <br />
-                          <i>
-                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
-                            {blog.lastUpdatedAt.slice(0, 10)}
-                          </i>
-                        </p>
-                      </div>
+          <Tab
+            eventKey="saveddraft"
+            title={
+              <React.Fragment>
+                Draft
+                <Badge variant="light" className="mx-1">
+                  {savedDraftBlogs?.length}
+                </Badge>
+              </React.Fragment>
+            }
+          >
+            <h5 className="mt-4">
+              <b>Saved Draft Blogs:</b>
+            </h5>
+            {savedDraftBlogs?.length === 0 ? (
+              <div>No saved draft Blogs found</div>
+            ) : (
+              <>
+                <ListGroup>
+                  {savedDraftBlogs?.map((blog) => (
+                    <ListGroup.Item key={blog.slug}>
+                      <div className="row align-items-center">
+                        <div className="col">
+                          <b>
+                            {++i}. {blog.title}
+                          </b>
+                          <p>
+                            <i>Current Reviewer: {blog.currentReviewer}</i>
+                            <br />
+                            <i>
+                              Last Updated at:{" "}
+                              {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                              {blog.lastUpdatedAt.slice(0, 10)}
+                            </i>
+                          </p>
+                        </div>
 
-                      <div className="col-auto">
-                        <Link
-                          to={`/editblog/${blog._id}`}
-                          className="btn btn-primary"
-                        >
-                          Edit
-                        </Link>
+                        <div className="col-auto">
+                          <Link
+                            to={`/editblog/${blog._id}`}
+                            className="btn btn-primary"
+                          >
+                            Edit
+                          </Link>
+                        </div>
+                        <div className="col-auto">
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="m-2"
+                            onClick={() =>
+                              handleDiscardBlog(
+                                blog._id,
+                                blog.authorEmail,
+                                blog.slug
+                              )
+                            }
+                          >
+                            Discard
+                          </Button>
+                        </div>
                       </div>
-                      <div className="col-auto">
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          className="m-2"
-                          onClick={() =>
-                            handleDiscardBlog(
-                              blog._id,
-                              blog.authorEmail,
-                              blog.slug
-                            )
-                          }
-                        >
-                          Discard
-                        </Button>
-                      </div>
-                    </div>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </>
-          )}
-        </Tab>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </>
+            )}
+          </Tab>
 
-        <Tab
-          eventKey="pending"
-          title={
-            <React.Fragment>
-              Pending Review
-              <Badge variant="light" className="mx-1">
-                {pendingReviewBlogs?.length}
-              </Badge>
-            </React.Fragment>
-          }
-        >
-          <h5 className="mt-4">
-            <b>Pending Review Blogs:</b>
-          </h5>
-          {pendingReviewBlogs?.length === 0 ? (
-            <div>No Pending Review Blogs found</div>
-          ) : (
-            <>
-              <ListGroup>
-                {pendingReviewBlogs?.map((blog) => (
-                  <ListGroup.Item key={blog.slug}>
-                    <div className="row align-items-center">
-                      <div className="col">
-                        <b>
-                          {++j}. {blog.title}
-                        </b>
-                        <p>
-                          <i>Current Reviewer: {blog.currentReviewer}</i>
-                          <br />
-                          <i>
-                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
-                            {blog.lastUpdatedAt.slice(0, 10)}
-                          </i>
-                        </p>
-                      </div>
+          <Tab
+            eventKey="pending"
+            title={
+              <React.Fragment>
+                Pending Review
+                <Badge variant="light" className="mx-1">
+                  {pendingReviewBlogs?.length}
+                </Badge>
+              </React.Fragment>
+            }
+          >
+            <h5 className="mt-4">
+              <b>Pending Review Blogs:</b>
+            </h5>
+            {pendingReviewBlogs?.length === 0 ? (
+              <div>No Pending Review Blogs found</div>
+            ) : (
+              <>
+                <ListGroup>
+                  {pendingReviewBlogs?.map((blog) => (
+                    <ListGroup.Item key={blog.slug}>
+                      <div className="row align-items-center">
+                        <div className="col">
+                          <b>
+                            {++j}. {blog.title}
+                          </b>
+                          <p>
+                            <i>Current Reviewer: {blog.currentReviewer}</i>
+                            <br />
+                            <i>
+                              Last Updated at:{" "}
+                              {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                              {blog.lastUpdatedAt.slice(0, 10)}
+                            </i>
+                          </p>
+                        </div>
 
-                      <div className="col-auto">
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          className="m-2"
-                          onClick={() =>
-                            handleDiscardBlog(
-                              blog._id,
-                              blog.authorEmail,
-                              blog.slug
-                            )
-                          }
-                        >
-                          Discard
-                        </Button>
+                        <div className="col-auto">
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="m-2"
+                            onClick={() =>
+                              handleDiscardBlog(
+                                blog._id,
+                                blog.authorEmail,
+                                blog.slug
+                              )
+                            }
+                          >
+                            Discard
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </>
-          )}
-        </Tab>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </>
+            )}
+          </Tab>
 
-        <Tab
-          eventKey="underreview"
-          title={
-            <React.Fragment>
-              Under Review
-              <Badge variant="light" className="mx-1">
-                {underReviewBlogs?.length}
-              </Badge>
-            </React.Fragment>
-          }
-        >
-          <h5 className="mt-4">
-            <b>Under Review Blogs:</b>
-          </h5>
-          {underReviewBlogs?.length === 0 ? (
-            <div>No Under Review Blogs found</div>
-          ) : (
-            <>
-              <ListGroup>
-                {underReviewBlogs?.map((blog) => (
-                  <ListGroup.Item key={blog.slug}>
-                    <div className="row align-items-center">
-                      <div className="col">
-                        <b>
-                          {++k}. {blog.title}
-                        </b>
-                        <p>
-                          <i>Current Reviewer: {blog.currentReviewer}</i>
-                          <br />
-                          <i>
-                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
-                            {blog.lastUpdatedAt.slice(0, 10)}
-                          </i>
-                        </p>
+          <Tab
+            eventKey="underreview"
+            title={
+              <React.Fragment>
+                Under Review
+                <Badge variant="light" className="mx-1">
+                  {underReviewBlogs?.length}
+                </Badge>
+              </React.Fragment>
+            }
+          >
+            <h5 className="mt-4">
+              <b>Under Review Blogs:</b>
+            </h5>
+            {underReviewBlogs?.length === 0 ? (
+              <div>No Under Review Blogs found</div>
+            ) : (
+              <>
+                <ListGroup>
+                  {underReviewBlogs?.map((blog) => (
+                    <ListGroup.Item key={blog.slug}>
+                      <div className="row align-items-center">
+                        <div className="col">
+                          <b>
+                            {++k}. {blog.title}
+                          </b>
+                          <p>
+                            <i>Current Reviewer: {blog.currentReviewer}</i>
+                            <br />
+                            <i>
+                              Last Updated at:{" "}
+                              {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                              {blog.lastUpdatedAt.slice(0, 10)}
+                            </i>
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </>
-          )}
-        </Tab>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </>
+            )}
+          </Tab>
 
-        <Tab
-          eventKey="awaitingauthor"
-          title={
-            <React.Fragment>
-              Awaiting Author
-              <Badge variant="light" className="mx-1">
-                {awaitingAuthorBlogs?.length}
-              </Badge>
-            </React.Fragment>
-          }
-        >
-          <h5 className="mt-4">
-            <b>Awaiting Author Blogs:</b>
-          </h5>
-          {awaitingAuthorBlogs?.length === 0 ? (
-            <div>No Awaiting Author Blogs found</div>
-          ) : (
-            <>
-              <ListGroup>
-                {awaitingAuthorBlogs?.map((blog) => (
-                  <ListGroup.Item key={blog.slug}>
-                    <div className="row align-items-center">
-                      <div className="col">
-                        <b>
-                          {++l}. {blog.title}
-                        </b>
-                        <p>
-                          <i>Current Reviewer: {blog.currentReviewer}</i>
-                          <br />
-                          <i>
-                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
-                            {blog.lastUpdatedAt.slice(0, 10)}
-                          </i>
-                        </p>
-                      </div>
+          <Tab
+            eventKey="awaitingauthor"
+            title={
+              <React.Fragment>
+                Awaiting Author
+                <Badge variant="light" className="mx-1">
+                  {awaitingAuthorBlogs?.length}
+                </Badge>
+              </React.Fragment>
+            }
+          >
+            <h5 className="mt-4">
+              <b>Awaiting Author Blogs:</b>
+            </h5>
+            {awaitingAuthorBlogs?.length === 0 ? (
+              <div>No Awaiting Author Blogs found</div>
+            ) : (
+              <>
+                <ListGroup>
+                  {awaitingAuthorBlogs?.map((blog) => (
+                    <ListGroup.Item key={blog.slug}>
+                      <div className="row align-items-center">
+                        <div className="col">
+                          <b>
+                            {++l}. {blog.title}
+                          </b>
+                          <p>
+                            <i>Current Reviewer: {blog.currentReviewer}</i>
+                            <br />
+                            <i>
+                              Last Updated at:{" "}
+                              {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                              {blog.lastUpdatedAt.slice(0, 10)}
+                            </i>
+                          </p>
+                        </div>
 
-                      <div className="col-auto">
-                        <Link
-                          to={`/editblog/${blog._id}`}
-                          className="btn btn-primary"
-                        >
-                          Edit
-                        </Link>
+                        <div className="col-auto">
+                          <Link
+                            to={`/editblog/${blog._id}`}
+                            className="btn btn-primary"
+                          >
+                            Edit
+                          </Link>
+                        </div>
+                        <div className="col-auto">
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="m-2"
+                            onClick={() =>
+                              handleDiscardBlog(
+                                blog._id,
+                                blog.authorEmail,
+                                blog.slug
+                              )
+                            }
+                          >
+                            Discard
+                          </Button>
+                        </div>
                       </div>
-                      <div className="col-auto">
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          className="m-2"
-                          onClick={() =>
-                            handleDiscardBlog(
-                              blog._id,
-                              blog.authorEmail,
-                              blog.slug
-                            )
-                          }
-                        >
-                          Discard
-                        </Button>
-                      </div>
-                    </div>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </>
-          )}
-        </Tab>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </>
+            )}
+          </Tab>
 
-        <Tab
-          eventKey="published"
-          title={
-            <React.Fragment>
-              Published
-              <Badge variant="light" className="mx-1">
-                {authorPublishedBlogs?.length}
-              </Badge>
-            </React.Fragment>
-          }
-        >
-          <h5 className="mt-4">
-            <b>Published Blogs:</b>
-          </h5>
-          {authorPublishedBlogs?.length === 0 ? (
-            <div>No Published Blogs found</div>
-          ) : (
-            <>
-              <ListGroup>
-                {authorPublishedBlogs?.map((blog) => (
-                  <ListGroup.Item key={blog.slug}>
-                    <div className="row align-items-center">
-                      <div className="col">
-                        <b>
-                          {++m}. {blog.title}
-                        </b>
-                        <p>
-                          <i>
-                            Last Updated at: {blog.lastUpdatedAt.slice(11, 19)},{" "}
-                            {blog.lastUpdatedAt.slice(0, 10)}
-                          </i>
-                        </p>
-                      </div>
+          <Tab
+            eventKey="published"
+            title={
+              <React.Fragment>
+                Published
+                <Badge variant="light" className="mx-1">
+                  {authorPublishedBlogs?.length}
+                </Badge>
+              </React.Fragment>
+            }
+          >
+            <h5 className="mt-4">
+              <b>Published Blogs:</b>
+            </h5>
+            {authorPublishedBlogs?.length === 0 ? (
+              <div>No Published Blogs found</div>
+            ) : (
+              <>
+                <ListGroup>
+                  {authorPublishedBlogs?.map((blog) => (
+                    <ListGroup.Item key={blog.slug}>
+                      <div className="row align-items-center">
+                        <div className="col">
+                          <b>
+                            {++m}. {blog.title}
+                          </b>
+                          <p>
+                            <i>
+                              Last Updated at:{" "}
+                              {blog.lastUpdatedAt.slice(11, 19)},{" "}
+                              {blog.lastUpdatedAt.slice(0, 10)}
+                            </i>
+                          </p>
+                        </div>
 
-                      <div className="col-auto">
-                        <Link
-                          to={`/${blog.slug}`}
-                          className="btn btn-primary"
-                          target="_blank"
-                        >
-                          View
-                        </Link>
+                        <div className="col-auto">
+                          <Link
+                            to={`/${blog.slug}`}
+                            className="btn btn-primary"
+                            target="_blank"
+                          >
+                            View
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </>
-          )}
-        </Tab>
-      </Tabs>
-    </Container>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </>
+            )}
+          </Tab>
+        </Tabs>
+      </Container>
+    </div>
   );
 };
 

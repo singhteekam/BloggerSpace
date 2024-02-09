@@ -10,6 +10,7 @@ import {
   FormControl,
 } from "react-bootstrap";
 import axios from "axios";
+import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
 import ImageCompressor from "image-compressor.js";
 import "./MyProfilePage.css";
@@ -23,39 +24,36 @@ const MyProfilePage = () => {
   const isLoggedIn = localStorage.getItem("token");
   const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [fullName, setFullName]= useState("");
-  const [userName, setUserName]= useState("");
-  const [userNameAvailable, setUserNameAvailable]= useState(null);
+  const [fullName, setFullName] = useState("");
+  const [userName, setUserName] = useState("");
+  const [userNameAvailable, setUserNameAvailable] = useState(null);
   const [showSuccess, setShowSuccess] = useState(null);
   const [showError, setShowError] = useState(null);
-
 
   let i = 0;
 
   useEffect(() => {
-      axios
-        .get("/api/users/userinfo")
-        .then((response) => {
-          const userData = response.data;
+    axios
+      .get("/api/users/userinfo")
+      .then((response) => {
+        const userData = response.data;
 
-          setIsLoading(false);
-          setUser(userData);
-          setFullName(userData?.fullName);
-          setUserName(userData?.userName);
-        })
-        .catch((error) => {
-          setIsLoading(false);
-          console.error("Error fetching user information:", error);
-          // localStorage.removeItem("token");
-          // navigate("/login");
-        });
-        
+        setIsLoading(false);
+        setUser(userData);
+        setFullName(userData?.fullName);
+        setUserName(userData?.userName);
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        console.error("Error fetching user information:", error);
+        // localStorage.removeItem("token");
+        // navigate("/login");
+      });
   }, []);
 
-
-  const checkUserNameAvailable= async(userName)=>{
+  const checkUserNameAvailable = async (userName) => {
     await axios
-      .post("/api/users/checkusername", {userName})
+      .post("/api/users/checkusername", { userName })
       .then((response) => {
         const userData = response.data.message;
 
@@ -64,10 +62,9 @@ const MyProfilePage = () => {
       })
       .catch((error) => {
         setUserNameAvailable(false);
-        console.log("Error: "+error.response.data.message);
+        console.log("Error: " + error.response.data.message);
       });
-  }
-
+  };
 
   const handleVerifyAccount = () => {
     navigate("/verify-account", {
@@ -81,7 +78,7 @@ const MyProfilePage = () => {
   const handleFileChange = async (e) => {
     // setSelectedFile(e.target.files[0]);
 
-    const file= e.target.files[0];
+    const file = e.target.files[0];
     // Check if the file size is greater than 64KB
     if (file.size > 0.064 * 1024 * 1024) {
       try {
@@ -143,194 +140,203 @@ const MyProfilePage = () => {
     );
   }
 
-    const handleshowEditPersonalDetailsModal = () => {
-      setShowConfirmModal(true); // Show the confirmation modal
-    };
+  const handleshowEditPersonalDetailsModal = () => {
+    setShowConfirmModal(true); // Show the confirmation modal
+  };
 
-    const updatePersonalDetails= async()=>{
-      try {
-        const response = await axios.patch("/api/users/updateusername", {
-          fullName,userName,
-        });
-        setShowSuccess(response.data.message);
-        setShowError("");
-        setUserName("");
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } catch (error) {
-        setShowError(error.response.data.error);
-        setShowSuccess("");
-      } 
+  const updatePersonalDetails = async () => {
+    try {
+      const response = await axios.patch("/api/users/updateusername", {
+        fullName,
+        userName,
+      });
+      setShowSuccess(response.data.message);
+      setShowError("");
+      setUserName("");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      setShowError(error.response.data.error);
+      setShowSuccess("");
     }
+  };
 
-    // const validateUsername = (username) => {
-    //   if (!username) {
-    //     return "Username cannot be empty.";
-    //   }
+  // const validateUsername = (username) => {
+  //   if (!username) {
+  //     return "Username cannot be empty.";
+  //   }
 
-    //   if (username.length < 3 || username.length > 20) {
-    //     return "Username must be between 3 and 20 characters long.";
-    //   }
+  //   if (username.length < 3 || username.length > 20) {
+  //     return "Username must be between 3 and 20 characters long.";
+  //   }
 
-    //   if (/\s/.test(username)) {
-    //     return "Username cannot contain spaces.";
-    //   }
+  //   if (/\s/.test(username)) {
+  //     return "Username cannot contain spaces.";
+  //   }
 
-    //   if (!/^[a-zA-Z0-9]+$/.test(username)) {
-    //     return "Username can only contain letters and numbers.";
-    //   }
+  //   if (!/^[a-zA-Z0-9]+$/.test(username)) {
+  //     return "Username can only contain letters and numbers.";
+  //   }
 
-    //   return ""; // Empty string indicates the username is valid
-    // };
+  //   return ""; // Empty string indicates the username is valid
+  // };
 
   return (
-    <Container className="my-profile-page">
-      <h2 className="my-profile-heading">My Profile</h2>
+    <div>
+      <Helmet>
+        <title>My Profile - BloggerSpace</title>
+      </Helmet>
+      <Container className="my-profile-page">
+        <h2 className="my-profile-heading">My Profile</h2>
 
-      <Card>
-        <Card.Body>
-          {uploadSuccess && (
-            <Alert variant="success">
-              Profile picture uploaded successfully
-            </Alert>
-          )}
-          {uploadError && <Alert variant="danger">{uploadError}</Alert>}
-          <div className="profile-section">
-            <div className="profile-picture">
-              {/* Display the user's profile picture */}
-              {user && (
-                <>
-                  {user.profilePicture ? (
-                    <img
-                      src={`data:image/jpeg;base64,${user.profilePicture}`}
-                      alt="Profile"
-                    />
-                  ) : (
-                    <img
-                      src="https://img.freepik.com/free-icon/user_318-159711.jpg"
-                      alt="Profile"
-                    />
-                  )}
+        <Card>
+          <Card.Body>
+            {uploadSuccess && (
+              <Alert variant="success">
+                Profile picture uploaded successfully
+              </Alert>
+            )}
+            {uploadError && <Alert variant="danger">{uploadError}</Alert>}
+            <div className="profile-section">
+              <div className="profile-picture">
+                {/* Display the user's profile picture */}
+                {user && (
+                  <>
+                    {user.profilePicture ? (
+                      <img
+                        src={`data:image/jpeg;base64,${user.profilePicture}`}
+                        alt="Profile"
+                      />
+                    ) : (
+                      <img
+                        src="https://img.freepik.com/free-icon/user_318-159711.jpg"
+                        alt="Profile"
+                      />
+                    )}
 
-                  {selectedFile ? (
-                    <p className="file-name">{selectedFile.name}</p>
-                  ) : (
-                    <div className="file-input">
-                      <label className="custom-file-upload">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileChange}
-                        />
-                        Change Picture
-                      </label>
-                    </div>
-                  )}
-                  {selectedFile && (
-                    <Button variant="success" onClick={handleUpload}>
-                      Upload
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-            <div className="profile-details">
-              {user && (
-                <>
-                  <p>
-                    <strong>Name:</strong> {user.fullName}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {user.email}
-                  </p>
-                  <p>
-                    <strong>Username:</strong> {user.userName}
-                  </p>
-                  <p>
-                    <strong>Public Profile:</strong>{" "}
-                    <Link to={`/profile/${user.userName}`} target="_blank">
-                      View Profile
-                    </Link>
-                  </p>
-                  <div className="verification-status">
-                    <strong>Verification Status:</strong>{" "}
-                    {user.isVerified ? "Verified" : "Not Verified"}
-                    {!user.isVerified && (
-                      <Button
-                        variant="primary mx-2"
-                        onClick={handleVerifyAccount}
-                      >
-                        Verify Account
+                    {selectedFile ? (
+                      <p className="file-name">{selectedFile.name}</p>
+                    ) : (
+                      <div className="file-input">
+                        <label className="custom-file-upload">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                          />
+                          Change Picture
+                        </label>
+                      </div>
+                    )}
+                    {selectedFile && (
+                      <Button variant="success" onClick={handleUpload}>
+                        Upload
                       </Button>
                     )}
-                  </div>
+                  </>
+                )}
+              </div>
+              <div className="profile-details">
+                {user && (
+                  <>
+                    <p>
+                      <strong>Name:</strong> {user.fullName}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {user.email}
+                    </p>
+                    <p>
+                      <strong>Username:</strong> {user.userName}
+                    </p>
+                    <p>
+                      <strong>Public Profile:</strong>{" "}
+                      <Link to={`/profile/${user.userName}`} target="_blank">
+                        View Profile
+                      </Link>
+                    </p>
+                    <div className="verification-status">
+                      <strong>Verification Status:</strong>{" "}
+                      {user.isVerified ? "Verified" : "Not Verified"}
+                      {!user.isVerified && (
+                        <Button
+                          variant="primary mx-2"
+                          onClick={handleVerifyAccount}
+                        >
+                          Verify Account
+                        </Button>
+                      )}
+                    </div>
 
-                  <Button
-                    variant="primary"
-                    className="goback-editedblog"
-                    onClick={handleshowEditPersonalDetailsModal}
-                  >
-                    Edit Personal Details
-                  </Button>
-                </>
-              )}
+                    <Button
+                      variant="primary"
+                      className="goback-editedblog"
+                      onClick={handleshowEditPersonalDetailsModal}
+                    >
+                      Edit Personal Details
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        </Card.Body>
-      </Card>
+          </Card.Body>
+        </Card>
 
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Personal Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {showError && <Alert variant="danger">{showError}</Alert>}
-          {showSuccess && <Alert variant="success">{showSuccess}</Alert>}
-          <b>Full Name:</b>
-          <FormControl
-            type="text"
-            placeholder={user?.fullName}
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
+        <Modal
+          show={showConfirmModal}
+          onHide={() => setShowConfirmModal(false)}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Personal Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {showError && <Alert variant="danger">{showError}</Alert>}
+            {showSuccess && <Alert variant="success">{showSuccess}</Alert>}
+            <b>Full Name:</b>
+            <FormControl
+              type="text"
+              placeholder={user?.fullName}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
 
-          <b>Username:</b>
-          <FormControl
-            type="text"
-            placeholder={user?.userName}
-            value={userName}
-            onChange={(e) => {
-              checkUserNameAvailable(e.target.value);
-              setUserName(e.target.value);
-            }}
-          />
-          {userNameAvailable !== null ? (
-            userNameAvailable === true ? (
-              <Alert variant="success">Username Available</Alert>
-            ) : (
-              <Alert variant="danger">Username not Available</Alert>
-            )
-          ) : null}
-        </Modal.Body>
+            <b>Username:</b>
+            <FormControl
+              type="text"
+              placeholder={user?.userName}
+              value={userName}
+              onChange={(e) => {
+                checkUserNameAvailable(e.target.value);
+                setUserName(e.target.value);
+              }}
+            />
+            {userNameAvailable !== null ? (
+              userNameAvailable === true ? (
+                <Alert variant="success">Username Available</Alert>
+              ) : (
+                <Alert variant="danger">Username not Available</Alert>
+              )
+            ) : null}
+          </Modal.Body>
 
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowConfirmModal(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={updatePersonalDetails}
-            disabled={!userNameAvailable}
-          >
-            Save Details
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={updatePersonalDetails}
+              disabled={!userNameAvailable}
+            >
+              Save Details
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Container>
+    </div>
   );
 };
 

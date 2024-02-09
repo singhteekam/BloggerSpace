@@ -35,6 +35,7 @@ const App = () => {
             content="A blogging website where anyone can signup and start writing blogs on any topic. Features: Create new blog, save as draft the blog, Change password, Email verification for new
     users, View public profile of any user, Change username, like and comment, visitors count, admin dashboard. This website is developed by Teekam Singh"
           />
+          <title>BloggerSpace</title>
 
           <meta
             name="keywords"

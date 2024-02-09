@@ -5,7 +5,7 @@ import "./LoginPage.css";
 
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import Helmet from "react-helmet";
+import { Helmet } from "react-helmet";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -94,66 +94,71 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-page">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-sm-8">
-            <div className="login-form">
-              <h2 className="text-center mb-4">Login</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
-              {success && <Alert variant="success">{success}</Alert>}
-              <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="email">
-                  <Form.Label>Email address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter email"
-                    value={email}
-                    onChange={handleEmailChange}
-                    required
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="password">
-                  <Form.Label>Password</Form.Label>
-                  <div className="password-input">
+    <div>
+      <Helmet>
+        <title>Login - BloggerSpace</title>
+      </Helmet>
+      <div className="login-page">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-6 col-sm-8">
+              <div className="login-form">
+                <h2 className="text-center mb-4">Login</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+                {success && <Alert variant="success">{success}</Alert>}
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group controlId="email">
+                    <Form.Label>Email address</Form.Label>
                     <Form.Control
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Password"
-                      value={password}
-                      onChange={handlePasswordChange}
+                      type="email"
+                      placeholder="Enter email"
+                      value={email}
+                      onChange={handleEmailChange}
                       required
                     />
-                    <i
-                      className={`toggle-password fas ${
-                        showPassword ? "fa-eye-slash" : "fa-eye"
-                      }`}
-                      onClick={togglePasswordVisibility}
-                    ></i>
-                  </div>
-                </Form.Group>
+                  </Form.Group>
 
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="loginbutton"
-                  block
-                >
-                  Login
-                </Button>
-                <Button
-                  variant="secondary"
-                  type="submit"
-                  onClick={() => navigate("/forgotpassword")}
-                  className="forgotpassbutton"
-                  block
-                >
-                  Forgot password?
-                </Button>
-                <div>
-                  Don't have an account? <Link to="/signup">Sign up</Link>
-                </div>
-              </Form>
+                  <Form.Group controlId="password">
+                    <Form.Label>Password</Form.Label>
+                    <div className="password-input">
+                      <Form.Control
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        required
+                      />
+                      <i
+                        className={`toggle-password fas ${
+                          showPassword ? "fa-eye-slash" : "fa-eye"
+                        }`}
+                        onClick={togglePasswordVisibility}
+                      ></i>
+                    </div>
+                  </Form.Group>
+
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="loginbutton"
+                    block
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    type="submit"
+                    onClick={() => navigate("/forgotpassword")}
+                    className="forgotpassbutton"
+                    block
+                  >
+                    Forgot password?
+                  </Button>
+                  <div>
+                    Don't have an account? <Link to="/signup">Sign up</Link>
+                  </div>
+                </Form>
+              </div>
             </div>
           </div>
         </div>

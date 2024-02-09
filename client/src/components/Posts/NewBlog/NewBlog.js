@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
 import axios from "axios";
+import { Helmet } from "react-helmet";
 import "./NewBlog.css";
 import { Link, useNavigate } from "react-router-dom";
 import blogCategory from "../../../utils/blogCategory.json";
@@ -194,194 +195,207 @@ const NewBlog = () => {
   }
 
   return (
-    <Container className="newblogpage">
-      <h2 className="new-blog-heading">New Blog</h2>
-      {alert && (
-        <Alert variant={alert.type} onClose={() => setAlert(null)} dismissible>
-          {alert.message}
-        </Alert>
-      )}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="blogTitle" className="newblogfields">
-          {/* <Form.Label>This article url after publish: {slug}</Form.Label> <br /> */}
-          <Form.Label>Title:</Form.Label>
-          <Form.Control
-            type="text"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              setSlug(slugify(e.target.value.trim()));
-              searchSimilarTitles(e.target.value);
-              // setSlug(slugify(title.trim()));
-            }}
-            placeholder="Enter blog title"
-            required
-          />
-          {title.trim().length !== 0 && isUniqueTitle !== null ? (
-            isUniqueTitle === true ? (
-              <Alert variant="success">Title Available</Alert>
-            ) : (
-              <Alert variant="danger">Title already exists</Alert>
-            )
-          ) : null}
-        </Form.Group>
+    <div>
+      <Helmet>
+        <title>New Blog - BloggerSpace</title>
+      </Helmet>
 
-        <Accordion defaultActiveKey="0">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>
-              Published Blogs with Similar title:
-            </Accordion.Header>
-            <Accordion.Body>
-              <ListGroup>
-                {searchTitleResults.map((blog) => (
-                  <ListGroup.Item key={blog._id} className="">
-                    <Link
-                      to={`/${blog.slug}`}
-                      target="_blank"
-                      style={{ textDecoration: "none" }}
-                    >
-                      <h6>{blog.title}</h6>
-                    </Link>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-
-        <Form.Group controlId="blogAuthor" className="newblogfields">
-          <Form.Label>Author:</Form.Label>
-          <Form.Control
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Enter author name"
-            disabled
-          />
-        </Form.Group>
-
-        <Form.Group controlId="blogCategory" className="newblogfields">
-          {" "}
-          {/* New form group for category */}
-          <Form.Label>Category:</Form.Label>
-          <Form.Control
-            as="select"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            placeholder="Select category"
-            required
+      <Container className="newblogpage">
+        <h2 className="new-blog-heading">New Blog</h2>
+        {alert && (
+          <Alert
+            variant={alert.type}
+            onClose={() => setAlert(null)}
+            dismissible
           >
-            <option value="">Select Category</option>
-            {blogCategory.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-            {/* Add more category options as needed */}
-          </Form.Control>
-        </Form.Group>
-
-        {category === "Other" ? (
-          <Form.Group controlId="otherCategory" className="newblogfields">
-            <Form.Label>Specify other category:</Form.Label>
+            {alert.message}
+          </Alert>
+        )}
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="blogTitle" className="newblogfields">
+            {/* <Form.Label>This article url after publish: {slug}</Form.Label> <br /> */}
+            <Form.Label>Title:</Form.Label>
             <Form.Control
               type="text"
-              value={otherCategory}
+              value={title}
               onChange={(e) => {
-                setOtherCategory(e.target.value);
+                setTitle(e.target.value);
+                setSlug(slugify(e.target.value.trim()));
+                searchSimilarTitles(e.target.value);
+                // setSlug(slugify(title.trim()));
               }}
-              placeholder="Enter category"
+              placeholder="Enter blog title"
               required
             />
+            {title.trim().length !== 0 && isUniqueTitle !== null ? (
+              isUniqueTitle === true ? (
+                <Alert variant="success">Title Available</Alert>
+              ) : (
+                <Alert variant="danger">Title already exists</Alert>
+              )
+            ) : null}
           </Form.Group>
-        ) : null}
 
-        <Form.Group controlId="blogCategory" className="newblogfields">
-          <Form.Label>Tags:</Form.Label>
-          <Form.Control
-            as="select"
-            value={selectedTag}
-            onChange={handleSelectedTag}
-            placeholder="Select tag"
-          >
-            <option value="">Select Tag</option>
-            {blogTags.map((tag) => (
-              <option key={tag} value={tag}>
+          <Accordion defaultActiveKey="0">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>
+                Published Blogs with Similar title:
+              </Accordion.Header>
+              <Accordion.Body>
+                <ListGroup>
+                  {searchTitleResults.map((blog) => (
+                    <ListGroup.Item key={blog._id} className="">
+                      <Link
+                        to={`/${blog.slug}`}
+                        target="_blank"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <h6>{blog.title}</h6>
+                      </Link>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+
+          <Form.Group controlId="blogAuthor" className="newblogfields">
+            <Form.Label>Author:</Form.Label>
+            <Form.Control
+              type="text"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="Enter author name"
+              disabled
+            />
+          </Form.Group>
+
+          <Form.Group controlId="blogCategory" className="newblogfields">
+            {" "}
+            {/* New form group for category */}
+            <Form.Label>Category:</Form.Label>
+            <Form.Control
+              as="select"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="Select category"
+              required
+            >
+              <option value="">Select Category</option>
+              {blogCategory.map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+              {/* Add more category options as needed */}
+            </Form.Control>
+          </Form.Group>
+
+          {category === "Other" ? (
+            <Form.Group controlId="otherCategory" className="newblogfields">
+              <Form.Label>Specify other category:</Form.Label>
+              <Form.Control
+                type="text"
+                value={otherCategory}
+                onChange={(e) => {
+                  setOtherCategory(e.target.value);
+                }}
+                placeholder="Enter category"
+                required
+              />
+            </Form.Group>
+          ) : null}
+
+          <Form.Group controlId="blogCategory" className="newblogfields">
+            <Form.Label>Tags:</Form.Label>
+            <Form.Control
+              as="select"
+              value={selectedTag}
+              onChange={handleSelectedTag}
+              placeholder="Select tag"
+            >
+              <option value="">Select Tag</option>
+              {blogTags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            </Form.Control>
+            <Button
+              variant="success"
+              size="sm"
+              onClick={handleTagAdd}
+              className="my-2"
+            >
+              Add Tag
+            </Button>
+            <br />
+            {tags.map((tag) => (
+              <Badge key={tag} pill bg="secondary">
                 {tag}
-              </option>
+                <CloseButton
+                  variant="white"
+                  onClick={() => handleTagDismiss(tag)}
+                ></CloseButton>
+              </Badge>
             ))}
-          </Form.Control>
-          <Button
-            variant="success"
-            size="sm"
-            onClick={handleTagAdd}
-            className="my-2"
-          >
-            Add Tag
-          </Button>
-          <br />
-          {tags.map((tag) => (
-            <Badge key={tag} pill bg="secondary">
-              {tag}
-              <CloseButton
-                variant="white"
-                onClick={() => handleTagDismiss(tag)}
-              ></CloseButton>
-            </Badge>
-          ))}
-        </Form.Group>
+          </Form.Group>
 
-        <Form.Group controlId="blogContent" className="newblogfields">
-          <Form.Label>Content:</Form.Label>
-          <QuillEditor content={content} onContentChange={setContent} />
-        </Form.Group>
-        <h6>Content size: {contentSize} KB</h6>
-        <Button
-          variant="secondary"
-          className="submit-newblog"
-          onClick={() => setShowConfirmModal(true)}
-        >
-          Preview Blog
-        </Button>
-        {/* <div dangerouslySetInnerHTML={{ __html: content }} /> */}
-
-        <Button
-          variant="secondary"
-          className="submit-newblog mx-2"
-          onClick={handleSaveAsDraft}
-        >
-          Save Draft
-        </Button>
-        <Button variant="primary" type="submit" className="submit-newblog">
-          Submit
-        </Button>
-      </Form>
-
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Preview Blog</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Title: {title}
-          <br />
-          Slug: {slug}
-          <br />
-          <br />
-          Content: <br />
-          <div dangerouslySetInnerHTML={{ __html: content }} />
+          <Form.Group controlId="blogContent" className="newblogfields">
+            <Form.Label>Content:</Form.Label>
+            <QuillEditor content={content} onContentChange={setContent} />
+          </Form.Group>
           <h6>Content size: {contentSize} KB</h6>
-        </Modal.Body>
-
-        <Modal.Footer>
           <Button
             variant="secondary"
-            onClick={() => setShowConfirmModal(false)}
+            className="submit-newblog"
+            onClick={() => setShowConfirmModal(true)}
           >
-            Cancel
+            Preview Blog
           </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+          {/* <div dangerouslySetInnerHTML={{ __html: content }} /> */}
+
+          <Button
+            variant="secondary"
+            className="submit-newblog mx-2"
+            onClick={handleSaveAsDraft}
+          >
+            Save Draft
+          </Button>
+          <Button variant="primary" type="submit" className="submit-newblog">
+            Submit
+          </Button>
+        </Form>
+
+        <Modal
+          show={showConfirmModal}
+          onHide={() => setShowConfirmModal(false)}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Preview Blog</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Title: {title}
+            <br />
+            Slug: {slug}
+            <br />
+            <br />
+            Content: <br />
+            <div dangerouslySetInnerHTML={{ __html: content }} />
+            <h6>Content size: {contentSize} KB</h6>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Container>
+    </div>
   );
 };
 

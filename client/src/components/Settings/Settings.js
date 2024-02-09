@@ -9,6 +9,7 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import "./Settings.css";
 
 const Settings = () => {
@@ -77,72 +78,83 @@ const Settings = () => {
   }
 
   return (
-    <Container className="settingspage">
-      <h2 className="settingspage-heading">Settings</h2>
-      {/* Account deletion success alert */}
-      {deleteSuccess && (
-        <Alert
-          variant="success"
-          onClose={() => setDeleteSuccess(false)}
-          dismissible
-        >
-          Account deleted successfully.
-        </Alert>
-      )}
-
-      <Card>
-        <Card.Body>
-          <Card.Title>Account Details</Card.Title>
-          {user && (
-            <>
-              <p>
-                <strong>Name:</strong> {user.fullName}
-              </p>
-              <p>
-                <strong>Email:</strong> {user.email}
-              </p>
-              <div className="verification-status">
-                <strong>Verification Status:</strong>{" "}
-                {user.isVerified ? "Verified" : "Not Verified"}
-                {!user.isVerified && (
-                  <Button variant="primary mx-2" onClick={handleVerifyAccount}>
-                    Verify Account
-                  </Button>
-                )}
-              </div>
-            </>
-          )}
-        </Card.Body>
-      </Card>
-
-      <Card className="mt-4">
-        <Card.Body>
-          <Card.Title>Account Actions</Card.Title>
-          <Button variant="danger" onClick={handleDeleteAccount}>
-            Delete Account
-          </Button>
-        </Card.Body>
-      </Card>
-
-      {/* Confirmation Modal */}
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Are you sure you want to delete your account?</Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowConfirmModal(false)}
+    <div>
+      <Helmet>
+        <title>Settings - BloggerSpace</title>
+      </Helmet>
+      <Container className="settingspage">
+        <h2 className="settingspage-heading">Settings</h2>
+        {/* Account deletion success alert */}
+        {deleteSuccess && (
+          <Alert
+            variant="success"
+            onClose={() => setDeleteSuccess(false)}
+            dismissible
           >
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+            Account deleted successfully.
+          </Alert>
+        )}
+
+        <Card>
+          <Card.Body>
+            <Card.Title>Account Details</Card.Title>
+            {user && (
+              <>
+                <p>
+                  <strong>Name:</strong> {user.fullName}
+                </p>
+                <p>
+                  <strong>Email:</strong> {user.email}
+                </p>
+                <div className="verification-status">
+                  <strong>Verification Status:</strong>{" "}
+                  {user.isVerified ? "Verified" : "Not Verified"}
+                  {!user.isVerified && (
+                    <Button
+                      variant="primary mx-2"
+                      onClick={handleVerifyAccount}
+                    >
+                      Verify Account
+                    </Button>
+                  )}
+                </div>
+              </>
+            )}
+          </Card.Body>
+        </Card>
+
+        <Card className="mt-4">
+          <Card.Body>
+            <Card.Title>Account Actions</Card.Title>
+            <Button variant="danger" onClick={handleDeleteAccount}>
+              Delete Account
+            </Button>
+          </Card.Body>
+        </Card>
+
+        {/* Confirmation Modal */}
+        <Modal
+          show={showConfirmModal}
+          onHide={() => setShowConfirmModal(false)}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Delete</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Are you sure you want to delete your account?</Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Container>
+    </div>
   );
 };
 
