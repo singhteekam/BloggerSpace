@@ -222,6 +222,7 @@ exports.saveEditedPendingBlog = async (req, res) => {
         Email: req.session.currentemail,
         Role: req.session.currentrole,
       },
+      Revision: content,
       Rating: rating,
       Remarks: reviewRemarks,
       statusTransition: "UNDERREVIEW-INREVIEW",

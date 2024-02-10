@@ -155,6 +155,8 @@ exports.saveEditedInReviewBlog = async (req, res) => {
       "base64"
     );
 
+    await Blog.findByIdAndUpdate({_id: new mongoose.Types.ObjectId(req.params.id), }, { $set: { 'reviewedBy.$[].Revision': "" } });
+
     // Update the blog fields
     blog.slug = slug;
     blog.title = title;
@@ -170,6 +172,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
         Email: req.session.currentemail,
         Role: req.session.currentrole,
       },
+      Revision:"NA",
       Rating: rating,
       Remarks: reviewRemarks,
       statusTransition: "INREVIEW-PUBLISHED",
