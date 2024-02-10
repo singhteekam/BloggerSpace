@@ -3,3 +3,4 @@ node_modules
 sitemap.xml
 robots.txt
 /server/utils/Logging/logs.log
+/server/queries.db

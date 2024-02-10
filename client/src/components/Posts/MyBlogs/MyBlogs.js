@@ -450,7 +450,7 @@ const MyBlogs = () => {
                           <Link
                             to={`/${blog.slug}`}
                             className="btn btn-primary"
-                            target="_blank"
+                            // target="_blank"
                           >
                             View
                           </Link>

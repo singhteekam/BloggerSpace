@@ -3156,3 +3156,85 @@
 [2024-02-09T23:37:16.059Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2024-02-09T23:37:16.173Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2024-02-09T23:37:16.618Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T15:35:27.583Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T15:35:27.846Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T15:36:53.125Z] [LOG] [DEBUG] - Searching for blog: updatedb
+[2024-02-10T15:36:53.158Z] [LOG] [ERROR] - blog not found. Slug: updatedb
+[2024-02-10T15:36:53.158Z] [LOG] [ERROR] - blog not found. Slug: updatedb
+[2024-02-10T15:36:53.158Z] [LOG] [ERROR] - blog not found. Slug: updatedb
+[2024-02-10T17:57:38.128Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T17:57:38.343Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T17:57:41.669Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T17:57:41.669Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T17:57:41.709Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T17:57:41.669Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T17:57:42.135Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T17:57:42.135Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T17:57:42.135Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T17:57:42.486Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T17:57:42.726Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T17:57:42.943Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:00:01.468Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:00:01.665Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:00:04.631Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:00:04.883Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: allBlog.toArray is not a function
+[2024-02-10T18:00:04.883Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: allBlog.toArray is not a function
+[2024-02-10T18:00:04.883Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: allBlog.toArray is not a function
+[2024-02-10T18:00:05.074Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:00:05.320Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: allBlog.toArray is not a function
+[2024-02-10T18:00:05.320Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: allBlog.toArray is not a function
+[2024-02-10T18:00:05.320Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: allBlog.toArray is not a function
+[2024-02-10T18:00:05.498Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:00:05.825Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:01:19.171Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:01:19.624Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:01:21.681Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:01:21.977Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:01:45.744Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:01:45.924Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T18:01:45.924Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T18:01:45.924Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T18:01:46.124Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:01:46.175Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T18:01:46.175Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T18:01:46.175Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).toArray is not a function
+[2024-02-10T18:01:46.588Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:01:46.738Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:02.965Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).fetch is not a function
+[2024-02-10T18:06:02.965Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).fetch is not a function
+[2024-02-10T18:06:02.965Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).fetch is not a function
+[2024-02-10T18:06:03.004Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:03.375Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).fetch is not a function
+[2024-02-10T18:06:03.375Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).fetch is not a function
+[2024-02-10T18:06:03.375Z] [LOG] [ERROR] - Error fetching blog in viewBlogRoute:TypeError: Blog.find(...).fetch is not a function
+[2024-02-10T18:06:03.493Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:03.735Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:03.971Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:23.910Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:24.428Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:25.904Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:26.403Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:26.659Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-02-10T18:06:26.761Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.2734375 KB
+[2024-02-10T18:06:26.761Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.2734375 KB
+[2024-02-10T18:06:26.765Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-10T18:06:26.920Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:27.378Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:06:27.857Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-02-10T18:06:27.974Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.2734375 KB
+[2024-02-10T18:06:27.974Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.2734375 KB
+[2024-02-10T18:06:27.977Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-10T18:07:44.439Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:07:44.909Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:07:46.693Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:07:46.698Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-02-10T18:07:46.781Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.2734375 KB
+[2024-02-10T18:07:46.781Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.2734375 KB
+[2024-02-10T18:07:46.782Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-10T18:07:47.161Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:07:47.230Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-02-10T18:07:47.375Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.2734375 KB
+[2024-02-10T18:07:47.375Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.2734375 KB
+[2024-02-10T18:07:47.376Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-10T18:07:47.665Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-02-10T18:07:48.110Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
