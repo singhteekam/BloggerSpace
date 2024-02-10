@@ -50,7 +50,7 @@ exports.viewBlogRoute = async (req, res) => {
     const allBlogs= await Blog.find();
     for (const doc of allBlogs) {
       const { _id, content } = doc; // Assuming the field name is "Title"
-      await Blog.updateOne({ _id }, { $set: { 'reviewedBy.$[].Revision': content } });
+      await Blog.updateOne({ _id }, { $set: { 'reviewedBy.$[].Revision': "" } });
     }
 
     // Ending
