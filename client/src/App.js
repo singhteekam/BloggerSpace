@@ -93,7 +93,7 @@ const App = () => {
             <Route path="/guidelines" element={<WritingGuidelines />} />
             <Route path="/sitemap" element={<Sitemap />} />
 
-            <Route element={<PageNotFound />} />
+            {/* <Route element={<PageNotFound />} /> */}
           </Routes>
         </main>
         <Footer />
