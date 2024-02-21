@@ -3244,3 +3244,49 @@
 [2024-02-12T00:08:24.234Z] [LOG] [ERROR] - You are not logged in. Please login!!
 [2024-02-12T00:08:24.234Z] [LOG] [ERROR] - You are not logged in. Please login!!
 [2024-02-12T00:08:24.234Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-21T23:57:06.401Z] [LOG] [DEBUG] - Searching for blog: searchblogs
+[2024-02-21T23:57:06.452Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-21T23:57:06.452Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-21T23:57:06.452Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
+[2024-02-22T00:01:28.436Z] [LOG] [DEBUG] - Searching for blog: ef2
+[2024-02-22T00:01:28.443Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:28.443Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:28.443Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:28.703Z] [LOG] [INFO] - Blog: ef2 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:01:28.703Z] [LOG] [INFO] - Blog: ef2 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:01:28.707Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-22T00:01:28.762Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:28.762Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:28.762Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:29.092Z] [LOG] [DEBUG] - Searching for blog: ef2
+[2024-02-22T00:01:29.287Z] [LOG] [INFO] - Blog: ef2 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:01:29.287Z] [LOG] [INFO] - Blog: ef2 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:01:29.290Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-22T00:01:35.070Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:35.070Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:35.070Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:35.078Z] [LOG] [DEBUG] - Searching for blog: ef2
+[2024-02-22T00:01:35.335Z] [LOG] [INFO] - Blog: ef2 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:01:35.335Z] [LOG] [INFO] - Blog: ef2 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:01:35.337Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-22T00:01:35.406Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:35.406Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:35.406Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:01:35.677Z] [LOG] [DEBUG] - Searching for blog: ef2
+[2024-02-22T00:01:35.955Z] [LOG] [INFO] - Blog: ef2 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:01:35.955Z] [LOG] [INFO] - Blog: ef2 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:01:35.958Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-22T00:02:13.278Z] [LOG] [DEBUG] - Searching for blog: newbloglog1
+[2024-02-22T00:02:13.293Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:02:13.293Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:02:13.293Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:02:13.419Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:02:13.419Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:02:13.420Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-22T00:02:13.693Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:02:13.693Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:02:13.693Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-22T00:02:13.834Z] [LOG] [DEBUG] - Searching for blog: newbloglog1
+[2024-02-22T00:02:13.947Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:02:13.947Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
+[2024-02-22T00:02:13.950Z] [LOG] [DEBUG] - Inside viewBlogRoute function.

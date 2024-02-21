@@ -20,7 +20,7 @@ const ViewBlog = () => {
 
   const [commentThumbColor, setCommentThumbColor] = useState("regular");
   const [disableCommentLikeButton, setDisableCommentLikeButton] = useState(false);
-  const [notFound, setNotFound] = useState(false);
+  // const [notFound, setNotFound] = useState(false);
 
   const navigate = useNavigate();
 
@@ -62,7 +62,7 @@ const ViewBlog = () => {
       } catch (error) {
         console.error("Error fetching blog Blog:", error);
         setLoading(false);
-        setNotFound(true);
+        // setNotFound(true);
       }
     };
 
@@ -153,19 +153,19 @@ const ViewBlog = () => {
     );
   }
 
-  // if (!blog) {
-  //   return (
-  //     <Container className="d-flex justify-content-center align-items-center vh-100">
-  //       <div>Blog not found.</div>
-  //     </Container>
-  //   );
-  // }
-
-  if (notFound) {
-    // Render the PageNotFound component when an error occurs
-    console.log("blog not found")
-    return <PageNotFound />;
+  if (!blog) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center vh-100">
+        <div>Blog not found.</div>
+      </Container>
+    );
   }
+
+  // if (notFound) {
+  //   // Render the PageNotFound component when an error occurs
+  //   console.log("blog not found")
+  //   return <PageNotFound />;
+  // }
 
   function stripHtmlTags(html) {
     // Create a temporary div element

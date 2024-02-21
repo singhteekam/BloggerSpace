@@ -61,7 +61,7 @@ const Footer = () => {
             {/* <p>&copy; 2023 Your Company. All rights reserved.</p> */}
             <p>
               <Link to={"/aboutdeveloper"}>
-                Made by <i>Teekam Singh</i>
+                  Developed by <i>Teekam Singh</i>
               </Link>
             </p>
           </Col>
