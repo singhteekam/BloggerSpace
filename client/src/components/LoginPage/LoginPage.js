@@ -69,7 +69,7 @@ function LoginPage() {
             // Redirect to the homepage
             setTimeout(() => {
               navigate("/");
-            }, 2000);
+            }, 500);
           } else {
             setTimeout(() => {
               navigate("/verify-account", {

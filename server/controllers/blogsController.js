@@ -5,6 +5,7 @@ const sendEmail = require("../services/mailer");
 const logger= require("./../utils/Logging/logs.js");
 
 exports.blogsHomepage = async (req, res) => {
+
   // console.log("Current user: "+ req.session.currentemail);
   // console.log("Homepage- User info: " + req.session.userId);
   // console.log("Email- User info: " + req.session.email);
@@ -28,6 +29,7 @@ exports.blogsHomepage = async (req, res) => {
   //   });
 
   // console.log("Date:  "+ new Date().toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}));
+    
 
   try {
     const blogs = await Blog.find({ status: "PUBLISHED" })
@@ -249,11 +251,12 @@ exports.createNewBlog = async (req, res) => {
 
     // Sending mail to admin
     // const blogLink = `http://localhost:3000/api/blogs/${slug}`;
-    const blogLink = `${process.env.FRONTEND_URL}/${slug}`;
+    const blogLink = `${process.env.REVIEWER_PANEL_URL}/${slug}`;
     const receiver2 = process.env.EMAIL;
     const subject2 = "New Blog available for review";
     const html2 = `
     <p>New blog available for review</p>
+    <p>Title: ${title}</p>
     <a href="${blogLink}">${blogLink}</a>
     `;
 

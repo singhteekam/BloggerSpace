@@ -1,1 +1,15 @@
 [2024-02-22T00:08:40.435Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-24T23:53:32.087Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-02-24T23:53:32.094Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-24T23:53:32.094Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-24T23:53:32.094Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-24T23:53:32.321Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-02-24T23:53:32.321Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-02-24T23:53:32.325Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-02-24T23:53:32.510Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-24T23:53:32.510Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-24T23:53:32.510Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-02-24T23:53:32.707Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-02-24T23:53:32.819Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-02-24T23:53:32.819Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-02-24T23:53:32.820Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
