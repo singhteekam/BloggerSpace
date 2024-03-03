@@ -55,57 +55,55 @@ const Footer = () => {
 
   return (
     <footer className="footer bg-light">
-      <Container className="col-lg-7 mt-1">
-        <Row className="align-items-center">
-          <Col md={6} className="text-md-left text-center">
-            {/* <p>&copy; 2023 Your Company. All rights reserved.</p> */}
-            <p>
-              <Link to={"/aboutdeveloper"}>
-                  Developed by <i>Teekam Singh</i>
-              </Link>
-            </p>
-          </Col>
-          <Col md={6} className="text-md-right text-center">
-            <ul className="list-inline">
-              <li className="list-inline-item mx-2">
-                <a target="_blank" href="https://in.linkedin.com/in/teekam-singh-26476a185">
-                  <i className="fab fa-linkedin fa-lg"></i>
-                </a>
-              </li>
-              <li className="list-inline-item mx-2">
-                <a target="_blank" href="https://github.com/singhteekam">
-                  <i className="fab fa-github fa-lg"></i>
-                </a>
-              </li>
-              <li className="list-inline-item mx-2">
-                <a target="_blank" href="mailto:contact.singhteekam@gmail.com">
-                  {/* <i className="fab fa-facebook fa-lg"></i> */}
-                  <i className="fa fa-envelope fa-lg"></i>
-                </a>
-              </li>
-              <li className="list-inline-item mx-2">
-                <a
-                  target="_blank"
-                  href="https://www.instagram.com/singh__teekam/"
-                >
-                  <i className="fab fa-instagram fa-lg"></i>
-                </a>
-              </li>
+      <div className="footer-container">
+        <div className="footer-row1">
+          <Link to="/about" className="footer-row1-item"><b>About</b></Link>
+          <Link to="/privacypolicy" className="footer-row1-item"><b>Privacy Policy</b></Link>
+          <Link to="/termsandconditions" className="footer-row1-item"><b>Terms & Conditions</b></Link>
+        </div>
 
-              <OverlayTrigger placement="top" overlay={visitorToopTip}>
-                <Badge bg="primary" className="mx-3">
-                  Visitors {visitCount}
-                </Badge>
-              </OverlayTrigger>
-            </ul>
-          </Col>
-        </Row>
-        {/* <Row>
-          <Col className="text-center">
-            <p>Additional footer content or social media icons can go here.</p>
-          </Col>
-        </Row> */}
-      </Container>
+        <div>
+          <ul className="list-inline">
+            <li className="list-inline-item mx-2">
+              <a
+                target="_blank"
+                href="https://in.linkedin.com/in/teekam-singh-26476a185"
+              >
+                <i className="fab fa-linkedin fa-lg"></i>
+              </a>
+            </li>
+            <li className="list-inline-item mx-2">
+              <a target="_blank" href="https://github.com/singhteekam">
+                <i className="fab fa-github fa-lg"></i>
+              </a>
+            </li>
+            <li className="list-inline-item mx-2">
+              <a target="_blank" href="mailto:contact.singhteekam@gmail.com">
+                {/* <i className="fab fa-facebook fa-lg"></i> */}
+                <i className="fa fa-envelope fa-lg"></i>
+              </a>
+            </li>
+            <li className="list-inline-item mx-2">
+              <a
+                target="_blank"
+                href="https://www.instagram.com/singh__teekam/"
+              >
+                <i className="fab fa-instagram fa-lg"></i>
+              </a>
+            </li>
+
+            <OverlayTrigger placement="top" overlay={visitorToopTip}>
+              <Badge bg="primary" className="mx-3">
+                Visitors {visitCount}
+              </Badge>
+            </OverlayTrigger>
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-muted">Copyright © 2024 BloggerSpace</p>
+        </div>
+      </div>
     </footer>
   );
 };

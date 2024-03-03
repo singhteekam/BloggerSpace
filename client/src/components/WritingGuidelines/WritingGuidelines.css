@@ -1,5 +1,6 @@
 .guidelines-page {
-    padding: 80px 10px;
+    /* padding: 80px 10px; */
+    padding: 0 10px;
     min-height: 100vh;
 }
 

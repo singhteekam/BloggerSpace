@@ -1,0 +1,11 @@
+.about-bloggerspace{
+    display: flex;
+    justify-content: space-evenly;
+}
+
+
+@media screen and (max-width:760px) {
+    .about-bloggerspace{
+        flex-wrap: wrap;
+    }
+}

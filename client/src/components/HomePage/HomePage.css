@@ -1,5 +1,16 @@
-.homepage {
-    padding: 80px 0;
+.homepage{
+    /* padding: 80px 0; */
+    min-height: 100vh;
+}
+
+/* .carousel-div{
+    max-width: 100%;
+} */
+
+.homepage-blogs {
+    
+    display: flex;
+    flex-direction: row;
 }
 
 .container {
@@ -7,41 +18,20 @@
     max-width: 100%;
 }
 
-.card {
+.blogitem{
+    background-color: lightgray;
+}
+
+.blogitem:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
-}
-
-.card:hover {
+    transition: transform 0.2s;
     transform: translateY(-5px);
+    background-color: skyblue;
 }
 
-.card-title {
-    font-size: 20px;
-    font-weight: bold;
-}
 
-.card-subtitle {
-    color: #888;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.card-text {
-    font-size: 16px;
-}
-
-.card-footer {
-    background-color: #f8f9fa;
-    border-top: none;
-    text-align: center;
-}
-
-.button {
-    display: inline-block;
-    margin-top: 10px;
-}
-
-.hoverblog:hover {
-    transform: translateY(-5px);
+@media only screen and (max-width:760px) {
+    .homepage-blogs{
+        flex-direction: column;
+    }
 }

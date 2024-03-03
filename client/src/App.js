@@ -23,6 +23,9 @@ import PageNotFound from "./components/PageNotFound/PageNotFound.js";
 import { Helmet } from "react-helmet";
 import Sitemap from "./components/Sitemap/Sitemap.js";
 import SavedBlogs from "./components/Posts/SavedBlogs/SavedBlogs.js";
+import PrivacyPolicy from "./components/Footer/PrivacyPolicy/PrivacyPolicy.js";
+import TermsAndConditions from "./components/Footer/TermsAndConditions/TermsAndConditions.js";
+import AboutBloggerSpace from "./components/Footer/AboutBloggerSpace/AboutBloggerSpace.js";
 
 const App = () => {
   return (
@@ -94,6 +97,9 @@ const App = () => {
             <Route path="/guidelines" element={<WritingGuidelines />} />
             <Route path="/savedblogs" element={<SavedBlogs />} />
             <Route path="/sitemap" element={<Sitemap />} />
+            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+            <Route path="/termsandconditions" element={<TermsAndConditions />} />
+            <Route path="/about" element={<AboutBloggerSpace />} />
 
             {/* <Route element={<PageNotFound />} /> */}
           </Routes>

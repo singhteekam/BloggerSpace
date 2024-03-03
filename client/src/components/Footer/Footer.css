@@ -1,6 +1,22 @@
 .footer {
-    position: fixed;
+    /* position: fixed; */
     left: 0;
     bottom: 0;
     width: 100%;
+}
+
+.footer-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.footer-row1{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.footer-row1-item{
+    padding: 10px;
+    color: black;
 }

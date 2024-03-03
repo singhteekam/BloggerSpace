@@ -9,6 +9,7 @@ import { RxDragHandleHorizontal } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SearchBlogs from "../Posts/SearchBlogs/SearchBlogs";
+import './Header.css';
 
 function Header() {
   const [user, setUser] = useState(null);
@@ -67,7 +68,8 @@ function Header() {
   };
 
   return (
-    <Navbar bg="light" expand="lg" fixed="top" className="mb-4">
+    <div className="header-page">
+        <Navbar bg="light" expand="lg" fixed="top" >
       <Container>
         <RxDragHandleHorizontal
           size="35px"
@@ -172,15 +174,15 @@ function Header() {
         </Navbar.Brand>
 
         <div>
-          <Button variant="light" onClick={handleSearchClick} className="me-4">
+          <Button variant="light" onClick={handleSearchClick}>
             <i className="fas fa-search"></i> Search
           </Button>
           <SearchBlogs show={showSearchModal} onHide={handleSearchModalClose} />
 
-          {isLoggedIn ? <b>Hi, {user?.fullName.split(" ")[0] || "Profile"}</b>:
+          {/* {isLoggedIn ? <b>Hi, {user?.fullName.split(" ")[0] || "Profile"}</b>:
           <Button variant="outline-success" onClick={() => navigate("/login")}>
             Login
-          </Button>}
+          </Button>} */}
         </div>
 
         {/* <Navbar.Toggle aria-controls="navbarScroll" />
@@ -269,6 +271,8 @@ function Header() {
         </Navbar.Collapse> */}
       </Container>
     </Navbar>
+    </div>
+    
   );
 }
 
