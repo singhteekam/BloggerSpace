@@ -153,9 +153,9 @@ const EditBlog = () => {
       setAlert({ type: "success", message: "blog saved successfully" });
 
       // Redirect to the homepage
-      setTimeout(() => {
-        navigate(-1);
-      }, 2000);
+      // setTimeout(() => {
+      //   navigate(-1);
+      // }, 2000);
     } catch (error) {
       setAlert({ type: "danger", message: "Failed to save blog" });
       console.error("Error saving blog:", error);

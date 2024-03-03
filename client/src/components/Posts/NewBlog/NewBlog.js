@@ -148,9 +148,9 @@ const NewBlog = () => {
       setAlert({ type: "success", message: "New blog saved as draft!!" });
 
       // Redirect to the homepage
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
+      // setTimeout(() => {
+      //   navigate("/");
+      // }, 2000);
     } catch (error) {
       setAlert({ type: "danger", message: "Error occured.." });
       console.error("Error saving blog:", error);

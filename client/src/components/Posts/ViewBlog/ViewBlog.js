@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { Container, Card,Button, Spinner, Badge, Image } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Button,
+  Spinner,
+  Badge,
+  Image,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from 'react-helmet';
+import { Helmet } from "react-helmet";
+import { IoBookmarkOutline, IoBookmark } from "react-icons/io5";
 import "./ViewBlog.css";
 import LoginPageModal from "../../../utils/LoginPageModal";
 import PageNotFound from "../../PageNotFound/PageNotFound";
@@ -15,11 +23,13 @@ const ViewBlog = () => {
   const [commentContent, setCommentContent] = useState("");
   const [comments, setComments] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
-  const [thumbColor, setThumbColor]= useState("regular");
-  const [disableLikeButton, setDisableLikeButton]= useState(false);
+  const [thumbColor, setThumbColor] = useState("regular");
+  const [isBlogSaved, setIsBlogSaved] = useState(false);
+  const [disableLikeButton, setDisableLikeButton] = useState(false);
 
   const [commentThumbColor, setCommentThumbColor] = useState("regular");
-  const [disableCommentLikeButton, setDisableCommentLikeButton] = useState(false);
+  const [disableCommentLikeButton, setDisableCommentLikeButton] =
+    useState(false);
   // const [notFound, setNotFound] = useState(false);
 
   const navigate = useNavigate();
@@ -35,29 +45,33 @@ const ViewBlog = () => {
   //   }
   // }, []); // Empty dependency array ensures the effect runs only once on mount
 
-
-  useEffect(()=>{
-    const fetchoggedInUser= async()=>{
+  useEffect(() => {
+    const fetchoggedInUser = async () => {
       await axios
         .get("/api/users/userinfo")
         .then((response) => {
           const user = response.data;
           // console.log(user);
           setUserInfo(user);
+          for (let index = 0; index < user.savedBlogs.length; index++) {
+            if (user.savedBlogs[index].slug === window.location.href.slice(window.location.href.lastIndexOf("/")+1)) {
+              setIsBlogSaved(true);
+              break;
+            }
+          }
           setLoading(false);
         })
         .catch((error) => {
           console.error("Error fetching user information:", error);
           setLoading(false);
         });
-    }
+    };
 
     const fetchBlog = async () => {
       try {
         const response = await axios.get(`/api/blogs/${blogSlug}`);
         setBlog(response.data.blog);
-        if (response.data.alreadyLiked === true) 
-          setThumbColor("solid");
+        if (response.data.alreadyLiked === true) setThumbColor("solid");
         setLoading(false);
       } catch (error) {
         console.error("Error fetching blog Blog:", error);
@@ -79,8 +93,7 @@ const ViewBlog = () => {
 
     fetchBlog();
     fetchoggedInUser();
-  },[])
-  
+  }, []);
 
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
@@ -98,8 +111,8 @@ const ViewBlog = () => {
     }
   };
 
-  const handleBlogLikes= async ()=>{
-    if(!userInfo){
+  const handleBlogLikes = async () => {
+    if (!userInfo) {
       console.log("Inside if");
       navigate("/login");
       // return <LoginPageModal show={true} handleClose={null} />;
@@ -107,7 +120,9 @@ const ViewBlog = () => {
     console.log("Likes");
     try {
       setDisableLikeButton(true);
-      const response= await axios.post(`/api/blogs/bloglikes/${blog._id}`, {thumbColor});
+      const response = await axios.post(`/api/blogs/bloglikes/${blog._id}`, {
+        thumbColor,
+      });
       console.log(response.data);
       setThumbColor(response.data.newThumbColor);
       setBlog((prevBlog) => ({
@@ -120,30 +135,52 @@ const ViewBlog = () => {
     } catch (error) {
       console.error("Error submitting like:", error);
     }
-  }
+  };
 
-  const handleCommentLike= async(commentId)=>{
-        if (!userInfo) {
-          console.log("Inside if");
-          navigate("/login");
-          // return <LoginPageModal show={true} handleClose={null} />;
-        }
-        try {
-          console.log(commentId);
-          setDisableCommentLikeButton(true);
-          const response = await axios.post(
-            `/api/blogs/blogcommentlike/${blog._id}`,
-            { commentId, commentThumbColor }
-          );
-          console.log(response.data);
-          setCommentThumbColor(response.data.newCommentThumbColor);
-          setComments([...response.data.updatedComments]);
-          setDisableCommentLikeButton(false);
-          // window.location.reload();
-        } catch (error) {
-          console.error("Error submitting like:", error);
-        }
-  }
+  const handleCommentLike = async (commentId) => {
+    if (!userInfo) {
+      console.log("Inside if");
+      navigate("/login");
+      // return <LoginPageModal show={true} handleClose={null} />;
+    }
+    try {
+      console.log(commentId);
+      setDisableCommentLikeButton(true);
+      const response = await axios.post(
+        `/api/blogs/blogcommentlike/${blog._id}`,
+        { commentId, commentThumbColor }
+      );
+      console.log(response.data);
+      setCommentThumbColor(response.data.newCommentThumbColor);
+      setComments([...response.data.updatedComments]);
+      setDisableCommentLikeButton(false);
+      // window.location.reload();
+    } catch (error) {
+      console.error("Error submitting like:", error);
+    }
+  };
+
+  const addToSavedBlogs = async () => {
+    try {
+      const blogDetails={
+        title:blog.title, slug:blog.slug, category:blog.category, tags:blog.tags
+      }
+      const response = await axios.patch(`/api/users/addtosavedblogs`, blogDetails);
+      setIsBlogSaved(true);
+    } catch (error) {
+      console.error("Error saving blog to savedBlogs:", error);
+    }
+  };
+
+  const removeFromSavedBlogs = async () => {
+    try {
+      const response = await axios.delete(`/api/users/removefromsavedblogs/${blog.slug}`);
+      console.log("Removed from savedBlogs");
+      setIsBlogSaved(false);
+    } catch (error) {
+      console.error("Error removing blog from savedBlogs:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -169,17 +206,16 @@ const ViewBlog = () => {
 
   function stripHtmlTags(html) {
     // Create a temporary div element
-    const tempDiv = document.createElement('div');
-  
+    const tempDiv = document.createElement("div");
+
     // Set the innerHTML of the div to your HTML content
     tempDiv.innerHTML = html;
-  
+
     // Retrieve the text content without HTML tags
     const textContent = tempDiv.textContent || tempDiv.innerText;
-  
+
     return textContent;
   }
-
 
   return (
     <div>
@@ -188,29 +224,35 @@ const ViewBlog = () => {
         <title>{blog?.title} - BloggerSpace</title>
 
         <meta property="og:title" content={blog?.title} />
-        <meta property="og:description" content={stripHtmlTags(blog?.content)} />
+        <meta
+          property="og:description"
+          content={stripHtmlTags(blog?.content)}
+        />
 
         <meta name="twitter:title" content={blog?.title} />
-        <meta name="twitter:description" content={stripHtmlTags(blog?.content)} />
-       </Helmet>
+        <meta
+          name="twitter:description"
+          content={stripHtmlTags(blog?.content)}
+        />
+      </Helmet>
 
       <Container className="view-blog-container">
-      {/* <h4>{window.location.href}</h4> */}
-      <h2 className="view-blog-heading">View Blog</h2>
-      <Card className="view-blog-card">
-        <Card.Body>
-          <Card.Title>{blog?.title}</Card.Title>
-          <i>Category: {blog?.category}</i>
-          <br />
-          {blog?.tags &&
-            blog?.tags.map((tag) => (
-              <Badge key={tag} pill bg="secondary" className="mx-1">
-                {tag}
-              </Badge>
-            ))}{" "}
-          <hr />
-          <div dangerouslySetInnerHTML={{ __html: blog?.content }} />
-          {/* {userInfo && blog.authorDetails.userName === userInfo.userName && (
+        {/* <h4>{window.location.href}</h4> */}
+        <h2 className="view-blog-heading">View Blog</h2>
+        <Card className="view-blog-card">
+          <Card.Body>
+            <Card.Title>{blog?.title}</Card.Title>
+            <i>Category: {blog?.category}</i>
+            <br />
+            {blog?.tags &&
+              blog?.tags.map((tag) => (
+                <Badge key={tag} pill bg="secondary" className="mx-1">
+                  {tag}
+                </Badge>
+              ))}{" "}
+            <hr />
+            <div dangerouslySetInnerHTML={{ __html: blog?.content }} />
+            {/* {userInfo && blog.authorDetails.userName === userInfo.userName && (
             <Link
               to={`/api/blogs/editblog/${blog._id}`}
               className="btn btn-primary"
@@ -218,99 +260,102 @@ const ViewBlog = () => {
               Edit Blog
             </Link>
           )} */}
-        </Card.Body>
-        <div>
-          <i className="mx-3">
-            Last Updated: {blog?.lastUpdatedAt?.slice(0, 10)}
-          </i>
-          <i
-            className={`fa-${thumbColor} fa-thumbs-up fa-xl`}
-            onClick={disableLikeButton === false ? handleBlogLikes : null}
-          ></i>{" "}
-          {/* {blog?.likes.length} */}
-          {blog?.blogLikes.length}
-        </div>
-        <div>
-          <Button size="sm" variant="secondary">
-            <i className="fa-solid fa-pen-to-square"></i> Improve Blog
-          </Button>
-        </div>
-        <Card.Footer className="d-flex justify-content-left">
-          {blog?.authorDetails.profilePicture ? (
-            <img
-              src={`data:image/jpeg;base64,${blog?.authorDetails.profilePicture}`}
-              alt="Profile"
-            />
-          ) : (
-            <img
-              src="https://img.freepik.com/free-icon/user_318-159711.jpg"
-              alt="Profile"
-            />
-          )}
-
+          </Card.Body>
           <div>
-            <Link
-              to={`/profile/${blog?.authorDetails.userName}`}
-              target="_blank"
-            >
-              <b className="mx-3">{blog?.authorDetails.userName}</b>
-            </Link>
-            <br />
-            <i className="mx-3">{blog?.lastUpdatedAt?.slice(0, 10)}</i>
+            <i className="mx-3">
+              Last Updated: {blog?.lastUpdatedAt?.slice(0, 10)}
+            </i>
+            <i
+              className={`fa-${thumbColor} fa-thumbs-up fa-xl`}
+              onClick={disableLikeButton === false ? handleBlogLikes : null}
+            ></i>{" "}
+            {/* {blog?.likes.length} */}
+            {blog?.blogLikes.length}
+            {isBlogSaved ? (
+              <IoBookmark size="25px" onClick={()=>removeFromSavedBlogs()} />
+            ) : (
+              <IoBookmarkOutline size="25px" onClick={()=>addToSavedBlogs()} />
+            )}
           </div>
+          <div>
+            <Button size="sm" variant="secondary">
+              <i className="fa-solid fa-pen-to-square"></i> Improve Blog
+            </Button>
+          </div>
+          <Card.Footer className="d-flex justify-content-left">
+            {blog?.authorDetails.profilePicture ? (
+              <img
+                src={`data:image/jpeg;base64,${blog?.authorDetails.profilePicture}`}
+                alt="Profile"
+              />
+            ) : (
+              <img
+                src="https://img.freepik.com/free-icon/user_318-159711.jpg"
+                alt="Profile"
+              />
+            )}
 
-          {/* <img src={blog.authorDetails.profilePicture} alt="No Image" /> */}
-        </Card.Footer>
-      </Card>
+            <div>
+              <Link
+                to={`/profile/${blog?.authorDetails.userName}`}
+                target="_blank"
+              >
+                <b className="mx-3">{blog?.authorDetails.userName}</b>
+              </Link>
+              <br />
+              <i className="mx-3">{blog?.lastUpdatedAt?.slice(0, 10)}</i>
+            </div>
 
-      <div className="comments-section mt-4">
-        <h5>
-          <b>Comments:</b>
-        </h5>
-        {comments?.length === 0 ? (
-          <p>No comments yet.</p>
-        ) : (
-          <ul>
-            {comments?.map((comment, index) => (
-              <li key={index} style={{ listStyleType: "none" }}>
-                {comment.userProfilePic ? (
-                  <div>
-                    <Image
-                      src={`data:image/jpeg;base64,${comment.userProfilePic}`}
-                      roundedCircle
-                      className="avatar-icon"
-                      style={{ width: "30px", height: "30px" }}
-                    />
-                    <Link
-                      to={`/profile/${comment.userName}`}
-                      target="_blank"
-                      style={{ textDecoration: "none" }}
-                    >
-                      <b className="mx-3">{comment.userName}</b>
-                    </Link>
-                  </div>
-                ) : (
-                  <div>
-                    <Image
-                      src="https://img.freepik.com/free-icon/user_318-159711.jpg"
-                      roundedCircle
-                      className="avatar-icon"
-                      style={{ width: "30px", height: "30px" }}
-                    />
-                    <Link
-                      to={`/profile/${comment.userName}`}
-                      target="_blank"
-                      style={{ textDecoration: "none" }}
-                    >
-                      <b className="mx-3">{comment.userName}</b>
-                    </Link>
-                  </div>
-                )}
-                <p className="comment-content">
-                  {comment.content}
-                </p>
+            {/* <img src={blog.authorDetails.profilePicture} alt="No Image" /> */}
+          </Card.Footer>
+        </Card>
 
-                {/* <div>
+        <div className="comments-section mt-4">
+          <h5>
+            <b>Comments:</b>
+          </h5>
+          {comments?.length === 0 ? (
+            <p>No comments yet.</p>
+          ) : (
+            <ul>
+              {comments?.map((comment, index) => (
+                <li key={index} style={{ listStyleType: "none" }}>
+                  {comment.userProfilePic ? (
+                    <div>
+                      <Image
+                        src={`data:image/jpeg;base64,${comment.userProfilePic}`}
+                        roundedCircle
+                        className="avatar-icon"
+                        style={{ width: "30px", height: "30px" }}
+                      />
+                      <Link
+                        to={`/profile/${comment.userName}`}
+                        target="_blank"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <b className="mx-3">{comment.userName}</b>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div>
+                      <Image
+                        src="https://img.freepik.com/free-icon/user_318-159711.jpg"
+                        roundedCircle
+                        className="avatar-icon"
+                        style={{ width: "30px", height: "30px" }}
+                      />
+                      <Link
+                        to={`/profile/${comment.userName}`}
+                        target="_blank"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <b className="mx-3">{comment.userName}</b>
+                      </Link>
+                    </div>
+                  )}
+                  <p className="comment-content">{comment.content}</p>
+
+                  {/* <div>
                   <i
                     className={`fa-${commentThumbColor} fa-thumbs-up fa-xl`}
                     onClick={
@@ -319,42 +364,41 @@ const ViewBlog = () => {
                   ></i>{" "}
                   {comment?.likes.length}
                 </div> */}
-                {/* <p className="comment-user">
+                  {/* <p className="comment-user">
                   <strong>Commented by:</strong> {comment.userName}
                 </p> */}
-              </li>
-            ))}
-          </ul>
-        )}
+                </li>
+              ))}
+            </ul>
+          )}
 
-        {userInfo && userInfo?.isVerified ? (
-          <form onSubmit={handleCommentSubmit}>
-            <div className="form-group">
-              <label htmlFor="commentContent">
-                <b>Add Comment:</b>
-              </label>
-              <textarea
-                id="commentContent"
-                className="form-control"
-                value={commentContent}
-                onChange={(e) => setCommentContent(e.target.value)}
-                required
-              />
-            </div>
-            <button type="submit" className="btn btn-primary mt-2">
-              Submit Comment
-            </button>
-          </form>
-        ) : (
-          <p>
-            You need to be logged in and verified to post comments.{" "}
-            <Link to="/login">Login</Link> or <Link to="/signup">Sign up</Link>{" "}
-            now.
-          </p>
-        )}
-      </div>
-    </Container>
-
+          {userInfo && userInfo?.isVerified ? (
+            <form onSubmit={handleCommentSubmit}>
+              <div className="form-group">
+                <label htmlFor="commentContent">
+                  <b>Add Comment:</b>
+                </label>
+                <textarea
+                  id="commentContent"
+                  className="form-control"
+                  value={commentContent}
+                  onChange={(e) => setCommentContent(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary mt-2">
+                Submit Comment
+              </button>
+            </form>
+          ) : (
+            <p>
+              You need to be logged in and verified to post comments.{" "}
+              <Link to="/login">Login</Link> or{" "}
+              <Link to="/signup">Sign up</Link> now.
+            </p>
+          )}
+        </div>
+      </Container>
     </div>
   );
 };

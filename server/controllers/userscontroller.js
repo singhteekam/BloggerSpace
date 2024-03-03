@@ -423,6 +423,7 @@ exports.loggedInUserInfo = async (req, res) => {
       email: user.email,
       isVerified: user.isVerified,
       profilePicture: user.profilePicture,
+      savedBlogs:user.savedBlogs
     };
     // console.log("LoggedIn user details fetched");
     logger.debug("LoggedIn user details fetched. Name: "+user.fullName);
@@ -500,6 +501,63 @@ exports.updateUserPersonalDetails = async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occurred while updating the username" });
+  }
+};
+
+// Add to SavedBlogs
+exports.addBlogToSavedBlogs = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const user= await User.findById(userId);
+    const {title, slug, category, tags}= req.body;
+
+    if(user.savedBlogs.map(e=>e.slug).indexOf(slug)!==-1){
+      console.log("Already saved the same blog");
+      return res.status(404).json({ message: "Already saved the same blog" });
+    }
+    user.savedBlogs.push({title, slug, category, tags});
+    await user.save();
+    console.log("Added to saved blogs successfully");
+    // Return a success message
+    res.json({ message: "Added to saved blogs successfully" });
+  } catch (error) {
+    // Handle any errors
+    console.error("Added to saved blogs failed:", error);
+    logger.error("Added to saved blogs failed: "+ error.message);
+    res.status(500).json({ error: "Failed to add to saved blogs" });
+  }
+};
+
+// Remove from SavedBlogs
+exports.removeBlogFromSavedBlogs = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const user= await User.findById(userId);
+
+    user.savedBlogs.splice(user.savedBlogs.map(e=>e.slug).indexOf(req.params.blogSlug),1);
+    await user.save();
+    // Return a success message
+    res.json({ message: "Removed from saved blogs successfully" });
+  } catch (error) {
+    // Handle any errors
+    console.error("Removing from saved blogs failed:", error);
+    logger.error("Removing from saved blogs failed: "+ error.message);
+    res.status(500).json({ error: "Failed to remove from saved blogs" });
+  }
+};
+
+// Get Saved blogs
+exports.getSavedBlogsOfUser = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const user= await User.findById(userId);
+
+    // Return a success message
+    // console.log(user.savedBlogs);
+    res.json(user.savedBlogs);
+  } catch (error) {
+    logger.error("Error getting saved blogs: "+ error.message);
+    res.status(500).json({ error: "Error getting saved blogs" });
   }
 };
 

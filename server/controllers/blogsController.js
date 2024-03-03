@@ -4,7 +4,23 @@ const pako = require("pako");
 const sendEmail = require("../services/mailer");
 const logger= require("./../utils/Logging/logs.js");
 
+// const Reviewer= require("../models/Reviewer.js");
+// const User= require("../models/User.js");
+
 exports.blogsHomepage = async (req, res) => {
+
+  // const abcd= await Reviewer.updateMany({isVerified:true}, {$set: {isEmailVerified:true}});
+  // const abcd= await Reviewer.aggregate([
+  //   {$addFields: {isEmailVerified: false}},
+  //   {$out: "reviewers"}
+  // ]);
+  // console.log(abcd);
+
+  // const fav= await User.aggregate([
+  //   {$addFields: {savedBlogs:[]}},
+  // {$out: "users"}
+  // ]);
+  // console.log(fav);
 
   // console.log("Current user: "+ req.session.currentemail);
   // console.log("Homepage- User info: " + req.session.userId);

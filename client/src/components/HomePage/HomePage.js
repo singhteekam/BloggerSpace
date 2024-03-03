@@ -57,7 +57,7 @@ function HomePage() {
                   <div className="row align-items-center">
                     <Link
                       to={`/${blog.slug}`}
-                      target="_blank"
+                      // target="_blank"
                       style={{ textDecoration: "none" }}
                     >
                       <div className="col">

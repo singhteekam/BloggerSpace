@@ -143,7 +143,8 @@ const MyBlogs = () => {
       <Helmet>
         <title>My Blogs - BloggerSpace</title>
       </Helmet>
-      <Container className="myblogs-page col-lg-7">
+      {/* <Container className="myblogs-page col-lg-7"> */}
+      <Container className="myblogs-page">
         <h2 className="myblogs-heading">My Blogs</h2>
 
         {alert && (

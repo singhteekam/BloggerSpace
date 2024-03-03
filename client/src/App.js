@@ -22,6 +22,7 @@ import WritingGuidelines from "./components/WritingGuidelines/WritingGuidelines.
 import PageNotFound from "./components/PageNotFound/PageNotFound.js";
 import { Helmet } from "react-helmet";
 import Sitemap from "./components/Sitemap/Sitemap.js";
+import SavedBlogs from "./components/Posts/SavedBlogs/SavedBlogs.js";
 
 const App = () => {
   return (
@@ -91,6 +92,7 @@ const App = () => {
             <Route path="/myblogs" element={<MyBlogs />} />
             <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
             <Route path="/guidelines" element={<WritingGuidelines />} />
+            <Route path="/savedblogs" element={<SavedBlogs />} />
             <Route path="/sitemap" element={<Sitemap />} />
 
             {/* <Route element={<PageNotFound />} /> */}

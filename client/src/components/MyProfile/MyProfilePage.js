@@ -13,6 +13,7 @@ import axios from "axios";
 import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
 import ImageCompressor from "image-compressor.js";
+import { MdVerified } from "react-icons/md";
 import "./MyProfilePage.css";
 
 const MyProfilePage = () => {
@@ -257,7 +258,7 @@ const MyProfilePage = () => {
                     </p>
                     <div className="verification-status">
                       <strong>Verification Status:</strong>{" "}
-                      {user.isVerified ? "Verified" : "Not Verified"}
+                      {user.isVerified ? <MdVerified size="25px" color="blue" /> : "Not Verified"}
                       {!user.isVerified && (
                         <Button
                           variant="primary mx-2"

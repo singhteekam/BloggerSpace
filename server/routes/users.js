@@ -17,6 +17,9 @@ const {
   updateUserPersonalDetails,
   incrementVisitCount,
   getVisitorCount,
+  addBlogToSavedBlogs,
+  removeBlogFromSavedBlogs,
+  getSavedBlogsOfUser,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -77,6 +80,15 @@ router.post("/checkusername", checkUserName);
 router.patch("/updateusername", authenticate, updateUserPersonalDetails);
 
 router.post("/discard/blog/:id", authenticate, discardBlogFromDB);
+
+// add to savedBlogs
+router.patch("/addtosavedblogs", authenticate, addBlogToSavedBlogs);
+
+// remove from savedBlogs
+router.delete("/removefromsavedblogs/:blogSlug", authenticate, removeBlogFromSavedBlogs);
+
+//Get Saved blogs
+router.get("/savedblogs", authenticate, getSavedBlogsOfUser);
 
 // Visitors
 router.get("/visitors", getVisitorCount);
