@@ -5,13 +5,15 @@ const AboutBloggerSpace = () => {
   return (
     <div>
       <div>
-        <h2 className="my-profile-heading">About</h2>
+        <h2 className="my-profile-heading mx-3">About</h2>
       </div>
       <div className="about-bloggerspace">
         <div>
           <img
-            src="https://github.com/singhteekam/BloggerSpace/blob/main/client/public/BLOGGERSPACE.png?raw=true"
+            // src="https://github.com/singhteekam/BloggerSpace/blob/main/client/public/BLOGGERSPACE.png?raw=true"
+            src="/BLOGGERSPACE.png"
             alt="BloggerSpace Logo"
+            width="300px"
           />
         </div>
         <div>

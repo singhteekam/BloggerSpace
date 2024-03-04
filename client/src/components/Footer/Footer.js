@@ -57,9 +57,9 @@ const Footer = () => {
     <footer className="footer bg-light">
       <div className="footer-container">
         <div className="footer-row1">
-          <Link to="/about" className="footer-row1-item"><b>About</b></Link>
-          <Link to="/privacypolicy" className="footer-row1-item"><b>Privacy Policy</b></Link>
-          <Link to="/termsandconditions" className="footer-row1-item"><b>Terms & Conditions</b></Link>
+          <Link to="/about" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>About</b></Link>
+          <Link to="/privacypolicy" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Privacy Policy</b></Link>
+          <Link to="/termsandconditions" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Terms & Conditions</b></Link>
         </div>
 
         <div>

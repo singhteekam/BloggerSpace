@@ -42,7 +42,7 @@ const Sitemap = () => {
         <title>Sitemap - BloggerSpace</title>
       </Helmet>
       <div className="sitemap-page">
-        <div className="row justify-content-center">
+        <div>
           <div className="col-md-6 col-sm-8">
             <section>
               <h5>Main Pages</h5>

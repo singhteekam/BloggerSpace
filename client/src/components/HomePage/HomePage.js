@@ -53,7 +53,7 @@ function HomePage() {
       <div className="carousel-div">
         <Carousel>
           <Carousel.Item>
-            <CarouselImage/>
+            <CarouselImage />
             <Carousel.Caption>
               <h3>Welcome to BloggerSpace</h3>
               <p>
@@ -67,10 +67,8 @@ function HomePage() {
             <Carousel.Caption>
               <h3>Features to explore</h3>
               <p>
-                View all published blogs, Create new blog, save as draft the
-                blog, Change password, Email verification for new users, View
-                public profile of any user, Change username, like and comment,
-                visitors count, admin dashboard and many more
+                Create new blog, save as draft the blog, Change password, Email
+                verification for new users, View public profile of users, etc
               </p>
             </Carousel.Caption>
           </Carousel.Item>
@@ -79,7 +77,9 @@ function HomePage() {
             <Carousel.Caption>
               <h3>Explore Reviewer Panel </h3>
               <p>
-                if you want to review blogs written by other authors then register yourself and verify your account. After successful verification, Admin will approve your request within a day. Review stages: Pending for Review-Under review-In Review-Awaiting author (if need modification)-Publish
+                if you want to review blogs written by other authors then
+                register yourself and verify your account. After successful
+                verification, Admin will approve your request within a day.
               </p>
             </Carousel.Caption>
           </Carousel.Item>
@@ -94,7 +94,7 @@ function HomePage() {
           ) : (
             <>
               <ListGroup className="m-3">
-                {blogs.slice(0,10)?.map((blog) => (
+                {blogs.slice(0, 10)?.map((blog) => (
                   <ListGroup.Item
                     key={blog.slug}
                     className="mb-2 border blogitem"
@@ -104,6 +104,7 @@ function HomePage() {
                         to={`/${blog.slug}`}
                         // target="_blank"
                         style={{ textDecoration: "none" }}
+                        onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}
                       >
                         <div className="col">
                           <b>{blog.title}</b>
@@ -155,6 +156,7 @@ function HomePage() {
                         to={`/${blog.slug}`}
                         // target="_blank"
                         style={{ textDecoration: "none" }}
+                        onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}
                       >
                         <div className="col">
                           <b>{blog.title}</b>

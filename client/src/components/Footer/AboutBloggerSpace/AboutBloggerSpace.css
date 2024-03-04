@@ -1,6 +1,12 @@
 .about-bloggerspace{
+    min-height: 100vh;
     display: flex;
     justify-content: space-evenly;
+    padding: 0 10px;
+}
+
+.about-bloggerspace div{
+    margin: 5px;
 }
 
 
