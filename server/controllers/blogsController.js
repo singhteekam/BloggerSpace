@@ -16,11 +16,19 @@ exports.blogsHomepage = async (req, res) => {
   // ]);
   // console.log(abcd);
 
-  // const fav= await User.aggregate([
-  //   {$addFields: {savedBlogs:[]}},
-  // {$out: "users"}
+  // const fav= await Blog.aggregate([
+  //   {$addFields: {blogViews:0}},
+  // {$out: "Blog"}
   // ]);
   // console.log(fav);
+
+    // Blog.updateMany({}, { $set: { blogViews: 0 }})
+    // .then((result) => {
+    //   console.log("Documents updated successfully:", result);
+    // })
+    // .catch((err) => {
+    //   console.error("Error updating documents:", err);
+    // });
 
   // console.log("Current user: "+ req.session.currentemail);
   // console.log("Homepage- User info: " + req.session.userId);
@@ -61,10 +69,20 @@ exports.blogsHomepage = async (req, res) => {
   }
 };
 
-exports.viewBlogRoute = async (req, res) => {
-  try {
+const addBlogViewsCounter= async (slug)=>{
+  const blog= await Blog.findOne({slug: slug, status:"PUBLISHED"});
+  blog.blogViews++;
+  console.log("BlogViews: "+blog.blogViews);
+  await blog.save();
+  return;
+}
 
+exports.viewBlogRoute = async (req, res) => {
+  //  addBlogViewsCounter(req.params.blogSlug);
+  try {
+    
     logger.debug("Searching for blog: "+ req.params.blogSlug);
+    console.log("Searching for blog: "+ req.params.blogSlug);
     const blog = await Blog.findOne({
       slug: req.params.blogSlug,
       status: "PUBLISHED",
@@ -79,6 +97,7 @@ exports.viewBlogRoute = async (req, res) => {
       return res.status(404).json({ error: "blog not found" });
     }
     // console.log(blog);
+
 
     // Decompress the content before displaying it
     const compressedContentBuffer = Buffer.from(blog.content, "base64");
@@ -114,14 +133,15 @@ exports.viewBlogRoute = async (req, res) => {
     // const alreadyLiked = blog.likes.findIndex((like) =>
     //   like._id.toString()===(req.session.userId)
     // )!==-1?true:false;
-    console.log(
-      blog.blogLikes.map(e=>e.userId).findIndex((like) => like._id.toString()===(req.session.userId))
-    );
+
+    // console.log("Is blog liked? "+
+    //   blog.blogLikes.map(e=>e.userId).findIndex((like) => like._id.toString()===(req.session.userId))
+    // );
     const alreadyLiked = blog.blogLikes.map(e=>e.userId).findIndex((like) =>
       like._id.toString()===(req.session.userId)
     )!==-1?true:false;
 
-    console.log("Liked? :"+ alreadyLiked);
+    // console.log("Liked? :"+ alreadyLiked);
     logger.debug("Inside viewBlogRoute function.");
     res.json({blog, alreadyLiked});
   } catch (error) {

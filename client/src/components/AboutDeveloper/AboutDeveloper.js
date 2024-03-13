@@ -18,7 +18,8 @@ function AboutDeveloper() {
             <div className="profile-section">
               <div className="profile-picture">
                 <img
-                  src="https://avatars.githubusercontent.com/u/55067104?s=400&u=804fb40a8cbd314f8ec4bb37c4091946780b1ac2&v=4"
+                  // src="https://avatars.githubusercontent.com/u/55067104?s=400&u=804fb40a8cbd314f8ec4bb37c4091946780b1ac2&v=4"
+                  src="/my_image.jpg"
                   alt="Profile"
                 />
                 <h4>Teekam Singh</h4>

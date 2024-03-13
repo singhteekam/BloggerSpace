@@ -74,7 +74,7 @@ const ViewBlog = () => {
         if (response.data.alreadyLiked === true) setThumbColor("solid");
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching blog Blog:", error);
+        console.error("Error fetching Blog:", error);
         setLoading(false);
         // setNotFound(true);
       }
@@ -281,6 +281,9 @@ const ViewBlog = () => {
             <Button size="sm" variant="secondary">
               <i className="fa-solid fa-pen-to-square"></i> Improve Blog
             </Button>
+              <br />
+              {/* <i>{blog.blogViews} Views</i> */}
+
           </div>
           <Card.Footer className="d-flex justify-content-left">
             {blog?.authorDetails.profilePicture ? (

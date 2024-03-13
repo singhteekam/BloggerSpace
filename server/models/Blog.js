@@ -82,6 +82,10 @@ const blogSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  blogViews: {
+    type: Number,
+    default: 0,
+  },
   comments: [commentSchema],
 });
 
