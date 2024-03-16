@@ -72,6 +72,10 @@
     "label": "Dynamic Programming"
   },
   {
+    "value": "English Grammar",
+    "label": "English Grammar"
+  },
+  {
     "value": "Firebase",
     "label": "Firebase"
   },
@@ -96,8 +100,8 @@
     "label": "Java"
   },
   {
-    "value": "Javascript",
-    "label": "Javascript"
+    "value": "JavaScript",
+    "label": "JavaScript"
   },
   {
     "value": "Linked List",

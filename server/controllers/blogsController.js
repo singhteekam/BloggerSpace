@@ -69,18 +69,21 @@ exports.blogsHomepage = async (req, res) => {
   }
 };
 
-const addBlogViewsCounter= async (slug)=>{
-  const blog= await Blog.findOne({slug: slug, status:"PUBLISHED"});
-  blog.blogViews++;
-  console.log("BlogViews: "+blog.blogViews);
-  await blog.save();
-  return;
+exports.addBlogViewsCounter= async (req, res)=>{
+  try {
+    const blog= await Blog.findOne({slug: req.body.blogSlug, status:"PUBLISHED"});
+    blog.blogViews++;
+    console.log("BlogViews: "+blog.blogViews);
+    await blog.save();
+    res.json({totalViews: blog.blogViews})
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 }
 
 exports.viewBlogRoute = async (req, res) => {
-  //  addBlogViewsCounter(req.params.blogSlug);
-  try {
-    
+  try {    
     logger.debug("Searching for blog: "+ req.params.blogSlug);
     console.log("Searching for blog: "+ req.params.blogSlug);
     const blog = await Blog.findOne({
@@ -98,7 +101,7 @@ exports.viewBlogRoute = async (req, res) => {
     }
     // console.log(blog);
 
-
+    
     // Decompress the content before displaying it
     const compressedContentBuffer = Buffer.from(blog.content, "base64");
     const decompressedContent = pako.inflate(compressedContentBuffer, {

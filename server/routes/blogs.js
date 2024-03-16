@@ -20,6 +20,7 @@ const {
   blogLikes,
   blogCommentLikes,
   isUniqueTitle,
+  addBlogViewsCounter,
 } = require("../controllers/blogsController");
 
 router.get("/", blogsHomepage);
@@ -56,6 +57,8 @@ router.get("/myblogs/authorpublishedblogs",authenticate,authorPublishedBlogs);
 router.post("/bloglikes/:id",authenticate, blogLikes);
 
 router.post("/blogcommentlike/:id", authenticate, blogCommentLikes);
+
+router.patch("/updateblogviews", addBlogViewsCounter);
 
 module.exports = router;
 

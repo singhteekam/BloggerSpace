@@ -6,6 +6,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { RxDragHandleHorizontal } from "react-icons/rx";
+import { MdVerified } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SearchBlogs from "../Posts/SearchBlogs/SearchBlogs";
@@ -80,7 +81,7 @@ function Header() {
           <Offcanvas show={showCanvas} onHide={handleCloseCanvas}>
             <Offcanvas.Header closeButton>
               <Offcanvas.Title>
-                Welcome, {user?.fullName || "Profile"}
+                Welcome, {user?.fullName || "Profile"} <MdVerified color="blue" />
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>

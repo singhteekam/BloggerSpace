@@ -12,6 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { IoBookmarkOutline, IoBookmark } from "react-icons/io5";
+import { FaEye } from "react-icons/fa";
 import "./ViewBlog.css";
 import LoginPageModal from "../../../utils/LoginPageModal";
 import PageNotFound from "../../PageNotFound/PageNotFound";
@@ -25,6 +26,7 @@ const ViewBlog = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [thumbColor, setThumbColor] = useState("regular");
   const [isBlogSaved, setIsBlogSaved] = useState(false);
+  // const [blogTotalViews, setBlogTotalViews] = useState(0);
   const [disableLikeButton, setDisableLikeButton] = useState(false);
 
   const [commentThumbColor, setCommentThumbColor] = useState("regular");
@@ -45,7 +47,23 @@ const ViewBlog = () => {
   //   }
   // }, []); // Empty dependency array ensures the effect runs only once on mount
 
+
   useEffect(() => {
+
+    const fetchBlogViews= async ()=>{
+      const blogTotalViews0= sessionStorage.getItem('blogTotalViews');
+      let blogTotalViews= JSON.parse(blogTotalViews0);
+      console.log("1: "+blogTotalViews)
+
+      if(blogTotalViews===null || !blogTotalViews.includes(blogSlug)){
+        if(blogTotalViews===null)
+          blogTotalViews=[];
+        blogTotalViews.push(blogSlug);
+        sessionStorage.setItem('blogTotalViews', JSON.stringify(blogTotalViews));
+        const response = await axios.patch(`/api/blogs/updateblogviews`, {blogSlug});
+      }
+    }
+
     const fetchoggedInUser = async () => {
       await axios
         .get("/api/users/userinfo")
@@ -67,11 +85,14 @@ const ViewBlog = () => {
         });
     };
 
+   
     const fetchBlog = async () => {
       try {
         const response = await axios.get(`/api/blogs/${blogSlug}`);
         setBlog(response.data.blog);
+        console.log("Blog fetched at: "+ new Date())
         if (response.data.alreadyLiked === true) setThumbColor("solid");
+        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching Blog:", error);
@@ -89,11 +110,12 @@ const ViewBlog = () => {
       }
     };
 
-    fetchComments();
-
-    fetchBlog();
     fetchoggedInUser();
+    fetchBlog();
+    fetchComments();
+    fetchBlogViews();
   }, []);
+
 
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
@@ -236,9 +258,10 @@ const ViewBlog = () => {
         />
       </Helmet>
 
-      <Container className="view-blog-container">
+      {blog && (
+        <Container className="view-blog-container">
         {/* <h4>{window.location.href}</h4> */}
-        <h2 className="view-blog-heading">View Blog</h2>
+        {/* <h2 className="view-blog-heading">View Blog</h2> */}
         <Card className="view-blog-card">
           <Card.Body>
             <Card.Title>{blog?.title}</Card.Title>
@@ -252,14 +275,7 @@ const ViewBlog = () => {
               ))}{" "}
             <hr />
             <div dangerouslySetInnerHTML={{ __html: blog?.content }} />
-            {/* {userInfo && blog.authorDetails.userName === userInfo.userName && (
-            <Link
-              to={`/api/blogs/editblog/${blog._id}`}
-              className="btn btn-primary"
-            >
-              Edit Blog
-            </Link>
-          )} */}
+
           </Card.Body>
           <div>
             <i className="mx-3">
@@ -277,14 +293,13 @@ const ViewBlog = () => {
               <IoBookmarkOutline size="25px" onClick={()=>addToSavedBlogs()} />
             )}
           </div>
+            <h6><FaEye size="20px" /> {blog.blogViews} views</h6>
           <div>
             <Button size="sm" variant="secondary">
               <i className="fa-solid fa-pen-to-square"></i> Improve Blog
             </Button>
-              <br />
-              {/* <i>{blog.blogViews} Views</i> */}
-
           </div>
+          <br />
           <Card.Footer className="d-flex justify-content-left">
             {blog?.authorDetails.profilePicture ? (
               <img
@@ -306,7 +321,8 @@ const ViewBlog = () => {
                 <b className="mx-3">{blog?.authorDetails.userName}</b>
               </Link>
               <br />
-              <i className="mx-3">{blog?.lastUpdatedAt?.slice(0, 10)}</i>
+              {/* <i className="mx-3">{blog?.lastUpdatedAt?.slice(0, 10)}</i> */}
+              <Button variant="success" size="sm" className="mx-3" disabled>Follow +</Button>
             </div>
 
             {/* <img src={blog.authorDetails.profilePicture} alt="No Image" /> */}
@@ -402,7 +418,9 @@ const ViewBlog = () => {
           )}
         </div>
       </Container>
-    </div>
+      )}
+
+      </div>
   );
 };
 
