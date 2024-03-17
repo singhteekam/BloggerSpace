@@ -1,5 +1,3 @@
-// db/blogModel.js
-
 const mongoose = require("mongoose");
 const { commentSchema } = require("./Comment");
 const User= require("./User");
@@ -41,16 +39,6 @@ const blogSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  // feedbackToAuthor: [
-  //   {
-  //     reviewer: {
-  //       type: String,
-  //     },
-  //     feedback: {
-  //       type: String,
-  //     },
-  //   },
-  // ],
   feedbackToAuthor: {
     type: Array,
     default: []
@@ -72,12 +60,6 @@ const blogSchema = new mongoose.Schema({
     type: Date,
     default: "",
   },
-  // likes: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: User,
-  //   }
-  // ],
   blogLikes: {
     type: Array,
     default: [],

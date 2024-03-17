@@ -92,7 +92,9 @@ exports.viewBlogRoute = async (req, res) => {
     }).populate("authorDetails")
       // .populate("likes")
       .populate("blogLikes")
-      .populate("comments")
+      // .populate("comments")
+      .populate("comments.user", "email userName profilePicture")
+      .populate("comments.commentReplies.replyCommentUser", "email userName profilePicture")
       .exec();
 
     if (!blog) {
@@ -416,7 +418,7 @@ exports.postNewBlogComment = async (req, res) => {
     await blog.populate("comments.user", "email userName");
 
     // Get the newly added comment with user details
-    const addedComment = blog.comments.find((comment) =>
+    const addedComment = blog.comments.findLast((comment) =>
       comment.user._id.equals(req.session.userId)
     );
 
@@ -434,6 +436,42 @@ exports.postNewBlogComment = async (req, res) => {
 
     logger.debug("New comment added in blog: "+ blogSlug);
     res.json(responseComment);
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    logger.error("Error adding comment: "+ error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.postNewBlogReplyComment = async (req, res) => {
+  try {
+    const { blogSlug } = req.params;
+    const { repliedToCommentId, replyCommentContent } = req.body;
+
+    const blog = await Blog.findOne({ slug: blogSlug });
+
+    if (!blog) {
+      logger.error("Blog not found  with blog: "+ blogSlug);
+      return res.status(404).json({ message: "blog not found" });
+    }
+
+    const newReplyComment = {
+      replyCommentContent: replyCommentContent,
+      replyCommentUser: req.session.userId,
+    };
+    console.log(newReplyComment)
+
+    const repliedToComment=blog.comments.map(e=>e._id.toString()).indexOf(repliedToCommentId);
+    
+    // console.log("Index: "+ typeof(repliedToComment[0].toString()));
+    console.log("Index2: "+ typeof(repliedToCommentId));
+    console.log("Index3: "+ repliedToComment);
+    blog.comments[repliedToComment].commentReplies.push(newReplyComment);
+    // console.log("Index2: "+ blog.comments[repliedToComment]);
+    await blog.save();
+
+
+    res.json({message: "Added reply to comment"});
   } catch (error) {
     console.error("Error adding comment:", error);
     logger.error("Error adding comment: "+ error);

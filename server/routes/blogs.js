@@ -21,6 +21,7 @@ const {
   blogCommentLikes,
   isUniqueTitle,
   addBlogViewsCounter,
+  postNewBlogReplyComment,
 } = require("../controllers/blogsController");
 
 router.get("/", blogsHomepage);
@@ -38,6 +39,8 @@ router.get("/editblog/:id", authenticate, editBlog);
 router.put("/editblog/save/:id", authenticate, saveEditedBlog);
 
 router.post("/:blogSlug/comments", authenticate, postNewBlogComment);
+
+router.post("/:blogSlug/comments/reply", authenticate, postNewBlogReplyComment);
 
 // Get comments of a blog
 router.get("/:blogSlug/comments", viewBlogComments);

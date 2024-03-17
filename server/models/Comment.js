@@ -3,6 +3,28 @@ const User= require("./User");
 
 const IST_OFFSET = 330;
 
+const replyCommentSchema= new mongoose.Schema(
+  {
+    replyCommentContent: {
+      type: String,
+      required: true,
+    },
+    replyCommentUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User,
+      required: true,
+    },
+    commentLikes: {
+      type: Array,
+      default: [],
+    },
+    createdAt: {
+      type: Date,
+      default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
+    },
+  }
+);
+
 const commentSchema = new mongoose.Schema(
   {
     content: {
@@ -18,11 +40,8 @@ const commentSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    commentReplies:[replyCommentSchema],
     createdAt: {
-      type: Date,
-      default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
-    },
-    updatedAt: {
       type: Date,
       default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
     },
@@ -30,11 +49,10 @@ const commentSchema = new mongoose.Schema(
   // { timestamps: true }
 );
 
-const Comment = mongoose.model("Comment", commentSchema);
-
+// const Comment = mongoose.model("Comment", commentSchema);
 
 // module.exports = Comment;
 module.exports = {
   commentSchema,
-  Comment
+  replyCommentSchema
 };
