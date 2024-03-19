@@ -20,6 +20,8 @@ const {
   addBlogToSavedBlogs,
   removeBlogFromSavedBlogs,
   getSavedBlogsOfUser,
+  followUser,
+  unfollowUser,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -61,11 +63,7 @@ router.post("/changepassword", authenticate, changePassword);
 //Update Profil pic
 const storage = multer.memoryStorage(); // Use memory storage for storing the uploaded file
 const upload = multer({ storage });
-router.post(
-  "/uploadprofilepicture",
-  upload.single("profilePicture"),
-  uploadProfilePicture
-);
+router.post("/uploadprofilepicture", upload.single("profilePicture"), uploadProfilePicture);
 
 // User Info
 router.get("/userinfo", loggedInUserInfo);
@@ -89,6 +87,10 @@ router.delete("/removefromsavedblogs/:blogSlug", authenticate, removeBlogFromSav
 
 //Get Saved blogs
 router.get("/savedblogs", authenticate, getSavedBlogsOfUser);
+
+// Follow and Unfollow
+router.patch("/follow/:idToFollow", authenticate, followUser);
+router.patch("/unfollow/:idToUnfollow", authenticate, unfollowUser);
 
 // Visitors
 router.get("/visitors", getVisitorCount);

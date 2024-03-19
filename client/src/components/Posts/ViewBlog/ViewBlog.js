@@ -49,6 +49,8 @@ const ViewBlog = () => {
     useState(false);
   // const [notFound, setNotFound] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  
 
   const navigate = useNavigate();
 
@@ -101,20 +103,21 @@ const ViewBlog = () => {
         });
     };
 
-    const fetchBlog = async () => {
-      try {
-        const response = await axios.get(`/api/blogs/${blogSlug}`);
-        setBlog(response.data.blog);
-        console.log("Blog fetched at: " + new Date());
-        if (response.data.alreadyLiked === true) setThumbColor("solid");
+    // const fetchBlog = async () => {
+    //   try {
+    //     const response = await axios.get(`/api/blogs/${blogSlug}`);
+    //     setBlog(response.data.blog);
+    //     console.log("Blog fetched at: " + new Date());
+    //     if (response.data.alreadyLiked === true) setThumbColor("solid");
 
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching Blog:", error);
-        setLoading(false);
-        // setNotFound(true);
-      }
-    };
+    //     setLoading(false);
+        
+    //   } catch (error) {
+    //     console.error("Error fetching Blog:", error);
+    //     setLoading(false);
+    //     // setNotFound(true);
+    //   }
+    // };
 
     // const fetchComments = async () => {
     //   try {
@@ -131,6 +134,21 @@ const ViewBlog = () => {
     fetchBlogViews();
   }, []);
 
+  const fetchBlog = async () => {
+    try {
+      const response = await axios.get(`/api/blogs/${blogSlug}`);
+      setBlog(response.data.blog);
+      console.log("Blog fetched at: " + new Date());
+      if (response.data.alreadyLiked === true) setThumbColor("solid");
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching Blog:", error);
+      setLoading(false);
+      // setNotFound(true);
+    }
+  };
+
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
     if (commentContent.trim().length === 0) {
@@ -142,15 +160,9 @@ const ViewBlog = () => {
       const response = await axios.post(`/api/blogs/${blogSlug}/comments`, {
         content: commentContent,
       });
-      window.location.reload();
-      setBlog((prevBlog) => ({
-        ...prevBlog,
-        comments: [...blog.comments, response.data],
-      }));
-      console.log(blog);
+      fetchBlog();
       setCommentContent("");
       toast.success("Comment submitted!!");
-      // setComments([...comments, response.data]);
     } catch (error) {
       toast.error("Error submitting comment!");
       console.error("Error submitting comment:", error);
@@ -172,15 +184,9 @@ const ViewBlog = () => {
           replyCommentContent: replyCommentContent,
         }
       );
-      window.location.reload();
-      setBlog((prevBlog) => ({
-        ...prevBlog,
-        comments: [...blog.comments, response.data],
-      }));
-      console.log(blog);
+      fetchBlog();
       setReplyCommentContent("");
       toast.success("Replied to comment!");
-      // setComments([...comments, response.data]);
     } catch (error) {
       toast.error("Error submitting comment!");
       console.error("Error submitting comment:", error);
@@ -189,8 +195,8 @@ const ViewBlog = () => {
 
   const handleBlogLikes = async () => {
     if (!userInfo) {
-      console.log("Inside if");
-      navigate("/login");
+      toast.error("Please login to like the blog");
+      return;
       // return <LoginPageModal show={true} handleClose={null} />;
     }
     try {
@@ -211,6 +217,7 @@ const ViewBlog = () => {
         toast.success("You liked this blog");
       // window.location.reload();
     } catch (error) {
+      toast.error("Error occured when liking the blog..");
       console.error("Error submitting like:", error);
     }
   };
@@ -253,6 +260,7 @@ const ViewBlog = () => {
       setIsBlogSaved(true);
       toast.success("Blog saved to SavedBlogs");
     } catch (error) {
+      toast.error("Error saving blog to savedBlogs");
       console.error("Error saving blog to savedBlogs:", error);
     }
   };
@@ -269,6 +277,34 @@ const ViewBlog = () => {
       console.error("Error removing blog from savedBlogs:", error);
     }
   };
+
+  const handleFollowUser= async (idToFollow)=>{
+    try {
+      const response= await axios.patch(`/api/users/follow/${idToFollow}`);
+      toast.success("Following.");
+      console.log("Following....");
+      setIsFollowing(true);
+      fetchBlog();
+      // window.location.reload();
+    } catch (error) {
+      toast.error("Error occured!! Please try again");
+      console.log("Error: "+error);
+    }
+  }
+
+  const handleUnfollowUser= async (idToUnfollow)=>{
+    try {
+      const response= await axios.patch(`/api/users/unfollow/${idToUnfollow}`);
+      toast.success("Unfollowed.");
+      console.log("Unfollowed....");
+      setIsFollowing(false);
+      fetchBlog();
+      // window.location.reload();
+    } catch (error) {
+      toast.error("Error occured!! Please try again");
+      console.log(error);
+    }
+  }
 
   if (loading) {
     return (
@@ -396,9 +432,13 @@ const ViewBlog = () => {
                 </Link>
                 <br />
                 {/* <i className="mx-3">{blog?.lastUpdatedAt?.slice(0, 10)}</i> */}
-                <Button variant="success" size="sm" className="mx-3" disabled>
+                {blog.authorDetails.followers.find((element)=>element===userInfo?._id)?
+                <Button variant="secondary" size="sm" className="mx-3" onClick={()=>handleUnfollowUser(blog?.authorDetails._id)} disabled>
+                  Following
+                </Button>:
+                <Button variant="success" size="sm" className="mx-3" onClick={()=>handleFollowUser(blog?.authorDetails._id)} disabled>
                   Follow +
-                </Button>
+                </Button>}
               </div>
 
               {/* <img src={blog.authorDetails.profilePicture} alt="No Image" /> */}
@@ -422,7 +462,6 @@ const ViewBlog = () => {
               url={window.location.href}
               quote="Please like and share this blog"
               hashtag="#bloggerspace"
-              
             >
               <WhatsappIcon size={30} round={true} />
             </WhatsappShareButton>
@@ -507,12 +546,19 @@ const ViewBlog = () => {
                         >
                           <b className="mx-3">{comment.user.userName}</b>
                         </Link>
+                        <small className="mx-3">
+                          {comment.createdAt.slice(0, 10)}{" "}
+                          {comment.createdAt.slice(11, 16)}
+                        </small>
                       </div>
                     )}
                     <p className="comment-content mx-2">{comment.content}</p>
                     <small
                       style={{ cursor: "pointer" }}
-                      onClick={() => setShowReplyInput(comment._id)}
+                      onClick={()=> {
+                        setShowReplyInput(comment._id);
+                        setReplyCommentContent("@"+comment.user.userName+" ");
+                      }}
                     >
                       <FaReply /> Reply
                     </small>
@@ -520,7 +566,7 @@ const ViewBlog = () => {
                     {comment.commentReplies ? (
                       <ul>
                         {comment.commentReplies.map((nestedReply, index) => (
-                          <li key={index} style={{ listStyleType: "none" }}>
+                          <li key={index} style={{ listStyleType: "none" }} className="mt-2">
                             {nestedReply.replyCommentUser?.profilePicture ? (
                               <div>
                                 <Image
@@ -560,6 +606,10 @@ const ViewBlog = () => {
                                     {nestedReply.replyCommentUser.userName}
                                   </b>
                                 </Link>
+                                <small className="mx-3">
+                                  {nestedReply.createdAt.slice(0, 10)}{" "}
+                                  {nestedReply.createdAt.slice(11, 16)}
+                                </small>
                               </div>
                             )}
                             {nestedReply.replyCommentContent}

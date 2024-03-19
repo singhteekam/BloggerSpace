@@ -37,6 +37,14 @@ const userSchema = new mongoose.Schema({
     type: Array,
     default:[]
   },
+  followers:[{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+  }],
+  following:[{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+  }],
   resetToken: String, // Field for storing the reset token
   resetTokenExpiration: Date, // Field for storing the token expiration date
   createdAt: {

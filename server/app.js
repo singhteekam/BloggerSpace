@@ -80,5 +80,10 @@ app.get("/api/viewlogs", async (req, res)=>{
   // res.sendFile(path.join(__dirname, "/utils/Logging/", "logs.log"));
 });  
 
+// Running update queries
+// const {addFollowersFields, addFollowingFields}= require("./utils/dbQueries");
+// addFollowersFields();
+// addFollowingFields();
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log("Server started at " + PORT));

@@ -21,7 +21,7 @@ const WritingGuidelines = () => {
               </h6>
               <ul>
                 <li>Choose an unique available topic of the blog.</li>
-                <li>The content must not be copied from the internet.</li>
+                <li>The content must not be copied directly from any website.</li>
                 <li>Choose appropriate Category and Tags</li>
                 <li>Explain the topic properly with examples.</li>
                 <li>
