@@ -1,29 +1,25 @@
 import React, { useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import "./LoginPage.css";
-
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet";
+import { ToastContainer, toast } from "react-toastify";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
-    setError("");
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    setError("");
   };
 
   const togglePasswordVisibility = () => {
@@ -55,8 +51,8 @@ function LoginPage() {
 
         // Check if the login was successful
         if (response.status === 200) {
-          setSuccess("Login successful");
-          setError("");
+          // setSuccess("Login successful");
+          // setError("");
 
           const headers = {
             Authorization: `Bearer ${token}`,
@@ -65,6 +61,8 @@ function LoginPage() {
 
           if (response.data.userDetails.isVerified) {
             await axios.get("/api/blogs", { headers });
+
+            toast.success("Login successful!");
 
             // Redirect to the homepage
             setTimeout(() => {
@@ -81,15 +79,13 @@ function LoginPage() {
             }, 1000);
           }
         } else {
-          setSuccess("");
-          setError("Login failed");
+          toast.error("Login Failed.");
         }
       })
       .catch((error) => {
         // Handle any errors here
         console.error(error);
-        setSuccess("");
-        setError("Login failed");
+        toast.error(error.response.data.message)
       });
   };
 
@@ -100,12 +96,12 @@ function LoginPage() {
       </Helmet>
       <div className="login-page">
         <div className="container">
+          <ToastContainer />
           <div className="row justify-content-center">
             <div className="col-md-6 col-sm-8">
               <div className="login-form">
                 <h2 className="text-center mb-4">Login</h2>
-                {error && <Alert variant="danger">{error}</Alert>}
-                {success && <Alert variant="success">{success}</Alert>}
+                
                 <Form onSubmit={handleSubmit}>
                   <Form.Group controlId="email">
                     <Form.Label>Email address</Form.Label>

@@ -9,6 +9,20 @@ import {
   Badge,
   Image,
 } from "react-bootstrap";
+import {
+  FacebookShareButton,
+  WhatsappShareButton,
+  WhatsappIcon,
+  FacebookIcon,
+  TwitterShareButton,
+  TwitterIcon,
+  LinkedinShareButton,
+  LinkedinIcon,
+  TelegramShareButton,
+  TelegramIcon,
+  FacebookMessengerShareButton,
+  FacebookMessengerIcon
+} from "react-share";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -191,6 +205,10 @@ const ViewBlog = () => {
         blogLikes: response.data.newLikes,
       }));
       setDisableLikeButton(false);
+      if(response.data.newThumbColor==="regular")
+        toast.info("You disliked this blog");
+      else
+        toast.success("You liked this blog");
       // window.location.reload();
     } catch (error) {
       console.error("Error submitting like:", error);
@@ -386,6 +404,63 @@ const ViewBlog = () => {
               {/* <img src={blog.authorDetails.profilePicture} alt="No Image" /> */}
             </Card.Footer>
           </Card>
+          <br />
+
+          <div>
+            <b>Share to:</b>
+            <FacebookShareButton
+              className="mx-2"
+              title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              url={window.location.href}
+              quote="Please like and share this blog"
+              hashtag="#bloggerspace"
+            >
+              <FacebookIcon size={30} round={true} />
+            </FacebookShareButton>
+            <WhatsappShareButton
+             title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              url={window.location.href}
+              quote="Please like and share this blog"
+              hashtag="#bloggerspace"
+              
+            >
+              <WhatsappIcon size={30} round={true} />
+            </WhatsappShareButton>
+            <TwitterShareButton
+            className="mx-2"
+             title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              url={window.location.href}
+              quote="Please like and share this blog"
+              hashtag="#bloggerspace"
+            >
+              <TwitterIcon size={30} round={true} />
+            </TwitterShareButton>
+            <LinkedinShareButton
+             title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              url={window.location.href}
+              quote="Please like and share this blog"
+              hashtag="#bloggerspace"
+            >
+              <LinkedinIcon size={30} round={true} />
+            </LinkedinShareButton>
+            <TelegramShareButton
+              className="mx-2"
+              title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              url={window.location.href}
+              quote="Please like and share this blog"
+              hashtag="#bloggerspace"
+            >
+              <TelegramIcon size={30} round={true} />
+            </TelegramShareButton>
+            <FacebookMessengerShareButton
+             title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              url={window.location.href}
+              quote="Please like and share this blog"
+              hashtag="#bloggerspace"
+            >
+              <FacebookMessengerIcon size={30} round={true} />
+            </FacebookMessengerShareButton>
+          </div>
 
           <div className="comments-section mt-4">
             <h5>
@@ -446,7 +521,6 @@ const ViewBlog = () => {
                       <ul>
                         {comment.commentReplies.map((nestedReply, index) => (
                           <li key={index} style={{ listStyleType: "none" }}>
-                            
                             {nestedReply.replyCommentUser?.profilePicture ? (
                               <div>
                                 <Image
@@ -487,7 +561,6 @@ const ViewBlog = () => {
                                   </b>
                                 </Link>
                               </div>
-                              
                             )}
                             {nestedReply.replyCommentContent}
                           </li>
@@ -496,40 +569,42 @@ const ViewBlog = () => {
                       </ul>
                     ) : null}
 
-                    {userInfo && userInfo?.isVerified && showReplyInput===comment._id && (
-                      <div>
-                        <small>
-                          <i>Replying to: {comment.user.userName}</i>
-                        </small>
-                        <form
-                          onSubmit={(e) =>
-                            handleReplyCommentSubmit(e, comment._id)
-                          }
-                        >
-                          <div className="form-group">
-                            <label htmlFor="commentContent">
-                              <b>Add Comment:</b>
-                            </label>
-                            <textarea
-                              id="commentContent"
-                              className="form-control"
-                              value={replyCommentContent}
-                              onChange={(e) =>
-                                setReplyCommentContent(e.target.value)
-                              }
-                              required
-                            />
-                          </div>
-                          <Button
-                            type="submit"
-                            size="sm"
-                            variant="success mt-2"
+                    {userInfo &&
+                      userInfo?.isVerified &&
+                      showReplyInput === comment._id && (
+                        <div>
+                          <small>
+                            <i>Replying to: {comment.user.userName}</i>
+                          </small>
+                          <form
+                            onSubmit={(e) =>
+                              handleReplyCommentSubmit(e, comment._id)
+                            }
                           >
-                            Submit
-                          </Button>
-                        </form>
-                      </div>
-                    )}
+                            <div className="form-group">
+                              <label htmlFor="commentContent">
+                                <b>Add Comment:</b>
+                              </label>
+                              <textarea
+                                id="commentContent"
+                                className="form-control"
+                                value={replyCommentContent}
+                                onChange={(e) =>
+                                  setReplyCommentContent(e.target.value)
+                                }
+                                required
+                              />
+                            </div>
+                            <Button
+                              type="submit"
+                              size="sm"
+                              variant="success mt-2"
+                            >
+                              Submit
+                            </Button>
+                          </form>
+                        </div>
+                      )}
 
                     {/* <div>
                   <i
