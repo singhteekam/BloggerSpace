@@ -13,6 +13,7 @@ import {
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
 import axios from "axios";
 import { Helmet } from "react-helmet";
+import { ToastContainer, toast } from "react-toastify";
 import "./NewBlog.css";
 import { Link, useNavigate } from "react-router-dom";
 import blogCategory from "../../../utils/blogCategory.json";
@@ -97,7 +98,8 @@ const NewBlog = () => {
       return null; // or display a loading indicator while redirecting
     }
     if (!isUniqueTitle) {
-      setAlert({ type: "danger", message: "Title already exists" });
+      // setAlert({ type: "danger", message: "Title already exists" });
+      toast.error("Title already exists");
       return null;
     }
 
@@ -111,10 +113,11 @@ const NewBlog = () => {
       });
       console.log(response.data);
 
-      setAlert({
-        type: "success",
-        message: "New blog created with pending review status!!",
-      });
+      toast.success("New blog created with pending review status!!");
+      // setAlert({
+      //   type: "success",
+      //   message: "New blog created with pending review status!!",
+      // });
 
       // Redirect to the homepage
       setTimeout(() => {
@@ -123,7 +126,8 @@ const NewBlog = () => {
 
       // Handle success or redirect to a different page
     } catch (error) {
-      setAlert({ type: "danger", message: "Error occured.." });
+      toast.error("Error creating new blog!!");
+      // setAlert({ type: "danger", message: "Error occured.." });
       console.error("Error creating new blog:", error);
       // Handle error
     }
@@ -131,7 +135,8 @@ const NewBlog = () => {
 
   const handleSaveAsDraft = async () => {
     if (!isUniqueTitle) {
-      setAlert({ type: "danger", message: "Title already exists" });
+      // setAlert({ type: "danger", message: "Title already exists" });
+      toast.error("Title already exists");
       return null;
     }
     console.log("Content: " + content);
@@ -145,14 +150,16 @@ const NewBlog = () => {
       });
       console.log(response.data);
 
-      setAlert({ type: "success", message: "New blog saved as draft!!" });
+      toast.success("New blog saved as draft!!");
+      // setAlert({ type: "success", message: "New blog saved as draft!!" });
 
       // Redirect to the homepage
       setTimeout(() => {
         navigate("/");
       }, 2000);
     } catch (error) {
-      setAlert({ type: "danger", message: "Error occured.." });
+      toast.error("Error saving blog!!");
+      // setAlert({ type: "danger", message: "Error occured.." });
       console.error("Error saving blog:", error);
       // Handle error
     }
@@ -202,7 +209,8 @@ const NewBlog = () => {
 
       <Container className="newblogpage">
         <h2 className="new-blog-heading">New Blog</h2>
-        {alert && (
+        <ToastContainer />
+        {/* {alert && (
           <Alert
             variant={alert.type}
             onClose={() => setAlert(null)}
@@ -210,7 +218,7 @@ const NewBlog = () => {
           >
             {alert.message}
           </Alert>
-        )}
+        )} */}
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="blogTitle" className="newblogfields">
             {/* <Form.Label>This article url after publish: {slug}</Form.Label> <br /> */}

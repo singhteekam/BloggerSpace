@@ -17,6 +17,7 @@ import axios from "axios";
 import "./EditBlog.css";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { ToastContainer, toast } from "react-toastify";
 import blogCategory from "../../../utils/blogCategory.json";
 import blogTags from "../../../utils/blogTags.json";
 
@@ -105,7 +106,8 @@ const EditBlog = () => {
     e.preventDefault();
 
     if (!isUniqueTitle) {
-      setAlert({ type: "danger", message: "Title already exists" });
+      // setAlert({ type: "danger", message: "Title already exists" });
+      toast.error("Title already exists");
       return null;
     }
 
@@ -120,7 +122,8 @@ const EditBlog = () => {
       console.log(response.data);
       // Handle success or redirect to a different page
       // Show success alert
-      setAlert({ type: "success", message: "blog updated successfully" });
+      toast.success("Blog updated successfully!!");
+      // setAlert({ type: "success", message: "blog updated successfully" });
 
       // Redirect to the homepage
       setTimeout(() => {
@@ -130,13 +133,15 @@ const EditBlog = () => {
       console.error("Error updating blog:", error);
       // Handle error
       // Show error alert
-      setAlert({ type: "danger", message: "Failed to update blog" });
+      toast.error("Failed to update blog.");
+      // setAlert({ type: "danger", message: "Failed to update blog" });
     }
   };
 
   const handleSaveAsDraft = async () => {
     if (!isUniqueTitle) {
-      setAlert({ type: "danger", message: "Title already exists" });
+      // setAlert({ type: "danger", message: "Title already exists" });
+      toast.error("Title already exists");
       return null;
     }
     try {
@@ -150,14 +155,16 @@ const EditBlog = () => {
       });
       console.log(response.data);
 
-      setAlert({ type: "success", message: "blog saved successfully" });
+      toast.success("Blog saved successfully!!");
+      // setAlert({ type: "success", message: "blog saved successfully" });
 
       // Redirect to the homepage
       // setTimeout(() => {
       //   navigate(-1);
       // }, 2000);
     } catch (error) {
-      setAlert({ type: "danger", message: "Failed to save blog" });
+      toast.error("Error saving blog..");
+      // setAlert({ type: "danger", message: "Failed to save blog" });
       console.error("Error saving blog:", error);
       // Handle error
     }
@@ -218,7 +225,8 @@ const EditBlog = () => {
       </Helmet>
       <Container className="editblogpage">
         <h2 className="edit-blog-heading">Edit Blog</h2>
-        {alert && (
+        <ToastContainer />
+        {/* {alert && (
           <Alert
             variant={alert.type}
             onClose={() => setAlert(null)}
@@ -226,7 +234,7 @@ const EditBlog = () => {
           >
             {alert.message}
           </Alert>
-        )}
+        )} */}
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="blogTitle" className="editblogfields">
             <Form.Label>Title: </Form.Label>
