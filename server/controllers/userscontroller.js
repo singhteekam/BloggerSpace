@@ -34,9 +34,10 @@ exports.verifyAccount = async (req, res) => {
     // Save the user with the new verification token
     await user.save();
     // Create the verification link
-    const verificationLink = `${req.protocol}://${req.get(
-      "host"
-    )}/api/users/verify-account?token=${verificationToken}`;
+    // const verificationLink = `${req.protocol}://${req.get(
+    //   "host"
+    // )}/api/users/verify-account?token=${verificationToken}`;
+    const verificationLink = `${process.env.BLOGGERSPACE1}/api/users/verify-account?token=${verificationToken}`;
 
     const receiver = email;
     const subject = "Account Verification";
