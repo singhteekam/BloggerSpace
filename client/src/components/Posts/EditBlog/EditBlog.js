@@ -41,6 +41,7 @@ const EditBlog = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [searchTitleResults, setTitleSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isDisabled, setIsDisabled]= useState(false);
 
   const navigate = useNavigate();
 
@@ -112,6 +113,7 @@ const EditBlog = () => {
     }
 
     try {
+      setIsDisabled(true);
       const response = await axios.put(`/api/blogs/editblog/save/${id}`, {
         slug,
         title,
@@ -130,6 +132,7 @@ const EditBlog = () => {
         navigate("/");
       }, 2000);
     } catch (error) {
+      setIsDisabled(false);
       console.error("Error updating blog:", error);
       // Handle error
       // Show error alert
@@ -145,6 +148,7 @@ const EditBlog = () => {
       return null;
     }
     try {
+      setIsDisabled(true);
       const response = await axios.post("/api/blogs/saveasdraft", {
         id,
         slug,
@@ -156,6 +160,7 @@ const EditBlog = () => {
       console.log(response.data);
 
       toast.success("Blog saved successfully!!");
+      setIsDisabled(false);
       // setAlert({ type: "success", message: "blog saved successfully" });
 
       // Redirect to the homepage
@@ -163,6 +168,7 @@ const EditBlog = () => {
       //   navigate(-1);
       // }, 2000);
     } catch (error) {
+      setIsDisabled(false);
       toast.error("Error saving blog..");
       // setAlert({ type: "danger", message: "Failed to save blog" });
       console.error("Error saving blog:", error);
@@ -385,10 +391,11 @@ const EditBlog = () => {
             variant="secondary"
             className="submit-editedblog mx-2"
             onClick={handleSaveAsDraft}
+            disabled={isDisabled}
           >
             Save Draft
           </Button>
-          <Button variant="primary" type="submit" className="submit-editedblog">
+          <Button variant="primary" type="submit" className="submit-editedblog" disabled={isDisabled}>
             Save
           </Button>
           <Button

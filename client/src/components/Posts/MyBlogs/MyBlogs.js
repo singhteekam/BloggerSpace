@@ -14,6 +14,7 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import { Helmet } from "react-helmet";
+import { ToastContainer, toast } from "react-toastify";
 import "./MyBlogs.css";
 
 const MyBlogs = () => {
@@ -25,6 +26,7 @@ const MyBlogs = () => {
   const [underReviewBlogs, setUnderReviewBlogs] = useState(null);
   const [savedDraftBlogs, setSavedDraftBlogs] = useState(null);
   const [alert, setAlert] = useState(null);
+  const [isDisabled, setIsDisabled]= useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -113,18 +115,22 @@ const MyBlogs = () => {
       "Are you sure you want to discard this blog?\n" + "Title: " + slug
     );
     if (confirmDiscard) {
+      setIsDisabled(true);
       try {
         const response = await axios.post(`/api/users/discard/blog/${blogId}`, {
           authorEmail,
           slug,
         });
         // Handle the response
-        setAlert({ type: "success", message: "blog discarded successfully" });
+        toast.success("Blog discarded!!");
+        // setAlert({ type: "success", message: "blog discarded successfully" });
         setTimeout(() => {
           window.location.reload();
         }, 2000);
       } catch (error) {
-        setAlert({ type: "danger", message: "error saving blog" });
+        setIsDisabled(false);
+        toast.error("Error discarding blog");
+        // setAlert({ type: "danger", message: "error saving blog" });
         console.error("Error discarding blog:", error.response.data);
       }
     }
@@ -146,6 +152,8 @@ const MyBlogs = () => {
       {/* <Container className="myblogs-page col-lg-7"> */}
       <Container className="myblogs-page">
         <h2 className="myblogs-heading">My Blogs</h2>
+
+        <ToastContainer />
 
         {alert && (
           <Alert
@@ -219,6 +227,7 @@ const MyBlogs = () => {
                             variant="danger"
                             size="sm"
                             className="m-2"
+                            disabled={isDisabled}
                             onClick={() =>
                               handleDiscardBlog(
                                 blog._id,
@@ -280,6 +289,7 @@ const MyBlogs = () => {
                             variant="danger"
                             size="sm"
                             className="m-2"
+                            disabled={isDisabled}
                             onClick={() =>
                               handleDiscardBlog(
                                 blog._id,

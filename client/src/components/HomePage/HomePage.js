@@ -88,7 +88,7 @@ function HomePage() {
 
       <div className="homepage-blogs">
         <Container>
-          <b className="m-3">Blogs you may like to read:</b>
+          <b className="m-3">Most Viewed Blogs:</b>
           {blogs?.length === 0 ? (
             <div>No blogs found</div>
           ) : (
@@ -134,6 +134,7 @@ function HomePage() {
                     </div>
                   </ListGroup.Item>
                 ))}
+                <Link to={"/sitemap"}>Show more</Link>
               </ListGroup>
             </>
           )}
@@ -146,7 +147,7 @@ function HomePage() {
           ) : (
             <>
               <ListGroup className="m-3">
-                {blogs.slice(-3)?.map((blog) => (
+                {blogs.slice(-4)?.map((blog) => (
                   <ListGroup.Item
                     key={blog.slug}
                     className="mb-2 border blogitem"

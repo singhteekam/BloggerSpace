@@ -16,6 +16,7 @@ function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [isDisabled, setIsDisabled]= useState(false);
 
   const navigate = useNavigate();
 
@@ -63,6 +64,8 @@ function SignupPage() {
       return;
     }
 
+    setIsDisabled(true);
+
     // Create the request body
     const requestBody = {
       fullName: fullName,
@@ -95,6 +98,7 @@ function SignupPage() {
         }, 1000);
       })
       .catch((error) => {
+        setIsDisabled(false);
         // Handle the error response here
         if (
           error.response &&
@@ -191,6 +195,7 @@ function SignupPage() {
                     type="submit"
                     className="signbutton"
                     block
+                    disabled={isDisabled}
                   >
                     SignUp
                   </Button>

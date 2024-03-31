@@ -56,7 +56,7 @@ exports.blogsHomepage = async (req, res) => {
     
 
   try {
-    const blogs = await Blog.find({ status: "PUBLISHED" })
+    const blogs = await Blog.find({ status: "PUBLISHED" }).sort({ blogViews: -1 })
       .populate("authorDetails") // Populate the author field with the User document
       .exec();
 

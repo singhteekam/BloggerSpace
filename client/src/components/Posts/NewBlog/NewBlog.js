@@ -35,6 +35,7 @@ const NewBlog = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [searchTitleResults, setTitleSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isDisabled, setIsDisabled]= useState(false);
 
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("token");
@@ -104,6 +105,7 @@ const NewBlog = () => {
     }
 
     try {
+      setIsDisabled(true);
       const response = await axios.post("/api/blogs/newblog", {
         slug,
         title,
@@ -126,6 +128,7 @@ const NewBlog = () => {
 
       // Handle success or redirect to a different page
     } catch (error) {
+      setIsDisabled(false);
       toast.error("Error creating new blog!!");
       // setAlert({ type: "danger", message: "Error occured.." });
       console.error("Error creating new blog:", error);
@@ -141,6 +144,7 @@ const NewBlog = () => {
     }
     console.log("Content: " + content);
     try {
+      setIsDisabled(true);
       const response = await axios.post("/api/blogs/saveasdraft", {
         slug,
         title,
@@ -158,6 +162,7 @@ const NewBlog = () => {
         navigate("/");
       }, 2000);
     } catch (error) {
+      setIsDisabled(false);
       toast.error("Error saving blog!!");
       // setAlert({ type: "danger", message: "Error occured.." });
       console.error("Error saving blog:", error);
@@ -367,10 +372,11 @@ const NewBlog = () => {
             variant="secondary"
             className="submit-newblog mx-2"
             onClick={handleSaveAsDraft}
+            disabled={isDisabled}
           >
-            Save Draft
+            Save as Draft
           </Button>
-          <Button variant="primary" type="submit" className="submit-newblog">
+          <Button variant="primary" type="submit" className="submit-newblog" disabled={isDisabled}>
             Submit
           </Button>
         </Form>
