@@ -14,17 +14,17 @@ const TinymceEditor = ({ content, onContentChange }) => {
     <div>
       <Editor
         value={content}
-        onChange={onContentChange}
+        onEditorChange={onContentChange}
         tinymceScriptSrc={process.env.PUBLIC_URL + '/tinymce/tinymce.min.js'}
         // onInit={(evt, editor) => editorRef.current = editor}
-        initialValue='<p>Please write here...</p>'
+        initialValue='<p></p>'
         init={{
           height: 300,
           menubar: false,
           plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'preview', 'wordcount', 'codesample', 'emoticons', 'autosave', 'autoresize',
+            'insertdatetime', 'media', 'table', 'preview', 'wordcount', 'codesample', 'emoticons', 'autosave',
           ],
           toolbar: 'undo redo | blocks | ' +
             'bold italic forecolor | codesample | link | image | media | table | emoticons | searchreplace | anchor | ' +
