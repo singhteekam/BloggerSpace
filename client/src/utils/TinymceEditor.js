@@ -30,7 +30,8 @@ const TinymceEditor = ({ content, onContentChange }) => {
             'bold italic forecolor | codesample | link | image | media | table | emoticons | searchreplace | anchor | ' +
             'alignleft aligncenter | alignright alignjustify | bullist numlist outdent indent |' +
             'insertdatetime | charmap | restoredraft | visualblocks | removeformat | preview | code | fullscreen',
-          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+          license_key: 'gpl'
         }}
       />
     </div>

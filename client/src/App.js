@@ -26,7 +26,8 @@ import SavedBlogs from "./components/Posts/SavedBlogs/SavedBlogs.js";
 import PrivacyPolicy from "./components/Footer/PrivacyPolicy/PrivacyPolicy.js";
 import TermsAndConditions from "./components/Footer/TermsAndConditions/TermsAndConditions.js";
 import AboutBloggerSpace from "./components/Footer/AboutBloggerSpace/AboutBloggerSpace.js";
-import Community from "./components/Community/Community.js";
+import CommunityPage from "./components/Community/CommunityPage.js";
+import ViewCommunityPost from "./components/Community/ViewCommunityPost.js";
 
 const App = () => {
   return (
@@ -101,7 +102,9 @@ const App = () => {
             <Route path="/privacypolicy" element={<PrivacyPolicy />} />
             <Route path="/termsandconditions" element={<TermsAndConditions />} />
             <Route path="/about" element={<AboutBloggerSpace />} />
-            <Route path="/community" element={<Community />} />
+
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/community/post/:communityPostId/:communityPostSlug" element={<ViewCommunityPost />} />
 
             {/* <Route element={<PageNotFound />} /> */}
           </Routes>

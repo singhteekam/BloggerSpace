@@ -81,7 +81,7 @@ function Header() {
           <Offcanvas show={showCanvas} onHide={handleCloseCanvas}>
             <Offcanvas.Header closeButton>
               <Offcanvas.Title>
-                Welcome, {user?.fullName || "Profile"} <MdVerified color="blue" />
+                Welcome, {user?.fullName || "Profile"} {user?.isVerified?<MdVerified color="blue" />:null}
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
@@ -104,7 +104,7 @@ function Header() {
                 <Button variant="secondary" href="/settings">
                   <i className="fas fa-gear"></i> Settings
                 </Button>
-                <Button variant="secondary" href="changepassword">
+                <Button variant="secondary" href="/changepassword">
                   <i className="fas fa-key"></i> Change Password
                 </Button>
                 
@@ -112,7 +112,10 @@ function Header() {
                   <i className="fas fa-sign-out"></i> Sign Out
                 </Button>
                 <hr />
-                <Button variant="secondary" href="guidelines">
+                <Button variant="secondary" href="/community" disabled>
+                  <i className="fas fa-users"></i> Community
+                </Button>
+                <Button variant="secondary" href="/guidelines">
                   <i className="fas fa-book"></i> Writing Guidelines
                 </Button>
                 <Button
@@ -148,6 +151,9 @@ function Header() {
                   <i className="fas fa-user"></i> SignUp
                 </Button>
                 <hr />
+                <Button variant="secondary" href="/community" disabled>
+                  <i className="fas fa-users"></i> Community
+                </Button>
                 <Button variant="secondary" href="guidelines">
                   <i className="fas fa-book"></i> Writing Guidelines
                 </Button>

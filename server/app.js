@@ -16,6 +16,7 @@ const authRoutes = require("./routes/users");
 
 const reviewerRouted= require("./routes/Reviewer/reviewerRoute")
 const adminRoutes= require("./routes/Admin/adminRoute");
+const communityRoutes= require("./routes/community");
 
 const sitemapRouter = require('./routes/sitemap');
 
@@ -64,6 +65,9 @@ app.use("/api/reviewer/", reviewerRouted);
 
 //Admin Panel
 app.use("/api/admin/", adminRoutes);
+
+// Community
+app.use("/api/community", communityRoutes);
 
 
 //For capturing logs

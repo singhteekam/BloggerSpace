@@ -77,7 +77,7 @@ const ViewBlog = () => {
       }
     };
 
-    const fetchoggedInUser = async () => {
+    const fetchLoggedInUser = async () => {
       await axios
         .get("/api/users/userinfo")
         .then((response) => {
@@ -128,7 +128,7 @@ const ViewBlog = () => {
     //   }
     // };
 
-    fetchoggedInUser();
+    fetchLoggedInUser();
     fetchBlog();
     // fetchComments();
     fetchBlogViews();

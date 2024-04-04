@@ -8,10 +8,13 @@ Tech Stack: MERN stack
  - Used nodemailer API to send emails. Ex: Email will be sent when the blog is under review, discarded, published.
  - Review stages: Pending for Review-Under review-In Review-Awaiting author (if need modification)-Publish
 Please try and give me the feedback. Your valuable feedback will help me to improve this website.
+- 60+ blogs are already ranked on Google search.
 
 ### Link: [https://bloggerspace.singhteekam.in](https://bloggerspace.singhteekam.in/)
 
 ### BloggerSpace Reviewer Panel: [https://reviewbloggerspace.singhteekam.in](https://reviewbloggerspace.singhteekam.in/)
+
+### BloggerSpace community: [https://bloggerspace.singhteekam.in/community](https://bloggerspace.singhteekam.in/community)
 
 ## Features
 - View all published blogs
@@ -19,7 +22,6 @@ Please try and give me the feedback. Your valuable feedback will help me to impr
 - save as draft the blog
 - Real time blog views count
 - Comments and Reply on the comments
-- Follow and Unfollow users
 - Share blog on most famous social media platforms
 - Count number of visitor who visited the website.
 - Forgot password page
@@ -46,6 +48,9 @@ Please try and give me the feedback. Your valuable feedback will help me to impr
 - Sitemap
 - Responsive
 - SEO friendly
+- Follow and Unfollow users
+- Community for bloggers to interactive with each other
+- No review process for community posts. Instantly published after submitting the post.
 
 
 #### Folder structure:
@@ -67,6 +72,7 @@ Please try and give me the feedback. Your valuable feedback will help me to impr
 │   │   ├── Admin
 │   │   ├── Reviewer
 │   │   ├── blogController.js
+│   │   ├── communityController.js
 │   │   └── userscontroller.js
 │   ├── db
 │   │   └── db.js
