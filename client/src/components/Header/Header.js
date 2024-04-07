@@ -112,7 +112,7 @@ function Header() {
                   <i className="fas fa-sign-out"></i> Sign Out
                 </Button>
                 <hr />
-                <Button variant="secondary" href="/community" disabled>
+                <Button variant="secondary" href="/community">
                   <i className="fas fa-users"></i> Community
                 </Button>
                 <Button variant="secondary" href="/guidelines">
@@ -151,7 +151,7 @@ function Header() {
                   <i className="fas fa-user"></i> SignUp
                 </Button>
                 <hr />
-                <Button variant="secondary" href="/community" disabled>
+                <Button variant="secondary" href="/community">
                   <i className="fas fa-users"></i> Community
                 </Button>
                 <Button variant="secondary" href="guidelines">

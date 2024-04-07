@@ -75,12 +75,24 @@ function HomePage() {
           <Carousel.Item>
             <CarouselImage />
             <Carousel.Caption>
-              <h3>Explore Reviewer Panel </h3>
-              <p>
-                if you want to review blogs written by other authors then
+              <h4>Explore Reviewer Panel </h4>
+              <small>
+                If you want to review blogs written by other authors then
                 register yourself and verify your account. After successful
                 verification, Admin will approve your request within a day.
-              </p>
+              </small> <br />
+              <a className="btn btn-danger">Go to Reviewer Panel<i className="fas fa-chevron-right"></i></a>
+            </Carousel.Caption>
+          </Carousel.Item>
+          <Carousel.Item>
+            <CarouselImage />
+            <Carousel.Caption>
+              <h4>Community</h4>
+              <small>
+                If you want to share your opinion or want to ask any question then post it on Community page. There is no review process. 
+                The submitted posts will be published immediately.
+              </small> <br />
+              <a className="btn btn-danger">Go to Community<i className="fas fa-chevron-right"></i></a>
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>

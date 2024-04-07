@@ -4,6 +4,7 @@ const fs = require('fs').promises; // Import the 'fs' module for file operations
 const path = require('path');
 const Blog = require('../models/Blog');
 const {fetchSitemapFile, uploadSitemapToGitHub}= require('./../utils/uploadToGitHub');
+const axios = require("axios");
 
 async function generateSitemap() {
   const Links=[
@@ -56,5 +57,26 @@ async function generateSitemap() {
     console.error('Error generating sitemap:', error);
   }
 }
+
+// async function generateSitemap2(){
+//   const apiUrl4 = await axios.get(`https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/contents/sitemap.xml`);
+//   console.log(apiUrl4.data.name);
+  // const sitemapPath= 'sitemap.xml';
+  // fs.readFile(sitemapPath,'utf8', (err, data)=>{
+  //   if(err){
+  //     console.log("Error");
+  //     return;
+  //   }
+  //   const newRecord= `<url><loc>new1</loc></url>`;
+  //   const updateSitemap= data.replace('</urlset>', `${newRecord}</urlset>`);
+  //   fs.writeFile(sitemapPath, updateSitemap, 'utf8', (err)=>{
+  //     if(err){
+  //       console.log("Error...");
+  //       return;
+  //     }
+  //     console.log("updated sitemap done...");
+  //   })
+  // })
+// }
 
 module.exports = generateSitemap;

@@ -13,6 +13,7 @@ import {
   Accordion,
 } from "react-bootstrap";
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
+import TinymceEditor from "../../../utils/TinymceEditor";
 import axios from "axios";
 import "./EditBlog.css";
 import { useNavigate } from "react-router-dom";
