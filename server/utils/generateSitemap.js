@@ -58,9 +58,30 @@ async function generateSitemap() {
   }
 }
 
-// async function generateSitemap2(){
-//   const apiUrl4 = await axios.get(`https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/contents/sitemap.xml`);
-//   console.log(apiUrl4.data.name);
+// Update the sitemap when new new blog/community postt is published
+async function generateSitemap2(){
+  const accessToken = process.env.GITHUBACCESSTOKEN;
+  const apiUrl3 = `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/main/sitemap.xml`;
+
+    const response = await axios.get(apiUrl3, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log(response.data);
+    const sitemapData= response.data;
+       const newRecord= `
+    <url>
+        <loc>new5</loc>
+        <priority>0.8</priority>
+    </url>`;
+    const updateSitemap= sitemapData.replace('</urlset>', `${newRecord}
+</urlset>`);
+    // Save the sitemap to the root of the project
+    const sitemapFilePath = path.join(__dirname, '../../', 'sitemap.xml');
+    await fs.writeFile(sitemapFilePath, updateSitemap, 'utf-8');
+    await uploadSitemapToGitHub();
+
   // const sitemapPath= 'sitemap.xml';
   // fs.readFile(sitemapPath,'utf8', (err, data)=>{
   //   if(err){
@@ -77,6 +98,6 @@ async function generateSitemap() {
   //     console.log("updated sitemap done...");
   //   })
   // })
-// }
+}
 
 module.exports = generateSitemap;

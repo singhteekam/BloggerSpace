@@ -46,6 +46,8 @@ const EditBlog = () => {
 
   const navigate = useNavigate();
 
+  const [initialContent, setInitialContent]= useState("");
+
   useEffect(() => {
     if (titleOrig !== title) {
       axios
@@ -80,6 +82,7 @@ const EditBlog = () => {
         setTitleOrig(title);
         setAuthorDetails(authorDetails);
         setContent(content);
+        setInitialContent(content);
         setCategory(category);
         setFeedbackComments(feedbackToAuthor);
         setTags(tags);
@@ -363,7 +366,8 @@ const EditBlog = () => {
 
           <Form.Group controlId="blogContent" className="editblogfields">
             <Form.Label>Content:</Form.Label>
-            <QuillEditor content={content} onContentChange={setContent} />
+            {/* <QuillEditor content={content} onContentChange={setContent} /> */}
+            <TinymceEditor content={content} onContentChange={setContent} initialValue={initialContent} />
           </Form.Group>
 
           <h6>Content size: {contentSize} KB</h6>

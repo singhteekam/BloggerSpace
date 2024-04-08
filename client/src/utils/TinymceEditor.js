@@ -1,7 +1,7 @@
 import React, {useRef} from 'react'
 import { Editor } from '@tinymce/tinymce-react';
 
-const TinymceEditor = ({ content, onContentChange }) => {
+const TinymceEditor = ({ content, onContentChange, initialValue="<i>Write your content here</i>" }) => {
 
   // const editorRef = useRef(null);
   // const log = () => {
@@ -17,7 +17,7 @@ const TinymceEditor = ({ content, onContentChange }) => {
         onEditorChange={onContentChange}
         tinymceScriptSrc={process.env.PUBLIC_URL + '/tinymce/tinymce.min.js'}
         // onInit={(evt, editor) => editorRef.current = editor}
-        initialValue='<p></p>'
+        initialValue={initialValue}
         init={{
           height: 300,
           menubar: false,

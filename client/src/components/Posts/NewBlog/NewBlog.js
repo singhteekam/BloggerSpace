@@ -11,6 +11,7 @@ import {
   Accordion,
 } from "react-bootstrap";
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
+import TinymceEditor from "../../../utils/TinymceEditor";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
@@ -356,7 +357,8 @@ const NewBlog = () => {
 
           <Form.Group controlId="blogContent" className="newblogfields">
             <Form.Label>Content:</Form.Label>
-            <QuillEditor content={content} onContentChange={setContent} />
+            {/* <QuillEditor content={content} onContentChange={setContent} /> */}
+            <TinymceEditor content={content} onContentChange={setContent}  />
           </Form.Group>
           <h6>Content size: {contentSize} KB</h6>
           <Button
