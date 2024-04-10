@@ -4,6 +4,29 @@ const User= require("./User");
 
 const IST_OFFSET = 330;
 
+const nestedReplyCommunityPostSchema=new mongoose.Schema({
+  nestedReplyCommunityPostContent: {
+    type: String,
+    required: true,
+  },
+  nestedReplyCommunityPostAuthor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User,
+  },
+  nestedReplyCommunityPostLikes: {
+    type: Array,
+    default: [],
+  },
+  createdAt: {
+    type: Date,
+    default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
+  },
+  lastUpdatedAt: {
+    type: Date,
+    default: "",
+  },
+});
+
 const replyCommunityPostSchema=new mongoose.Schema({
     replyCommunityPostContent: {
       type: String,
@@ -17,6 +40,7 @@ const replyCommunityPostSchema=new mongoose.Schema({
       type: Array,
       default: [],
     },
+    replyCommunityPostComments: [nestedReplyCommunityPostSchema],
     createdAt: {
       type: Date,
       default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
@@ -52,6 +76,10 @@ const communitySchema = new mongoose.Schema({
   communityPostAuthor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: User,
+  },
+  communityPostStatus: {
+    type: String,
+    required: true,
   },
   reportCommunityPost: {
     type: Array,

@@ -10,10 +10,11 @@ async function generateSitemap() {
   const Links=[
     "https://bloggerspace.singhteekam.in/login",
     "https://bloggerspace.singhteekam.in/signup",
-    "https://bloggerspace.singhteekam.in/sitemap",
+    "https://bloggerspace.singhteekam.in/community",
     "https://bloggerspace.singhteekam.in/guidelines",
     "https://bloggerspace.singhteekam.in/aboutdeveloper",
-    "https://bloggerspace.singhteekam.in/forgotpassword"
+    "https://bloggerspace.singhteekam.in/forgotpassword",
+    "https://bloggerspace.singhteekam.in/sitemap"
   ];
 
   try {
@@ -72,7 +73,7 @@ async function generateSitemap2(){
     const sitemapData= response.data;
        const newRecord= `
     <url>
-        <loc>new5</loc>
+        <loc>new${Math.floor(Math.random() * 100)}</loc>
         <priority>0.8</priority>
     </url>`;
     const updateSitemap= sitemapData.replace('</urlset>', `${newRecord}
