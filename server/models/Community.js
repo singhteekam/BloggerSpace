@@ -79,7 +79,7 @@ const communitySchema = new mongoose.Schema({
   },
   communityPostStatus: {
     type: String,
-    required: true,
+    required: false,
   },
   reportCommunityPost: {
     type: Array,
