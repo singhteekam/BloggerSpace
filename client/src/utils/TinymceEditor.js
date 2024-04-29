@@ -26,12 +26,12 @@ const TinymceEditor = ({ content, onContentChange, initialValue="<i>Write your c
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
             'insertdatetime', 'media', 'table', 'preview', 'wordcount', 'codesample', 'emoticons', 'autosave',
           ],
-          toolbar: 'undo redo | blocks | ' +
+          toolbar: 'undo redo | blocks | cut copy paste |' +
             'bold italic forecolor | codesample | link | image | media | table | emoticons | searchreplace | anchor | ' +
             'alignleft aligncenter | alignright alignjustify | bullist numlist outdent indent |' +
             'insertdatetime | charmap | restoredraft | visualblocks | removeformat | preview | code | fullscreen',
           content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-          license_key: 'gpl'
+          license_key: 'gpl',
         }}
       />
     </div>
