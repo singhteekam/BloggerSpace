@@ -50,6 +50,7 @@ exports.createCommunityPost = async (req, res) => {
       communityPostCategory,
       communityPostContent: compressedContent,
       communityPostAuthor: req.session.userId,
+      communityPostStatus:"PUBLISHED",
       lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
     });
     const savedPost = await newCommunityPost.save();
