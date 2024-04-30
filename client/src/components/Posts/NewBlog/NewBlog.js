@@ -357,8 +357,8 @@ const NewBlog = () => {
 
           <Form.Group controlId="blogContent" className="newblogfields">
             <Form.Label>Content:</Form.Label>
-            {/* <QuillEditor content={content} onContentChange={setContent} /> */}
-            <TinymceEditor content={content} onContentChange={setContent}  />
+            <QuillEditor content={content} onContentChange={setContent} />
+            {/* <TinymceEditor content={content} onContentChange={setContent}  /> */}
           </Form.Group>
           <h6>Content size: {contentSize} KB</h6>
           <Button
