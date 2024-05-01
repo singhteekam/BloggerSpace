@@ -22,6 +22,10 @@ import { ToastContainer, toast } from "react-toastify";
 import blogCategory from "../../../utils/blogCategory.json";
 import blogTags from "../../../utils/blogTags.json";
 
+import Editor from 'ckeditor5-custom-build/build/ckeditor';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+
+
 const EditBlog = () => {
   const { id } = useParams();
   // const [blog, setBlog] = useState(null);
@@ -366,8 +370,17 @@ const EditBlog = () => {
 
           <Form.Group controlId="blogContent" className="editblogfields">
             <Form.Label>Content:</Form.Label>
-            <QuillEditor content={content} onContentChange={setContent} />
+            {/* <QuillEditor content={content} onContentChange={setContent} /> */}
             {/* <TinymceEditor content={content} onContentChange={setContent} initialValue={initialContent} /> */}
+
+            <CKEditor
+                    editor={ Editor }
+                    data={initialContent}
+                    onChange={ ( event, editor ) => {
+                        setContent(editor.getData());
+                    } }
+                />
+
           </Form.Group>
 
           <h6>Content size: {contentSize} KB</h6>

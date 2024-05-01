@@ -15,6 +15,9 @@ import TinymceEditor from "../../utils/TinymceEditor";
 import { Button, Form, Card, ListGroup } from "react-bootstrap";
 import blogCategory from "../../utils/blogCategory.json";
 
+import Editor from 'ckeditor5-custom-build/build/ckeditor';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+
 const Community = () => {
   const [slug, setSlug] = useState("");
   const [topic, setTopic] = useState("");
@@ -117,7 +120,16 @@ const Community = () => {
 
           <b>Content:</b>
           <div className="editor-div">
-            <TinymceEditor content={content} onContentChange={setContent} />
+            {/* <TinymceEditor content={content} onContentChange={setContent} /> */}
+
+            <CKEditor
+                editor={ Editor }
+                data="<p></p>"
+                onChange={ ( event, editor ) => {
+                    setContent(editor.getData());
+                } }
+            />
+
           </div>
           <br />
           <b>Category:</b>
