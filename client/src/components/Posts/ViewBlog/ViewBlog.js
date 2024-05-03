@@ -412,12 +412,12 @@ const ViewBlog = () => {
             <br />
             <Card.Footer className="d-flex justify-content-left">
               {blog?.authorDetails.profilePicture ? (
-                <img
+                <img className="viewblog-img"
                   src={`data:image/jpeg;base64,${blog?.authorDetails.profilePicture}`}
                   alt="Profile"
                 />
               ) : (
-                <img
+                <img className="viewblog-img"
                   src="https://img.freepik.com/free-icon/user_318-159711.jpg"
                   alt="Profile"
                 />

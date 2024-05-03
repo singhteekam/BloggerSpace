@@ -162,12 +162,12 @@ const ViewCommunityPost = () => {
             </Card.Body>
             <Card.Footer className="d-flex justify-content-left">
               {communityPost?.communityPostAuthor.profilePicture ? (
-                <img
+                <img className="viewcommynitypost-img"
                   src={`data:image/jpeg;base64,${communityPost?.communityPostAuthor.profilePicture}`}
                   alt="Profile"
                 />
               ) : (
-                <img
+                <img className="viewcommynitypost-img"
                   src="https://img.freepik.com/free-icon/user_318-159711.jpg"
                   alt="Profile"
                 />

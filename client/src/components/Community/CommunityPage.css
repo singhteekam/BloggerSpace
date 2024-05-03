@@ -3,3 +3,13 @@
     min-height: 100vh;
     /* margin: 10px; */
 }
+
+.viewcommynitypost-img {
+    width: 50px;
+    /* Adjust the width as needed */
+    height: 50px;
+    /* Adjust the height as needed */
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
