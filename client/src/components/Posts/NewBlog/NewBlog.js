@@ -20,8 +20,8 @@ import { Link, useNavigate } from "react-router-dom";
 import blogCategory from "../../../utils/blogCategory.json";
 import blogTags from "../../../utils/blogTags.json";
 
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
+import Editor from "ckeditor5-custom-build/build/ckeditor";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 
 const NewBlog = () => {
   const [title, setTitle] = useState("");
@@ -39,7 +39,7 @@ const NewBlog = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [searchTitleResults, setTitleSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isDisabled, setIsDisabled]= useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("token");
@@ -364,12 +364,38 @@ const NewBlog = () => {
             {/* <TinymceEditor content={content} onContentChange={setContent}  /> */}
 
             <CKEditor
-                    editor={ Editor }
-                    data="<p></p>"
-                    onChange={ ( event, editor ) => {
-                        setContent(editor.getData());
-                    } }
-                />
+              editor={Editor}
+              data="<p></p>"
+              onChange={(event, editor) => {
+                setContent(editor.getData());
+              }}
+            />
+
+            <br />
+            <b>Note:</b>
+            <small>
+              If you want to embed youtube video then copy the below code and
+              use Insert HTML toolbar item. Replace VIDEO_ID with your youtube
+              video id. Ex: https://youtu.be/cfbepul-yHY?si=Xt6YWbm1M2AgWfjx
+              VIDEO_ID: cfbepul-yHY?si=Xt6YWbm1M2AgWfjx
+            </small>
+            <br />
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`
+          <div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID"
+                style="position: absolute; width: 100%;height:100%; top: 0; left: 0;"
+                frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+            </iframe>
+          </div>
+          `);
+                toast.success("Copied to clipboard");
+              }}
+            >
+              Copy code
+            </button>
+            <br />
 
           </Form.Group>
           <h6>Content size: {contentSize} KB</h6>
@@ -390,7 +416,12 @@ const NewBlog = () => {
           >
             Save as Draft
           </Button>
-          <Button variant="primary" type="submit" className="submit-newblog" disabled={isDisabled}>
+          <Button
+            variant="primary"
+            type="submit"
+            className="submit-newblog"
+            disabled={isDisabled}
+          >
             Submit
           </Button>
         </Form>

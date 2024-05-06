@@ -28,7 +28,13 @@ import { Heading } from '@ckeditor/ckeditor5-heading';
 import { Highlight } from '@ckeditor/ckeditor5-highlight';
 import { HorizontalLine } from '@ckeditor/ckeditor5-horizontal-line';
 import { HtmlEmbed } from '@ckeditor/ckeditor5-html-embed';
-import { FullPage, GeneralHtmlSupport, HtmlComment } from '@ckeditor/ckeditor5-html-support';
+import {
+	DataFilter,
+	DataSchema,
+	FullPage,
+	GeneralHtmlSupport,
+	HtmlComment
+} from '@ckeditor/ckeditor5-html-support';
 import {
 	AutoImage,
 	Image,
@@ -42,13 +48,13 @@ import {
 import { Indent, IndentBlock } from '@ckeditor/ckeditor5-indent';
 import { AutoLink, Link, LinkImage } from '@ckeditor/ckeditor5-link';
 import { List, ListProperties, TodoList } from '@ckeditor/ckeditor5-list';
-import { Markdown } from '@ckeditor/ckeditor5-markdown-gfm';
 import { MediaEmbed, MediaEmbedToolbar } from '@ckeditor/ckeditor5-media-embed';
 import { Mention } from '@ckeditor/ckeditor5-mention';
 import { PageBreak } from '@ckeditor/ckeditor5-page-break';
 import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
 import { PasteFromOffice } from '@ckeditor/ckeditor5-paste-from-office';
 import { RemoveFormat } from '@ckeditor/ckeditor5-remove-format';
+import { StandardEditingMode } from '@ckeditor/ckeditor5-restricted-editing';
 import { SelectAll } from '@ckeditor/ckeditor5-select-all';
 import { ShowBlocks } from '@ckeditor/ckeditor5-show-blocks';
 import { SourceEditing } from '@ckeditor/ckeditor5-source-editing';
@@ -72,6 +78,7 @@ import {
 } from '@ckeditor/ckeditor5-table';
 import { TextTransformation } from '@ckeditor/ckeditor5-typing';
 import { Undo } from '@ckeditor/ckeditor5-undo';
+import { Base64UploadAdapter } from '@ckeditor/ckeditor5-upload';
 import { WordCount } from '@ckeditor/ckeditor5-word-count';
 
 // You can read more about extending the build with additional plugins in the "Installing plugins" guide.
@@ -84,11 +91,14 @@ class Editor extends ClassicEditor {
 		AutoLink,
 		Autoformat,
 		Autosave,
+		Base64UploadAdapter,
 		BlockQuote,
 		Bold,
 		CloudServices,
 		Code,
 		CodeBlock,
+		DataFilter,
+		DataSchema,
 		Essentials,
 		FindAndReplace,
 		FontBackgroundColor,
@@ -116,7 +126,6 @@ class Editor extends ClassicEditor {
 		LinkImage,
 		List,
 		ListProperties,
-		Markdown,
 		MediaEmbed,
 		MediaEmbedToolbar,
 		Mention,
@@ -134,6 +143,7 @@ class Editor extends ClassicEditor {
 		SpecialCharactersLatin,
 		SpecialCharactersMathematical,
 		SpecialCharactersText,
+		StandardEditingMode,
 		Strikethrough,
 		Style,
 		Subscript,
@@ -156,43 +166,44 @@ class Editor extends ClassicEditor {
 			items: [
 				'undo',
 				'redo',
-				'heading',
 				'|',
+				'heading',
 				'bold',
 				'italic',
 				'underline',
-				'fontSize',
 				'highlight',
+				'link',
+				'codeBlock',
+				'code',
+				'blockQuote',
 				'findAndReplace',
 				'selectAll',
-				'link',
-				'code',
-				'codeBlock',
-				'blockQuote',
 				'|',
 				'bulletedList',
 				'numberedList',
+				'todoList',
+				'alignment',
 				'outdent',
 				'indent',
-				'alignment',
-				'todoList',
 				'|',
 				'imageUpload',
 				'imageInsert',
 				'insertTable',
 				'mediaEmbed',
-				'horizontalLine',
 				'fontBackgroundColor',
 				'fontColor',
 				'fontFamily',
+				'fontSize',
+				'horizontalLine',
 				'htmlEmbed',
 				'pageBreak',
-				'removeFormat',
 				'sourceEditing',
 				'specialCharacters',
+				'restrictedEditingException',
 				'strikethrough',
 				'subscript',
 				'superscript',
+				'removeFormat',
 				'showBlocks',
 				'style'
 			]

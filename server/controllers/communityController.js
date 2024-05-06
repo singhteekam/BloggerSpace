@@ -3,6 +3,7 @@ const Community = require("../models/Community");
 const sendEmail = require("../services/mailer");
 const pako = require("pako");
 
+
 exports.getAllCommunityPosts = async (req, res) => {
   try {
     const posts = await Community.find({})
@@ -27,7 +28,9 @@ exports.getAllCommunityPosts = async (req, res) => {
   }
 };
 
+
 exports.createCommunityPost = async (req, res) => {
+  let iframely;
   try {
     const {
       communityPostSlug,

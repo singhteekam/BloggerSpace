@@ -73,6 +73,9 @@ const App = () => {
           <meta name="twitter:site" content="@singh__teekam" />
 
           <link rel="canonical" href={window.location.href} />
+
+          
+        <script charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=0737793c1d093bd321e4d7"></script>
         </Helmet>
 
         <main>

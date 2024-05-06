@@ -15,8 +15,8 @@ import TinymceEditor from "../../utils/TinymceEditor";
 import { Button, Form, Card, ListGroup } from "react-bootstrap";
 import blogCategory from "../../utils/blogCategory.json";
 
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
+import Editor from "ckeditor5-custom-build/build/ckeditor";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 
 const Community = () => {
   const [slug, setSlug] = useState("");
@@ -31,7 +31,6 @@ const Community = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-
     const fetchLoggedInUser = async () => {
       await axios
         .get("/api/users/userinfo")
@@ -117,19 +116,17 @@ const Community = () => {
             />
           </Form.Group>
           <br />
-
           <b>Content:</b>
           <div className="editor-div">
             {/* <TinymceEditor content={content} onContentChange={setContent} /> */}
 
             <CKEditor
-                editor={ Editor }
-                data="<p></p>"
-                onChange={ ( event, editor ) => {
-                    setContent(editor.getData());
-                } }
+              editor={Editor}
+              data="<p></p>"
+              onChange={(event, editor) => {
+                setContent(editor.getData());
+              }}
             />
-
           </div>
           <br />
           <b>Category:</b>
@@ -141,17 +138,29 @@ const Community = () => {
             required
           />
           <br />
-          {userInfo===null?<b>You are not logged in. Please login to post anything you want.</b>:false} <br />
+          {userInfo === null ? (
+            <b>
+              You are not logged in. Please login to post anything you want.
+            </b>
+          ) : (
+            false
+          )}{" "}
+          <br />
           <Button
             type="submit"
             onClick={handlePostSubmit}
             variant="success"
             size="sm"
-            disabled={userInfo===null?true:false}
+            disabled={userInfo === null ? true : false}
           >
             Post
           </Button>
-          <Button variant="secondary" size="sm" className="mx-2" onClick={()=>navigate(-1)}>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="mx-2"
+            onClick={() => navigate(-1)}
+          >
             Go back
           </Button>
         </Form>
@@ -159,6 +168,30 @@ const Community = () => {
         {/* <h5>View Content:</h5>
         <div dangerouslySetInnerHTML={{ __html: content }} /> */}
       </div>
+
+      <hr />
+
+      <b>Note:</b><small>If you want to embed youtube video then copy the below code and use Insert HTML toolbar item. Replace VIDEO_ID with your youtube video id. 
+        Ex: https://youtu.be/cfbepul-yHY?si=Xt6YWbm1M2AgWfjx
+        VIDEO_ID: cfbepul-yHY?si=Xt6YWbm1M2AgWfjx
+      </small>
+      <br />
+      <button
+        onClick={() =>{
+          navigator.clipboard.writeText(`
+          <div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID"
+                style="position: absolute; width: 100%;height:100%; top: 0; left: 0;"
+                frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+            </iframe>
+          </div>
+          `)
+          toast.success("Copied to clipboard");
+        }
+        }
+      >
+        Copy code
+      </button>
 
       <hr />
 
