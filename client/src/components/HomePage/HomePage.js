@@ -6,11 +6,77 @@ import {
   Spinner,
   ListGroup,
   Badge,
+  Button,
+  Row,
+  Col,
+  Form,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import axios from "axios";
 import CarouselImage from "../../utils/CarouselImage";
+import { motion } from "framer-motion";
+import { FaLocationArrow } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+import { ToastContainer, toast } from "react-toastify";
+
+const carouselVariant = {
+  hidden: {
+    opacity: 0,
+    x: -50,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring",
+      delay: 0.5,
+      duration: 2,
+    },
+  },
+};
+const blogItemVariant = {
+  hover: {
+    scale: 1.1,
+    fontWeight: "bold",
+    originX: 0,
+    // textShadow:"0px 0px 8px rgb(255,255,255)",
+    // boxShadow:"0px 0px 8px rgb(255,255,255)",
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      yoyo: Infinity, // We can give any value like 100 etc
+    },
+  },
+};
+
+const buttonVariant = {
+  hover: {
+    scale: 1.1,
+    // textShadow:"0px 0px 8px rgb(255,255,255)",
+    // boxShadow:"0px 0px 8px rgb(255,255,255)",
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      yoyo: Infinity, // We can give any value like 100 etc
+    },
+  },
+};
+
+const marqueVariants = {
+  animate: {
+    x: [-25, -1000],
+    transition: {
+      x: {
+        repeat: Infinity,
+        repeatType: "loop",
+        duration: 6,
+        ease: "linear",
+        stiffness: 500,
+      },
+    },
+  },
+};
 
 function HomePage() {
   const [blogs, setBlogs] = useState([]);
@@ -50,16 +116,30 @@ function HomePage() {
 
   return (
     <div className="homepage">
-      <div className="carousel-div">
+      <ToastContainer />
+      <div>
         <Carousel>
           <Carousel.Item>
             <CarouselImage />
             <Carousel.Caption>
-              <h3>Welcome to BloggerSpace</h3>
-              <p>
+              <motion.h3
+                variants={carouselVariant}
+                initial="hidden"
+                animate="visible"
+                // initial={{x:-20}}
+                // animate={{x:20}}
+                // transition={{type:"tween", duration:2}}
+              >
+                Welcome to BloggerSpace
+              </motion.h3>
+              <motion.p
+                variants={carouselVariant}
+                initial="hidden"
+                animate="visible"
+              >
                 Write on any topic of your choice. Please refer the basic
                 guidelines so that we can review your blog and publish it.
-              </p>
+              </motion.p>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
@@ -80,8 +160,11 @@ function HomePage() {
                 If you want to review blogs written by other authors then
                 register yourself and verify your account. After successful
                 verification, Admin will approve your request within a day.
-              </small> <br />
-              <a className="btn btn-danger">Go to Reviewer Panel<i className="fas fa-chevron-right"></i></a>
+              </small>{" "}
+              <br />
+              <a className="btn btn-danger">
+                Go to Reviewer Panel<i className="fas fa-chevron-right"></i>
+              </a>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
@@ -89,16 +172,202 @@ function HomePage() {
             <Carousel.Caption>
               <h4>Community</h4>
               <small>
-                If you want to share your opinion or want to ask any question then post it on Community page. There is no review process. 
-                The submitted posts will be published immediately.
-              </small> <br />
-              <a className="btn btn-danger">Go to Community<i className="fas fa-chevron-right"></i></a>
+                If you want to share your opinion or want to ask any question
+                then post it on Community page. There is no review process. The
+                submitted posts will be published immediately.
+              </small>{" "}
+              <br />
+              <a className="btn btn-danger">
+                Go to Community<i className="fas fa-chevron-right"></i>
+              </a>
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>
       </div>
 
-      <div className="homepage-blogs">
+      {/* Adding more sections */}
+      <section className="section2">
+        <Container>
+          <Row>
+            <Col md={12} className="text-center">
+              <h3 className="section2heading">About BloggerSpace</h3>
+              <div className="underline mx-auto"></div>
+              <p>
+                A blogging website where users can write a blog on any topic.
+                There are two panels: Writing and Reviewing panel. In writing
+                panel, anyone can signup and start writing blogs. The reviewer
+                requests would be sent to admin for approval and then user can
+                start reviewing the assigned blogs. The admin can delete any
+                user, revoke/grant reviewer access.
+              </p>
+              <motion.div variants={buttonVariant} whileHover="hover">
+                <Link to="/about" className="btn btn-warning shadow mx-1">
+                  Read more
+                </Link>
+              </motion.div>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+      {/* Adding more sections end */}
+
+      {/* Adding more sections */}
+      <section className="section2 bgcolor border-top">
+        <Container>
+          <Row>
+            <Col md={12} className="text-center mb-3">
+              <h3 className="section2heading">What You can do</h3>
+              <div className="underline mx-auto"></div>
+            </Col>
+            <Col md={4} className="text-center">
+              <h5>Write Blogs</h5>
+              <p>
+                A blogging website where users can write a blog on any topic.
+                There are two panels: Writing and Reviewing panel. In writing
+                panel, anyone can signup and start writing blogs. The reviewer
+                requests would be sent to admin for approval and then user can
+                start reviewing the assigned blogs. The admin can delete any
+                user, revoke/grant reviewer access.
+              </p>
+              <Link to={"/newblog"} className="btn btn-outline-success mb-3">
+                Write a blog <FaLocationArrow />
+              </Link>
+            </Col>
+            <Col md={4} className="text-center">
+              <h5>Post your query in Community</h5>
+              <p>
+                A blogging website where users can write a blog on any topic.
+                There are two panels: Writing and Reviewing panel. In writing
+                panel, anyone can signup and start writing blogs. The reviewer
+                requests would be sent to admin for approval and then user can
+                start reviewing the assigned blogs. The admin can delete any
+                user, revoke/grant reviewer access.
+              </p>
+              <Link to={"/community"} className="btn btn-outline-success mb-3">
+                Create community post <FaLocationArrow />
+              </Link>
+            </Col>
+            <Col md={4} className="text-center">
+              <h5>Become a Reviewer</h5>
+              <p>
+                A blogging website where users can write a blog on any topic.
+                There are two panels: Writing and Reviewing panel. In writing
+                panel, anyone can signup and start writing blogs. The reviewer
+                requests would be sent to admin for approval and then user can
+                start reviewing the assigned blogs. The admin can delete any
+                user, revoke/grant reviewer access.
+              </p>
+              <Link to={"/newblog"} className="btn btn-outline-success mb-3">
+                Become a Reviewer <FaLocationArrow />
+              </Link>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+      {/* Adding more sections end */}
+
+      {/* Adding more sections */}
+      <section className="section2 border-top">
+        <Container>
+          <Row>
+            <Col md={12} className="text-center mb-3">
+              <h3 className="section2heading">Reviews from the Users</h3>
+              <div className="underline mx-auto"></div>
+            </Col>
+            <Col md={4}>
+              <Card className="shadow reviews-card">
+                <Card.Img
+                  style={{ maxHeight: "250px" }}
+                  src="https://source.unsplash.com/random?blue sky"
+                  className="w-100 border-bottom"
+                  alt="Services"
+                ></Card.Img>
+                <Card.Body>
+                  <h6>Mohit Sharma</h6>
+                  <div className="underline"></div>
+                  <p>
+                    <cite>
+                      ❝ My experience as a reviewer and writer has reached new
+                      heights. The platform’s reliability and extensive feature
+                      set have streamlined my writing and editing processes,
+                      allowing me to focus on creating high-quality content. The
+                      supportive community and responsive customer service
+                      further enhance the overall experience, making
+                      BloggerSpace a standout choice for serious bloggers.❞
+                    </cite>
+                  </p>
+                </Card.Body>
+                <Card.Footer>
+                  <Link to="#" className="btn btn-outline-success">
+                    View Profile
+                  </Link>
+                </Card.Footer>
+              </Card>
+            </Col>
+
+            <Col md={4}>
+              <Card className="shadow reviews-card">
+                <Card.Img
+                  style={{ maxHeight: "250px" }}
+                  src="https://source.unsplash.com/random?blue sky"
+                  className="w-100 border-bottom"
+                  alt="Services"
+                ></Card.Img>
+                <Card.Body>
+                  <h6>Swaranjali</h6>
+                  <div className="underline"></div>
+                  <p>
+                    <cite>
+                      ❝ As a dedicated blogger who values both creativity and
+                      efficiency, my experience with BloggerSpace has been
+                      exceptional. The platform's focus on enhancing the writing
+                      process through innovative features sets it apart in the
+                      crowded world of blogging tools.❞
+                    </cite>
+                  </p>
+                </Card.Body>
+                <Card.Footer>
+                  <Link to="#" className="btn btn-outline-success">
+                    View Profile
+                  </Link>
+                </Card.Footer>
+              </Card>
+            </Col>
+
+            <Col md={4}>
+              <Card className="shadow reviews-card">
+                <Card.Img
+                  style={{ maxHeight: "250px" }}
+                  src="https://source.unsplash.com/random/100×100"
+                  className="w-100 border-bottom"
+                  alt="Services"
+                ></Card.Img>
+                <Card.Body>
+                  <h6>Saksham Kumar</h6>
+                  <div className="underline"></div>
+                  <p>
+                    <cite>
+                      ❝ BloggerSpace has exceeded my expectations with its
+                      exceptional writing features and user-friendly interface.
+                      The advanced editing tools, collaborative features, and
+                      powerful SEO capabilities have transformed my blogging
+                      experience, making it more productive and enjoyable.❞
+                    </cite>
+                  </p>
+                </Card.Body>
+                <Card.Footer>
+                  <Link to="#" className="btn btn-outline-success">
+                    View Profile
+                  </Link>
+                </Card.Footer>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+      {/* Adding more sections end */}
+
+      {/* <div className="homepage-blogs">
         <Container>
           <b className="m-3">Most Viewed Blogs:</b>
           {blogs?.length === 0 ? (
@@ -111,12 +380,18 @@ function HomePage() {
                     key={blog.slug}
                     className="mb-2 border blogitem"
                   >
-                    <div className="row align-items-center">
+                    <motion.div
+                      variants={blogItemVariant}
+                      whileHover="hover"
+                      className="row align-items-center"
+                    >
                       <Link
                         to={`/${blog.slug}`}
                         // target="_blank"
                         style={{ textDecoration: "none" }}
-                        onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        onClick={() =>
+                          window.scrollTo({ top: 0, behavior: "smooth" })
+                        }
                       >
                         <div className="col">
                           <b>{blog.title}</b>
@@ -143,7 +418,7 @@ function HomePage() {
                           </p>
                         </div>
                       </Link>
-                    </div>
+                    </motion.div>
                   </ListGroup.Item>
                 ))}
                 <Link to={"/sitemap"}>Show more</Link>
@@ -169,7 +444,9 @@ function HomePage() {
                         to={`/${blog.slug}`}
                         // target="_blank"
                         style={{ textDecoration: "none" }}
-                        onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        onClick={() =>
+                          window.scrollTo({ top: 0, behavior: "smooth" })
+                        }
                       >
                         <div className="col">
                           <b>{blog.title}</b>
@@ -203,6 +480,121 @@ function HomePage() {
             </>
           )}
         </Container>
+      </div> */}
+
+      {/* Tech stack used */}
+      <section className="section2">
+        <Container>
+          <h3 className="section2heading text-center">Tech Stack used</h3>
+          <div className="underline mx-auto mb-3"></div>
+          <div className="logos">
+            <motion.div
+              variants={marqueVariants}
+              animate="animate"
+              className="logos-slide"
+            >
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/2300px-React-icon.svg.png" />
+              <img src="https://cdn.buttercms.com/4XpulFfySpWyYTXuaVL2" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/2560px-Node.js_logo.svg.png" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MongoDB_Logo.svg/2560px-MongoDB_Logo.svg.png" />
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa5ZSJpLPqVsS-3h_GuNL6MVQWOq822oOzO9bx8BEuYQ&s" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/2300px-React-icon.svg.png" />
+              <img src="https://cdn.buttercms.com/4XpulFfySpWyYTXuaVL2" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/2560px-Node.js_logo.svg.png" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MongoDB_Logo.svg/2560px-MongoDB_Logo.svg.png" />
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa5ZSJpLPqVsS-3h_GuNL6MVQWOq822oOzO9bx8BEuYQ&s" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/2300px-React-icon.svg.png" />
+              <img src="https://cdn.buttercms.com/4XpulFfySpWyYTXuaVL2" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/2560px-Node.js_logo.svg.png" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/MongoDB_Logo.svg/2560px-MongoDB_Logo.svg.png" />
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa5ZSJpLPqVsS-3h_GuNL6MVQWOq822oOzO9bx8BEuYQ&s" />
+            </motion.div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Contact us */}
+      <div>
+        <section className="section2">
+          <Container>
+            <h3 className="section2heading text-center">Contact Us</h3>
+            <div className="underline mx-auto mb-3"></div>
+            <Card className="shadow">
+              <Card.Body>
+                <Row>
+                  <Col md={6}>
+                    <h6>Contact Us</h6>
+                    <hr />
+                    <Form>
+                      <Form.Group controlId="email">
+                        <Form.Label>Email address</Form.Label>
+                        <Form.Control
+                          type="email"
+                          placeholder="Enter email"
+                          // value={email}
+                          // onChange={handleEmailChange}
+                          required
+                        />
+                      </Form.Group>
+                      <Form.Group controlId="mobile">
+                        <Form.Label>Email address</Form.Label>
+                        <Form.Control
+                          type="number"
+                          placeholder="Enter mobile"
+                          // value={email}
+                          // onChange={handleEmailChange}
+                          required
+                        />
+                      </Form.Group>
+                      <Form.Group controlId="message">
+                        <Form.Label>Your message</Form.Label>
+                        <Form.Control
+                          type="textarea"
+                          placeholder="Enter your message"
+                          // value={email}
+                          // onChange={handleEmailChange}
+                          required
+                        />
+                      </Form.Group>
+
+                      <Button
+                        variant="primary"
+                        type="submit"
+                        className="w-100 my-2"
+                        block
+                        disabled
+                      >
+                        Send Message
+                      </Button>
+                      <i>Currently disabled.</i>
+                    </Form>
+                  </Col>
+                  <Col md={6} className="border-start">
+                    <h5 className="section2heading">Contact Information</h5>
+                    <div className="underline"></div>
+                    <b>
+                      <MdEmail size="25px" /> Email: singhteekam.in@gmail.com
+                    </b>
+                    <br />
+                    <Button
+                      variant="outline-success"
+                      size="sm"
+                      onClick={() =>{
+                        navigator.clipboard.writeText(
+                          "singhteekam.in@gmail.com"
+                        );
+                        toast.success("Email Copied to clipboard");
+                      }
+                      }
+                    >
+                      Copy Email
+                    </Button>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </Container>
+        </section>
       </div>
     </div>
   );

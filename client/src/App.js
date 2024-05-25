@@ -28,6 +28,7 @@ import TermsAndConditions from "./components/Footer/TermsAndConditions/TermsAndC
 import AboutBloggerSpace from "./components/Footer/AboutBloggerSpace/AboutBloggerSpace.js";
 import CommunityPage from "./components/Community/CommunityPage.js";
 import ViewCommunityPost from "./components/Community/ViewCommunityPost.js";
+import AllBlogs from "./components/Posts/AllBlogs/AllBlogs.js";
 
 const App = () => {
   return (
@@ -81,6 +82,7 @@ const App = () => {
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} exact />
+            <Route path="/blogs" element={<AllBlogs />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/mynotes" element={<SignupPage />} />

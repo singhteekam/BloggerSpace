@@ -70,7 +70,7 @@ function Header() {
 
   return (
     <div className="header-page">
-        <Navbar bg="light" expand="lg" fixed="top" >
+        <Navbar bg="dark" data-bs-theme="dark" expand="lg" fixed="top" className="text-white">
       <Container>
         <RxDragHandleHorizontal
           size="35px"
@@ -135,7 +135,7 @@ function Header() {
             </Offcanvas.Body>
           </Offcanvas>
         ) : (
-          <Offcanvas show={showCanvas} onHide={handleCloseCanvas}>
+          <Offcanvas show={showCanvas} onHide={handleCloseCanvas} className="bg-dark text-white">
             <Offcanvas.Header closeButton>
               <Offcanvas.Title>Hi, User</Offcanvas.Title>
             </Offcanvas.Header>
@@ -143,6 +143,9 @@ function Header() {
               <div className="d-grid gap-2">
               <Button variant="secondary" href="/">
                   <i className="fas fa-home"></i> Home
+                </Button>
+              <Button variant="secondary" href="/blogs">
+                  <i className="fas fa-home"></i> Blogs
                 </Button>
                 <Button variant="secondary" href="/login">
                   <i className="fas fa-user"></i> Login
@@ -177,7 +180,7 @@ function Header() {
 
         <Navbar.Brand href="/" className="fw-bold">
           <img src="/favicon2.ico" height={25} className="mx-2"></img>
-          BloggerSpace
+          <b className="text-white">BloggerSpace</b>
         </Navbar.Brand>
 
         <div>

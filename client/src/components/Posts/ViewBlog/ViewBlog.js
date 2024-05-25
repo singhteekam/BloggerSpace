@@ -21,7 +21,7 @@ import {
   TelegramShareButton,
   TelegramIcon,
   FacebookMessengerShareButton,
-  FacebookMessengerIcon
+  FacebookMessengerIcon,
 } from "react-share";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +31,7 @@ import { FaEye, FaReply } from "react-icons/fa";
 import "./ViewBlog.css";
 import LoginPageModal from "../../../utils/LoginPageModal";
 import PageNotFound from "../../PageNotFound/PageNotFound";
+import { motion, useScroll, useSpring } from "framer-motion";
 
 const ViewBlog = () => {
   const { blogSlug } = useParams();
@@ -50,7 +51,7 @@ const ViewBlog = () => {
   // const [notFound, setNotFound] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
-  
+
 
   const navigate = useNavigate();
 
@@ -111,7 +112,7 @@ const ViewBlog = () => {
     //     if (response.data.alreadyLiked === true) setThumbColor("solid");
 
     //     setLoading(false);
-        
+
     //   } catch (error) {
     //     console.error("Error fetching Blog:", error);
     //     setLoading(false);
@@ -211,10 +212,9 @@ const ViewBlog = () => {
         blogLikes: response.data.newLikes,
       }));
       setDisableLikeButton(false);
-      if(response.data.newThumbColor==="regular")
+      if (response.data.newThumbColor === "regular")
         toast.info("You disliked this blog");
-      else
-        toast.success("You liked this blog");
+      else toast.success("You liked this blog");
       // window.location.reload();
     } catch (error) {
       toast.error("Error occured when liking the blog..");
@@ -278,9 +278,9 @@ const ViewBlog = () => {
     }
   };
 
-  const handleFollowUser= async (idToFollow)=>{
+  const handleFollowUser = async (idToFollow) => {
     try {
-      const response= await axios.patch(`/api/users/follow/${idToFollow}`);
+      const response = await axios.patch(`/api/users/follow/${idToFollow}`);
       toast.success("Following.");
       console.log("Following....");
       setIsFollowing(true);
@@ -288,13 +288,13 @@ const ViewBlog = () => {
       // window.location.reload();
     } catch (error) {
       toast.error("Error occured!! Please try again");
-      console.log("Error: "+error);
+      console.log("Error: " + error);
     }
-  }
+  };
 
-  const handleUnfollowUser= async (idToUnfollow)=>{
+  const handleUnfollowUser = async (idToUnfollow) => {
     try {
-      const response= await axios.patch(`/api/users/unfollow/${idToUnfollow}`);
+      const response = await axios.patch(`/api/users/unfollow/${idToUnfollow}`);
       toast.success("Unfollowed.");
       console.log("Unfollowed....");
       setIsFollowing(false);
@@ -304,7 +304,7 @@ const ViewBlog = () => {
       toast.error("Error occured!! Please try again");
       console.log(error);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -343,6 +343,7 @@ const ViewBlog = () => {
 
   return (
     <div>
+      
       <Helmet>
         <meta name="description" content={stripHtmlTags(blog?.content)} />
         <title>{blog?.title} - BloggerSpace</title>
@@ -364,6 +365,7 @@ const ViewBlog = () => {
         <Container className="view-blog-container">
           {/* <h4>{window.location.href}</h4> */}
           {/* <h2 className="view-blog-heading">View Blog</h2> */}
+
           <ToastContainer />
           <Card className="view-blog-card">
             <Card.Body>
@@ -412,12 +414,14 @@ const ViewBlog = () => {
             <br />
             <Card.Footer className="d-flex justify-content-left">
               {blog?.authorDetails.profilePicture ? (
-                <img className="viewblog-img"
+                <img
+                  className="viewblog-img"
                   src={`data:image/jpeg;base64,${blog?.authorDetails.profilePicture}`}
                   alt="Profile"
                 />
               ) : (
-                <img className="viewblog-img"
+                <img
+                  className="viewblog-img"
                   src="https://img.freepik.com/free-icon/user_318-159711.jpg"
                   alt="Profile"
                 />
@@ -432,13 +436,29 @@ const ViewBlog = () => {
                 </Link>
                 <br />
                 {/* <i className="mx-3">{blog?.lastUpdatedAt?.slice(0, 10)}</i> */}
-                {blog.authorDetails.followers.find((element)=>element===userInfo?._id)?
-                <Button variant="secondary" size="sm" className="mx-3" onClick={()=>handleUnfollowUser(blog?.authorDetails._id)} disabled>
-                  Following
-                </Button>:
-                <Button variant="success" size="sm" className="mx-3" onClick={()=>handleFollowUser(blog?.authorDetails._id)} disabled>
-                  Follow +
-                </Button>}
+                {blog.authorDetails.followers.find(
+                  (element) => element === userInfo?._id
+                ) ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="mx-3"
+                    onClick={() => handleUnfollowUser(blog?.authorDetails._id)}
+                    disabled
+                  >
+                    Following
+                  </Button>
+                ) : (
+                  <Button
+                    variant="success"
+                    size="sm"
+                    className="mx-3"
+                    onClick={() => handleFollowUser(blog?.authorDetails._id)}
+                    disabled
+                  >
+                    Follow +
+                  </Button>
+                )}
               </div>
 
               {/* <img src={blog.authorDetails.profilePicture} alt="No Image" /> */}
@@ -450,7 +470,12 @@ const ViewBlog = () => {
             <b>Share to:</b>
             <FacebookShareButton
               className="mx-2"
-              title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              title={
+                "Title: " +
+                window.location.href.slice(
+                  window.location.href.lastIndexOf("/") + 1
+                )
+              }
               url={window.location.href}
               quote="Please like and share this blog"
               hashtag="#bloggerspace"
@@ -458,7 +483,12 @@ const ViewBlog = () => {
               <FacebookIcon size={30} round={true} />
             </FacebookShareButton>
             <WhatsappShareButton
-             title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              title={
+                "Title: " +
+                window.location.href.slice(
+                  window.location.href.lastIndexOf("/") + 1
+                )
+              }
               url={window.location.href}
               quote="Please like and share this blog"
               hashtag="#bloggerspace"
@@ -466,8 +496,13 @@ const ViewBlog = () => {
               <WhatsappIcon size={30} round={true} />
             </WhatsappShareButton>
             <TwitterShareButton
-            className="mx-2"
-             title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              className="mx-2"
+              title={
+                "Title: " +
+                window.location.href.slice(
+                  window.location.href.lastIndexOf("/") + 1
+                )
+              }
               url={window.location.href}
               quote="Please like and share this blog"
               hashtag="#bloggerspace"
@@ -475,7 +510,12 @@ const ViewBlog = () => {
               <TwitterIcon size={30} round={true} />
             </TwitterShareButton>
             <LinkedinShareButton
-             title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              title={
+                "Title: " +
+                window.location.href.slice(
+                  window.location.href.lastIndexOf("/") + 1
+                )
+              }
               url={window.location.href}
               quote="Please like and share this blog"
               hashtag="#bloggerspace"
@@ -484,7 +524,12 @@ const ViewBlog = () => {
             </LinkedinShareButton>
             <TelegramShareButton
               className="mx-2"
-              title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              title={
+                "Title: " +
+                window.location.href.slice(
+                  window.location.href.lastIndexOf("/") + 1
+                )
+              }
               url={window.location.href}
               quote="Please like and share this blog"
               hashtag="#bloggerspace"
@@ -492,7 +537,12 @@ const ViewBlog = () => {
               <TelegramIcon size={30} round={true} />
             </TelegramShareButton>
             <FacebookMessengerShareButton
-             title={"Title: "+window.location.href.slice(window.location.href.lastIndexOf("/") + 1)}
+              title={
+                "Title: " +
+                window.location.href.slice(
+                  window.location.href.lastIndexOf("/") + 1
+                )
+              }
               url={window.location.href}
               quote="Please like and share this blog"
               hashtag="#bloggerspace"
@@ -555,9 +605,11 @@ const ViewBlog = () => {
                     <p className="comment-content mx-2">{comment.content}</p>
                     <small
                       style={{ cursor: "pointer" }}
-                      onClick={()=> {
+                      onClick={() => {
                         setShowReplyInput(comment._id);
-                        setReplyCommentContent("@"+comment.user.userName+" ");
+                        setReplyCommentContent(
+                          "@" + comment.user.userName + " "
+                        );
                       }}
                     >
                       <FaReply /> Reply
@@ -566,7 +618,11 @@ const ViewBlog = () => {
                     {comment.commentReplies ? (
                       <ul>
                         {comment.commentReplies.map((nestedReply, index) => (
-                          <li key={index} style={{ listStyleType: "none" }} className="mt-2">
+                          <li
+                            key={index}
+                            style={{ listStyleType: "none" }}
+                            className="mt-2"
+                          >
                             {nestedReply.replyCommentUser?.profilePicture ? (
                               <div>
                                 <Image

@@ -3,6 +3,16 @@
     min-height: 100vh;
 }
 
+.new-page-container{
+    margin-top: 80px;
+    min-height: 100vh;
+}
+
+.page-title{
+    color: black;
+    font-size: 25px;
+}
+
 /* .carousel-div{
     max-width: 100%;
 } */
@@ -18,6 +28,28 @@
     max-width: 100%;
 }
 
+.section2{
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.section2heading{
+    color: rgb(204, 18, 18);
+    font-size: 20px;
+}
+
+.underline{
+    height: 4px;
+    width: 4rem;
+    background-color: #f76c2f;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.bgcolor{
+    background-color: #f2f2f2;
+}
+
 .blogitem{
     background-color: lightgray;
 }
@@ -29,6 +61,33 @@
     background-color: skyblue;
 }
 
+
+.cardbody{
+    background-image: url('https://source.unsplash.com/random?blue sky');
+}
+
+.reviews-card{
+    margin-bottom: 5px;
+    min-height: 600px;
+}
+
+.logos{
+    position: relative;
+    width: 100vw;
+    max-width: 100%;
+    height: 100px;
+    overflow-x: hidden;
+}
+
+.logos-slide{
+    position: absolute;
+    white-space: nowrap;
+
+}
+.logos-slide img{
+    height: 60px;
+    margin: 0 30px;
+}
 
 @media only screen and (max-width:760px) {
     .homepage-blogs{
