@@ -36,7 +36,7 @@ const AllBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(6);
+  const [postsPerPage, setPostsPerPage] = useState(2);
   const navigate = useNavigate();
 
   // const dispatch= useDispatch();
@@ -178,7 +178,7 @@ const AllBlogs = () => {
                       Prev
                     </a>
                   </li>
-                  {numbers.map((n, i) => (
+                  {numbers.slice(0,3).map((n, i) => (
                     <li
                       className={`page-item ${
                         currentPage === n ? "active" : ""
@@ -191,21 +191,16 @@ const AllBlogs = () => {
                     </li>
                     
                   ))}
-                  {npage>3??(
-                    
                   <li className="page-item">
                     <a href="#" className="page-link" >
                       ...
                     </a>
                   </li>
-                  )}
-                  {npage>3??(
                   <li className="page-item">
-                    <a href="#" className="page-link" >
+                    <a href="#" className="page-link" onClick={()=>changeCPage(npage)}>
                       {npage}
                     </a>
                   </li>
-                  )}
                   <li className="page-item">
                     <a href="#next" className="page-link" onClick={nextPage}>
                       Next
