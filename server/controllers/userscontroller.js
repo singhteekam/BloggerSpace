@@ -456,9 +456,9 @@ exports.userProfile = async (req, res) => {
   try {
     const userName = req.params.username;
     const user = await User.findOne({ userName })
-    .populate("following")
-    .populate("followers")
-    .exec();
+      .populate("following")
+      .populate("followers")
+      .exec();
 
     if (!user) {
       logger.error("The requested User not found of username: " + userName);
@@ -486,8 +486,8 @@ exports.userProfile = async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       blogs: userBlogs,
-      followers:user.followers,
-      following: user.following
+      followers: user.followers,
+      following: user.following,
     };
 
     logger.info("Returning from user profile route with data.");
@@ -591,7 +591,7 @@ exports.getSavedBlogsOfUser = async (req, res) => {
 // Follow and Unfollow users
 exports.followUser = async (req, res) => {
   try {
-    if(!req.session.userId){
+    if (!req.session.userId) {
       console.log("You are not logged in..");
       return res.status(404).json("You are not logged in..");
     }
@@ -609,11 +609,9 @@ exports.followUser = async (req, res) => {
       },
       { new: true }
     );
-    
-    if(!response || !response2)
-      return res.status(404).json({ error: error });
-    return res.json("Done")
-   
+
+    if (!response || !response2) return res.status(404).json({ error: error });
+    return res.json("Done");
   } catch (error) {
     return res.status(404).json({ error: "Error occured" + error });
   }
@@ -621,7 +619,7 @@ exports.followUser = async (req, res) => {
 
 exports.unfollowUser = async (req, res) => {
   try {
-    if(!req.session.userId){
+    if (!req.session.userId) {
       console.log("You are not logged in..");
       return res.status(404).json("You are not logged in..");
     }
@@ -639,10 +637,8 @@ exports.unfollowUser = async (req, res) => {
       },
       { new: true }
     );
-    if(!response || !response2)
-      return res.status(404).json({ error: error });
-    return res.json("Done")
-
+    if (!response || !response2) return res.status(404).json({ error: error });
+    return res.json("Done");
 
     // User.findByIdAndUpdate(
     //   req.params.idToUnfollow,
@@ -694,5 +690,21 @@ exports.incrementVisitCount = async (req, res) => {
   } catch (error) {
     logger.error("Error incrementing visit count: " + error);
     console.error("Error incrementing visit count:", error);
+  }
+};
+
+exports.contactUs = async (req, res) => {
+  try {
+    const { email, mobileNo, message } = req.body;
+    sendEmail(
+      process.env.EMAIL,
+      "New contact us email",
+      `<div><p>Details of the form submitted user:</p><p>Email: ${email}</p><p>MobileNo: ${mobileNo}</p><p>Message: ${message}</p></div>`
+    ).then((response)=>{
+      console.log("Email sent!!!");
+    }).catch((err)=>res.status(404).json("Error when sending mail"));
+    return res.status(200).json("Email sent successfully");
+  } catch (error) {
+    return res.status(404).json("Error when sending mail...");
   }
 };

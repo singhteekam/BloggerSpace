@@ -68,7 +68,12 @@
 
 .reviews-card{
     margin-bottom: 5px;
-    min-height: 600px;
+    min-height: 550px;
+}
+.review-card-img{
+    width: 100%; /* Make the image fill the container width */ 
+    height: 250px; /* Make the image fill the container height */ 
+    object-fit: cover;
 }
 
 .logos{
@@ -87,6 +92,13 @@
 .logos-slide img{
     height: 60px;
     margin: 0 30px;
+}
+
+.myroundimg{
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    /* width: 100%; */
 }
 
 @media only screen and (max-width:760px) {

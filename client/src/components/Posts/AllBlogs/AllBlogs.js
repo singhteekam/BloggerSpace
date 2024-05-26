@@ -14,14 +14,15 @@ import axios from "axios";
 import "./AllBlogs.css";
 import { motion } from "framer-motion";
 
-import {useDispatch, useSelector} from "react-redux";
-import {fetchAllBlog} from "../../../redux/slice/allblog";
+
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllBlog } from "../../../redux/slice/allblog";
 
 const blogItemVariant = {
   hover: {
-    scale: 1.1,
+    // scale: 1.1,
     fontWeight: "bold",
-    originX: 0,
+    // originX: 0,
     // textShadow:"0px 0px 8px rgb(255,255,255)",
     // boxShadow:"0px 0px 8px rgb(255,255,255)",
     transition: {
@@ -81,29 +82,30 @@ const AllBlogs = () => {
   const npage = Math.ceil(blogs.length / postsPerPage);
   const numbers = [...Array(npage + 1).keys()].slice(1);
 
-  const prePage=()=>{
-    if(currentPage!==1){
-        setCurrentPage(currentPage-1);
+  const prePage = () => {
+    if (currentPage !== 1) {
+      setCurrentPage(currentPage - 1);
     }
-  }
+  };
 
-  const changeCPage=(id)=>{
-    setCurrentPage(id)
-  }
+  const changeCPage = (id) => {
+    setCurrentPage(id);
+  };
 
-  const nextPage=()=>{
-    if(currentPage!==npage){
-        setCurrentPage(currentPage+1);
+  const nextPage = () => {
+    if (currentPage !== npage) {
+      setCurrentPage(currentPage + 1);
     }
-  }
-
+  };
 
   return (
     <div className="new-page-container">
       <Container>
         <h3 className="page-title">Blogs</h3>
         <div className="underline"></div>
-        <i>Showing total results: {blogs.length}, Page {currentPage} of {npage}</i>
+        <i>
+          Showing total results: {blogs.length}, Page {currentPage} of {npage}
+        </i>
 
         {/* {state.isLoading && <div>Loading..</div>}
         {!state.isLoading && state.isError && <div>Error..{state.error}</div>}
@@ -139,7 +141,15 @@ const AllBlogs = () => {
                         }
                       >
                         <Card className="blogcard">
-                          <Card.Body className="cardbody">
+                          <div class="blogcard-container">
+                            <img
+                              src="carousel_img1.png"
+                              alt="Image"
+                              className="blogcard-container-img"
+                            />
+                            <div class="blogcard-container-text">{blog.category}</div>
+                          </div>
+                          <Card.Body className="">
                             <Card.Title>{blog.title}</Card.Title>
                             <div className="underline"></div>
                             {blog.tags &&
@@ -178,26 +188,33 @@ const AllBlogs = () => {
                       Prev
                     </a>
                   </li>
-                  {numbers.slice(0,3).map((n, i) => (
+                  {numbers.slice(0, 3).map((n, i) => (
                     <li
                       className={`page-item ${
                         currentPage === n ? "active" : ""
                       }`}
                       key={i}
                     >
-                      <a href="#" className="page-link" onClick={()=>changeCPage(n)}>
+                      <a
+                        href="#"
+                        className="page-link"
+                        onClick={() => changeCPage(n)}
+                      >
                         {n}
                       </a>
                     </li>
-                    
                   ))}
                   <li className="page-item">
-                    <a href="#" className="page-link" >
+                    <a href="#" className="page-link">
                       ...
                     </a>
                   </li>
                   <li className="page-item">
-                    <a href="#" className="page-link" onClick={()=>changeCPage(npage)}>
+                    <a
+                      href="#"
+                      className="page-link"
+                      onClick={() => changeCPage(npage)}
+                    >
                       {npage}
                     </a>
                   </li>

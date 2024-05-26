@@ -22,6 +22,7 @@ const {
   getSavedBlogsOfUser,
   followUser,
   unfollowUser,
+  contactUs,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -91,6 +92,9 @@ router.get("/savedblogs", authenticate, getSavedBlogsOfUser);
 // Follow and Unfollow
 router.patch("/follow/:idToFollow", authenticate, followUser);
 router.patch("/unfollow/:idToUnfollow", authenticate, unfollowUser);
+
+// Contact us
+router.post("/contactus",contactUs);
 
 // Visitors
 router.get("/visitors", getVisitorCount);

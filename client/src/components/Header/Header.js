@@ -89,6 +89,9 @@ function Header() {
                 <Button variant="secondary" href="/">
                   <i className="fas fa-home"></i> Home
                 </Button>
+                <Button variant="secondary" href="/blogs">
+                  <i className="fas fa-rectangle-list"></i> Blogs
+                </Button>
                 <Button variant="secondary" href="/myprofile">
                   <i className="fas fa-user"></i> My Profile
                 </Button>
@@ -145,7 +148,7 @@ function Header() {
                   <i className="fas fa-home"></i> Home
                 </Button>
               <Button variant="secondary" href="/blogs">
-                  <i className="fas fa-home"></i> Blogs
+                  <i className="fas fa-rectangle-list"></i> Blogs
                 </Button>
                 <Button variant="secondary" href="/login">
                   <i className="fas fa-user"></i> Login

@@ -17,8 +17,8 @@ import axios from "axios";
 import CarouselImage from "../../utils/CarouselImage";
 import { motion } from "framer-motion";
 import { FaLocationArrow } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
 import { ToastContainer, toast } from "react-toastify";
+import ContactUs from "./ContactUs";
 
 const carouselVariant = {
   hidden: {
@@ -35,11 +35,11 @@ const carouselVariant = {
     },
   },
 };
-const blogItemVariant = {
+const imageHoverVariant = {
   hover: {
-    scale: 1.1,
+    scale: 1.2,
     fontWeight: "bold",
-    originX: 0,
+    // originX: 0,
     // textShadow:"0px 0px 8px rgb(255,255,255)",
     // boxShadow:"0px 0px 8px rgb(255,255,255)",
     transition: {
@@ -53,8 +53,6 @@ const blogItemVariant = {
 const buttonVariant = {
   hover: {
     scale: 1.1,
-    // textShadow:"0px 0px 8px rgb(255,255,255)",
-    // boxShadow:"0px 0px 8px rgb(255,255,255)",
     transition: {
       type: "spring",
       stiffness: 300,
@@ -277,9 +275,8 @@ function HomePage() {
             <Col md={4}>
               <Card className="shadow reviews-card">
                 <Card.Img
-                  style={{ maxHeight: "250px" }}
-                  src="https://source.unsplash.com/random?blue sky"
-                  className="w-100 border-bottom"
+                  src="/assets/mohit.jpeg"
+                  className="w-100 border-bottom review-card-img"
                   alt="Services"
                 ></Card.Img>
                 <Card.Body>
@@ -288,12 +285,11 @@ function HomePage() {
                   <p>
                     <cite>
                       ❝ My experience as a reviewer and writer has reached new
-                      heights. The platform’s reliability and extensive feature
-                      set have streamlined my writing and editing processes,
+                      heights. The platform’s draft and editing tools feature
                       allowing me to focus on creating high-quality content. The
-                      supportive community and responsive customer service
-                      further enhance the overall experience, making
-                      BloggerSpace a standout choice for serious bloggers.❞
+                      supportive community further enhance the overall
+                      experience, making BloggerSpace a standout choice for
+                      serious bloggers.❞
                     </cite>
                   </p>
                 </Card.Body>
@@ -308,9 +304,8 @@ function HomePage() {
             <Col md={4}>
               <Card className="shadow reviews-card">
                 <Card.Img
-                  style={{ maxHeight: "250px" }}
-                  src="https://source.unsplash.com/random?blue sky"
-                  className="w-100 border-bottom"
+                  src="/assets/swara.jpeg"
+                  className="w-100 border-bottom review-card-img"
                   alt="Services"
                 ></Card.Img>
                 <Card.Body>
@@ -337,9 +332,9 @@ function HomePage() {
             <Col md={4}>
               <Card className="shadow reviews-card">
                 <Card.Img
-                  style={{ maxHeight: "250px" }}
-                  src="https://source.unsplash.com/random/100×100"
-                  className="w-100 border-bottom"
+                  src="/assets/saksham.jpeg"
+                  // src="https://source.unsplash.com/random/100×100"
+                  className="w-100 border-bottom review-card-img"
                   alt="Services"
                 ></Card.Img>
                 <Card.Body>
@@ -513,89 +508,139 @@ function HomePage() {
         </Container>
       </section>
 
-      {/* Contact us */}
-      <div>
-        <section className="section2">
-          <Container>
-            <h3 className="section2heading text-center">Contact Us</h3>
-            <div className="underline mx-auto mb-3"></div>
-            <Card className="shadow">
-              <Card.Body>
-                <Row>
-                  <Col md={6}>
-                    <h6>Contact Us</h6>
-                    <hr />
-                    <Form>
-                      <Form.Group controlId="email">
-                        <Form.Label>Email address</Form.Label>
-                        <Form.Control
-                          type="email"
-                          placeholder="Enter email"
-                          // value={email}
-                          // onChange={handleEmailChange}
-                          required
-                        />
-                      </Form.Group>
-                      <Form.Group controlId="mobile">
-                        <Form.Label>Email address</Form.Label>
-                        <Form.Control
-                          type="number"
-                          placeholder="Enter mobile"
-                          // value={email}
-                          // onChange={handleEmailChange}
-                          required
-                        />
-                      </Form.Group>
-                      <Form.Group controlId="message">
-                        <Form.Label>Your message</Form.Label>
-                        <Form.Control
-                          type="textarea"
-                          placeholder="Enter your message"
-                          // value={email}
-                          // onChange={handleEmailChange}
-                          required
-                        />
-                      </Form.Group>
-
-                      <Button
-                        variant="primary"
-                        type="submit"
-                        className="w-100 my-2"
-                        block
-                        disabled
-                      >
-                        Send Message
-                      </Button>
-                      <i>Currently disabled.</i>
-                    </Form>
-                  </Col>
-                  <Col md={6} className="border-start">
-                    <h5 className="section2heading">Contact Information</h5>
-                    <div className="underline"></div>
-                    <b>
-                      <MdEmail size="25px" /> Email: singhteekam.in@gmail.com
-                    </b>
-                    <br />
-                    <Button
-                      variant="outline-success"
-                      size="sm"
-                      onClick={() =>{
-                        navigator.clipboard.writeText(
-                          "singhteekam.in@gmail.com"
-                        );
-                        toast.success("Email Copied to clipboard");
-                      }
-                      }
+      {/* About Developer */}
+      <section className="section2">
+        <Container>
+          <h3 className="section2heading text-center">About Developer</h3>
+          <div className="underline mx-auto mb-3"></div>
+          <Row>
+            <Col md={4}>
+              <h6>Teekam Singh</h6>
+              <div className="underline"></div>
+              <p>
+                Hi, I'm Teekam Singh currently working on this website and
+                adding new features, fixing bugs, adding animations, running
+                server 24x7 without a downtime.
+              </p>
+              <Link
+                className="btn btn-outline-success"
+                to={"https://www.singhteekam.in/"}
+                target="_blank"
+              >
+                View Portfolio <FaLocationArrow />
+              </Link>
+              <br />
+              <i>
+                It would be a great help if you give me your 2 minutes and
+                explore this website and give me your suggestions/feedback.
+              </i>
+            </Col>
+            <Col md={4} className="text-center">
+              <motion.div variants={imageHoverVariant} whileHover="hover">
+                <img src="my_image.jpg" className="myroundimg" />
+              </motion.div>
+            </Col>
+            <Col md={4}>
+              <h5>More projects:</h5>
+              <div>
+                <b>BrainQuiz: </b>
+                <Link
+                  className="btn btn-outline-info m-1"
+                  to={"https://brainquiz.singhteekam.in/"}
+                  target="_blank"
+                >
+                  Live demo
+                </Link>
+                <Link
+                  className="btn btn-outline-info m-1"
+                  to={"https://github.com/singhteekam/Kaun-Banega-Crorepati"}
+                  target="_blank"
+                >
+                  Source code
+                </Link>
+                <Link
+                  className="btn btn-outline-info m-1"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      "https://brainquiz.singhteekam.in/"
+                    );
+                    toast.success("URL Copied to clipboard");
+                  }}
+                >
+                  Copy URL
+                </Link>
+              </div>
+              <div className="mt-2">
+                <b>MyDiary: </b>
+                <Link
+                  className="btn btn-outline-info m-1"
+                  to={"https://mydiary.singhteekam.in/"}
+                  target="_blank"
+                >
+                  Live demo
+                </Link>
+                <Link
+                  className="btn btn-outline-info m-1"
+                  to={"https://github.com/singhteekam/My-Diary"}
+                  target="_blank"
+                >
+                  Source code
+                </Link>
+                <Link
+                  className="btn btn-outline-info m-1"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      "https://mydiary.singhteekam.in/"
+                    );
+                    toast.success("URL Copied to clipboard");
+                  }}
+                >
+                  Copy URL
+                </Link>
+              </div>
+              <br />
+              <div>
+                <h5>Social Media Links:</h5>
+                <ul className="list-inline">
+                  <li className="list-inline-item">
+                    <a
+                      target="_blank"
+                      href="https://in.linkedin.com/in/singhteekam"
                     >
-                      Copy Email
-                    </Button>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Container>
-        </section>
-      </div>
+                      <i className="fab fa-linkedin fa-lg"></i>
+                    </a>
+                  </li>
+                  <li className="list-inline-item mx-2">
+                    <a target="_blank" href="https://github.com/singhteekam">
+                      <i className="fab fa-github fa-lg"></i>
+                    </a>
+                  </li>
+                  <li className="list-inline-item mx-2">
+                    <a
+                      target="_blank"
+                      href="mailto:contact.singhteekam@gmail.com"
+                    >
+                      {/* <i className="fab fa-facebook fa-lg"></i> */}
+                      <i className="fa fa-envelope fa-lg"></i>
+                    </a>
+                  </li>
+                  <li className="list-inline-item mx-2">
+                    <a
+                      target="_blank"
+                      href="https://www.instagram.com/singh__teekam/"
+                    >
+                      <i className="fab fa-instagram fa-lg"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+
+      {/* Contact us */}
+      <ContactUs />
     </div>
   );
 }
