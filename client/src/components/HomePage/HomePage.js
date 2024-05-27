@@ -19,62 +19,9 @@ import { motion } from "framer-motion";
 import { FaLocationArrow } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import ContactUs from "./ContactUs";
+import {carouselVariant,imageHoverVariant,buttonVariant,marqueVariants} from "./../../utils/motionVariants/variants"
 
-const carouselVariant = {
-  hidden: {
-    opacity: 0,
-    x: -50,
-  },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      type: "spring",
-      delay: 0.5,
-      duration: 2,
-    },
-  },
-};
-const imageHoverVariant = {
-  hover: {
-    scale: 1.2,
-    fontWeight: "bold",
-    // originX: 0,
-    // textShadow:"0px 0px 8px rgb(255,255,255)",
-    // boxShadow:"0px 0px 8px rgb(255,255,255)",
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      yoyo: Infinity, // We can give any value like 100 etc
-    },
-  },
-};
 
-const buttonVariant = {
-  hover: {
-    scale: 1.1,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      yoyo: Infinity, // We can give any value like 100 etc
-    },
-  },
-};
-
-const marqueVariants = {
-  animate: {
-    x: [-25, -1000],
-    transition: {
-      x: {
-        repeat: Infinity,
-        repeatType: "loop",
-        duration: 6,
-        ease: "linear",
-        stiffness: 500,
-      },
-    },
-  },
-};
 
 function HomePage() {
   const [blogs, setBlogs] = useState([]);
@@ -484,7 +431,7 @@ function HomePage() {
           <div className="underline mx-auto mb-3"></div>
           <div className="logos">
             <motion.div
-              variants={marqueVariants}
+              variants={marqueVariants} 
               animate="animate"
               className="logos-slide"
             >

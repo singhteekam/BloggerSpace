@@ -1,7 +1,15 @@
 import React, { useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.css";
+import {
+  Form,
+  Button,
+  Alert,
+  Container,
+  Row,
+  Col,
+  FloatingLabel,
+} from "react-bootstrap";
 import "./SignupPage.css";
+import { ToastContainer, toast } from "react-toastify";
 
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
@@ -14,9 +22,9 @@ function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+
   const [signupSuccess, setSignupSuccess] = useState(false);
-  const [isDisabled, setIsDisabled]= useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const navigate = useNavigate();
 
@@ -26,17 +34,14 @@ function SignupPage() {
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
-    setError("");
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    setError("");
   };
 
   const handleConfirmPasswordChange = (e) => {
     setConfirmPassword(e.target.value);
-    setError("");
   };
 
   const togglePasswordVisibility = () => {
@@ -50,7 +55,7 @@ function SignupPage() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -58,7 +63,7 @@ function SignupPage() {
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,}$/;
     if (!passwordRegex.test(password)) {
-      setError(
+      toast.error(
         "Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one digit, and one special character"
       );
       return;
@@ -105,33 +110,42 @@ function SignupPage() {
           error.response.data &&
           error.response.data.message
         ) {
-          setError(error.response.data.message);
+          toast.error(error.response.data.message);
         } else {
           // setError("Signup failed");
-          setError(error);
+          toast.error(error);
           console.log(error);
         }
       });
   };
 
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <title>Sign up - BloggerSpace</title>
       </Helmet>
-      <div className="signup-page">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-md-6 col-sm-8">
-              <div className="signup-form">
-                <h2 className="text-center mb-4">Signup</h2>
-                {error && <Alert variant="danger">{error}</Alert>}
-                {signupSuccess && (
-                  <Alert variant="success">Signup successful!</Alert>
-                )}
-                <Form onSubmit={handleSubmit}>
-                  <Form.Group controlId="fullName">
-                    <Form.Label>Full Name</Form.Label>
+
+      <Container>
+        <Row className="pt-3">
+          <Col md={6}>
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9bb9Mz7yTmUO-Ky9T9pTXHb2W5cUW9_L4FWcxCyGq5A&s"
+              className="loginpage-image"
+            />
+          </Col>
+          <Col md={6}>
+            <div className="signup-form">
+              <h2 className="text-center loginpage-heading">Sign Up</h2>
+              <div className="underline mx-auto"></div>
+
+              <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="fullName">
+                  <FloatingLabel
+                    controlId="floatingInput"
+                    label="Full Name"
+                    className="mb-3"
+                    key="name"
+                  >
                     <Form.Control
                       type="text"
                       placeholder="Enter your full name"
@@ -139,10 +153,16 @@ function SignupPage() {
                       onChange={handleFullNameChange}
                       required
                     />
-                  </Form.Group>
+                  </FloatingLabel>
+                </Form.Group>
 
-                  <Form.Group controlId="email">
-                    <Form.Label>Email address</Form.Label>
+                <Form.Group controlId="email">
+                  <FloatingLabel
+                    controlId="floatingInput"
+                    label="Email address"
+                    className="mb-3"
+                    key="email"
+                  >
                     <Form.Control
                       type="email"
                       placeholder="Enter email"
@@ -150,11 +170,17 @@ function SignupPage() {
                       onChange={handleEmailChange}
                       required
                     />
-                  </Form.Group>
+                  </FloatingLabel>
+                </Form.Group>
 
-                  <Form.Group controlId="password">
-                    <Form.Label>Password</Form.Label>
-                    <div className="password-input">
+                <Form.Group controlId="password">
+                  <div className="password-input">
+                    <FloatingLabel
+                      controlId="floatingInput"
+                      label="Password"
+                      className="mb-3"
+                      key="pass"
+                    >
                       <Form.Control
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
@@ -162,18 +188,24 @@ function SignupPage() {
                         onChange={handlePasswordChange}
                         required
                       />
-                      <i
-                        className={`toggle-password fas ${
-                          showPassword ? "fa-eye-slash" : "fa-eye"
-                        }`}
-                        onClick={togglePasswordVisibility}
-                      ></i>
-                    </div>
-                  </Form.Group>
+                    </FloatingLabel>
+                    <i
+                      className={`toggle-password fas ${
+                        showPassword ? "fa-eye-slash" : "fa-eye"
+                      }`}
+                      onClick={togglePasswordVisibility}
+                    ></i>
+                  </div>
+                </Form.Group>
 
-                  <Form.Group controlId="confirmPassword">
-                    <Form.Label>Confirm Password</Form.Label>
-                    <div className="confirmpassword-input">
+                <Form.Group controlId="confirmPassword">
+                  <div className="confirmpassword-input">
+                    <FloatingLabel
+                      controlId="floatingInput"
+                      label="Confirm Password"
+                      className="mb-3"
+                      key="confirmpass"
+                    >
                       <Form.Control
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm Password"
@@ -181,34 +213,42 @@ function SignupPage() {
                         onChange={handleConfirmPasswordChange}
                         required
                       />
-                      <i
-                        className={`toggle-confirmpassword fas ${
-                          showConfirmPassword ? "fa-eye-slash" : "fa-eye"
-                        }`}
-                        onClick={toggleConfirmPasswordVisibility}
-                      ></i>
-                    </div>
-                  </Form.Group>
-
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    className="signbutton"
-                    block
-                    disabled={isDisabled}
-                  >
-                    SignUp
-                  </Button>
-
-                  <div>
-                    Already have an account? <Link to="/login">Login</Link>
+                    </FloatingLabel>
+                    <i
+                      className={`toggle-confirmpassword fas ${
+                        showConfirmPassword ? "fa-eye-slash" : "fa-eye"
+                      }`}
+                      onClick={toggleConfirmPasswordVisibility}
+                    ></i>
                   </div>
-                </Form>
-              </div>
-            </div>
+                </Form.Group>
+
+                <Button
+                  variant="success"
+                  type="submit"
+                  block
+                  disabled={isDisabled}
+                >
+                  Create Account
+                </Button>
+
+                <div>
+                  Already have an account? <Link to="/login">Login</Link>
+                </div>
+              </Form>
+            </div>{" "}
+          </Col>
+        </Row>
+        <ToastContainer />
+      </Container>
+
+      {/* <div className="signup-page">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-6 col-sm-8"></div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

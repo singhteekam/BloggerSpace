@@ -78,12 +78,13 @@ const Settings = () => {
   }
 
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <title>Settings - BloggerSpace</title>
       </Helmet>
       <Container className="settingspage">
-        <h2 className="settingspage-heading">Settings</h2>
+      <h3 className="page-title">Settings</h3>
+        <div className="underline"></div>
         {/* Account deletion success alert */}
         {deleteSuccess && (
           <Alert

@@ -5,7 +5,7 @@ import "./SavedBlogs.css";
 
 const SavedBlogs = () => {
 
-  const [savedBlogs, setSavedBlogs]= useState(null);
+  const [savedBlogs, setSavedBlogs]= useState([]);
 
   useEffect(()=>{
     const fetchSavedBlogs= async ()=>{
@@ -41,10 +41,9 @@ const SavedBlogs = () => {
   }
 
   return (
-    <div className="savedblogs-page">
-      <div className="savedblogs-header">
-        <h4>Saved Blogs</h4>
-      </div>
+    <div className="new-page-container">
+        <h3 className="page-title">Saved Blogs</h3>
+        <div className="underline"></div>
       <div className="savedblogs-items">
         {savedBlogs?.map((blog)=>(
           <Card className="savedblogs-card">

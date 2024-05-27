@@ -211,13 +211,14 @@ const NewBlog = () => {
   }
 
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <title>New Blog - BloggerSpace</title>
       </Helmet>
 
-      <Container className="newblogpage">
-        <h2 className="new-blog-heading">New Blog</h2>
+      <Container>
+      <h3 className="page-title">New Blog</h3>
+        <div className="underline"></div>
         <ToastContainer />
         {/* {alert && (
           <Alert

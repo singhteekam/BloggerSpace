@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Card, Form, Button, Row, Col } from "react-bootstrap";
+import { Container, Card, Form, Button, Row, Col,FloatingLabel } from "react-bootstrap";
 import { MdEmail } from "react-icons/md";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -45,7 +45,12 @@ const ContactUs = () => {
                     <hr />
                     <Form>
                       <Form.Group controlId="email">
-                        <Form.Label>Email address</Form.Label>
+                      <FloatingLabel
+                      controlId="floatingInput"
+                      label="Enter your email"
+                      className="mb-3"
+                      key="email101"
+                    >
                         <Form.Control
                           type="email"
                           placeholder="Enter email"
@@ -53,18 +58,30 @@ const ContactUs = () => {
                           onChange={(e) => setEmail(e.target.value)}
                           required
                         />
+                        </FloatingLabel>
                       </Form.Group>
                       <Form.Group controlId="mobile">
-                        <Form.Label>Your mobile number(optional)</Form.Label>
+                      <FloatingLabel
+                      controlId="floatingInput"
+                      label="Enter your mobile no(Optional)"
+                      className="mb-3"
+                      key="mobile101"
+                    >
                         <Form.Control
                           type="number"
                           placeholder="Enter mobile"
                           value={mobileNo}
                           onChange={(e) => setMobileNo(e.target.value)}
                         />
+                        </FloatingLabel>
                       </Form.Group>
                       <Form.Group controlId="message">
-                        <Form.Label>Your message</Form.Label>
+                      <FloatingLabel
+                      controlId="floatingInput"
+                      label="Your message"
+                      className="mb-3"
+                      key="message101"
+                    >
                         <Form.Control
                           type="textarea"
                           placeholder="Enter your message"
@@ -72,6 +89,7 @@ const ContactUs = () => {
                           onChange={(e) => setMessage(e.target.value)}
                           required
                         />
+                        </FloatingLabel>
                       </Form.Group>
 
                       <Link

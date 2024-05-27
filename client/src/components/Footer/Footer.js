@@ -109,7 +109,7 @@ const Footer = () => {
       <Container>
         <Row>
           <Col md={4}>
-              <h6>BloggerSpace</h6>
+              <h6 class="footer-headings">BloggerSpace</h6>
               <hr />
               <p className="text-white">
               A blogging website where users can write a blog on any topic.
@@ -118,15 +118,16 @@ const Footer = () => {
               </p>
           </Col>
           <Col md={4}>
-              <h6>Quick Links:</h6>
+              <h6 class="footer-headings">Quick Links:</h6>
               <hr />      
               <div><Link to="#"  className="footer-row1-item"><b>Home</b></Link></div>
+              <div><Link to="/blogs" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Blogs</b></Link></div>
               <div><Link to="/about" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>About</b></Link></div>
               <div><Link to="/privacypolicy" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Privacy Policy</b></Link></div>
-              <div><Link to="/termsandconditions" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Terms & Conditions</b></Link></div>
+              <div className="mb-2"><Link to="/termsandconditions" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Terms & Conditions</b></Link></div>
           </Col>
           <Col md={4}>
-              <h6>Contact Information</h6>
+              <h6 class="footer-headings">Contact Information</h6>
               <hr />
               <ul className="list-inline">
             <li className="list-inline-item">

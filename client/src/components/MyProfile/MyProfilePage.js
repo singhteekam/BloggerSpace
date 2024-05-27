@@ -184,12 +184,13 @@ const MyProfilePage = () => {
   // };
 
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <title>My Profile - BloggerSpace</title>
       </Helmet>
       <Container className="my-profile-page">
-        <h2 className="my-profile-heading">My Profile</h2>
+      <h3 className="page-title">My Profile</h3>
+        <div className="underline"></div>
 
         <Card>
           <Card.Body>
@@ -270,7 +271,7 @@ const MyProfilePage = () => {
                     </div>
 
                     <Button
-                      variant="primary"
+                      variant="success"
                       className="goback-editedblog"
                       onClick={handleshowEditPersonalDetailsModal}
                     >

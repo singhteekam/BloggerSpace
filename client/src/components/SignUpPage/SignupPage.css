@@ -1,24 +1,15 @@
-.signup-page {
-    background-color: #f2f2f2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-}
+
 
 .signup-form {
-    background-color: #fff;
+    background-color: #f2f2f2;
     padding: 20px;
     border-radius: 5px;
     display: flex;
     flex-direction: column;
 }
 
-.signup-form .form-group {
-    margin-bottom: 20px;
-}
 
-.signup-form .password-input {
+.password-input, .confirmpassword-input {
     position: relative;
 }
 
@@ -51,8 +42,4 @@
 
 .signup-form .confirmpassword-input i:hover {
     color: #333;
-}
-
-.signup-form .signbutton{
-    margin-top: 20px;
 }

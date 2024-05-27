@@ -7,7 +7,7 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { RxDragHandleHorizontal } from "react-icons/rx";
 import { MdVerified } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import SearchBlogs from "../Posts/SearchBlogs/SearchBlogs";
 import './Header.css';
@@ -86,9 +86,9 @@ function Header() {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <div className="d-grid gap-2">
-                <Button variant="secondary" href="/">
+                <Link className="btn btn-secondary" to="/">
                   <i className="fas fa-home"></i> Home
-                </Button>
+                </Link>
                 <Button variant="secondary" href="/blogs">
                   <i className="fas fa-rectangle-list"></i> Blogs
                 </Button>
@@ -144,9 +144,9 @@ function Header() {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <div className="d-grid gap-2">
-              <Button variant="secondary" href="/">
+              <Link className="btn btn-secondary" to="/">
                   <i className="fas fa-home"></i> Home
-                </Button>
+                </Link>
               <Button variant="secondary" href="/blogs">
                   <i className="fas fa-rectangle-list"></i> Blogs
                 </Button>

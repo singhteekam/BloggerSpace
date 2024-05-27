@@ -30,3 +30,8 @@
 [2024-05-27T00:12:22.009Z] [LOG] [INFO] - Blog: dssawf fetched. Content size is: 0.93359375 KB
 [2024-05-27T00:12:22.009Z] [LOG] [INFO] - Blog: dssawf fetched. Content size is: 0.93359375 KB
 [2024-05-27T00:12:22.009Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-05-27T20:11:31.644Z] [LOG] [ERROR] - Error fetching blogs:MongoServerSelectionError: getaddrinfo ENOTFOUND ac-b32ejg8-shard-00-00.6qzif2x.mongodb.net
+[2024-05-27T20:11:31.644Z] [LOG] [ERROR] - Error fetching blogs:MongoServerSelectionError: getaddrinfo ENOTFOUND ac-b32ejg8-shard-00-00.6qzif2x.mongodb.net
+[2024-05-27T20:11:31.644Z] [LOG] [ERROR] - Error fetching blogs:MongoServerSelectionError: getaddrinfo ENOTFOUND ac-b32ejg8-shard-00-00.6qzif2x.mongodb.net
+[2024-05-27T23:03:49.066Z] [LOG] [DEBUG] - Topic is available: 
+[2024-05-27T23:03:49.230Z] [LOG] [DEBUG] - Topic is available: 

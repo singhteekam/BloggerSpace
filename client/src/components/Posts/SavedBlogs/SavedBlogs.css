@@ -1,14 +1,3 @@
-.savedblogs-page{
-    margin-top: 60px;
-    margin-bottom: 80px;
-}
-
-.savedblogs-header{
-    padding-left: 20px;
-}
-/* .savedblogs-header h4{
-    font-weight: bold;
-} */
 
 .savedblogs-items{
     display: grid;
