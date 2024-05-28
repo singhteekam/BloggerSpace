@@ -7,12 +7,13 @@ import "./WritingGuidelines.css";
 
 const WritingGuidelines = () => {
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <title>Writing Guidelines - BloggerSpace</title>
       </Helmet>
-      <Container className="guidelines-page">
-        <h2 className="guidelines-heading">Writing Guidelines</h2>
+      <Container>
+      <h3 className="page-title">Writing Guidelines</h3>
+        <div className="underline"></div>
         <Card>
           <Card.Body>
             <div className="guidelines-section">
@@ -31,7 +32,7 @@ const WritingGuidelines = () => {
                 <li>
                   If you are still having a query then drop a mail to:{" "}
                   <a href="mailto:contact.singhteekam@gmail.com">
-                    contact.singhteekam@gmail.com
+                    singhteekam.in@gmail.com
                   </a>
                 </li>
               </ul>

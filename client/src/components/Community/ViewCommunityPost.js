@@ -24,6 +24,9 @@ import {
 } from "react-bootstrap";
 import blogCategory from "../../utils/blogCategory.json";
 
+import Editor from "ckeditor5-custom-build/build/ckeditor";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+
 const ViewCommunityPost = () => {
   const { communityPostSlug, communityPostId } = useParams();
 
@@ -120,7 +123,7 @@ const ViewCommunityPost = () => {
   };
 
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <meta
           name="description"
@@ -145,9 +148,11 @@ const ViewCommunityPost = () => {
       </Helmet>
 
       {communityPost && (
-        <Container className="view-blog-container">
+        <Container>
           {/* <h4>{window.location.href}</h4> */}
-          <h2 className="view-blog-heading">Community Post</h2>
+          <h3 className="page-title">View Community post</h3>
+        <div className="underline"></div>
+          
           <ToastContainer />
           <Card className="view-blog-card">
             <Card.Body>
@@ -246,7 +251,14 @@ const ViewCommunityPost = () => {
 
           <b> Add your reply:</b>
           <div>
-            <TinymceEditor content={content} onContentChange={setContent} />
+            {/* <TinymceEditor content={content} onContentChange={setContent} /> */}
+            <CKEditor
+              editor={Editor}
+              data="<p></p>"
+              onChange={(event, editor) => {
+                setContent(editor.getData());
+              }}
+            />
             <br />
             {userInfo===null?<b>You are not logged in. Please login to post your response.</b>:false} <br />
             <Button

@@ -37,15 +37,16 @@ const Sitemap = () => {
   }
 
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <title>Sitemap - BloggerSpace</title>
       </Helmet>
-      <div className="sitemap-page">
-        <div>
+        <Container>
+          <h3 className="page-title">Sitemap</h3>
+          <div className="underline"></div>
           <div className="col-md-6 col-sm-8">
             <section>
-              <h5>Main Pages</h5>
+              <h6>Main Pages</h6>
               <ul>
                 <li>
                   <a href="/">Home</a>
@@ -59,10 +60,16 @@ const Sitemap = () => {
                 <li>
                   <a href="/aboutdeveloper">About Developer</a>
                 </li>
+                <li>
+                  <a href="/community">Community</a>
+                </li>
+                <li>
+                  <a href="/guidelines">Writing Guidelines</a>
+                </li>
               </ul>
             </section>
             <section>
-              <h5>Published Blogs</h5>
+              <h6>Published Blogs</h6>
               <ul>
                 {blogs?.map((blog) => (
                   <li>
@@ -72,8 +79,7 @@ const Sitemap = () => {
               </ul>
             </section>
           </div>
-        </div>
-      </div>
+        </Container>
     </div>
   );
 };

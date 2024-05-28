@@ -107,7 +107,7 @@ const App = () => {
             <Route path="/privacypolicy" element={<PrivacyPolicy />} />
             <Route path="/termsandconditions" element={<TermsAndConditions />} />
             <Route path="/about" element={<AboutBloggerSpace />} />
-
+            
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/community/post/:communityPostId/:communityPostSlug" element={<ViewCommunityPost />} />
 

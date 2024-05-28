@@ -37,7 +37,7 @@ const AllBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(2);
+  const [postsPerPage, setPostsPerPage] = useState(6);
   const navigate = useNavigate();
 
   // const dispatch= useDispatch();
@@ -150,8 +150,8 @@ const AllBlogs = () => {
                             <div class="blogcard-container-text">{blog.category}</div>
                           </div>
                           <Card.Body className="">
-                            <Card.Title>{blog.title}</Card.Title>
-                            <div className="underline"></div>
+                            <h6>{blog.title}</h6>
+                            {/* <div className="underline"></div> */}
                             {blog.tags &&
                               blog.tags.map((tag) => (
                                 <Badge

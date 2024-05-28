@@ -12,7 +12,7 @@ import "tinymce/skins/ui/oxide/content.inline.min.css"; // Inline content styles
 import "tinymce/skins/ui/oxide/skin.shadowdom.min.css";
 
 import TinymceEditor from "../../utils/TinymceEditor";
-import { Button, Form, Card, ListGroup } from "react-bootstrap";
+import { Button, Form, Card, ListGroup, Container } from "react-bootstrap";
 import blogCategory from "../../utils/blogCategory.json";
 
 import Editor from "ckeditor5-custom-build/build/ckeditor";
@@ -92,14 +92,16 @@ const Community = () => {
   };
 
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <title>Community - BloggerSpace</title>
       </Helmet>
 
-      <div className="community-page">
+      <Container>
+      <div>
         <ToastContainer />
-        <h4>Community Page</h4>
+        <h3 className="page-title">Community</h3>
+        <div className="underline"></div>
         <Form>
           <Form.Group controlId="topic" className="topicfield">
             <Form.Label>
@@ -196,7 +198,7 @@ const Community = () => {
       <hr />
 
       <div>
-        <h4>Recently posted:</h4>
+        <h5>Recently posted:</h5>
         <ListGroup className="m-3">
           {allPosts &&
             allPosts.map((post) => (
@@ -233,6 +235,9 @@ const Community = () => {
             ))}
         </ListGroup>
       </div>
+
+      </Container>
+
     </div>
   );
 };
