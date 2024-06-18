@@ -13,6 +13,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./AllBlogs.css";
 import { motion } from "framer-motion";
+import Select from "react-select";
+import blogCategory from "../../../utils/blogCategory.json";
 
 
 import { useDispatch, useSelector } from "react-redux";
@@ -38,6 +40,7 @@ const AllBlogs = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage, setPostsPerPage] = useState(6);
+  const [filterCategory, setFilterCategory] = useState(null);
   const navigate = useNavigate();
 
   // const dispatch= useDispatch();
@@ -106,6 +109,16 @@ const AllBlogs = () => {
         <i>
           Showing total results: {blogs.length}, Page {currentPage} of {npage}
         </i>
+        <div>
+          <b>Filter by category: </b>
+          <Select
+            className="react-select-dropdown m-1"
+            defaultValue={filterCategory}
+            onChange={setFilterCategory}
+            options={blogCategory}
+          />
+          <Button variant="success" size="sm" onClick={()=>null}>Search</Button>
+        </div>
 
         {/* {state.isLoading && <div>Loading..</div>}
         {!state.isLoading && state.isError && <div>Error..{state.error}</div>}

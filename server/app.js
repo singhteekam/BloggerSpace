@@ -8,8 +8,12 @@ const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo")(session);
 const path = require('path');
 
+const functions = require('firebase-functions');
 
-require("dotenv").config(); // Load environment variables from .env file
+
+require("dotenv").config(); // Load environment variables from .env file - Production mode
+// require("dotenv").config({path:'.env.local'}); // development mode
+
 const connectDB = require("./db/db");
 const blogs= require('./routes/blogs');
 const authRoutes = require("./routes/users");
@@ -90,4 +94,8 @@ app.get("/api/viewlogs", async (req, res)=>{
 // addFollowingFields();
 
 const PORT = process.env.PORT || 5000;
+// const PORT = 8183;
 app.listen(PORT, console.log("Server started at " + PORT));
+
+
+exports.bloggerspacebackend = functions.https.onRequest(app);

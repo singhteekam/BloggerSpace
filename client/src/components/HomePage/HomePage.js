@@ -43,21 +43,21 @@ function HomePage() {
     // }, [isLoggedIn, blogs]);
   }, [blogs]);
 
-  if (isLoading) {
-    return (
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="primary" />
-      </Container>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <Container className="d-flex justify-content-center align-items-center vh-100">
+  //       <Spinner animation="border" variant="primary" />
+  //     </Container>
+  //   );
+  // }
 
-  if (blogs.length === 0) {
-    return (
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        <div>Blogs not found.</div>
-      </Container>
-    );
-  }
+  // if (blogs.length === 0) {
+  //   return (
+  //     <Container className="d-flex justify-content-center align-items-center vh-100">
+  //       <div>Blogs not found.</div>
+  //     </Container>
+  //   );
+  // }
 
   return (
     <div className="homepage">

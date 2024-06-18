@@ -24,3 +24,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
   }
+
+  .react-select-dropdown{
+    max-width: 300px;
+  }
