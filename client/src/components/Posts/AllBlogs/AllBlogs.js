@@ -38,10 +38,12 @@ const blogItemVariant = {
 const AllBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(6);
   const [filterCategory, setFilterCategory] = useState(null);
   const navigate = useNavigate();
+
+  const [total, setTotal]= useState(0);
+  const [page, setPage]= useState(1);
+  const limit=6;
 
   // const dispatch= useDispatch();
   // const state= useSelector((state)=>state.allblog);
@@ -49,10 +51,20 @@ const AllBlogs = () => {
 
   useEffect(() => {
     // dispatch(fetchAllBlog());
+    // const fetchBlogs = async () => {
+    //   try {
+    //     const response = await axios.get("/api/blogs");
+    //     setBlogs(response.data);
+    //     setIsLoading(false);
+    //   } catch (error) {
+    //     console.error("Error fetching Blogs:", error);
+    //   }
+    // };
     const fetchBlogs = async () => {
       try {
-        const response = await axios.get("/api/blogs");
-        setBlogs(response.data);
+        const response = await axios.get(`/api/blogs/allblogs?page=${page}&limit=${limit}`);
+        setBlogs(response.data.blogs);
+        setTotal(response.data.total);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching Blogs:", error);
@@ -60,7 +72,7 @@ const AllBlogs = () => {
     };
     fetchBlogs();
     // }, [isLoggedIn, blogs]);
-  }, [blogs]);
+  }, [page]);
 
   if (isLoading) {
     return (
@@ -78,36 +90,33 @@ const AllBlogs = () => {
     );
   }
 
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = blogs.slice(indexOfFirstPost, indexOfLastPost);
-
-  const npage = Math.ceil(blogs.length / postsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
-
+  
   const prePage = () => {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
+    if(page>1){
+      setPage(page-1);
     }
   };
-
+  
   const changeCPage = (id) => {
-    setCurrentPage(id);
+    setPage(id);
   };
-
+  
   const nextPage = () => {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
+    if(page<totalPages){
+      setPage(page+1);
     }
   };
-
+  
+  const totalPages= Math.ceil(total/limit);
+  const numbers = [...Array(totalPages + 1).keys()].slice(1);
+  
   return (
     <div className="new-page-container">
       <Container>
         <h3 className="page-title">Blogs</h3>
         <div className="underline"></div>
         <i>
-          Showing total results: {blogs.length}, Page {currentPage} of {npage}
+          Showing total results: {total}, Page {page} of {totalPages}
         </i>
         <div>
           <b>Filter by category: </b>
@@ -137,7 +146,7 @@ const AllBlogs = () => {
         ) : (
           <>
             <Row className="m-3">
-              {currentPosts?.map((blog) => (
+              {blogs?.map((blog) => (
                 <Col md={4}>
                   <div key={blog.slug} className="mb-2 border blogitem">
                     <motion.div
@@ -197,44 +206,42 @@ const AllBlogs = () => {
               <nav>
                 <ul className="pagination">
                   <li className="page-item">
-                    <a href="#prev" className="page-link" onClick={prePage}>
+                    <button className="page-link" onClick={prePage}>
                       Prev
-                    </a>
+                    </button>
                   </li>
                   {numbers.slice(0, 3).map((n, i) => (
                     <li
                       className={`page-item ${
-                        currentPage === n ? "active" : ""
+                        page === n ? "active" : ""
                       }`}
                       key={i}
                     >
-                      <a
-                        href="#"
+                      <button
                         className="page-link"
                         onClick={() => changeCPage(n)}
                       >
                         {n}
-                      </a>
+                      </button>
                     </li>
                   ))}
                   <li className="page-item">
-                    <a href="#" className="page-link">
+                    <button className="page-link">
                       ...
-                    </a>
+                    </button>
                   </li>
                   <li className="page-item">
-                    <a
-                      href="#"
+                    <button
                       className="page-link"
-                      onClick={() => changeCPage(npage)}
+                      onClick={() => changeCPage(totalPages)}
                     >
-                      {npage}
-                    </a>
+                      {totalPages}
+                    </button>
                   </li>
                   <li className="page-item">
-                    <a href="#next" className="page-link" onClick={nextPage}>
+                    <button className="page-link" onClick={nextPage}>
                       Next
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </nav>

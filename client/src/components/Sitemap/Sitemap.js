@@ -15,26 +15,26 @@ const Sitemap = () => {
   const [blogs, setBlogs] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const response = await axios.get("/api/blogs");
-        setBlogs(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching Blogs:", error);
-      }
-    };
-    fetchBlogs();
-  }, [blogs]);
+  // useEffect(() => {
+  //   const fetchBlogs = async () => {
+  //     try {
+  //       const response = await axios.get("/api/blogs");
+  //       setBlogs(response.data);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching Blogs:", error);
+  //     }
+  //   };
+  //   fetchBlogs();
+  // }, [blogs]);
 
-  if (loading) {
-    return (
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="primary" />
-      </Container>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Container className="d-flex justify-content-center align-items-center vh-100">
+  //       <Spinner animation="border" variant="primary" />
+  //     </Container>
+  //   );
+  // }
 
   return (
     <div className="new-page-container">
@@ -66,9 +66,15 @@ const Sitemap = () => {
                 <li>
                   <a href="/guidelines">Writing Guidelines</a>
                 </li>
+                <li>
+                  <a href="/blogs">All Blogs</a>
+                </li>
+                <li>
+                  <a href="/savedblogs">Saved Blogs</a>
+                </li>
               </ul>
             </section>
-            <section>
+            {/* <section>
               <h6>Published Blogs</h6>
               <ul>
                 {blogs?.map((blog) => (
@@ -77,7 +83,7 @@ const Sitemap = () => {
                   </li>
                 ))}
               </ul>
-            </section>
+            </section> */}
           </div>
         </Container>
     </div>

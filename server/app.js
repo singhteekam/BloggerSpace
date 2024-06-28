@@ -93,8 +93,8 @@ app.get("/api/viewlogs", async (req, res)=>{
 // addFollowersFields();
 // addFollowingFields();
 
-const PORT = process.env.PORT || 5000;
-// const PORT = 8183;
+// const PORT = process.env.PORT || 5000;  // For development
+const PORT = 8183;  // For production
 app.listen(PORT, console.log("Server started at " + PORT));
 
 

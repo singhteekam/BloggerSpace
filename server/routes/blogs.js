@@ -22,9 +22,12 @@ const {
   isUniqueTitle,
   addBlogViewsCounter,
   postNewBlogReplyComment,
+  fetchAllBlogs,
 } = require("../controllers/blogsController");
 
 router.get("/", blogsHomepage);
+
+router.get("/allblogs", fetchAllBlogs);
 
 router.get("/:blogSlug", viewBlogRoute);
 

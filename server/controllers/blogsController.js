@@ -69,6 +69,29 @@ exports.blogsHomepage = async (req, res) => {
   }
 };
 
+exports.fetchAllBlogs = async (req, res) => {
+
+  const page= parseInt(req.query.page) || 1;
+  const limit= parseInt(req.query.limit) || 6;
+  const skip= (page-1)*limit;
+
+  try {
+    const blogs = await Blog.find({ status: "PUBLISHED" }).skip(skip).limit(limit).sort({ blogViews: -1 })
+      .populate("authorDetails") // Populate the author field with the User document
+      .exec();
+
+      const total= await Blog.countDocuments({ status: "PUBLISHED" });
+
+    res.json({
+      blogs, total, page, pages: Math.ceil(total/limit)
+    });
+  } catch (error) {
+    logger.error("Error fetching blogs..:"+ error);
+    console.error("Error fetching blogs..:", error);
+    res.status(500).json({ error: "Server error.." });
+  }
+};
+
 exports.addBlogViewsCounter= async (req, res)=>{
   try {
     const blog= await Blog.findOne({slug: req.body.blogSlug, status:"PUBLISHED"});

@@ -565,7 +565,7 @@ function HomePage() {
                   <li className="list-inline-item mx-2">
                     <a
                       target="_blank"
-                      href="mailto:contact.singhteekam@gmail.com"
+                      href="mailto:singhteekam.in@gmail.com"
                     >
                       {/* <i className="fab fa-facebook fa-lg"></i> */}
                       <i className="fa fa-envelope fa-lg"></i>
