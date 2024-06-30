@@ -14,3 +14,86 @@
 [2024-06-28T23:53:37.035Z] [LOG] [ERROR] - You are not logged in. Please login!!
 [2024-06-28T23:53:37.035Z] [LOG] [ERROR] - You are not logged in. Please login!!
 [2024-06-28T23:53:37.035Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:21:02.244Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:21:02.244Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:21:02.244Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:21:02.594Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:21:02.594Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:21:02.594Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:22:43.439Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:22:43.439Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:22:43.439Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:22:43.814Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:22:43.814Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:22:43.814Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:46:13.492Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:46:13.492Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:46:13.492Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:46:13.750Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:46:13.750Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:46:13.750Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-29T14:57:56.004Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-06-29T14:57:57.885Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:58:20.365Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:58:21.321Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:58:23.541Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-29T14:58:24.124Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-29T14:58:24.231Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:58:25.141Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:58:25.808Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:58:32.081Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:58:32.510Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:59:30.819Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:59:33.657Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:59:51.321Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T14:59:59.968Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T15:00:00.736Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T15:00:01.144Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T15:00:01.867Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-29T15:04:57.776Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-06-29T15:04:59.408Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:36:43.097Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-30T22:36:43.097Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-30T22:36:43.097Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-30T22:36:43.119Z] [LOG] [DEBUG] - Searching for blog: newbloglog1
+[2024-06-30T22:36:43.307Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
+[2024-06-30T22:36:43.307Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
+[2024-06-30T22:36:43.313Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-06-30T22:36:43.446Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-30T22:36:43.446Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-30T22:36:43.446Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-06-30T22:36:43.679Z] [LOG] [DEBUG] - Searching for blog: newbloglog1
+[2024-06-30T22:36:43.907Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
+[2024-06-30T22:36:43.907Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
+[2024-06-30T22:36:43.908Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-06-30T22:38:29.581Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:38:29.582Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:39:18.799Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:39:18.854Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:39:33.928Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:39:34.212Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:40:28.712Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-06-30T22:40:30.194Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:40:32.725Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:40:33.057Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:40:47.275Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:40:47.283Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:40:47.382Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:40:47.642Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:40:48.244Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:40:52.824Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:40:52.832Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:40:52.916Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:40:53.460Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:40:54.034Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:41:06.570Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:41:06.880Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:41:12.541Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:41:12.564Z] [LOG] [DEBUG] - Topic is available: 
+[2024-06-30T22:41:12.662Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:41:13.179Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:41:14.087Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:43:11.823Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:43:13.246Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:43:25.465Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-06-30T22:43:25.903Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh

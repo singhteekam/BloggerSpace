@@ -86,54 +86,55 @@ function Header() {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <div className="d-grid gap-2">
-                <Link className="btn btn-secondary" to="/">
+                <Link className="btn btn-secondary" to="/" onClick={handleCloseCanvas}>
                   <i className="fas fa-home"></i> Home
                 </Link>
-                <Button variant="secondary" href="/blogs">
+                <Link className="btn btn-secondary" to="/blogs" onClick={handleCloseCanvas}>
                   <i className="fas fa-rectangle-list"></i> Blogs
-                </Button>
-                <Button variant="secondary" href="/myprofile">
+                </Link>
+                <Link className="btn btn-secondary" to="/myprofile" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> My Profile
-                </Button>
-                <Button variant="secondary" href="/newblog">
+                </Link>
+                <Link className="btn btn-secondary" to="/newblog" onClick={handleCloseCanvas}>
                   <i className="fas fa-blog"></i> New Post
-                </Button>
-                <Button variant="secondary" href="/myblogs">
+                </Link>
+                <Link className="btn btn-secondary" to="/myblogs" onClick={handleCloseCanvas}>
                   <i className="fas fa-blog"></i> My Blogs
-                </Button>
-                <Button variant="secondary" href="/savedblogs">
+                </Link>
+                <Link className="btn btn-secondary" to="/savedblogs" onClick={handleCloseCanvas}>
                   <i className="fas fa-bookmark"></i> Saved Blogs
-                </Button>
-                <Button variant="secondary" href="/settings">
+                </Link>
+                <Link className="btn btn-secondary" to="/settings" onClick={handleCloseCanvas}>
                   <i className="fas fa-gear"></i> Settings
-                </Button>
-                <Button variant="secondary" href="/changepassword">
+                </Link>
+                <Link className="btn btn-secondary" to="/changepassword" onClick={handleCloseCanvas}>
                   <i className="fas fa-key"></i> Change Password
-                </Button>
+                </Link>
                 
-                <Button variant="danger" onClick={handleLogout}>
+                <Link className="btn btn-danger" to="/" onClick={handleLogout}>
                   <i className="fas fa-sign-out"></i> Sign Out
-                </Button>
+                </Link>
                 <hr />
-                <Button variant="secondary" href="/community">
+                <Link className="btn btn-secondary" to="/community" onClick={handleCloseCanvas}>
                   <i className="fas fa-users"></i> Community
-                </Button>
-                <Button variant="secondary" href="/guidelines">
+                </Link>
+                <Link className="btn btn-secondary" to="/guidelines" onClick={handleCloseCanvas}>
                   <i className="fas fa-book"></i> Writing Guidelines
-                </Button>
-                <Button
-                  variant="secondary"
-                  href="https://reviewbloggerspace.singhteekam.in/"
+                </Link>
+                <Link
+                  className="btn btn-secondary"
+                  to="https://reviewbloggerspace.singhteekam.in/"
                   target="_blank"
+                  onClick={handleCloseCanvas}
                 >
                   <i className="fas fa-globe"></i> Reviewer Panel
-                </Button>
-                <Button variant="secondary" href="/sitemap">
+                </Link>
+                <Link className="btn btn-secondary" to="/sitemap" onClick={handleCloseCanvas}>
                   <i className="fas fa-globe"></i> Sitemap
-                </Button>
-                <Button variant="secondary" href="/aboutdeveloper">
+                </Link>
+                <Link className="btn btn-secondary" to="/aboutdeveloper" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> About Developer
-                </Button>
+                </Link>
               </div>
             </Offcanvas.Body>
           </Offcanvas>
@@ -143,39 +144,39 @@ function Header() {
               <Offcanvas.Title>Hi, User</Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              <div className="d-grid gap-2">
-              <Link className="btn btn-secondary" to="/">
+              <div className="d-grid gap-2 ">
+              <Link className="btn btn-secondary" to="/" onClick={handleCloseCanvas}>
                   <i className="fas fa-home"></i> Home
                 </Link>
-              <Button variant="secondary" href="/blogs">
+              <Link className="btn btn-secondary" to="/blogs" onClick={handleCloseCanvas}>
                   <i className="fas fa-rectangle-list"></i> Blogs
-                </Button>
-                <Button variant="secondary" href="/login">
+                </Link>
+                <Link className="btn btn-secondary" to="/login" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> Login
-                </Button>
-                <Button variant="secondary" href="/signup">
+                </Link>
+                <Link className="btn btn-secondary" to="/signup" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> SignUp
-                </Button>
+                </Link>
                 <hr />
-                <Button variant="secondary" href="/community">
+                <Link className="btn btn-secondary" to="/community" onClick={handleCloseCanvas}>
                   <i className="fas fa-users"></i> Community
-                </Button>
-                <Button variant="secondary" href="guidelines">
+                </Link>
+                <Link className="btn btn-secondary" to="guidelines" onClick={handleCloseCanvas}>
                   <i className="fas fa-book"></i> Writing Guidelines
-                </Button>
-                <Button
-                  variant="secondary"
-                  href="https://reviewbloggerspace.singhteekam.in/"
+                </Link>
+                <Link
+                  className="btn btn-secondary"
+                  to="https://reviewbloggerspace.singhteekam.in/"
                   target="_blank"
                 >
                   <i className="fas fa-globe"></i> Reviewer Panel
-                </Button>
-                <Button variant="secondary" href="/sitemap">
+                </Link>
+                <Link className="btn btn-secondary" to="/sitemap" onClick={handleCloseCanvas}>
                   <i className="fas fa-globe"></i> Sitemap
-                </Button>
-                <Button variant="secondary" href="/aboutdeveloper">
+                </Link>
+                <Link className="btn btn-secondary" to="/aboutdeveloper" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> About Developer
-                </Button>
+                </Link>
               </div>
             </Offcanvas.Body>
           </Offcanvas>

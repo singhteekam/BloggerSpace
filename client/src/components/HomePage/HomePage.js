@@ -202,7 +202,7 @@ function HomePage() {
                 start reviewing the assigned blogs. The admin can delete any
                 user, revoke/grant reviewer access.
               </p>
-              <Link to={"/newblog"} className="btn btn-outline-success mb-3">
+              <Link to={"https://reviewbloggerspace.singhteekam.in/signup"} target="_blank" className="btn btn-outline-success mb-3">
                 Become a Reviewer <FaLocationArrow />
               </Link>
             </Col>
@@ -456,7 +456,7 @@ function HomePage() {
       </section>
 
       {/* About Developer */}
-      <section className="section2">
+      <section className="section2 bgcolor">
         <Container>
           <h3 className="section2heading text-center">About Developer</h3>
           <div className="underline mx-auto mb-3"></div>
