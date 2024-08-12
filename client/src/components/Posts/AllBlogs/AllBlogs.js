@@ -77,7 +77,8 @@ const AllBlogs = () => {
   if (isLoading) {
     return (
       <Container className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="primary" />
+        {/* <Spinner animation="border" variant="primary" /> */}
+        <div class="loader"></div>
       </Container>
     );
   }

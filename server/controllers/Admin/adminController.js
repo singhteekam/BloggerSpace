@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const Admin= require("../../models/Admin");
 const Reviewer= require("../../models/Reviewer");
 const User= require("../../models/User");
+const Community= require("../../models/Community");
 const jwt = require("jsonwebtoken");
 const Blog = require("../../models/Blog");
 const mongoose = require("mongoose");
@@ -439,5 +440,55 @@ exports.deleteUserAccount = async (req, res) => {
     await sendEmail(receiver, subject, html);
   } catch (error) {
     console.log("Error when deleting user account by admin");
+  }
+};
+
+// Community
+exports.getCommunityPosts = async (req, res) => {
+  const page= parseInt(req.query.page) || 1;
+  const limit= parseInt(req.query.limit) || 6;
+  const skip= (page-1)*limit;
+  try {
+    const posts = await Community.find({}).skip(skip).limit(limit)
+      .sort({ createdAt: -1 })
+      .populate("communityPostAuthor") // Populate the author field with the User document
+      .exec();
+
+    // console.log(typeof posts[1].communityPostContent);
+
+    for (let i = 0; i < posts.length; i++) {
+      const compressedContentBuffer = Buffer.from(posts[i].communityPostContent, "base64");
+      const decompressedContent = pako.inflate(compressedContentBuffer, {
+        to: "string",
+      });
+      posts[i].communityPostContent= decompressedContent
+    }
+ 
+    const total= await Community.countDocuments({});
+    
+    res.json({
+      posts, total, page, pages: Math.ceil(total/limit)
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.deleteCommunityPost = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Community.findByIdAndDelete(id);
+
+    const receiver = process.env.EMAIL;
+    const subject = `Community post ${id} deleted`;
+    const html = `Hi,
+              <p>Post deleted ${id}</p>
+                `;
+
+    res.json({ message: "post deleted by admin successfully" });
+    await sendEmail(receiver, subject, html);
+  } catch (error) {
+    console.log("Error when deleting post by admin");
   }
 };

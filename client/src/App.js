@@ -29,6 +29,7 @@ import AboutBloggerSpace from "./components/Footer/AboutBloggerSpace/AboutBlogge
 import CommunityPage from "./components/Community/CommunityPage.js";
 import ViewCommunityPost from "./components/Community/ViewCommunityPost.js";
 import AllBlogs from "./components/Posts/AllBlogs/AllBlogs.js";
+import AuthSuccess from "./utils/AuthSuccess.js";
 
 const App = () => {
   return (
@@ -111,6 +112,7 @@ const App = () => {
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/community/post/:communityPostId/:communityPostSlug" element={<ViewCommunityPost />} />
 
+            <Route path="/auth-success" element={<AuthSuccess />} />
             {/* <Route element={<PageNotFound />} /> */}
           </Routes>
         </main>

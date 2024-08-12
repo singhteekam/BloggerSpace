@@ -30,6 +30,7 @@ function HomePage() {
 
   const isLoggedIn = localStorage.getItem("token");
   useEffect(() => {
+    // console.log(localStorage.getItem("token"));
     const fetchBlogs = async () => {
       try {
         const response = await axios.get("/api/blogs");

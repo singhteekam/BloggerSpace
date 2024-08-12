@@ -288,7 +288,7 @@ const ViewBlog = () => {
       // window.location.reload();
     } catch (error) {
       toast.error("Error occured!! Please try again");
-      console.log("Error: " + error);
+      console.log("Error: ",error);
     }
   };
 
@@ -444,7 +444,7 @@ const ViewBlog = () => {
                     size="sm"
                     className="mx-3"
                     onClick={() => handleUnfollowUser(blog?.authorDetails._id)}
-                    disabled
+                    // disabled
                   >
                     Following
                   </Button>
@@ -454,7 +454,7 @@ const ViewBlog = () => {
                     size="sm"
                     className="mx-3"
                     onClick={() => handleFollowUser(blog?.authorDetails._id)}
-                    disabled
+                    // disabled
                   >
                     Follow +
                   </Button>

@@ -19,7 +19,9 @@ const {
   approveReviewerRequest,
   removeFromReviewerRole,
   fetchAllUsers,
-  deleteUserAccount
+  deleteUserAccount,
+  getCommunityPosts,
+  deleteCommunityPost
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -61,5 +63,9 @@ router.patch("/dashboard/removefromreviewer/:id", adminMiddleware, removeFromRev
 router.get("/dashboard/allusers", adminMiddleware, fetchAllUsers);
 
 router.delete("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
+
+router.get("/community", adminMiddleware, getCommunityPosts);
+
+router.delete("/deletecommunitypost/:id", adminMiddleware, deleteCommunityPost);
 
 module.exports = router;

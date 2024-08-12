@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  authType:{
+    type:String,
+    default:"Email"
+  },
   verificationToken: {
     type: String,
     default: null,

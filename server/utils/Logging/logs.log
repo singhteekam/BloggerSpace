@@ -1,99 +1,192 @@
 [2024-03-19T23:38:48.234Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: erdjgf
 [2024-03-19T23:38:48.890Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: erdjgf[2024-05-24T23:27:39.981Z] [LOG] [ERROR] - You are not logged in. Please login!!
 [2024-05-24T23:27:39.981Z] [LOG] [ERROR] - You are not logged in. Please login!![2024-06-28T23:31:17.761Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
-[2024-06-28T23:31:17.761Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
-[2024-06-28T23:31:18.054Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
-[2024-06-28T23:31:18.054Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
-[2024-06-28T23:52:09.745Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
-[2024-06-28T23:52:09.745Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
-[2024-06-28T23:52:09.785Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
-[2024-06-28T23:52:09.785Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
-[2024-06-28T23:53:36.685Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-28T23:53:36.685Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-28T23:53:36.685Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-28T23:53:37.035Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-28T23:53:37.035Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-28T23:53:37.035Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:21:02.244Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:21:02.244Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:21:02.244Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:21:02.594Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:21:02.594Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:21:02.594Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:22:43.439Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:22:43.439Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:22:43.439Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:22:43.814Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:22:43.814Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:22:43.814Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:46:13.492Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:46:13.492Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:46:13.492Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:46:13.750Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:46:13.750Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:46:13.750Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-29T14:57:56.004Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
-[2024-06-29T14:57:57.885Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:58:20.365Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:58:21.321Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:58:23.541Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-29T14:58:24.124Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-29T14:58:24.231Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:58:25.141Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:58:25.808Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:58:32.081Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:58:32.510Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:59:30.819Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:59:33.657Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:59:51.321Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T14:59:59.968Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T15:00:00.736Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T15:00:01.144Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T15:00:01.867Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-29T15:04:57.776Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
-[2024-06-29T15:04:59.408Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:36:43.097Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-30T22:36:43.097Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-30T22:36:43.097Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-30T22:36:43.119Z] [LOG] [DEBUG] - Searching for blog: newbloglog1
-[2024-06-30T22:36:43.307Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
-[2024-06-30T22:36:43.307Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
-[2024-06-30T22:36:43.313Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2024-06-30T22:36:43.446Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-30T22:36:43.446Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-30T22:36:43.446Z] [LOG] [ERROR] - You are not logged in. Please login!!
-[2024-06-30T22:36:43.679Z] [LOG] [DEBUG] - Searching for blog: newbloglog1
-[2024-06-30T22:36:43.907Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
-[2024-06-30T22:36:43.907Z] [LOG] [INFO] - Blog: newbloglog1 fetched. Content size is: 0.02734375 KB
-[2024-06-30T22:36:43.908Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2024-06-30T22:38:29.581Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:38:29.582Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:39:18.799Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:39:18.854Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:39:33.928Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:39:34.212Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:40:28.712Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
-[2024-06-30T22:40:30.194Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:40:32.725Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:40:33.057Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:40:47.275Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:40:47.283Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:40:47.382Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:40:47.642Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:40:48.244Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:40:52.824Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:40:52.832Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:40:52.916Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:40:53.460Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:40:54.034Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:41:06.570Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:41:06.880Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:41:12.541Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:41:12.564Z] [LOG] [DEBUG] - Topic is available: 
-[2024-06-30T22:41:12.662Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:41:13.179Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:41:14.087Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:43:11.823Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:43:13.246Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:43:25.465Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2024-06-30T22:43:25.903Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-07-29T23:33:30.469Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-07-29T23:33:31.816Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-07-30T10:41:24.209Z] [LOG] [ERROR] - Error fetching blogs:MongoServerSelectionError: connection <monitor> to 3.6.235.185:27017 timed out
+[2024-07-30T10:41:24.209Z] [LOG] [ERROR] - Error fetching blogs:MongoServerSelectionError: connection <monitor> to 3.6.235.185:27017 timed out
+[2024-07-30T10:41:24.209Z] [LOG] [ERROR] - Error fetching blogs:MongoServerSelectionError: connection <monitor> to 3.6.235.185:27017 timed out
+[2024-07-30T20:02:53.900Z] [LOG] [ERROR] - Error fetching user information: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2024-07-30T20:02:53.900Z] [LOG] [ERROR] - Error fetching user information: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2024-08-08T13:49:50.984Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:52:20.048Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:52:20.353Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:52:35.350Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:52:38.276Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:52:38.440Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:54:14.820Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:54:19.453Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:54:19.553Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:56:05.379Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:56:13.675Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T13:56:13.857Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:06:06.385Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:06:14.399Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:06:14.646Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:07:09.236Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:07:09.680Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:07:10.001Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:07:10.116Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:11:46.363Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:12:00.059Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:12:00.156Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-08T14:30:36.283Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-12T00:00:26.964Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T00:00:26.964Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T00:00:26.964Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T00:00:27.297Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T00:00:27.297Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T00:00:27.297Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T22:24:07.275Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-12T22:24:11.372Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-12T22:24:11.825Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-12T22:38:54.707Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-08-12T23:33:15.437Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-12T23:33:15.437Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-12T23:33:15.837Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-12T23:33:15.837Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-12T23:56:46.159Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:56:46.159Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:56:46.159Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:56:46.626Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-12T23:56:46.685Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:56:46.685Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:56:46.685Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:56:46.819Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:56:46.819Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:56:46.820Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-12T23:56:47.253Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-12T23:56:47.435Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:56:47.435Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:56:47.437Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-12T23:57:30.568Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-12T23:57:30.570Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:57:30.570Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:57:30.570Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:57:30.826Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:57:30.826Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:57:30.826Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-12T23:58:48.397Z] [LOG] [INFO] - Returning from user profile route with data.
+[2024-08-12T23:58:48.397Z] [LOG] [INFO] - Returning from user profile route with data.
+[2024-08-12T23:58:48.703Z] [LOG] [INFO] - Returning from user profile route with data.
+[2024-08-12T23:58:48.703Z] [LOG] [INFO] - Returning from user profile route with data.
+[2024-08-12T23:59:43.870Z] [LOG] [INFO] - Returning from user profile route with data.
+[2024-08-12T23:59:43.870Z] [LOG] [INFO] - Returning from user profile route with data.
+[2024-08-12T23:59:44.409Z] [LOG] [INFO] - Returning from user profile route with data.
+[2024-08-12T23:59:44.409Z] [LOG] [INFO] - Returning from user profile route with data.
+[2024-08-12T23:59:47.821Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-12T23:59:47.821Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-12T23:59:50.236Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-12T23:59:50.236Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-12T23:59:54.952Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:59:54.952Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:59:54.952Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:59:54.954Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-12T23:59:55.205Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:59:55.205Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:59:55.206Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-12T23:59:55.259Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:59:55.259Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:59:55.259Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-12T23:59:55.338Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-12T23:59:55.674Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:59:55.674Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-12T23:59:55.674Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:00:28.039Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:00:28.039Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:00:28.039Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:00:28.040Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:00:28.274Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:00:28.274Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:00:28.274Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:00:28.334Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:00:28.334Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:00:28.334Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:00:28.395Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:00:28.548Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:00:28.548Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:00:28.548Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:00:31.302Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:00:31.302Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:01:10.965Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:01:10.965Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:01:27.618Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:01:27.618Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:02:50.557Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:50.557Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:50.557Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:50.562Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:02:50.752Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:02:50.752Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:02:50.752Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:02:53.541Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:53.541Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:53.541Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:53.543Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:02:53.746Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:02:53.746Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:02:53.746Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:02:57.119Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:57.119Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:57.119Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:02:57.228Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:02:57.423Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:02:57.423Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:02:57.475Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:02:57.475Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:02:57.475Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:03:08.598Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:08.598Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:08.598Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:08.768Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:03:09.011Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:03:09.011Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:03:09.011Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:03:09.414Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:03:09.414Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:03:31.327Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:31.327Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:31.327Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:31.634Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:03:31.900Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:03:31.900Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:03:31.901Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:03:32.148Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:03:32.148Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:03:40.543Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:40.543Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:40.543Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:40.854Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:03:41.161Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:03:41.161Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:03:41.162Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:03:44.026Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:44.026Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:44.026Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:03:44.171Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:03:44.436Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:03:44.436Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-08-13T00:03:44.438Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:03:44.438Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:03:44.439Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:05:16.593Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:05:16.593Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:05:16.593Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:05:16.596Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:05:16.801Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:05:16.801Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:05:16.801Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:06:02.572Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:06:02.572Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:06:02.572Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:06:02.576Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:06:02.884Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:06:02.884Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:06:02.885Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-08-13T00:06:59.520Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:06:59.520Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:06:59.520Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-08-13T00:06:59.522Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-08-13T00:06:59.714Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:06:59.714Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-08-13T00:06:59.715Z] [LOG] [DEBUG] - Inside viewBlogRoute function.

@@ -13,6 +13,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
+import { FaGoogle, FaFacebook } from "react-icons/fa";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -96,6 +97,27 @@ function LoginPage() {
       });
   };
 
+
+  // const handleGoogleAuth= async()=>{
+  //   try {
+  //     const response= await axios.get('/api/users/auth/google');
+  //     console.log(response);
+  //     toast.success("Logged in");
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Error occured"+error);
+  //   }
+  // }
+
+  // const handleGoogleAuth = () => {
+  //   const popup = window.open('http://localhost:5000/api/users/auth/google', 'GoogleSignIn', 'width=500,height=600');
+  //   window.addEventListener('message', (event) => {
+  //     if (event.origin === 'http://localhost:3000' && event.data === 'success') {
+  //       navigate('/');
+  //     }
+  //   });
+  // };
+
   return (
     <div className="new-page-container loginpage-container">
       <Helmet>
@@ -105,7 +127,8 @@ function LoginPage() {
         <Row className="pt-3">
           <Col md={6}>
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9bb9Mz7yTmUO-Ky9T9pTXHb2W5cUW9_L4FWcxCyGq5A&s"
+              src="assets/signin.png"
+              // src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9bb9Mz7yTmUO-Ky9T9pTXHb2W5cUW9_L4FWcxCyGq5A&s"
               className="loginpage-image"
             />
           </Col>
@@ -179,6 +202,18 @@ function LoginPage() {
                 <div>
                   Don't have an account? <Link to="/signup">Sign up</Link>
                 </div>
+
+                {/* <Button
+                  variant="primary"
+                  onClick={handleGoogleAuth}
+                  className="forgotpassbutton"
+                  block
+                >
+                  Login with Google
+                </Button> */}
+                <center>or</center> <br />
+                <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link>
+                {/* <Link className=" mx-2 btn btn-primary" to="#"><FaFacebook title="Facebook" className="mb-1"  /> Facebook</Link> */}
               </Form>
             </div>
           </Col>

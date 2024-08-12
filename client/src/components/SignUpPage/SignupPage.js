@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { FaGoogle, FaFacebook } from "react-icons/fa";
 
 function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -129,7 +130,8 @@ function SignupPage() {
         <Row className="pt-3">
           <Col md={6}>
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9bb9Mz7yTmUO-Ky9T9pTXHb2W5cUW9_L4FWcxCyGq5A&s"
+              src="assets/signup.png"
+              // src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9bb9Mz7yTmUO-Ky9T9pTXHb2W5cUW9_L4FWcxCyGq5A&s"
               className="loginpage-image"
             />
           </Col>
@@ -235,6 +237,9 @@ function SignupPage() {
                 <div>
                   Already have an account? <Link to="/login">Login</Link>
                 </div>
+
+                <center>or</center> <br />
+                <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link>
               </Form>
             </div>{" "}
           </Col>

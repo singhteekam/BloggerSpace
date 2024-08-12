@@ -8,7 +8,7 @@ Tech Stack: MERN stack
  - Used nodemailer API to send emails. Ex: Email will be sent when the blog is under review, discarded, published.
  - Review stages: Pending for Review-Under review-In Review-Awaiting author (if need modification)-Publish
 Please try and give me the feedback. Your valuable feedback will help me to improve this website.
-- 60+ blogs are already ranked on Google search.
+- 80+ blogs are already ranked on Google search.
 
 ### Link: [https://bloggerspace.singhteekam.in](https://bloggerspace.singhteekam.in/)
 
@@ -24,12 +24,14 @@ Please try and give me the feedback. Your valuable feedback will help me to impr
 - Comments and Reply on the comments
 - Share blog on most famous social media platforms
 - Count number of visitor who visited the website.
+- Login/Sign up with Email and password
+- Sign in with Google
 - Forgot password page
 - Change password
 - Delete Account
 - Change username
 - View public profile of any user
-- Email verification for new users
+- Email verification for new users(except Sign in with Google)
 - Review stages:
     - Pending for Review
     - Under review

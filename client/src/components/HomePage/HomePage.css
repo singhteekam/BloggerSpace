@@ -102,8 +102,28 @@
     /* width: 100%; */
 }
 
+.loader {
+    border: 16px solid #e3e3e3;
+    border-top: 16px solid rgb(77, 238, 68);
+    border-radius: 50%;
+    width: 140px;
+    height: 140px;
+    animation: spin 1s ease-in infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
 @media only screen and (max-width:760px) {
     .homepage-blogs{
         flex-direction: column;
     }
 }
+

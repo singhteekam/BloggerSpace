@@ -23,12 +23,17 @@ const {
   followUser,
   unfollowUser,
   contactUs,
+  oauthGoogleSuccess,
+  oauthGoogleCallback,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
 const multer = require("multer");
 const { checkUserName } = require("../utils/checkUsername");
 const { discardBlogFromDB } = require("../utils/discardBlog");
+
+const passport = require('./../services/oauth2.js'); 
+
 
 // Route for verifying the user account
 router.post("/verify-account", verifyAccount);
@@ -45,6 +50,17 @@ router.post("/signup", signup);
 
 // Login route
 router.post("/login", login);
+
+// Login with Google
+router.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/' }),
+  oauthGoogleCallback
+);
+
 
 // Logout route
 router.post("/logout", logout);

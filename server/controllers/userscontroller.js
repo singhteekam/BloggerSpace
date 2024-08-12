@@ -9,6 +9,7 @@ const sendEmail = require("../services/mailer");
 const validateUsername = require("../utils/validateUsername");
 const Visit = require("../models/Visitor");
 const logger = require("./../utils/Logging/logs");
+const passport = require("./../services/oauth2.js");
 
 // verifyAccount controller
 exports.verifyAccount = async (req, res) => {
@@ -700,11 +701,37 @@ exports.contactUs = async (req, res) => {
       process.env.EMAIL,
       "New contact us email",
       `<div><p>Details of the form submitted user:</p><p>Email: ${email}</p><p>MobileNo: ${mobileNo}</p><p>Message: ${message}</p></div>`
-    ).then((response)=>{
-      console.log("Email sent!!!");
-    }).catch((err)=>res.status(404).json("Error when sending mail"));
+    )
+      .then((response) => {
+        console.log("Email sent!!!");
+      })
+      .catch((err) => res.status(404).json("Error when sending mail"));
     return res.status(200).json("Email sent successfully");
   } catch (error) {
     return res.status(404).json("Error when sending mail...");
   }
+};
+
+// Google OAuth20
+exports.oauthGoogleCallback = async (req, res) => {
+  // Successful authentication, redirect to profile page
+
+  console.log(req.user.emails[0].value);
+  const user = await User.findOne({ email: req.user.emails[0].value });
+  if (!user) {
+    return res.redirect(`${process.env.FRONTEND_URL}/login`);
+  }
+
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "15m", // Token expiration time
+  });
+
+  req.session.user = user; // Will remove in future
+  req.session.userId = user._id;
+  req.session.token = token;
+  req.session.email = user.email;
+
+  const encodedToken = encodeURIComponent(token);
+  res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
+  // res.json({ token });
 };
