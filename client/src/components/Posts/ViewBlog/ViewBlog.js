@@ -445,7 +445,7 @@ const ViewBlog = () => {
                     className="mx-3"
                     onClick={() => handleUnfollowUser(blog?.authorDetails._id)}
                     // disabled
-                  >
+                  > 
                     Following
                   </Button>
                 ) : (
