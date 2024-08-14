@@ -29,20 +29,20 @@ function HomePage() {
   const navigate = useNavigate();
 
   const isLoggedIn = localStorage.getItem("token");
-  useEffect(() => {
-    // console.log(localStorage.getItem("token"));
-    const fetchBlogs = async () => {
-      try {
-        const response = await axios.get("/api/blogs");
-        setBlogs(response.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching Blogs:", error);
-      }
-    };
-    fetchBlogs();
-    // }, [isLoggedIn, blogs]);
-  }, [blogs]);
+  // useEffect(() => {
+  //   // console.log(localStorage.getItem("token"));
+  //   const fetchBlogs = async () => {
+  //     try {
+  //       const response = await axios.get("/api/blogs");
+  //       setBlogs(response.data);
+  //       setIsLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching Blogs:", error);
+  //     }
+  //   };
+  //   fetchBlogs();
+  //   // }, [isLoggedIn, blogs]);
+  // }, [blogs]);
 
   // if (isLoading) {
   //   return (

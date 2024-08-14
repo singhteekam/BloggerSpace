@@ -92,6 +92,59 @@ exports.fetchAllBlogs = async (req, res) => {
   }
 };
 
+exports.fetchBlogByBlogId = async (req, res) => {
+  try {
+    const blog = await Blog.findOne({
+      blogId:req.params.blogId,
+    }).populate("authorDetails").exec();
+
+    if (!blog) {
+      logger.error("The requested blog can't open in improve blog mode because it doesn't exist. ")
+      return res.status(404).json({ error: "blog not found" });
+    }
+
+    // Decompress the content before displaying it
+    const compressedContentBuffer = Buffer.from(blog.content, "base64");
+    const decompressedContent = pako.inflate(compressedContentBuffer, {
+      to: "string",
+    });
+    blog.content = decompressedContent;
+    logger.debug("Blog opened in Improve mode. Blog title: "+ blog.title);
+
+    res.json(blog);
+  } catch (error) {
+    console.error("Error fetching blog blog:", error);
+    logger.error("Error fetching blog blog:"+ error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.fetchBlogsByCategory = async (req, res) => {
+
+  
+  const category= req.params.filterCategory;
+  // console.log(category);
+  const page= parseInt(req.query.page) || 1;
+  const limit= parseInt(req.query.limit) || 6;
+  const skip= (page-1)*limit;
+
+  try {
+    const blogs = await Blog.find({ category:category, status: "PUBLISHED" }).skip(skip).limit(limit).sort({ blogViews: -1 })
+      .populate("authorDetails") // Populate the author field with the User document
+      .exec();
+
+      const total= await Blog.countDocuments({ category:category, status: "PUBLISHED" });
+
+    res.json({
+      blogs, total, page, pages: Math.ceil(total/limit)
+    });
+  } catch (error) {
+    logger.error("Error fetching blogs..:"+ error);
+    console.error("Error fetching blogs..:", error);
+    res.status(500).json({ error: "Server error.." });
+  }
+};
+
 exports.addBlogViewsCounter= async (req, res)=>{
   try {
     const blog= await Blog.findOne({slug: req.body.blogSlug, status:"PUBLISHED"});

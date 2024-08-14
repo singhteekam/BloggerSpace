@@ -7,12 +7,13 @@ import "./AboutDeveloper.css";
 
 function AboutDeveloper() {
   return (
-    <div>
+    <div className="new-page-container">
       <Helmet>
         <title>About Developer - BloggerSpace</title>
       </Helmet>
       <Container className="developer-page">
-        <h2 className="developer-heading">About Developer</h2>
+        <h2 className="page-title">About Developer</h2>
+        <div className="underline"></div>
         <Card>
           <Card.Body>
             <div className="profile-section">
@@ -27,7 +28,7 @@ function AboutDeveloper() {
               <div className="profile-details">
                 <p>
                   Hello, I’m Teekam Singh currently working in Tata Consultancy
-                  Services(TCS) having 1.5 years of Experience and completed my
+                  Services(TCS) having 2+ years of Experience and completed my
                   B.Tech from ABES Engineering College, Ghaziabad.
                 </p>
                 <Stack direction="horizontal" gap={2}>
@@ -49,7 +50,7 @@ function AboutDeveloper() {
                     <li className="list-inline-item mx-2">
                       <a
                         target="_blank"
-                        href="https://in.linkedin.com/in/teekam-singh-26476a185"
+                        href="https://in.linkedin.com/in/singhteekam"
                       >
                         <i className="fab fa-linkedin fa-lg"></i>
                       </a>
@@ -62,7 +63,7 @@ function AboutDeveloper() {
                     <li className="list-inline-item mx-2">
                       <a
                         target="_blank"
-                        href="https://www.facebook.com/teekam.singh.9480/"
+                        href="https://www.facebook.com/singhteekam.in"
                       >
                         <i className="fab fa-facebook fa-lg"></i>
                       </a>

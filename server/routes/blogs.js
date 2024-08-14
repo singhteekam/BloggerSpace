@@ -23,13 +23,20 @@ const {
   addBlogViewsCounter,
   postNewBlogReplyComment,
   fetchAllBlogs,
+  fetchBlogsByCategory,
+  fetchBlogByBlogId,
 } = require("../controllers/blogsController");
 
 router.get("/", blogsHomepage);
 
 router.get("/allblogs", fetchAllBlogs);
 
+// fetch Blogs by category filter 
+router.get("/allblogs/category/:filterCategory", fetchBlogsByCategory);
+
 router.get("/:blogSlug", viewBlogRoute);
+
+router.get("/fetchblog/:blogId", fetchBlogByBlogId);
 
 router.post("/saveasdraft", saveAsDraftBlog);
 

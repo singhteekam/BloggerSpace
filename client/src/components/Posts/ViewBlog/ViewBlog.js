@@ -44,6 +44,7 @@ const ViewBlog = () => {
   const [thumbColor, setThumbColor] = useState("regular");
   const [isBlogSaved, setIsBlogSaved] = useState(false);
   const [disableLikeButton, setDisableLikeButton] = useState(false);
+  const [disableFollowButton, setDisableFollowButton] = useState(true);
 
   const [commentThumbColor, setCommentThumbColor] = useState("regular");
   const [disableCommentLikeButton, setDisableCommentLikeButton] =
@@ -85,6 +86,7 @@ const ViewBlog = () => {
           const user = response.data;
           // console.log(user);
           setUserInfo(user);
+          setDisableFollowButton(false);
           for (let index = 0; index < user.savedBlogs.length; index++) {
             if (
               user.savedBlogs[index].slug ===
@@ -280,13 +282,16 @@ const ViewBlog = () => {
 
   const handleFollowUser = async (idToFollow) => {
     try {
+      setDisableFollowButton(true);
       const response = await axios.patch(`/api/users/follow/${idToFollow}`);
       toast.success("Following.");
       console.log("Following....");
       setIsFollowing(true);
+      setDisableFollowButton(false);
       fetchBlog();
       // window.location.reload();
     } catch (error) {
+      setDisableFollowButton(false);
       toast.error("Error occured!! Please try again");
       console.log("Error: ",error);
     }
@@ -294,13 +299,16 @@ const ViewBlog = () => {
 
   const handleUnfollowUser = async (idToUnfollow) => {
     try {
+      setDisableFollowButton(true);
       const response = await axios.patch(`/api/users/unfollow/${idToUnfollow}`);
       toast.success("Unfollowed.");
       console.log("Unfollowed....");
       setIsFollowing(false);
+      setDisableFollowButton(false);
       fetchBlog();
       // window.location.reload();
     } catch (error) {
+      setDisableFollowButton(false);
       toast.error("Error occured!! Please try again");
       console.log(error);
     }
@@ -407,9 +415,12 @@ const ViewBlog = () => {
               <FaEye size="20px" /> {blog.blogViews} views
             </h6>
             <div>
-              <Button size="sm" variant="secondary">
+              <Link className="btn btn-outline-success" 
+              // to={`/improveblog/${blog.blogId}`}
+              to="#"
+              >
                 <i className="fa-solid fa-pen-to-square"></i> Improve Blog
-              </Button>
+              </Link>
             </div>
             <br />
             <Card.Footer className="d-flex justify-content-left">
@@ -444,7 +455,7 @@ const ViewBlog = () => {
                     size="sm"
                     className="mx-3"
                     onClick={() => handleUnfollowUser(blog?.authorDetails._id)}
-                    disabled
+                    disabled={disableFollowButton}
                   > 
                     Following
                   </Button>
@@ -454,7 +465,7 @@ const ViewBlog = () => {
                     size="sm"
                     className="mx-3"
                     onClick={() => handleFollowUser(blog?.authorDetails._id)}
-                    disabled
+                    disabled={disableFollowButton}
                   >
                     Follow +
                   </Button>

@@ -614,6 +614,7 @@ exports.followUser = async (req, res) => {
     if (!response || !response2) return res.status(404).json({ error: error });
     return res.json("Done");
   } catch (error) {
+    console.log(error);
     return res.status(404).json({ error: "Error occured" + error });
   }
 };

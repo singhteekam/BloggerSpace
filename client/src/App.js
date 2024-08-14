@@ -30,6 +30,7 @@ import CommunityPage from "./components/Community/CommunityPage.js";
 import ViewCommunityPost from "./components/Community/ViewCommunityPost.js";
 import AllBlogs from "./components/Posts/AllBlogs/AllBlogs.js";
 import AuthSuccess from "./utils/AuthSuccess.js";
+import ImproveBlog from "./components/Posts/ImproveBlog/ImproveBlog.js";
 
 const App = () => {
   return (
@@ -104,6 +105,7 @@ const App = () => {
             <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
             <Route path="/guidelines" element={<WritingGuidelines />} />
             <Route path="/savedblogs" element={<SavedBlogs />} />
+            <Route path="/improveblog/:blogId" element={<ImproveBlog />} />
             <Route path="/sitemap" element={<Sitemap />} />
             <Route path="/privacypolicy" element={<PrivacyPolicy />} />
             <Route path="/termsandconditions" element={<TermsAndConditions />} />

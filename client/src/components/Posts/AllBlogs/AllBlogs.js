@@ -15,6 +15,7 @@ import "./AllBlogs.css";
 import { motion } from "framer-motion";
 import Select from "react-select";
 import blogCategory from "../../../utils/blogCategory.json";
+import blogTags from "../../../utils/blogTags.json";
 
 
 import { useDispatch, useSelector } from "react-redux";
@@ -49,6 +50,17 @@ const AllBlogs = () => {
   // const state= useSelector((state)=>state.allblog);
   // console.log("State",state)
 
+  const fetchBlogs = async () => {
+    try {
+      const response = await axios.get(`/api/blogs/allblogs?page=${page}&limit=${limit}`);
+      setBlogs(response.data.blogs);
+      setTotal(response.data.total);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching Blogs:", error);
+    }
+  };
+
   useEffect(() => {
     // dispatch(fetchAllBlog());
     // const fetchBlogs = async () => {
@@ -60,19 +72,21 @@ const AllBlogs = () => {
     //     console.error("Error fetching Blogs:", error);
     //   }
     // };
-    const fetchBlogs = async () => {
-      try {
-        const response = await axios.get(`/api/blogs/allblogs?page=${page}&limit=${limit}`);
-        setBlogs(response.data.blogs);
-        setTotal(response.data.total);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching Blogs:", error);
-      }
-    };
+    
     fetchBlogs();
-    // }, [isLoggedIn, blogs]);
   }, [page]);
+
+  const fetchBlogsByCategory = async (filterCategory) => {
+    console.log(filterCategory);
+    try {
+      const response = await axios.get(`/api/blogs/allblogs/category/${filterCategory}?page=${page}&limit=${limit}`);
+      setBlogs(response.data.blogs);
+      setTotal(response.data.total);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching Blogs:", error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -83,13 +97,13 @@ const AllBlogs = () => {
     );
   }
 
-  if (blogs.length === 0) {
-    return (
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        <div>Blogs not found.</div>
-      </Container>
-    );
-  }
+  // if (blogs.length === 0) {
+  //   return (
+  //     <Container className="d-flex justify-content-center align-items-center vh-100">
+  //       <div>Blogs not found.</div>
+  //     </Container>
+  //   );
+  // }
 
   
   const prePage = () => {
@@ -127,7 +141,9 @@ const AllBlogs = () => {
             onChange={setFilterCategory}
             options={blogCategory}
           />
-          <Button variant="success" size="sm" onClick={()=>null}>Search</Button>
+          
+          <Button variant="success" size="sm" onClick={()=>fetchBlogsByCategory(filterCategory.value)}>Search</Button>
+          <Button variant="danger" size="sm" className="mx-2" onClick={fetchBlogs}>Reset</Button>
         </div>
 
         {/* {state.isLoading && <div>Loading..</div>}

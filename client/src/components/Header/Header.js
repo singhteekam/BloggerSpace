@@ -32,23 +32,6 @@ function Header() {
     setShowSearchModal(false);
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      axios
-        .get("/api/users/userinfo")
-        .then((response) => {
-          const userData = response.data;
-          setUser(userData);
-        })
-        .catch((error) => {
-          console.error("Error fetching user information:", error);
-          if (error.response.status === 404) {
-            handleLogout();
-          }
-        });
-    }
-  }, [isLoggedIn]);
-
   const handleLogout = () => {
     axios
       .post("/api/users/logout")
@@ -67,6 +50,24 @@ function Header() {
         console.error("Logout failed:", error);
       });
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      axios
+        .get("/api/users/userinfo")
+        .then((response) => {
+          const userData = response.data;
+          setUser(userData);
+        })
+        .catch((error) => {
+          console.error("Error fetching user information:", error);
+          if (error.response.status === 404) {
+            handleLogout();
+          }
+        });
+    }
+  }, [isLoggedIn]);
+
 
   return (
     <div className="header-page">
