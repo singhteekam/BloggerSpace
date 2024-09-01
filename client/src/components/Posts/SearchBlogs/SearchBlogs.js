@@ -32,11 +32,11 @@ const SearchBlogs = ({ show, onHide }) => {
   };
 
   return (
-    <Modal show={show} onHide={onHide} centered>
-      <Modal.Header closeButton>
+    <Modal show={show} onHide={onHide} centered className="bgcolor-mint">
+      <Modal.Header closeButton className="bgcolor-spearmint">
         <Modal.Title>Search Blogs</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className="bgcolor-spearmint">
         <div className="search-bar">
           <FormControl
             type="text"
@@ -44,7 +44,7 @@ const SearchBlogs = ({ show, onHide }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <Button variant="primary" onClick={searchBlogs} className="mt-2 mb-2">
+          <Button onClick={searchBlogs} className="mt-2 mb-2 bs-button">
             Search
           </Button>
         </div>

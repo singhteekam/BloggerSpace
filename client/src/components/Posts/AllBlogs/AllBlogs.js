@@ -11,11 +11,12 @@ import {
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./AllBlogs.css";
 import { motion } from "framer-motion";
 import Select from "react-select";
 import blogCategory from "../../../utils/blogCategory.json";
 import blogTags from "../../../utils/blogTags.json";
+
+import { FaEye, FaHeart } from "react-icons/fa";
 
 
 import { useDispatch, useSelector } from "react-redux";
@@ -126,10 +127,10 @@ const AllBlogs = () => {
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
   
   return (
-    <div className="new-page-container">
+    <section className="newpage-section">
       <Container>
         <h3 className="page-title">Blogs</h3>
-        <div className="underline"></div>
+        <div className="heading-underline"></div>
         <i>
           Showing total results: {total}, Page {page} of {totalPages}
         </i>
@@ -145,18 +146,6 @@ const AllBlogs = () => {
           <Button variant="success" size="sm" onClick={()=>fetchBlogsByCategory(filterCategory.value)}>Search</Button>
           <Button variant="danger" size="sm" className="mx-2" onClick={fetchBlogs}>Reset</Button>
         </div>
-
-        {/* {state.isLoading && <div>Loading..</div>}
-        {!state.isLoading && state.isError && <div>Error..{state.error}</div>}
-        {!state.isLoading && state.data.length?(
-          <ul>
-            {
-              state.data.map(blog=>(
-                <li>{blog.title}</li>
-              ))
-            }
-          </ul>
-        ):null} */}
 
         {blogs?.length === 0 ? (
           <div>No blogs found</div>
@@ -179,16 +168,17 @@ const AllBlogs = () => {
                           window.scrollTo({ top: 0, behavior: "smooth" })
                         }
                       >
-                        <Card className="blogcard">
+                        <Card className="blogcard bgcolor-mint">
                           <div class="blogcard-container">
-                            <img
+                            {/* <img
                               src="carousel_img1.png"
                               alt="Image"
                               className="blogcard-container-img"
-                            />
+                            /> */}
+                            <div className="blogcard-container-img bgcolor-teal-green"></div>
                             <div class="blogcard-container-text">{blog.category}</div>
                           </div>
-                          <Card.Body className="">
+                          <Card.Body>
                             <h6>{blog.title}</h6>
                             {/* <div className="underline"></div> */}
                             {blog.tags &&
@@ -211,6 +201,9 @@ const AllBlogs = () => {
                                 Last Updated: {blog.lastUpdatedAt.slice(11, 19)}
                                 , {blog.lastUpdatedAt.slice(0, 10)}
                               </i>
+                              <br />
+                              <FaEye className="color-teal-green" /> <span className="color-teal-green">{blog.blogViews}{"  "}</span>
+                              <FaHeart className="color-teal-green" /> <span className="color-teal-green">{blog.blogLikes.length}</span>
                             </p>
                           </Card.Body>
                         </Card>
@@ -268,7 +261,7 @@ const AllBlogs = () => {
           </>
         )}
       </Container>
-    </div>
+    </section>
   );
 };
 

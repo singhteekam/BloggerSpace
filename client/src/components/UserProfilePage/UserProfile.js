@@ -3,7 +3,6 @@ import { Container, Card, ListGroup, Spinner, Image } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet";
-import "./UserProfile.css";
 
 const UserProfile = () => {
   const [userProfile, setUserProfile] = useState(null);
@@ -45,12 +44,12 @@ const UserProfile = () => {
   const { fullName, email, blogs } = userProfile;
 
   return (
-    <div>
+    <section className="newpage-section">
       <Helmet>
         <title>{username} - User Profile - BloggerSpace</title>
       </Helmet>
-      <Container className="user-profile-page">
-        <h2 className="user-profile-heading">User Profile</h2>
+      <Container>
+        <h2 className="page-title">User Profile</h2>
         <Card>
           <Card.Body>
             <Card.Title>{fullName}</Card.Title>
@@ -135,7 +134,7 @@ const UserProfile = () => {
           </ListGroup>
         )}
       </Container>
-    </div>
+    </section>
   );
 };
 

@@ -10,7 +10,6 @@ import { MdVerified } from "react-icons/md";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import SearchBlogs from "../Posts/SearchBlogs/SearchBlogs";
-import './Header.css';
 
 function Header() {
   const [user, setUser] = useState(null);
@@ -70,8 +69,9 @@ function Header() {
 
 
   return (
-    <div className="header-page">
-        <Navbar bg="dark" data-bs-theme="dark" expand="lg" fixed="top" className="text-white">
+    <div className="bgcolor-teal-green">
+        {/* <Navbar bg="dark" data-bs-theme="dark" expand="lg" fixed="top" className="text-white"> */}
+        <Navbar expand="lg" fixed="top" className="text-white bgcolor-teal-green">
       <Container>
         <RxDragHandleHorizontal
           size="35px"
@@ -79,36 +79,36 @@ function Header() {
           onClick={handleShowCanvas}
         />
         {isLoggedIn ? (
-          <Offcanvas show={showCanvas} onHide={handleCloseCanvas}>
+          <Offcanvas show={showCanvas} onHide={handleCloseCanvas} className="bgcolor-spearmint text-white">
             <Offcanvas.Header closeButton>
-              <Offcanvas.Title>
+              <Offcanvas.Title className="color-teal-green">
                 Welcome, {user?.fullName || "Profile"} {user?.isVerified?<MdVerified color="blue" />:null}
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
               <div className="d-grid gap-2">
-                <Link className="btn btn-secondary" to="/" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/" onClick={handleCloseCanvas}>
                   <i className="fas fa-home"></i> Home
                 </Link>
-                <Link className="btn btn-secondary" to="/blogs" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/blogs" onClick={handleCloseCanvas}>
                   <i className="fas fa-rectangle-list"></i> Blogs
                 </Link>
-                <Link className="btn btn-secondary" to="/myprofile" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/myprofile" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> My Profile
                 </Link>
-                <Link className="btn btn-secondary" to="/newblog" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/newblog" onClick={handleCloseCanvas}>
                   <i className="fas fa-blog"></i> New Post
                 </Link>
-                <Link className="btn btn-secondary" to="/myblogs" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/myblogs" onClick={handleCloseCanvas}>
                   <i className="fas fa-blog"></i> My Blogs
                 </Link>
-                <Link className="btn btn-secondary" to="/savedblogs" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/savedblogs" onClick={handleCloseCanvas}>
                   <i className="fas fa-bookmark"></i> Saved Blogs
                 </Link>
-                <Link className="btn btn-secondary" to="/settings" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/settings" onClick={handleCloseCanvas}>
                   <i className="fas fa-gear"></i> Settings
                 </Link>
-                <Link className="btn btn-secondary" to="/changepassword" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/changepassword" onClick={handleCloseCanvas}>
                   <i className="fas fa-key"></i> Change Password
                 </Link>
                 
@@ -116,66 +116,66 @@ function Header() {
                   <i className="fas fa-sign-out"></i> Sign Out
                 </Link>
                 <hr />
-                <Link className="btn btn-secondary" to="/community" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/community" onClick={handleCloseCanvas}>
                   <i className="fas fa-users"></i> Community
                 </Link>
-                <Link className="btn btn-secondary" to="/guidelines" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/guidelines" onClick={handleCloseCanvas}>
                   <i className="fas fa-book"></i> Writing Guidelines
                 </Link>
                 <Link
-                  className="btn btn-secondary"
+                  className="btn bs-button"
                   to="https://reviewbloggerspace.singhteekam.in/"
                   target="_blank"
                   onClick={handleCloseCanvas}
                 >
                   <i className="fas fa-globe"></i> Reviewer Panel
                 </Link>
-                <Link className="btn btn-secondary" to="/sitemap" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/sitemap" onClick={handleCloseCanvas}>
                   <i className="fas fa-globe"></i> Sitemap
                 </Link>
-                <Link className="btn btn-secondary" to="/aboutdeveloper" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/aboutdeveloper" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> About Developer
                 </Link>
               </div>
             </Offcanvas.Body>
           </Offcanvas>
         ) : (
-          <Offcanvas show={showCanvas} onHide={handleCloseCanvas} className="bg-dark text-white">
+          <Offcanvas show={showCanvas} onHide={handleCloseCanvas} className="bgcolor-spearmint text-white">
             <Offcanvas.Header closeButton>
-              <Offcanvas.Title>Hi, User</Offcanvas.Title>
+              <Offcanvas.Title className="color-teal-green">Hi, User</Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
               <div className="d-grid gap-2 ">
-              <Link className="btn btn-secondary" to="/" onClick={handleCloseCanvas}>
+              <Link className="btn bs-button" to="/" onClick={handleCloseCanvas}>
                   <i className="fas fa-home"></i> Home
                 </Link>
-              <Link className="btn btn-secondary" to="/blogs" onClick={handleCloseCanvas}>
+              <Link className="btn bs-button" to="/blogs" onClick={handleCloseCanvas}>
                   <i className="fas fa-rectangle-list"></i> Blogs
                 </Link>
-                <Link className="btn btn-secondary" to="/login" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/login" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> Login
                 </Link>
-                <Link className="btn btn-secondary" to="/signup" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/signup" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> SignUp
                 </Link>
                 <hr />
-                <Link className="btn btn-secondary" to="/community" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/community" onClick={handleCloseCanvas}>
                   <i className="fas fa-users"></i> Community
                 </Link>
-                <Link className="btn btn-secondary" to="guidelines" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="guidelines" onClick={handleCloseCanvas}>
                   <i className="fas fa-book"></i> Writing Guidelines
                 </Link>
                 <Link
-                  className="btn btn-secondary"
+                  className="btn bs-button"
                   to="https://reviewbloggerspace.singhteekam.in/"
                   target="_blank"
                 >
                   <i className="fas fa-globe"></i> Reviewer Panel
                 </Link>
-                <Link className="btn btn-secondary" to="/sitemap" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/sitemap" onClick={handleCloseCanvas}>
                   <i className="fas fa-globe"></i> Sitemap
                 </Link>
-                <Link className="btn btn-secondary" to="/aboutdeveloper" onClick={handleCloseCanvas}>
+                <Link className="btn bs-button" to="/aboutdeveloper" onClick={handleCloseCanvas}>
                   <i className="fas fa-user"></i> About Developer
                 </Link>
               </div>
@@ -189,7 +189,7 @@ function Header() {
         </Navbar.Brand>
 
         <div>
-          <Button variant="light" onClick={handleSearchClick}>
+          <Button onClick={handleSearchClick} className="bs-button-outline">
             <i className="fas fa-search"></i> Search
           </Button>
           <SearchBlogs show={showSearchModal} onHide={handleSearchModalClose} />

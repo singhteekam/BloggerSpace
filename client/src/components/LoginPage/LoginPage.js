@@ -8,12 +8,12 @@ import {
   FloatingLabel,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
-import "./LoginPage.css";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
+import { CiLock } from "react-icons/ci";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -119,23 +119,24 @@ function LoginPage() {
   // };
 
   return (
-    <div className="new-page-container loginpage-container">
+    <div className="newpage-section">
       <Helmet>
         <title>Login - BloggerSpace</title>
       </Helmet>
       <Container>
         <Row className="pt-3">
           <Col md={6}>
-            <img
+            {/* <img
               src="assets/signin.png"
               // src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9bb9Mz7yTmUO-Ky9T9pTXHb2W5cUW9_L4FWcxCyGq5A&s"
               className="loginpage-image"
-            />
+            /> */}
+            <CiLock className="lock-icon" />
           </Col>
           <Col md={6}>
-            <div className="login-form">
-              <h2 className="text-center loginpage-heading">Login</h2>
-              <div className="underline mx-auto"></div>
+            <div className="login-form bgcolor-mint">
+              <h2 className="text-center page-title">Login</h2>
+              <div className="heading-underline mx-auto"></div>
 
               <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="email">
@@ -185,7 +186,7 @@ function LoginPage() {
                 <Button
                   variant="success"
                   type="submit"
-                  className="loginbutton"
+                  className="bs-button"
                   block
                 >
                   Login
@@ -194,7 +195,7 @@ function LoginPage() {
                   variant="secondary"
                   type="submit"
                   onClick={() => navigate("/forgotpassword")}
-                  className="forgotpassbutton"
+                  className="bs-button-outline mx-1"
                   block
                 >
                   Forgot password?

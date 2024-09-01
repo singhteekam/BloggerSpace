@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button, Alert, Row, Container, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
@@ -71,14 +71,13 @@ function ResetPasswordPage() {
   };
 
   return (
-    <div>
+    <section className="newpage-section">
       <Helmet>
         <title>Reset Password - BloggerSpace</title>
       </Helmet>
-      <div className="password-reset-page">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-md-6 col-sm-8">
+        <Container className="password-page-container">
+          <Row className="justify-content-center">
+            <Col md={6} sm={8}>
               <div className="password-reset-form">
                 <h2 className="text-center mb-4">Reset Password</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
@@ -117,11 +116,10 @@ function ResetPasswordPage() {
                   </Button>
                 </Form>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Col>
+          </Row>
+        </Container>
+    </section>
   );
 }
 

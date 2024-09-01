@@ -15,7 +15,6 @@ import {
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
 import TinymceEditor from "../../../utils/TinymceEditor";
 import axios from "axios";
-// import "./EditBlog.css";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
@@ -135,13 +134,13 @@ const ImproveBlog = () => {
 
   return (
     <>
-    <div className="new-page-container">
+    <div className="newpage-section">
       <Helmet>
         <title>Improve Blog</title>
       </Helmet>
       <Container>
         <h2 className="page-title">Improve Blog - Id:{blogId}</h2>
-        <div className="underline"></div>
+        <div className="heading-underline"></div>
 
         <Form onSubmit={handleSubmit}>
         <Form.Group controlId="blogTitle" className="editblogfields">

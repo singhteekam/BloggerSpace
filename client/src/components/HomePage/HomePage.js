@@ -12,9 +12,8 @@ import {
   Form,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import "./HomePage.css";
+import "./../../styles/style.css";
 import axios from "axios";
-import CarouselImage from "../../utils/CarouselImage";
 import { motion } from "framer-motion";
 import { FaLocationArrow } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -29,52 +28,19 @@ function HomePage() {
   const navigate = useNavigate();
 
   const isLoggedIn = localStorage.getItem("token");
-  // useEffect(() => {
-  //   // console.log(localStorage.getItem("token"));
-  //   const fetchBlogs = async () => {
-  //     try {
-  //       const response = await axios.get("/api/blogs");
-  //       setBlogs(response.data);
-  //       setIsLoading(false);
-  //     } catch (error) {
-  //       console.error("Error fetching Blogs:", error);
-  //     }
-  //   };
-  //   fetchBlogs();
-  //   // }, [isLoggedIn, blogs]);
-  // }, [blogs]);
-
-  // if (isLoading) {
-  //   return (
-  //     <Container className="d-flex justify-content-center align-items-center vh-100">
-  //       <Spinner animation="border" variant="primary" />
-  //     </Container>
-  //   );
-  // }
-
-  // if (blogs.length === 0) {
-  //   return (
-  //     <Container className="d-flex justify-content-center align-items-center vh-100">
-  //       <div>Blogs not found.</div>
-  //     </Container>
-  //   );
-  // }
 
   return (
-    <div className="homepage">
+    <section className="newpage-section">
       <ToastContainer />
       <div>
         <Carousel>
           <Carousel.Item>
-            <CarouselImage />
-            <Carousel.Caption>
+            <div className="carousel-image"></div>
+            <Carousel.Caption className="color-teal-green">
               <motion.h3
                 variants={carouselVariant}
                 initial="hidden"
                 animate="visible"
-                // initial={{x:-20}}
-                // animate={{x:20}}
-                // transition={{type:"tween", duration:2}}
               >
                 Welcome to BloggerSpace
               </motion.h3>
@@ -89,8 +55,8 @@ function HomePage() {
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
-            <CarouselImage />
-            <Carousel.Caption>
+          <div className="carousel-image"></div>
+            <Carousel.Caption className="color-teal-green">
               <h3>Features to explore</h3>
               <p>
                 Create new blog, save as draft the blog, Change password, Email
@@ -99,8 +65,8 @@ function HomePage() {
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
-            <CarouselImage />
-            <Carousel.Caption>
+          <div className="carousel-image"></div>
+            <Carousel.Caption className="color-teal-green">
               <h4>Explore Reviewer Panel </h4>
               <small>
                 If you want to review blogs written by other authors then
@@ -108,14 +74,14 @@ function HomePage() {
                 verification, Admin will approve your request within a day.
               </small>{" "}
               <br />
-              <a className="btn btn-danger">
+              <Link className="btn bs-button">
                 Go to Reviewer Panel<i className="fas fa-chevron-right"></i>
-              </a>
+              </Link>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
-            <CarouselImage />
-            <Carousel.Caption>
+          <div className="carousel-image"></div>
+            <Carousel.Caption className="color-teal-green">
               <h4>Community</h4>
               <small>
                 If you want to share your opinion or want to ask any question
@@ -123,21 +89,21 @@ function HomePage() {
                 submitted posts will be published immediately.
               </small>{" "}
               <br />
-              <a className="btn btn-danger">
+              <Link className="btn bs-button">
                 Go to Community<i className="fas fa-chevron-right"></i>
-              </a>
+              </Link>
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>
       </div>
 
       {/* Adding more sections */}
-      <section className="section2">
+      <section className="page-new-section">
         <Container>
           <Row>
             <Col md={12} className="text-center">
-              <h3 className="section2heading">About BloggerSpace</h3>
-              <div className="underline mx-auto"></div>
+              <h3 className="new-section-heading">About BloggerSpace</h3>
+              <div className="heading-underline mx-auto"></div>
               <p>
                 A blogging website where users can write a blog on any topic.
                 There are two panels: Writing and Reviewing panel. In writing
@@ -147,7 +113,7 @@ function HomePage() {
                 user, revoke/grant reviewer access.
               </p>
               <motion.div variants={buttonVariant} whileHover="hover">
-                <Link to="/about" className="btn btn-warning shadow mx-1">
+                <Link to="/about" className="btn mx-1 bs-button">
                   Read more
                 </Link>
               </motion.div>
@@ -158,12 +124,12 @@ function HomePage() {
       {/* Adding more sections end */}
 
       {/* Adding more sections */}
-      <section className="section2 bgcolor border-top">
+      <section className="page-new-section bgcolor-mint">
         <Container>
           <Row>
             <Col md={12} className="text-center mb-3">
-              <h3 className="section2heading">What You can do</h3>
-              <div className="underline mx-auto"></div>
+              <h3 className="new-section-heading">What You can do</h3>
+              <div className="heading-underline mx-auto"></div>
             </Col>
             <Col md={4} className="text-center">
               <h5>Write Blogs</h5>
@@ -175,7 +141,7 @@ function HomePage() {
                 start reviewing the assigned blogs. The admin can delete any
                 user, revoke/grant reviewer access.
               </p>
-              <Link to={"/newblog"} className="btn btn-outline-success mb-3">
+              <Link to={"/newblog"} className="btn mb-3 bs-button-outline">
                 Write a blog <FaLocationArrow />
               </Link>
             </Col>
@@ -189,7 +155,7 @@ function HomePage() {
                 start reviewing the assigned blogs. The admin can delete any
                 user, revoke/grant reviewer access.
               </p>
-              <Link to={"/community"} className="btn btn-outline-success mb-3">
+              <Link to={"/community"} className="btn mb-3 bs-button-outline">
                 Create community post <FaLocationArrow />
               </Link>
             </Col>
@@ -203,7 +169,7 @@ function HomePage() {
                 start reviewing the assigned blogs. The admin can delete any
                 user, revoke/grant reviewer access.
               </p>
-              <Link to={"https://reviewbloggerspace.singhteekam.in/signup"} target="_blank" className="btn btn-outline-success mb-3">
+              <Link to={"https://reviewbloggerspace.singhteekam.in/signup"} target="_blank" className="btn mb-3 bs-button-outline">
                 Become a Reviewer <FaLocationArrow />
               </Link>
             </Col>
@@ -213,15 +179,15 @@ function HomePage() {
       {/* Adding more sections end */}
 
       {/* Adding more sections */}
-      <section className="section2 border-top">
+      <section className="page-new-section">
         <Container>
           <Row>
             <Col md={12} className="text-center mb-3">
-              <h3 className="section2heading">Reviews from the Users</h3>
-              <div className="underline mx-auto"></div>
+              <h3 className="new-section-heading">Reviews from the Users</h3>
+              <div className="heading-underline mx-auto"></div>
             </Col>
             <Col md={4}>
-              <Card className="shadow reviews-card">
+              <Card className="bgcolor-mint">
                 <Card.Img
                   src="/assets/mohit.jpeg"
                   className="w-100 border-bottom review-card-img"
@@ -229,20 +195,19 @@ function HomePage() {
                 ></Card.Img>
                 <Card.Body>
                   <h6>Mohit Sharma</h6>
-                  <div className="underline"></div>
+                  <div className="heading-underline"></div>
                   <p>
                     <cite>
                       ❝ My experience as a reviewer and writer has reached new
                       heights. The platform’s draft and editing tools feature
                       allowing me to focus on creating high-quality content. The
                       supportive community further enhance the overall
-                      experience, making BloggerSpace a standout choice for
-                      serious bloggers.❞
+                      experience, making BloggerSpace a standout choice.❞
                     </cite>
                   </p>
                 </Card.Body>
                 <Card.Footer>
-                  <Link to="#" className="btn btn-outline-success">
+                  <Link to="#" className="btn bs-button-outline">
                     View Profile
                   </Link>
                 </Card.Footer>
@@ -250,7 +215,7 @@ function HomePage() {
             </Col>
 
             <Col md={4}>
-              <Card className="shadow reviews-card">
+              <Card className="bgcolor-mint">
                 <Card.Img
                   src="/assets/swara.jpeg"
                   className="w-100 border-bottom review-card-img"
@@ -258,7 +223,7 @@ function HomePage() {
                 ></Card.Img>
                 <Card.Body>
                   <h6>Swaranjali</h6>
-                  <div className="underline"></div>
+                  <div className="heading-underline"></div>
                   <p>
                     <cite>
                       ❝ As a dedicated blogger who values both creativity and
@@ -270,7 +235,7 @@ function HomePage() {
                   </p>
                 </Card.Body>
                 <Card.Footer>
-                  <Link to="#" className="btn btn-outline-success">
+                  <Link to="#" className="btn bs-button-outline">
                     View Profile
                   </Link>
                 </Card.Footer>
@@ -278,7 +243,7 @@ function HomePage() {
             </Col>
 
             <Col md={4}>
-              <Card className="shadow reviews-card">
+              <Card className="bgcolor-mint">
                 <Card.Img
                   src="/assets/saksham.jpeg"
                   // src="https://source.unsplash.com/random/100×100"
@@ -287,7 +252,7 @@ function HomePage() {
                 ></Card.Img>
                 <Card.Body>
                   <h6>Saksham Kumar</h6>
-                  <div className="underline"></div>
+                  <div className="heading-underline"></div>
                   <p>
                     <cite>
                       ❝ BloggerSpace has exceeded my expectations with its
@@ -299,7 +264,7 @@ function HomePage() {
                   </p>
                 </Card.Body>
                 <Card.Footer>
-                  <Link to="#" className="btn btn-outline-success">
+                  <Link to="#" className="btn bs-button-outline">
                     View Profile
                   </Link>
                 </Card.Footer>
@@ -310,126 +275,11 @@ function HomePage() {
       </section>
       {/* Adding more sections end */}
 
-      {/* <div className="homepage-blogs">
-        <Container>
-          <b className="m-3">Most Viewed Blogs:</b>
-          {blogs?.length === 0 ? (
-            <div>No blogs found</div>
-          ) : (
-            <>
-              <ListGroup className="m-3">
-                {blogs.slice(0, 10)?.map((blog) => (
-                  <ListGroup.Item
-                    key={blog.slug}
-                    className="mb-2 border blogitem"
-                  >
-                    <motion.div
-                      variants={blogItemVariant}
-                      whileHover="hover"
-                      className="row align-items-center"
-                    >
-                      <Link
-                        to={`/${blog.slug}`}
-                        // target="_blank"
-                        style={{ textDecoration: "none" }}
-                        onClick={() =>
-                          window.scrollTo({ top: 0, behavior: "smooth" })
-                        }
-                      >
-                        <div className="col">
-                          <b>{blog.title}</b>
-                          {blog.tags &&
-                            blog.tags.map((tag) => (
-                              <Badge
-                                key={tag}
-                                pill
-                                bg="secondary"
-                                className="mx-1"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          <p>
-                            <i className="text-muted">
-                              Author: {blog.authorDetails.userName}
-                            </i>
-                            <br />
-                            <i className="text-muted">
-                              Last Updated: {blog.lastUpdatedAt.slice(11, 19)},{" "}
-                              {blog.lastUpdatedAt.slice(0, 10)}
-                            </i>
-                          </p>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  </ListGroup.Item>
-                ))}
-                <Link to={"/sitemap"}>Show more</Link>
-              </ListGroup>
-            </>
-          )}
-        </Container>
-
-        <Container>
-          <b className="m-3">Recently published:</b>
-          {blogs?.length === 0 ? (
-            <div>No blogs found</div>
-          ) : (
-            <>
-              <ListGroup className="m-3">
-                {blogs.slice(-4)?.map((blog) => (
-                  <ListGroup.Item
-                    key={blog.slug}
-                    className="mb-2 border blogitem"
-                  >
-                    <div className="row align-items-center">
-                      <Link
-                        to={`/${blog.slug}`}
-                        // target="_blank"
-                        style={{ textDecoration: "none" }}
-                        onClick={() =>
-                          window.scrollTo({ top: 0, behavior: "smooth" })
-                        }
-                      >
-                        <div className="col">
-                          <b>{blog.title}</b>
-                          {blog.tags &&
-                            blog.tags.map((tag) => (
-                              <Badge
-                                key={tag}
-                                pill
-                                bg="secondary"
-                                className="mx-1"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          <p>
-                            <i className="text-muted">
-                              Author: {blog.authorDetails.userName}
-                            </i>
-                            <br />
-                            <i className="text-muted">
-                              Last Updated: {blog.lastUpdatedAt.slice(11, 19)},{" "}
-                              {blog.lastUpdatedAt.slice(0, 10)}
-                            </i>
-                          </p>
-                        </div>
-                      </Link>
-                    </div>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </>
-          )}
-        </Container>
-      </div> */}
-
       {/* Tech stack used */}
-      <section className="section2">
+      <section className="page-new-section">
         <Container>
-          <h3 className="section2heading text-center">Tech Stack used</h3>
-          <div className="underline mx-auto mb-3"></div>
+          <h3 className="new-section-heading text-center">Tech Stack used</h3>
+          <div className="heading-underline mx-auto mb-3"></div>
           <div className="logos">
             <motion.div
               variants={marqueVariants} 
@@ -457,21 +307,21 @@ function HomePage() {
       </section>
 
       {/* About Developer */}
-      <section className="section2 bgcolor">
+      <section className="page-new-section bgcolor-mint">
         <Container>
-          <h3 className="section2heading text-center">About Developer</h3>
-          <div className="underline mx-auto mb-3"></div>
+          <h3 className="new-section-heading text-center">About Developer</h3>
+          <div className="heading-underline mx-auto mb-3"></div>
           <Row>
             <Col md={4}>
               <h6>Teekam Singh</h6>
-              <div className="underline"></div>
+              <div className="heading-underline"></div>
               <p>
                 Hi, I'm Teekam Singh currently working on this website and
                 adding new features, fixing bugs, adding animations, running
                 server 24x7 without a downtime.
               </p>
               <Link
-                className="btn btn-outline-success"
+                className="btn bs-button-outline"
                 to={"https://www.singhteekam.in/"}
                 target="_blank"
               >
@@ -493,21 +343,21 @@ function HomePage() {
               <div>
                 <b>BrainQuiz: </b>
                 <Link
-                  className="btn btn-outline-info m-1"
+                  className="btn bs-button-outline m-1"
                   to={"https://brainquiz.singhteekam.in/"}
                   target="_blank"
                 >
                   Live demo
                 </Link>
                 <Link
-                  className="btn btn-outline-info m-1"
+                  className="btn bs-button-outline m-1"
                   to={"https://github.com/singhteekam/Kaun-Banega-Crorepati"}
                   target="_blank"
                 >
                   Source code
                 </Link>
                 <Link
-                  className="btn btn-outline-info m-1"
+                  className="btn bs-button-outline m-1"
                   onClick={() => {
                     navigator.clipboard.writeText(
                       "https://brainquiz.singhteekam.in/"
@@ -521,21 +371,21 @@ function HomePage() {
               <div className="mt-2">
                 <b>MyDiary: </b>
                 <Link
-                  className="btn btn-outline-info m-1"
+                  className="btn bs-button-outline m-1"
                   to={"https://mydiary.singhteekam.in/"}
                   target="_blank"
                 >
                   Live demo
                 </Link>
                 <Link
-                  className="btn btn-outline-info m-1"
+                  className="btn bs-button-outline m-1"
                   to={"https://github.com/singhteekam/My-Diary"}
                   target="_blank"
                 >
                   Source code
                 </Link>
                 <Link
-                  className="btn btn-outline-info m-1"
+                  className="btn bs-button-outline m-1"
                   onClick={() => {
                     navigator.clipboard.writeText(
                       "https://mydiary.singhteekam.in/"
@@ -589,7 +439,7 @@ function HomePage() {
 
       {/* Contact us */}
       <ContactUs />
-    </div>
+    </section>
   );
 }
 

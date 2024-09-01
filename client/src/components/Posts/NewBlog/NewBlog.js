@@ -15,7 +15,6 @@ import TinymceEditor from "../../../utils/TinymceEditor";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
-import "./NewBlog.css";
 import { Link, useNavigate } from "react-router-dom";
 import blogCategory from "../../../utils/blogCategory.json";
 import blogTags from "../../../utils/blogTags.json";
@@ -211,14 +210,14 @@ const NewBlog = () => {
   }
 
   return (
-    <div className="new-page-container">
+    <div className="newpage-section">
       <Helmet>
         <title>New Blog - BloggerSpace</title>
       </Helmet>
 
       <Container>
       <h3 className="page-title">New Blog</h3>
-        <div className="underline"></div>
+        <div className="heading-underline"></div>
         <ToastContainer />
         {/* {alert && (
           <Alert

@@ -10,7 +10,6 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import "./Settings.css";
 
 const Settings = () => {
   const [user, setUser] = useState(null);
@@ -78,13 +77,13 @@ const Settings = () => {
   }
 
   return (
-    <div className="new-page-container">
+    <section className="newpage-section">
       <Helmet>
         <title>Settings - BloggerSpace</title>
       </Helmet>
-      <Container className="settingspage">
+      <Container>
       <h3 className="page-title">Settings</h3>
-        <div className="underline"></div>
+        <div className="heading-underline"></div>
         {/* Account deletion success alert */}
         {deleteSuccess && (
           <Alert
@@ -107,7 +106,7 @@ const Settings = () => {
                 <p>
                   <strong>Email:</strong> {user.email}
                 </p>
-                <div className="verification-status">
+                <div>
                   <strong>Verification Status:</strong>{" "}
                   {user.isVerified ? "Verified" : "Not Verified"}
                   {!user.isVerified && (
@@ -155,7 +154,7 @@ const Settings = () => {
           </Modal.Footer>
         </Modal>
       </Container>
-    </div>
+    </section>
   );
 };
 

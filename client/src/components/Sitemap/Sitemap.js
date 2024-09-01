@@ -9,7 +9,6 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import { Helmet } from "react-helmet";
-import "./Sitemap.css";
 
 const Sitemap = () => {
   const [blogs, setBlogs] = useState(null);
@@ -37,13 +36,13 @@ const Sitemap = () => {
   // }
 
   return (
-    <div className="new-page-container">
+    <div className="newpage-section">
       <Helmet>
         <title>Sitemap - BloggerSpace</title>
       </Helmet>
         <Container>
           <h3 className="page-title">Sitemap</h3>
-          <div className="underline"></div>
+          <div className="heading-underline"></div>
           <div className="col-md-6 col-sm-8">
             <section>
               <h6>Main Pages</h6>

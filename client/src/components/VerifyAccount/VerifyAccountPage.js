@@ -5,7 +5,6 @@ import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import "./VerifyAccountPage.css";
 
 function VerifyAccountPage() {
   const location = useLocation();
@@ -89,11 +88,11 @@ function VerifyAccountPage() {
   };
 
   return (
-    <div>
+    <section className="newpage-section">
       <Helmet>
         <title>Verify account - BloggerSpace</title>
       </Helmet>
-      <div className="verify-account-page">
+      <div>
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-md-6 col-sm-8">
@@ -137,7 +136,7 @@ function VerifyAccountPage() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

@@ -3,20 +3,19 @@ import { Container, Card, Button, Badge, Stack } from "react-bootstrap";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import "./WritingGuidelines.css";
 
 const WritingGuidelines = () => {
   return (
-    <div className="new-page-container">
+    <div className="newpage-section">
       <Helmet>
         <title>Writing Guidelines - BloggerSpace</title>
       </Helmet>
       <Container>
       <h3 className="page-title">Writing Guidelines</h3>
-        <div className="underline"></div>
-        <Card>
+        <div className="heading-underline"></div>
+        <Card className="bgcolor-mint">
           <Card.Body>
-            <div className="guidelines-section">
+            <div>
               <h6>
                 Please remember the below guidelines before writing any blog.
               </h6>
@@ -31,7 +30,7 @@ const WritingGuidelines = () => {
                 </li>
                 <li>
                   If you are still having a query then drop a mail to:{" "}
-                  <a href="mailto:contact.singhteekam@gmail.com">
+                  <a href="mailto:singhteekam.in@gmail.com">
                     singhteekam.in@gmail.com
                   </a>
                 </li>

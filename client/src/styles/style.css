@@ -1,0 +1,603 @@
+/* BACKUP */
+    /* --color-teal-green: #167d7f;  heading */
+    /* --color-teal: #29a0b1;  buttoncolor */
+    /* --color-mint:#ddffe7;   bg color */
+    /* --color-spearmint: #98d7c2;  bg color */
+
+/* BACKUP */
+
+html {
+    --color-teal-green: #167d7f;  /* heading */
+    --color-teal: #29a0b1;  /* buttoncolor */
+    --color-mint:#ddffe7;   /* bg color */
+    --color-spearmint: #98d7c2;  /* bg color */
+
+  }
+
+  .color-teal-green{
+    color: var(--color-teal-green) !important;
+  }
+  .color-teal{
+    color: var(--color-teal) !important;
+  }
+  .color-mint{
+    color: var(--color-mint) !important;
+  }
+  .color-spearmint{
+    color: var(--color-spearmint) !important;
+  }
+  .bgcolor-teal-green{
+    background-color: var(--color-teal-green) !important;
+  }
+  .bgcolor-teal{
+    background-color: var(--color-teal) !important;
+  }
+  .bgcolor-mint{
+    background-color: var(--color-mint) !important;
+  }
+  .bgcolor-spearmint{
+    background-color: var(--color-spearmint) !important;
+  }
+  
+
+.newpage-section{
+    min-height: 100vh;
+    margin-top: 80px;
+    margin-bottom: 10px;
+}
+
+
+.page-title{
+    color: var(--color-teal-green);
+    font-size: 25px;
+}
+
+.new-section-heading{
+    color: var(--color-teal-green);
+    font-size: 20px;
+}
+
+.bs-button{
+    background-color: var(--color-teal) !important;
+    color: white !important;
+}
+
+.bs-button-outline{
+    background-color: var(--color-mint) !important;
+    color: var(--color-teal) !important;
+    border: 2px solid var(--color-teal) !important;
+}
+.bs-button-outline:hover{
+    background-color: var(--color-teal) !important;
+    color: white !important;
+    border: 2px solid var(--color-teal) !important;
+}
+
+.heading-underline{
+    height: 4px;
+    width: 4rem;
+    background-color: var(--color-teal-green);
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.page-new-section{
+    padding-top: 40px;
+    padding-bottom: 40px;
+    border-top: var(--color-teal-green);
+}
+
+
+/*=============*/
+/*  Header  */
+/* =========== */
+.header-section{
+    margin-bottom: 25px !important;
+}
+
+
+/*=============*/
+/*  Homepage  */
+/* =========== */
+
+.carousel-image{
+    width: 100%;
+    min-height: 250px;
+    background-color: var(--color-mint);
+    /* background-image: url("./../assets/bs_bg_img.svg"); */
+    /* background-repeat: no-repeat; */
+}
+
+.homepage-blogs {
+    
+    display: flex;
+    flex-direction: row;
+}
+
+.container {
+    /* max-width: 900px; */
+    max-width: 100%;
+}
+
+
+
+.underline{
+    height: 4px;
+    width: 4rem;
+    background-color: #f76c2f;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.bgcolor{
+    background-color: #f2f2f2;
+}
+
+.blogitem{
+    background-color: lightgray;
+}
+
+.blogitem:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    transform: translateY(-5px);
+    background-color: skyblue;
+}
+
+
+.cardbody{
+    background-image: url('https://source.unsplash.com/random?blue sky');
+}
+
+.reviews-card{
+    margin-bottom: 5px;
+    min-height: 550px;
+}
+.review-card-img{
+    width: 100%; /* Make the image fill the container width */ 
+    height: 250px; /* Make the image fill the container height */ 
+    object-fit: cover;
+}
+
+.logos{
+    position: relative;
+    width: 100vw;
+    max-width: 100%;
+    height: 100px;
+    overflow-x: hidden;
+}
+
+.logos-slide{
+    position: absolute;
+    white-space: nowrap;
+
+}
+.logos-slide img{
+    height: 60px;
+    margin: 0 30px;
+}
+
+.myroundimg{
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    /* width: 100%; */
+}
+
+.loader {
+    border: 16px solid #e3e3e3;
+    border-top: 16px solid rgb(77, 238, 68);
+    border-radius: 50%;
+    width: 140px;
+    height: 140px;
+    animation: spin 1s ease-in infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+@media only screen and (max-width:760px) {
+    .homepage-blogs{
+        flex-direction: column;
+    }
+}
+
+
+/*=============*/
+/*  AllBlogs  */
+/* =========== */
+
+
+.blogcard{
+    min-height: 200px;
+}
+
+.blogcard-container {
+    position: relative;
+    text-align: center;
+    color: white;
+  }
+
+  .blogcard-container-img{
+    width: 100%;
+    height: 120px;
+  }
+
+  .blogcard-container-text {
+    font-size: 25px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .react-select-dropdown{
+    max-width: 300px;
+  }
+
+
+  /*=============*/
+/*  ViewBlog  */
+/* =========== */
+
+.view-blog-card {
+    padding: 20px;
+}
+
+.viewblog-img {
+    width: 50px;
+    /* Adjust the width as needed */
+    height: 50px;
+    /* Adjust the height as needed */
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: var(--color-teal-green);
+    transform-origin: 0%;
+  }
+  
+  /*=============*/
+/*  AbouDeveloper  */
+/* =========== */
+
+.profile-picture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*=============*/
+/*  ViewCommunity Post  */
+/* =========== */
+
+.viewcommynitypost-img {
+  width: 50px;
+  /* Adjust the width as needed */
+  height: 50px;
+  /* Adjust the height as needed */
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+/*=============*/
+/*  AboutBloggerSPace  */
+/* =========== */
+
+.about-bloggerspace{
+  min-height: 100vh;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0 10px;
+}
+
+.about-bloggerspace div{
+  margin: 5px;
+}
+
+
+@media screen and (max-width:760px) {
+  .about-bloggerspace{
+      flex-wrap: wrap;
+  }
+}
+
+/*=============*/
+/*  LoginPage  */
+/* =========== */
+
+
+.login-page {
+  background-color: #f2f2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.loginpage-image{
+  width: 100%;
+}
+.lock-icon{
+  width: 100%;
+  font-size: 400px;
+}
+
+@media only screen and (max-width:760px) {
+  .lock-icon{
+    width: 100%;
+    font-size: 150px;
+  }
+}
+
+.login-form {
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.password-input {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #999;
+  cursor: pointer;
+}
+
+.toggle-password:hover {
+  color: #333;
+}
+
+
+.login-form .loginbutton {
+  margin-top: 20px;
+}
+
+.login-form .forgotpassbutton{
+  margin-top: 20px;
+  margin-left: 5px;
+}
+
+/*=============*/
+/*  SignUp Page  */
+/* =========== */
+
+.signup-form {
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.password-input, .confirmpassword-input {
+  position: relative;
+}
+
+.signup-form .password-input i {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #999;
+  cursor: pointer;
+}
+
+.signup-form .password-input i:hover {
+  color: #333;
+}
+
+
+.signup-form .confirmpassword-input {
+  position: relative;
+}
+
+.signup-form .confirmpassword-input i {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #999;
+  cursor: pointer;
+}
+
+.signup-form .confirmpassword-input i:hover {
+  color: #333;
+}
+
+
+/*=============*/
+/*  MyProfile  */
+/* =========== */
+
+
+.profile-picture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-picture img {
+  width: 150px;
+  /* Adjust the width as needed */
+  height: 150px;
+  /* Adjust the height as needed */
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 4px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.custom-file-upload:hover {
+  background-color: #45a049;
+}
+
+.custom-file-upload input[type="file"] {
+  display: none;
+}
+
+
+
+/*=============*/
+/*  NewBlog  */
+/* =========== */
+
+.editor-wrapper {
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.editor-content {
+  min-height: 200px;
+  padding: 10px;
+  border: none;
+}
+
+.editor-toolbar {
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.submit-newblog {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.newblogfields {
+  margin-top: 10px;
+}
+
+
+/*=============*/
+/*  EditBlog  */
+/* =========== */
+
+
+.submit-editedblog {
+  margin-top: 10px;
+}
+.goback-editedblog {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.editblogfields {
+  margin-top: 10px;
+}
+
+/*=============*/
+/*  SavedBlogs  */
+/* =========== */
+
+
+.savedblogs-items{
+  display: grid;
+  /* grid-template-columns: 1fr 1fr 1fr; */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  /* background-color: #04AA6D; */
+  padding: 10px;
+  margin: 10px;
+}
+
+.savedblogs-items a{
+  color: black;
+  cursor: pointer;
+}
+
+.savedblogs-card{
+  background-color: lightgray;
+}
+
+.savedblogs-card:hover{
+  background-color: lightgreen;
+}
+.savedblogs-card a:hover{
+  color: blue;
+}
+
+.card-footer2{
+  color: black;
+  background-color: darkgray;
+  cursor: pointer;
+}
+.card-footer2:hover{
+  background-color: rgb(233, 185, 185);
+}
+
+@media only screen and (max-width:760px) {
+  .savedblogs-items{
+      grid-template-columns: auto;
+  } 
+}
+
+
+/*=============*/
+/*  VerifyAccount Page  */
+/* =========== */
+
+.verify-account-page {
+  background-color: #f2f2f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+}
+
+.verify-account-form {
+  background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+}
+
+.verify-button{
+  margin-top: 20px;
+}
+.resend-link-button {
+  margin-top: 20px;
+  margin-left: 10px
+}
+
+/*=============*/
+/*  Password Pages  */
+/* =========== */
+
+.password-page-container{
+  max-width: 500px !important;
+}

@@ -28,7 +28,6 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { IoBookmarkOutline, IoBookmark } from "react-icons/io5";
 import { FaEye, FaReply } from "react-icons/fa";
-import "./ViewBlog.css";
 import LoginPageModal from "../../../utils/LoginPageModal";
 import PageNotFound from "../../PageNotFound/PageNotFound";
 import { motion, useScroll, useSpring } from "framer-motion";
@@ -350,7 +349,7 @@ const ViewBlog = () => {
   }
 
   return (
-    <div>
+    <section className="newpage-section">
       
       <Helmet>
         <meta name="description" content={stripHtmlTags(blog?.content)} />
@@ -370,7 +369,7 @@ const ViewBlog = () => {
       </Helmet>
 
       {blog && (
-        <Container className="view-blog-container">
+        <Container>
           {/* <h4>{window.location.href}</h4> */}
           {/* <h2 className="view-blog-heading">View Blog</h2> */}
 
@@ -415,7 +414,7 @@ const ViewBlog = () => {
               <FaEye size="20px" /> {blog.blogViews} views
             </h6>
             <div>
-              <Link className="btn btn-outline-success" 
+              <Link className="btn bs-button-outline" 
               // to={`/improveblog/${blog.blogId}`}
               to="#"
               >
@@ -562,7 +561,7 @@ const ViewBlog = () => {
             </FacebookMessengerShareButton>
           </div>
 
-          <div className="comments-section mt-4">
+          <div className="mt-4 p-2 bgcolor-mint">
             <h5>
               <b>Comments:</b>
             </h5>
@@ -613,7 +612,7 @@ const ViewBlog = () => {
                         </small>
                       </div>
                     )}
-                    <p className="comment-content mx-2">{comment.content}</p>
+                    <p className="mx-2">{comment.content}</p>
                     <small
                       style={{ cursor: "pointer" }}
                       onClick={() => {
@@ -715,7 +714,8 @@ const ViewBlog = () => {
                             <Button
                               type="submit"
                               size="sm"
-                              variant="success mt-2"
+                              variant="mt-2"
+                              className="bs-button"
                             >
                               Submit
                             </Button>
@@ -768,7 +768,7 @@ const ViewBlog = () => {
           </div>
         </Container>
       )}
-    </div>
+    </section>
   );
 };
 

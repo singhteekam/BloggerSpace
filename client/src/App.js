@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import LoginPage from "./components/LoginPage/LoginPage.js";
 import SignupPage from "./components/SignUpPage/SignupPage.js";
@@ -48,7 +48,7 @@ const App = () => {
 
           <meta
             name="keywords"
-            content="blogging, blogs, technicalblogs, teekam, singhteekam, singh_teekam, singh__teekam, bloggerspace, bloggingwebsite, articles "
+            content="blogging, blogs, technicalblogs, teekam, singhteekam, singh_teekam, singh__teekam, bloggerspace, bloggingwebsite, articles, technical, tcs, abes, react "
           />
           <meta name="apple-mobile-web-app-title" content="BloggerSpace" />
 
@@ -115,6 +115,7 @@ const App = () => {
             <Route path="/community/post/:communityPostId/:communityPostSlug" element={<ViewCommunityPost />} />
 
             <Route path="/auth-success" element={<AuthSuccess />} />
+            <Route path="*" element={<Navigate to="/" />} />
             {/* <Route element={<PageNotFound />} /> */}
           </Routes>
         </main>

@@ -15,7 +15,6 @@ import {
 import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
 import TinymceEditor from "../../../utils/TinymceEditor";
 import axios from "axios";
-import "./EditBlog.css";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
@@ -233,12 +232,13 @@ const EditBlog = () => {
   }
 
   return (
-    <div>
+    <section className="newpage-section">
       <Helmet>
         <title>Edit Blog - {title}</title>
       </Helmet>
-      <Container className="editblogpage">
-        <h2 className="edit-blog-heading">Edit Blog</h2>
+      <Container>
+        <h2 className="page-title">Edit Blog</h2>
+        <div className="heading-underline"></div>
         <ToastContainer />
         {/* {alert && (
           <Alert
@@ -453,7 +453,7 @@ const EditBlog = () => {
           </Modal.Footer>
         </Modal>
       </Container>
-    </div>
+    </section>
   );
 };
 

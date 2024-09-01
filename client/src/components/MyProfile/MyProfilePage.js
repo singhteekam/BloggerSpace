@@ -14,7 +14,7 @@ import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
 import ImageCompressor from "image-compressor.js";
 import { MdVerified } from "react-icons/md";
-import "./MyProfilePage.css";
+
 
 const MyProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -184,13 +184,13 @@ const MyProfilePage = () => {
   // };
 
   return (
-    <div className="new-page-container">
+    <section className="newpage-section">
       <Helmet>
         <title>My Profile - BloggerSpace</title>
       </Helmet>
-      <Container className="my-profile-page">
+      <Container>
       <h3 className="page-title">My Profile</h3>
-        <div className="underline"></div>
+        <div className="heading-underline"></div>
 
         <Card>
           <Card.Body>
@@ -338,7 +338,7 @@ const MyProfilePage = () => {
           </Modal.Footer>
         </Modal>
       </Container>
-    </div>
+    </section>
   );
 };
 

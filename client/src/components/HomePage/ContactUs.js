@@ -32,12 +32,12 @@ const ContactUs = () => {
   return (
     <div>
       <div>
-        <section className="section2">
+        <section className="page-new-section">
           {/* <ToastContainer /> */}
           <Container>
-            <h3 className="section2heading text-center">Contact Us</h3>
-            <div className="underline mx-auto mb-3"></div>
-            <Card className="shadow">
+            <h3 className="new-section-heading text-center">Contact Us</h3>
+            <div className="heading-underline mx-auto mb-3"></div>
+            <Card className="shadow bgcolor-mint">
               <Card.Body>
                 <Row>
                   <Col md={6}>
@@ -93,7 +93,7 @@ const ContactUs = () => {
                       </Form.Group>
 
                       <Link
-                        className="w-100 my-2 btn btn-success"
+                        className="w-100 my-2 btn bs-button"
                         block
                         onClick={handleSubmit}
                       >
@@ -109,7 +109,7 @@ const ContactUs = () => {
                     </b>
                     <br />
                     <Button
-                      variant="outline-success"
+                      className="bs-button-outline"
                       size="sm"
                       onClick={() => {
                         navigator.clipboard.writeText(

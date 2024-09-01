@@ -1,11 +1,11 @@
 import React from "react";
-import "./AboutBloggerSpace.css";
 
 const AboutBloggerSpace = () => {
   return (
-    <div>
+    <section className="newpage-section">
       <div>
-        <h2 className="my-profile-heading mx-3">About</h2>
+        <h2 className="page-title mx-3">About</h2>
+        <div className="heading-underline mx-3"></div>
       </div>
       <div className="about-bloggerspace">
         <div>
@@ -47,7 +47,7 @@ const AboutBloggerSpace = () => {
           </ul>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

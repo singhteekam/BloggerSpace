@@ -3,20 +3,19 @@ import { Container, Card, Button, Badge, Stack } from "react-bootstrap";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import "./AboutDeveloper.css";
 
 function AboutDeveloper() {
   return (
-    <div className="new-page-container">
+    <section className="newpage-section">
       <Helmet>
         <title>About Developer - BloggerSpace</title>
       </Helmet>
-      <Container className="developer-page">
+      <Container>
         <h2 className="page-title">About Developer</h2>
-        <div className="underline"></div>
-        <Card>
+        <div className="heading-underline"></div>
+        <Card className="bgcolor-mint">
           <Card.Body>
-            <div className="profile-section">
+            <div>
               <div className="profile-picture">
                 <img
                   // src="https://avatars.githubusercontent.com/u/55067104?s=400&u=804fb40a8cbd314f8ec4bb37c4091946780b1ac2&v=4"
@@ -25,7 +24,7 @@ function AboutDeveloper() {
                 />
                 <h4>Teekam Singh</h4>
               </div>
-              <div className="profile-details">
+              <div>
                 <p>
                   Hello, I’m Teekam Singh currently working in Tata Consultancy
                   Services(TCS) having 2+ years of Experience and completed my
@@ -83,7 +82,7 @@ function AboutDeveloper() {
           </Card.Body>
         </Card>
       </Container>
-    </div>
+    </section>
   );
 }
 

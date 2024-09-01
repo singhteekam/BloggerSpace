@@ -15,7 +15,6 @@ import {
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
-import "./MyBlogs.css";
 
 const MyBlogs = () => {
   const [userProfile, setUserProfile] = useState(null);
@@ -145,13 +144,14 @@ const MyBlogs = () => {
   }
 
   return (
-    <div>
+    <section className="newpage-section">
       <Helmet>
         <title>My Blogs - BloggerSpace</title>
       </Helmet>
       {/* <Container className="myblogs-page col-lg-7"> */}
-      <Container className="myblogs-page">
-        <h2 className="myblogs-heading">My Blogs</h2>
+      <Container>
+        <h2 className="page-title">My Blogs</h2>
+        <div className="heading-underline"></div>
 
         <ToastContainer />
 
@@ -475,7 +475,7 @@ const MyBlogs = () => {
           </Tab>
         </Tabs>
       </Container>
-    </div>
+    </section>
   );
 };
 

@@ -4,7 +4,7 @@ import Select from "react-select";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import "./CommunityPage.css";
+
 import "tinymce/skins/content/default/content.css";
 import "tinymce/skins/ui/oxide/skin.min.css";
 import "tinymce/skins/ui/oxide/content.min.css"; // Main content styles
@@ -92,7 +92,7 @@ const Community = () => {
   };
 
   return (
-    <div className="new-page-container">
+    <section className="newpage-section">
       <Helmet>
         <title>Community - BloggerSpace</title>
       </Helmet>
@@ -101,7 +101,7 @@ const Community = () => {
       <div>
         <ToastContainer />
         <h3 className="page-title">Community</h3>
-        <div className="underline"></div>
+        <div className="heading-underline"></div>
         <Form>
           <Form.Group controlId="topic" className="topicfield">
             <Form.Label>
@@ -151,16 +151,15 @@ const Community = () => {
           <Button
             type="submit"
             onClick={handlePostSubmit}
-            variant="success"
+            className="bs-button"
             size="sm"
             disabled={userInfo === null ? true : false}
           >
             Post
           </Button>
           <Button
-            variant="secondary"
             size="sm"
-            className="mx-2"
+            className="mx-2 bs-button-outline"
             onClick={() => navigate(-1)}
           >
             Go back
@@ -179,6 +178,7 @@ const Community = () => {
       </small>
       <br />
       <button
+      className="btn bs-button-outline"
         onClick={() =>{
           navigator.clipboard.writeText(`
           <div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;">
@@ -238,7 +238,7 @@ const Community = () => {
 
       </Container>
 
-    </div>
+    </section>
   );
 };
 

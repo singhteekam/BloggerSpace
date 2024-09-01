@@ -8,7 +8,7 @@ import {
   OverlayTrigger,
   Button,
 } from "react-bootstrap";
-import "./Footer.css";
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -105,11 +105,11 @@ const Footer = () => {
     //     </div>
     //   </div>
     // </footer>
-    <section className="section2 footer bg-dark text-white">
+    <section className="page-new-section footer bgcolor-teal-green text-white">
       <Container>
         <Row>
           <Col md={4}>
-              <h6 class="footer-headings">BloggerSpace</h6>
+              <h6 class="color-mint">BloggerSpace</h6>
               <hr />
               <p className="text-white">
               A blogging website where users can write a blog on any topic.
@@ -118,16 +118,16 @@ const Footer = () => {
               </p>
           </Col>
           <Col md={4}>
-              <h6 class="footer-headings">Quick Links:</h6>
+              <h6 class="color-mint">Quick Links:</h6>
               <hr />      
-              <div><Link to="#"  className="footer-row1-item"><b>Home</b></Link></div>
-              <div><Link to="/blogs" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Blogs</b></Link></div>
-              <div><Link to="/about" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>About</b></Link></div>
-              <div><Link to="/privacypolicy" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Privacy Policy</b></Link></div>
-              <div className="mb-2"><Link to="/termsandconditions" className="footer-row1-item" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Terms & Conditions</b></Link></div>
+              <div><Link to="#"  className="color-mint text-decoration-none"><b>Home</b></Link></div>
+              <div><Link to="/blogs" className="color-mint text-decoration-none" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Blogs</b></Link></div>
+              <div><Link to="/about" className="color-mint text-decoration-none" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>About</b></Link></div>
+              <div><Link to="/privacypolicy" className="color-mint text-decoration-none" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Privacy Policy</b></Link></div>
+              <div className="mb-2"><Link to="/termsandconditions" className="color-mint text-decoration-none" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Terms & Conditions</b></Link></div>
           </Col>
           <Col md={4}>
-              <h6 class="footer-headings">Contact Information</h6>
+              <h6 class="color-mint">Contact Information</h6>
               <hr />
               <ul className="list-inline">
             <li className="list-inline-item">
@@ -135,18 +135,18 @@ const Footer = () => {
                 target="_blank"
                 href="https://in.linkedin.com/in/teekam-singh-26476a185"
               >
-                <i className="fab fa-linkedin fa-lg"></i>
+                <i className="fab fa-linkedin fa-lg color-mint"></i>
               </a>
             </li>
             <li className="list-inline-item mx-2">
               <a target="_blank" href="https://github.com/singhteekam">
-                <i className="fab fa-github fa-lg"></i>
+                <i className="fab fa-github fa-lg color-mint"></i>
               </a>
             </li>
             <li className="list-inline-item mx-2">
               <a target="_blank" href="mailto:singhteekam.in@gmail.com">
                 {/* <i className="fab fa-facebook fa-lg"></i> */}
-                <i className="fa fa-envelope fa-lg"></i>
+                <i className="fa fa-envelope fa-lg color-mint"></i>
               </a>
             </li>
             <li className="list-inline-item mx-2">
@@ -154,7 +154,7 @@ const Footer = () => {
                 target="_blank"
                 href="https://www.instagram.com/singh__teekam/"
               >
-                <i className="fab fa-instagram fa-lg"></i>
+                <i className="fab fa-instagram fa-lg color-mint"></i>
               </a>
             </li>
 

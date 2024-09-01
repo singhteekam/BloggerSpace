@@ -8,13 +8,13 @@ import {
   Col,
   FloatingLabel,
 } from "react-bootstrap";
-import "./SignupPage.css";
 import { ToastContainer, toast } from "react-toastify";
 
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
+import { CiLock } from "react-icons/ci";
 
 function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -121,7 +121,7 @@ function SignupPage() {
   };
 
   return (
-    <div className="new-page-container">
+    <div className="newpage-section">
       <Helmet>
         <title>Sign up - BloggerSpace</title>
       </Helmet>
@@ -129,11 +129,12 @@ function SignupPage() {
       <Container>
         <Row className="pt-3">
           <Col md={6}>
-            <img
+            {/* <img
               src="assets/signup.png"
               // src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9bb9Mz7yTmUO-Ky9T9pTXHb2W5cUW9_L4FWcxCyGq5A&s"
               className="loginpage-image"
-            />
+            /> */}
+            <CiLock className="lock-icon" />
           </Col>
           <Col md={6}>
             <div className="signup-form">

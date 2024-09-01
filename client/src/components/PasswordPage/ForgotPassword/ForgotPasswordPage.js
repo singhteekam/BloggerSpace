@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Form, Button, Alert, Spinner } from "react-bootstrap";
+import { Form, Button, Alert, Spinner, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 import { Helmet } from "react-helmet";
-import "./ForgotPasswordPage.css";
 
 function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -49,16 +48,16 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div>
+    <section className="newpage-section">
       <Helmet>
         <title>Forgot password - BloggerSpace</title>
       </Helmet>
-      <div className="forgot-password-page">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-md-6 col-sm-8">
-              <div className="forgot-password-form">
-                <h2 className="text-center mb-4">Forgot Password</h2>
+      <div>
+      <Container className="bgcolor-mint password-page-container">
+        <Row>
+          <Col md={12} sm={12}>
+            <div>
+                <h2 className="page-title text-center">Forgot Password</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
                 {success && <Alert variant="success">{success}</Alert>}
                 <Form onSubmit={handleSubmit}>
@@ -76,7 +75,8 @@ function ForgotPasswordPage() {
                   <Button
                     variant="primary"
                     type="submit"
-                    className="forgot-password-button"
+                    className="bs-button my-2"
+                    size="sm"
                     block
                     disabled={loading}
                   >
@@ -88,11 +88,11 @@ function ForgotPasswordPage() {
                   </Button>
                 </Form>
               </div>
-            </div>
-          </div>
-        </div>
+          </Col>
+        </Row>
+      </Container>
       </div>
-    </div>
+    </section>
   );
 }
 

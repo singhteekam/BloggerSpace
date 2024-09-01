@@ -4,7 +4,7 @@ import Select from "react-select";
 import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import "./CommunityPage.css";
+
 import "tinymce/skins/content/default/content.css";
 import "tinymce/skins/ui/oxide/skin.min.css";
 import "tinymce/skins/ui/oxide/content.min.css"; // Main content styles
@@ -123,7 +123,7 @@ const ViewCommunityPost = () => {
   };
 
   return (
-    <div className="new-page-container">
+    <div className="newpage-section">
       <Helmet>
         <meta
           name="description"
@@ -151,7 +151,7 @@ const ViewCommunityPost = () => {
         <Container>
           {/* <h4>{window.location.href}</h4> */}
           <h3 className="page-title">View Community post</h3>
-        <div className="underline"></div>
+        <div className="heading-underline"></div>
           
           <ToastContainer />
           <Card className="view-blog-card">
@@ -262,7 +262,7 @@ const ViewCommunityPost = () => {
             <br />
             {userInfo===null?<b>You are not logged in. Please login to post your response.</b>:false} <br />
             <Button
-              variant="success"
+              className="bs-button"
               size="sm"
               onClick={handleCommunityPostReply}
               disabled={userInfo===null?true:false}
