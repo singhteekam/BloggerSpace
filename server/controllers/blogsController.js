@@ -92,6 +92,21 @@ exports.fetchAllBlogs = async (req, res) => {
   }
 };
 
+exports.fetchMostViewedBlogs = async (req, res) => {
+
+  try {
+    const blogs = await Blog.find({ status: "PUBLISHED" }).limit(15).sort({ blogViews: -1 })
+      .populate("authorDetails") // Populate the author field with the User document
+      .exec();
+
+    res.json(blogs);
+  } catch (error) {
+    logger.error("Error fetching most viewed blogs..:"+ error);
+    console.error("Error fetching most viewed blogs..:", error);
+    res.status(500).json({ error: "Server error.." });
+  }
+};
+
 exports.fetchBlogByBlogId = async (req, res) => {
   try {
     const blog = await Blog.findOne({

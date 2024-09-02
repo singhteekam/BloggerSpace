@@ -50,7 +50,7 @@ const UserProfile = () => {
       </Helmet>
       <Container>
         <h2 className="page-title">User Profile</h2>
-        <Card>
+        <Card className="bgcolor-mint">
           <Card.Body>
             <Card.Title>{fullName}</Card.Title>
             <Card.Text>

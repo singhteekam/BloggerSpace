@@ -31,6 +31,7 @@ import { FaEye, FaReply } from "react-icons/fa";
 import LoginPageModal from "../../../utils/LoginPageModal";
 import PageNotFound from "../../PageNotFound/PageNotFound";
 import { motion, useScroll, useSpring } from "framer-motion";
+import ViewBlogRightSection from "./ViewBlogRightSection";
 
 const ViewBlog = () => {
   const { blogSlug } = useParams();
@@ -313,10 +314,10 @@ const ViewBlog = () => {
     }
   };
 
-  if (loading) {
+  if (loading || disableLikeButton) {
     return (
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="primary" />
+      <Container className="loading-container">
+        <div className="loader"></div>
       </Container>
     );
   }
@@ -350,6 +351,7 @@ const ViewBlog = () => {
 
   return (
     <section className="newpage-section">
+      <ToastContainer />
       
       <Helmet>
         <meta name="description" content={stripHtmlTags(blog?.content)} />
@@ -368,12 +370,13 @@ const ViewBlog = () => {
         />
       </Helmet>
 
+      <Container>
       {blog && (
-        <Container>
+        <div className="viewblog-flex">
+          <div className="viewblog-flex1">
           {/* <h4>{window.location.href}</h4> */}
           {/* <h2 className="view-blog-heading">View Blog</h2> */}
 
-          <ToastContainer />
           <Card className="view-blog-card">
             <Card.Body>
               <Card.Title>{blog?.title}</Card.Title>
@@ -766,8 +769,13 @@ const ViewBlog = () => {
               </p>
             )}
           </div>
-        </Container>
-      )}
+        </div>
+        <div className="viewblog-flex2 bgcolor-mint">
+           <ViewBlogRightSection />
+        </div>
+        </div>
+        )}
+      </Container>
     </section>
   );
 };

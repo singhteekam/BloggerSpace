@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button, Alert, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import "./ChangePasswordPage.css";
 
 function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState("");
@@ -118,86 +117,85 @@ function ChangePasswordPage() {
   };
 
   return (
-    <div>
+    <section className="newpage-section">
       <Helmet>
         <title>Change Password - BloggerSpace</title>
       </Helmet>
-      <div className="password-change-page">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-md-6 col-sm-8">
-              <div className="password-change-form">
-                <h2 className="text-center mb-4">Change Password</h2>
-                {error && <Alert variant="danger">{error}</Alert>}
-                {success && <Alert variant="success">{success}</Alert>}
-                <Form onSubmit={handleSubmit}>
-                  <Form.Group controlId="oldPassword">
-                    <Form.Label>Old Password</Form.Label>
-                    <Form.Control
-                      type={showOldPassword ? "text" : "password"}
-                      placeholder="Enter old password"
-                      value={oldPassword}
-                      onChange={handleOldPasswordChange}
-                      required
-                    />
-                    <i
-                      className={`toggle-password fas ${
-                        showOldPassword ? "fa-eye-slash" : "fa-eye"
-                      }`}
-                      onClick={toggleOldPasswordVisibility}
-                    ></i>
-                  </Form.Group>
-
-                  <Form.Group controlId="newPassword">
-                    <Form.Label>New Password</Form.Label>
-                    <Form.Control
-                      type={showNewPassword ? "text" : "password"}
-                      placeholder="Enter new password"
-                      value={newPassword}
-                      onChange={handleNewPasswordChange}
-                      required
-                    />
-                    <i
-                      className={`toggle-password fas ${
-                        showNewPassword ? "fa-eye-slash" : "fa-eye"
-                      }`}
-                      onClick={toggleNewPasswordVisibility}
-                    ></i>
-                  </Form.Group>
-
-                  <Form.Group controlId="confirmNewPassword">
-                    <Form.Label>Confirm Password</Form.Label>
-                    <Form.Control
-                      type={showConfirmNewPassword ? "text" : "password"}
-                      placeholder="Confirm new password"
-                      value={confirmNewPassword}
-                      onChange={handleConfirmNewPasswordChange}
-                      required
-                    />
-                    <i
-                      className={`toggle-password fas ${
-                        showConfirmNewPassword ? "fa-eye-slash" : "fa-eye"
-                      }`}
-                      onClick={toggleConfirmNewPasswordVisibility}
-                    ></i>
-                  </Form.Group>
-
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    className="password-change-button"
-                    block
-                    disabled={loading}
-                  >
-                    {loading ? "Changing Password..." : "Change Password"}
-                  </Button>
-                </Form>
+      <Container className="password-page-container">
+        <div className="password-change-form">
+          <h2 className="text-center mb-4">Change Password</h2>
+          {error && <Alert variant="danger">{error}</Alert>}
+          {success && <Alert variant="success">{success}</Alert>}
+          <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="oldPassword">
+              <Form.Label>Old Password</Form.Label>
+              <div className="password-input">
+              <Form.Control
+                type={showOldPassword ? "text" : "password"}
+                placeholder="Enter old password"
+                value={oldPassword}
+                onChange={handleOldPasswordChange}
+                required
+              />
+              <i
+                className={`toggle-password fas ${
+                  showOldPassword ? "fa-eye-slash" : "fa-eye"
+                }`}
+                onClick={toggleOldPasswordVisibility}
+              ></i>
               </div>
-            </div>
-          </div>
+            </Form.Group>
+
+            <Form.Group controlId="newPassword">
+              <Form.Label>New Password</Form.Label>
+              <div className="password-input">
+              <Form.Control
+                type={showNewPassword ? "text" : "password"}
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={handleNewPasswordChange}
+                required
+              />
+              <i
+                className={`toggle-password fas ${
+                  showNewPassword ? "fa-eye-slash" : "fa-eye"
+                }`}
+                onClick={toggleNewPasswordVisibility}
+              ></i>
+              </div>
+            </Form.Group>
+
+            <Form.Group controlId="confirmNewPassword">
+              <Form.Label>Confirm Password</Form.Label>
+              <div className="password-input">
+              <Form.Control
+                type={showConfirmNewPassword ? "text" : "password"}
+                placeholder="Confirm new password"
+                value={confirmNewPassword}
+                onChange={handleConfirmNewPasswordChange}
+                required
+              />
+              <i
+                className={`toggle-password fas ${
+                  showConfirmNewPassword ? "fa-eye-slash" : "fa-eye"
+                }`}
+                onClick={toggleConfirmNewPasswordVisibility}
+              ></i>
+              </div>
+            </Form.Group>
+
+            <Button
+              type="submit"
+              className="bs-button my-2"
+              block
+              disabled={loading}
+            >
+              {loading ? "Changing Password..." : "Change Password"}
+            </Button>
+          </Form>
         </div>
-      </div>
-    </div>
+      </Container>
+    </section>
   );
 }
 

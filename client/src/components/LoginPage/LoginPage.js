@@ -75,7 +75,7 @@ function LoginPage() {
             // Redirect to the homepage
             setTimeout(() => {
               navigate("/");
-            }, 500);
+            }, 2000);
           } else {
             setTimeout(() => {
               navigate("/verify-account", {
@@ -117,6 +117,7 @@ function LoginPage() {
   //     }
   //   });
   // };
+
 
   return (
     <div className="newpage-section">
@@ -184,7 +185,6 @@ function LoginPage() {
                 </Form.Group>
 
                 <Button
-                  variant="success"
                   type="submit"
                   className="bs-button"
                   block
@@ -192,7 +192,6 @@ function LoginPage() {
                   Login
                 </Button>
                 <Button
-                  variant="secondary"
                   type="submit"
                   onClick={() => navigate("/forgotpassword")}
                   className="bs-button-outline mx-1"

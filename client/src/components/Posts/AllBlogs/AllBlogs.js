@@ -18,7 +18,6 @@ import blogTags from "../../../utils/blogTags.json";
 
 import { FaEye, FaHeart } from "react-icons/fa";
 
-
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllBlog } from "../../../redux/slice/allblog";
 
@@ -43,9 +42,9 @@ const AllBlogs = () => {
   const [filterCategory, setFilterCategory] = useState(null);
   const navigate = useNavigate();
 
-  const [total, setTotal]= useState(0);
-  const [page, setPage]= useState(1);
-  const limit=6;
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const limit = 6;
 
   // const dispatch= useDispatch();
   // const state= useSelector((state)=>state.allblog);
@@ -53,7 +52,23 @@ const AllBlogs = () => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get(`/api/blogs/allblogs?page=${page}&limit=${limit}`);
+      const response = await axios.get(
+        `/api/blogs/allblogs?page=${page}&limit=${limit}`
+      );
+      setBlogs(response.data.blogs);
+      setTotal(response.data.total);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching Blogs:", error);
+    }
+  };
+
+  const fetchBlogsByCategory = async (filterCategory) => {
+    console.log(filterCategory);
+    try {
+      const response = await axios.get(
+        `/api/blogs/allblogs/category/${filterCategory}?page=${page}&limit=${limit}`
+      );
       setBlogs(response.data.blogs);
       setTotal(response.data.total);
       setIsLoading(false);
@@ -63,69 +78,37 @@ const AllBlogs = () => {
   };
 
   useEffect(() => {
-    // dispatch(fetchAllBlog());
-    // const fetchBlogs = async () => {
-    //   try {
-    //     const response = await axios.get("/api/blogs");
-    //     setBlogs(response.data);
-    //     setIsLoading(false);
-    //   } catch (error) {
-    //     console.error("Error fetching Blogs:", error);
-    //   }
-    // };
-    
-    fetchBlogs();
+    if (filterCategory) fetchBlogsByCategory();
+    else fetchBlogs();
   }, [page]);
-
-  const fetchBlogsByCategory = async (filterCategory) => {
-    console.log(filterCategory);
-    try {
-      const response = await axios.get(`/api/blogs/allblogs/category/${filterCategory}?page=${page}&limit=${limit}`);
-      setBlogs(response.data.blogs);
-      setTotal(response.data.total);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching Blogs:", error);
-    }
-  };
 
   if (isLoading) {
     return (
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        {/* <Spinner animation="border" variant="primary" /> */}
-        <div class="loader"></div>
+      <Container className="loading-container">
+        <div className="loader"></div>
       </Container>
     );
   }
 
-  // if (blogs.length === 0) {
-  //   return (
-  //     <Container className="d-flex justify-content-center align-items-center vh-100">
-  //       <div>Blogs not found.</div>
-  //     </Container>
-  //   );
-  // }
-
-  
   const prePage = () => {
-    if(page>1){
-      setPage(page-1);
+    if (page > 1) {
+      setPage(page - 1);
     }
   };
-  
+
   const changeCPage = (id) => {
     setPage(id);
   };
-  
+
   const nextPage = () => {
-    if(page<totalPages){
-      setPage(page+1);
+    if (page < totalPages) {
+      setPage(page + 1);
     }
   };
-  
-  const totalPages= Math.ceil(total/limit);
+
+  const totalPages = Math.ceil(total / limit);
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
-  
+
   return (
     <section className="newpage-section">
       <Container>
@@ -142,9 +125,25 @@ const AllBlogs = () => {
             onChange={setFilterCategory}
             options={blogCategory}
           />
-          
-          <Button variant="success" size="sm" onClick={()=>fetchBlogsByCategory(filterCategory.value)}>Search</Button>
-          <Button variant="danger" size="sm" className="mx-2" onClick={fetchBlogs}>Reset</Button>
+
+          <Button
+            variant="success"
+            size="sm"
+            onClick={() => fetchBlogsByCategory(filterCategory.value)}
+          >
+            Search
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
+            className="mx-2"
+            onClick={() => {
+              setFilterCategory(false);
+              fetchBlogs();
+            }}
+          >
+            Reset
+          </Button>
         </div>
 
         {blogs?.length === 0 ? (
@@ -176,7 +175,9 @@ const AllBlogs = () => {
                               className="blogcard-container-img"
                             /> */}
                             <div className="blogcard-container-img bgcolor-teal-green"></div>
-                            <div class="blogcard-container-text">{blog.category}</div>
+                            <div class="blogcard-container-text">
+                              {blog.category}
+                            </div>
                           </div>
                           <Card.Body>
                             <h6>{blog.title}</h6>
@@ -202,8 +203,15 @@ const AllBlogs = () => {
                                 , {blog.lastUpdatedAt.slice(0, 10)}
                               </i>
                               <br />
-                              <FaEye className="color-teal-green" /> <span className="color-teal-green">{blog.blogViews}{"  "}</span>
-                              <FaHeart className="color-teal-green" /> <span className="color-teal-green">{blog.blogLikes.length}</span>
+                              <FaEye className="color-teal-green" />{" "}
+                              <span className="color-teal-green">
+                                {blog.blogViews}
+                                {"  "}
+                              </span>
+                              <FaHeart className="color-teal-green" />{" "}
+                              <span className="color-teal-green">
+                                {blog.blogLikes.length}
+                              </span>
                             </p>
                           </Card.Body>
                         </Card>
@@ -222,9 +230,7 @@ const AllBlogs = () => {
                   </li>
                   {numbers.slice(0, 3).map((n, i) => (
                     <li
-                      className={`page-item ${
-                        page === n ? "active" : ""
-                      }`}
+                      className={`page-item ${page === n ? "active" : ""}`}
                       key={i}
                     >
                       <button
@@ -236,9 +242,7 @@ const AllBlogs = () => {
                     </li>
                   ))}
                   <li className="page-item">
-                    <button className="page-link">
-                      ...
-                    </button>
+                    <button className="page-link">...</button>
                   </li>
                   <li className="page-item">
                     <button

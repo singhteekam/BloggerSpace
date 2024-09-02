@@ -60,6 +60,7 @@ html {
 .bs-button{
     background-color: var(--color-teal) !important;
     color: white !important;
+    border: 1px solid var(--color-teal) !important;
 }
 
 .bs-button-outline{
@@ -85,6 +86,32 @@ html {
     padding-top: 40px;
     padding-bottom: 40px;
     border-top: var(--color-teal-green);
+}
+
+.loading-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.loader {
+  border: 16px solid #e3e3e3;
+  border-top: 16px solid var(--color-teal-green);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  animation: spin 1s ease-in infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 
@@ -184,25 +211,6 @@ html {
     /* width: 100%; */
 }
 
-.loader {
-    border: 16px solid #e3e3e3;
-    border-top: 16px solid rgb(77, 238, 68);
-    border-radius: 50%;
-    width: 140px;
-    height: 140px;
-    animation: spin 1s ease-in infinite;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
 @media only screen and (max-width:760px) {
     .homepage-blogs{
         flex-direction: column;
@@ -249,6 +257,48 @@ html {
 
 .view-blog-card {
     padding: 20px;
+}
+
+.viewblog-flex{
+  display: flex;
+  /* height: 100vh !important; */
+  /* overflow: hidden !important; */
+}
+.viewblog-flex1{
+  flex: 1;
+  overflow-y: auto;
+}
+.viewblog-flex2{
+  width: 350px;
+  margin: 20px ;
+  padding: 5px;
+  position: sticky; /* Fix the section to the viewport */
+    top: 10%; /* Stick to the top */
+    overflow-y: auto; 
+  height: 80vh;
+}
+
+@media screen and (max-width:760px) {
+  .viewblog-flex{
+      flex-direction: column;
+  }
+  .viewblog-flex2{
+    width: auto;
+    height: auto;
+  }
+}
+
+.view-blog-most-viewed ul{
+  list-style-type:circle;
+}
+
+.view-blog-most-viewed a{
+  text-decoration: none;
+}
+.view-blog-most-viewed a:hover{
+  font-size: 18px;
+  color: var(--color-teal-green);
+  font-weight: bold;
 }
 
 .viewblog-img {
@@ -600,4 +650,6 @@ html {
 
 .password-page-container{
   max-width: 500px !important;
+  background-color: var(--color-mint) !important;
+  padding: 10px !important;
 }

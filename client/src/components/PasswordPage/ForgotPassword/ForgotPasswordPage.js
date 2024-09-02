@@ -73,11 +73,9 @@ function ForgotPasswordPage() {
                   </Form.Group>
 
                   <Button
-                    variant="primary"
                     type="submit"
                     className="bs-button my-2"
                     size="sm"
-                    block
                     disabled={loading}
                   >
                     {loading ? (

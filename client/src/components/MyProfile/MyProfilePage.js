@@ -192,7 +192,7 @@ const MyProfilePage = () => {
       <h3 className="page-title">My Profile</h3>
         <div className="heading-underline"></div>
 
-        <Card>
+        <Card className="bgcolor-mint">
           <Card.Body>
             {uploadSuccess && (
               <Alert variant="success">
@@ -271,8 +271,7 @@ const MyProfilePage = () => {
                     </div>
 
                     <Button
-                      variant="success"
-                      className="goback-editedblog"
+                      className="bs-button"
                       onClick={handleshowEditPersonalDetailsModal}
                     >
                       Edit Personal Details
@@ -291,7 +290,7 @@ const MyProfilePage = () => {
           <Modal.Header closeButton>
             <Modal.Title>Personal Details</Modal.Title>
           </Modal.Header>
-          <Modal.Body>
+          <Modal.Body >
             {showError && <Alert variant="danger">{showError}</Alert>}
             {showSuccess && <Alert variant="success">{showSuccess}</Alert>}
             <b>Full Name:</b>
@@ -323,13 +322,13 @@ const MyProfilePage = () => {
 
           <Modal.Footer>
             <Button
-              variant="secondary"
+              className="bs-button-outline"
               onClick={() => setShowConfirmModal(false)}
             >
               Cancel
             </Button>
             <Button
-              variant="primary"
+              className="bs-button"
               onClick={updatePersonalDetails}
               disabled={!userNameAvailable}
             >
