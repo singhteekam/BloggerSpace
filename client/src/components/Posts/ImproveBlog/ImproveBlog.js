@@ -12,14 +12,14 @@ import {
   ListGroup,
   Accordion,
 } from "react-bootstrap";
-import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
-import TinymceEditor from "../../../utils/TinymceEditor";
+import { QuillEditor } from "components/QuillEditor/QuillEditor"; // Import the QuillEditor component
+import TinymceEditor from "utils/TinymceEditor";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
-import blogCategory from "../../../utils/blogCategory.json";
-import blogTags from "../../../utils/blogTags.json";
+import blogCategory from "utils/blogCategory.json";
+import blogTags from "utils/blogTags.json";
 
 import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import { CKEditor } from '@ckeditor/ckeditor5-react';

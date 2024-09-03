@@ -104,6 +104,10 @@ html {
   animation: spin 1s ease-in infinite;
 }
 
+.loader-none {
+  opacity: 0;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -296,7 +300,7 @@ html {
   text-decoration: none;
 }
 .view-blog-most-viewed a:hover{
-  font-size: 18px;
+  font-size: 15px;
   color: var(--color-teal-green);
   font-weight: bold;
 }

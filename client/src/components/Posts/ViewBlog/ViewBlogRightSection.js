@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { FaEye, FaHeart } from 'react-icons/fa';
 import { Link, Navigate } from 'react-router-dom';
 import { BsBoxArrowUpRight } from "react-icons/bs";
+import PreLoader from 'utils/PreLoader';
 
 const ViewBlogRightSection = () => {
 
@@ -25,7 +26,8 @@ const ViewBlogRightSection = () => {
     <div>
         <h4 className='page-title'>Most Viewed Blogs:</h4>
         <div className='view-blog-most-viewed'>
-            <ul>
+            {mostViewed===null? <PreLoader isLoading={true} />:
+                <ul>
                 {mostViewed && mostViewed.map((blog)=>(
                     <li key={blog}>
                         <Link to={`/${blog.slug}`} target='_blank'>{blog.title} <BsBoxArrowUpRight /></Link> <br />
@@ -34,6 +36,8 @@ const ViewBlogRightSection = () => {
                     </li>
                 ))}
             </ul>
+            }
+            
         </div>
     </div>
   )

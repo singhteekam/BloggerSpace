@@ -13,13 +13,15 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 import Select from "react-select";
-import blogCategory from "../../../utils/blogCategory.json";
-import blogTags from "../../../utils/blogTags.json";
+import blogCategory from "utils/blogCategory.json";
+import blogTags from "utils/blogTags.json";
 
 import { FaEye, FaHeart } from "react-icons/fa";
+import PreLoader from "utils/PreLoader";
+import { toast, ToastContainer } from "react-toastify";
 
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAllBlog } from "../../../redux/slice/allblog";
+// import { useDispatch, useSelector } from "react-redux";
+// import { fetchAllBlog } from "redux/slice/allblog";
 
 const blogItemVariant = {
   hover: {
@@ -52,6 +54,7 @@ const AllBlogs = () => {
 
   const fetchBlogs = async () => {
     try {
+      setIsLoading(true);
       const response = await axios.get(
         `/api/blogs/allblogs?page=${page}&limit=${limit}`
       );
@@ -84,9 +87,7 @@ const AllBlogs = () => {
 
   if (isLoading) {
     return (
-      <Container className="loading-container">
-        <div className="loader"></div>
-      </Container>
+      <PreLoader isLoading={isLoading} />
     );
   }
 
@@ -130,6 +131,7 @@ const AllBlogs = () => {
             variant="success"
             size="sm"
             onClick={() => fetchBlogsByCategory(filterCategory.value)}
+            disabled
           >
             Search
           </Button>
@@ -138,7 +140,7 @@ const AllBlogs = () => {
             size="sm"
             className="mx-2"
             onClick={() => {
-              setFilterCategory(false);
+              setFilterCategory(null);
               fetchBlogs();
             }}
           >

@@ -11,11 +11,12 @@ import "tinymce/skins/ui/oxide/content.min.css"; // Main content styles
 import "tinymce/skins/ui/oxide/content.inline.min.css"; // Inline content styles
 import "tinymce/skins/ui/oxide/skin.shadowdom.min.css";
 
-import TinymceEditor from "../../utils/TinymceEditor";
+import TinymceEditor from "utils/TinymceEditor";
 import { Button, Form, Card, ListGroup, Container } from "react-bootstrap";
 import blogCategory from "../../utils/blogCategory.json";
 
 import Editor from "ckeditor5-custom-build/build/ckeditor";
+// import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 
 const Community = () => {

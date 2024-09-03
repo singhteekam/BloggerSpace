@@ -11,7 +11,8 @@ import "tinymce/skins/ui/oxide/content.min.css"; // Main content styles
 import "tinymce/skins/ui/oxide/content.inline.min.css"; // Inline content styles
 import "tinymce/skins/ui/oxide/skin.shadowdom.min.css";
 
-import TinymceEditor from "./../../utils/TinymceEditor";
+// import TinymceEditor from "./../../utils/TinymceEditor";
+import TinymceEditor from "utils/TinymceEditor";
 import { Image } from "react-bootstrap";
 
 import {

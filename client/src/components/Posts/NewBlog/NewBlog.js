@@ -10,8 +10,8 @@ import {
   ListGroup,
   Accordion,
 } from "react-bootstrap";
-import { QuillEditor } from "../../QuillEditor/QuillEditor"; // Import the QuillEditor component
-import TinymceEditor from "../../../utils/TinymceEditor";
+import { QuillEditor } from "components/QuillEditor/QuillEditor"; // Import the QuillEditor component
+import TinymceEditor from "utils/TinymceEditor";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";

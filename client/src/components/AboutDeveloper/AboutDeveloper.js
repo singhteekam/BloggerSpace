@@ -3,7 +3,7 @@ import { Container, Card, Button, Badge, Stack } from "react-bootstrap";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-
+import myImg from "assets/my_image.jpg";
 function AboutDeveloper() {
   return (
     <section className="newpage-section">
@@ -19,7 +19,7 @@ function AboutDeveloper() {
               <div className="profile-picture">
                 <img
                   // src="https://avatars.githubusercontent.com/u/55067104?s=400&u=804fb40a8cbd314f8ec4bb37c4091946780b1ac2&v=4"
-                  src="/my_image.jpg"
+                  src={myImg}
                   alt="Profile"
                 />
                 <h4>Teekam Singh</h4>
