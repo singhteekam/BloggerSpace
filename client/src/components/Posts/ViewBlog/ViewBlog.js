@@ -31,7 +31,8 @@ import { FaEye, FaReply } from "react-icons/fa";
 import LoginPageModal from "../../../utils/LoginPageModal";
 import PageNotFound from "../../PageNotFound/PageNotFound";
 import { motion, useScroll, useSpring } from "framer-motion";
-import ViewBlogRightSection from "./ViewBlogRightSection";
+import ViewBlogRightSection from "./MostViewedBlogs";
+import TableOfContent from "./TOC/TableOfContent";
 
 const ViewBlog = () => {
   const { blogSlug } = useParams();
@@ -771,6 +772,7 @@ const ViewBlog = () => {
           </div>
         </div>
         <div className="viewblog-flex2 bgcolor-mint">
+           <TableOfContent />
            <ViewBlogRightSection />
         </div>
         </div>

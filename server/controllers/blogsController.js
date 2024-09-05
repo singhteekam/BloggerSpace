@@ -176,7 +176,7 @@ exports.addBlogViewsCounter= async (req, res)=>{
 exports.viewBlogRoute = async (req, res) => {
   try {    
     logger.debug("Searching for blog: "+ req.params.blogSlug);
-    console.log("Searching for blog: "+ req.params.blogSlug);
+    // console.log("Searching for blog: "+ req.params.blogSlug);
     const blog = await Blog.findOne({
       slug: req.params.blogSlug,
       status: "PUBLISHED",
@@ -201,11 +201,11 @@ exports.viewBlogRoute = async (req, res) => {
       to: "string",
     });
 
-    console.log(
-      "Content size:",
-      Buffer.byteLength(blog.content, "utf8") / 1024,
-      " KB"
-    );
+    // console.log(
+    //   "Content size:",
+    //   Buffer.byteLength(blog.content, "utf8") / 1024,
+    //   " KB"
+    // );
     logger.info("Blog: "+ blog.title+" fetched. Content size is: "+Buffer.byteLength(blog.content, "utf8") / 1024+" KB")
 
     // Assuming `content` is the original content string

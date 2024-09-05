@@ -5,7 +5,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import PreLoader from 'utils/PreLoader';
 
-const ViewBlogRightSection = () => {
+const MostViewedBlogs = () => {
 
     const [mostViewed, setMostViewed]= useState(null);
 
@@ -24,7 +24,7 @@ const ViewBlogRightSection = () => {
 
   return (
     <div>
-        <h4 className='page-title'>Most Viewed Blogs:</h4>
+        <h5 className='color-teal-green' >Most Viewed Blogs:</h5>
         <div className='view-blog-most-viewed'>
             {mostViewed===null? <PreLoader isLoading={true} />:
                 <ul>
@@ -43,4 +43,4 @@ const ViewBlogRightSection = () => {
   )
 }
 
-export default ViewBlogRightSection
+export default MostViewedBlogs

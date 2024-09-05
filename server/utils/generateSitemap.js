@@ -8,6 +8,7 @@ const axios = require("axios");
 
 async function generateSitemap() {
   const Links=[
+    "https://bloggerspace.singhteekam.in/blogs",
     "https://bloggerspace.singhteekam.in/login",
     "https://bloggerspace.singhteekam.in/signup",
     "https://bloggerspace.singhteekam.in/community",
