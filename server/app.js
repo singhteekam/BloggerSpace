@@ -10,8 +10,8 @@ const path = require("path");
 
 const functions = require("firebase-functions");
 
-// require("dotenv").config(); // Load environment variables from .env file - Production mode
-require("dotenv").config({ path: ".env.local" }); // development mode
+require("dotenv").config(); // Load environment variables from .env file - Production mode
+// require("dotenv").config({ path: ".env.local" }); // development mode
 
 const connectDB = require("./db/db");
 const blogs = require("./routes/blogs");
@@ -106,8 +106,8 @@ app.get("/api/viewlogs", async (req, res) => {
 // addFollowersFields();
 // addFollowingFields();
 
-const PORT = process.env.PORT || 5000; // For development
-// const PORT = 8183;  // For production
+// const PORT = process.env.PORT || 5000; // For development
+const PORT = 8183;  // For production
 app.listen(PORT, console.log("Server started at " + PORT));
 
 exports.bloggerspacebackend = functions.https.onRequest(app);

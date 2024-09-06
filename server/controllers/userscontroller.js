@@ -717,9 +717,10 @@ exports.contactUs = async (req, res) => {
 exports.oauthGoogleCallback = async (req, res) => {
   // Successful authentication, redirect to profile page
 
-  console.log(req.user.emails[0].value);
+  console.log("Email: ", req.user.emails[0].value);
   const user = await User.findOne({ email: req.user.emails[0].value });
   if (!user) {
+    console.log("User not found G-Auth");
     return res.redirect(`${process.env.FRONTEND_URL}/login`);
   }
 

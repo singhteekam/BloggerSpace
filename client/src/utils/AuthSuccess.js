@@ -28,7 +28,7 @@ const AuthSuccess = () => {
       navigate('/');
     } else {
       // Handle login failure
-      navigate('/');
+      navigate('/login');
     }
   }, [navigate, location]);
 

@@ -27,7 +27,7 @@ passport.use(
           "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         var passwordLength = 8;
         var password = "";
-        for (var i = 0; i <= passwordLength; i++) {
+        for (var i = 0; i < passwordLength; i++) {
           var randomNumber = Math.floor(Math.random() * chars.length);
           password += chars.substring(randomNumber, randomNumber + 1);
         }
@@ -52,7 +52,7 @@ passport.use(
           authType: "Google",
         });
         await user.save();
-      }
+
 
       const receiver = profile.emails[0].value;
       const receiver2 = process.env.EMAIL;
@@ -81,6 +81,8 @@ passport.use(
           console.error("Error sending email:", error);
           // Handle error
         });
+
+      }
 
       return done(null, profile);
     }
