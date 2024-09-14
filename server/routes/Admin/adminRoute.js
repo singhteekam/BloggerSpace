@@ -21,7 +21,15 @@ const {
   fetchAllUsers,
   deleteUserAccount,
   getCommunityPosts,
-  deleteCommunityPost
+  deleteCommunityPost,
+  adminNewBlog,
+  adminSaveAsDraftBlog,
+  adminDraftBlogs,
+  adminPublishedBlogs,
+  adminDiscardedBlogs,
+  adminWrittenDiscardBlogFromDB,
+  adminBlogEdit,
+  adminSaveEditedBlog
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -67,5 +75,18 @@ router.delete("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
 router.get("/community", adminMiddleware, getCommunityPosts);
 
 router.delete("/deletecommunitypost/:id", adminMiddleware, deleteCommunityPost);
+
+router.post("/blogs/newblog", adminMiddleware, adminNewBlog);
+
+router.post("/blogs/saveasdraft", adminMiddleware,adminSaveAsDraftBlog);
+
+router.get("/blogs/drafts", adminMiddleware,adminDraftBlogs);
+router.get("/blogs/published",adminPublishedBlogs);
+
+router.get("/blogs/discarded", adminMiddleware,adminDiscardedBlogs);
+router.post("/blogs/adminblogdiscard/:id", adminMiddleware,adminWrittenDiscardBlogFromDB);
+
+router.get("/blogs/editblog/:id", adminMiddleware,adminBlogEdit);
+router.put("/blogs/editblog/save/:id", adminMiddleware,adminSaveEditedBlog);
 
 module.exports = router;

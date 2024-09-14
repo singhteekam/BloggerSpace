@@ -33,6 +33,13 @@ export const headerLinks = [
       onclick: "closeCanvas",
     },
     {
+      icon: <CgNotes />,
+      name: "Admin Blogs",
+      to: "/adminblogs",
+      target: "",
+      onclick: "closeCanvas",
+    },
+    {
       icon: <IoPeople />,
       name: "Community",
       to: "/community",
@@ -133,6 +140,13 @@ export const authheaderLinks = [
       target: "",
       onclick: "logout",
     },
+    {
+        icon: <CgNotes />,
+        name: "Admin Blogs",
+        to: "/adminblogs",
+        target: "",
+        onclick: "closeCanvas",
+      },
     {
         icon: <IoPeople />,
         name: "Community",

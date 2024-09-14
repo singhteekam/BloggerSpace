@@ -718,22 +718,30 @@ exports.oauthGoogleCallback = async (req, res) => {
   // Successful authentication, redirect to profile page
 
   console.log("Email: ", req.user.emails[0].value);
-  const user = await User.findOne({ email: req.user.emails[0].value });
-  if (!user) {
-    console.log("User not found G-Auth");
+  User.findOne({ email: req.user.emails[0].value })
+  .then((user) => {
+    if (!user) {
+      logger.error("User Not found G-auth ");
+      console.log("User not found G-Auth");
     return res.redirect(`${process.env.FRONTEND_URL}/login`);
-  }
-
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "15m", // Token expiration time
+    }
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m", // Token expiration time
+    });
+  
+    req.session.user = user; // Will remove in future
+    req.session.userId = user._id;
+    req.session.token = token;
+    req.session.email = user.email;
+  
+    const encodedToken = encodeURIComponent(token);
+    res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
+  })
+  .catch((err) => {
+    logger.error("Error when using G-Auth login");
+    console.log("Error when using G-Auth login");
+    res.status(500).json({ error: err });
   });
 
-  req.session.user = user; // Will remove in future
-  req.session.userId = user._id;
-  req.session.token = token;
-  req.session.email = user.email;
-
-  const encodedToken = encodeURIComponent(token);
-  res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
   // res.json({ token });
 };

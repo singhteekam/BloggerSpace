@@ -10,6 +10,7 @@ const pako = require("pako");
 const sendEmail = require("../../services/mailer");
 const generateSitemap = require('../../utils/generateSitemap');
 
+
 exports.adminSignup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
@@ -490,5 +491,280 @@ exports.deleteCommunityPost = async (req, res) => {
     await sendEmail(receiver, subject, html);
   } catch (error) {
     console.log("Error when deleting post by admin");
+  }
+};
+
+
+// Admin Blogs
+// New Blog
+exports.adminNewBlog = async (req, res) => {
+  try {
+    const { slug, title, content, category, tags } = req.body;
+
+    // Compress the content before saving it
+    const compressedContentBuffer = pako.deflate(content, { to: "string" });
+    const compressedContent = Buffer.from(compressedContentBuffer).toString(
+      "base64"
+    );
+
+    // Assuming `content` is the original content string
+    console.log(
+      "Original content size:",
+      Buffer.byteLength(content, "utf8") / 1024,
+      " KB"
+    );
+    // Log the size of the compressed content
+    console.log(
+      "Compressed content size:",
+      Buffer.byteLength(compressedContent, "utf8") / 1024,
+      " KB"
+    );
+
+    const newPost = new Blog({
+      slug,
+      title,
+      content: compressedContent,
+      category,
+      authorDetails: req.session.currentuserId,
+      // lastUpdatedAt: Date.now(),
+      lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
+      tags,
+      status: "ADMIN_PUBLISHED"
+    });
+    const savedBlog = await newPost.save();
+
+    // Sending mail to admin
+    // const blogLink = `http://localhost:3000/api/blogs/${slug}`;
+    const blogLink = `${process.env.FRONTEND_URL}/${slug}`;
+    const receiver2 = process.env.EMAIL;
+    const subject2 = "New Blog available for review";
+    const html2 = `
+    <p>New blog available for review</p>
+    <p>Title: ${title}</p>
+    <a href="${blogLink}">${blogLink}</a>
+    `;
+
+    sendEmail(receiver2, subject2, html2)
+      .then((response) => {
+        console.log(`Email sent to ${receiver2}:`, response);
+        // Handle success
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+        // Handle error
+      });
+
+    res.json(savedBlog);
+  } catch (error) {
+    console.error("Error creating new post by admin:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the post by admin" });
+  }
+};
+
+exports.adminSaveAsDraftBlog= async (req, res)=>{
+  try {
+    const { slug, title, content, category, tags } = req.body;
+
+    // Compress the content before saving it
+    const compressedContentBuffer = pako.deflate(content, { to: "string" });
+    const compressedContent = Buffer.from(compressedContentBuffer).toString(
+      "base64"
+    );
+
+    console.log(
+      "Original content size:",
+      Buffer.byteLength(content, "utf8") / 1024,
+      " KB"
+    );
+    // Log the size of the compressed content
+    console.log(
+      "Compressed content size:",
+      Buffer.byteLength(compressedContent, "utf8") / 1024,
+      " KB"
+    );
+
+    const blog = await Blog.findById({
+    _id: new mongoose.Types.ObjectId(req.body.id),
+  });
+    if(blog){
+        blog.slug= slug;
+        blog.title=title;
+        blog.content = compressedContent;
+        blog.category= category;
+        blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
+        blog.tags= tags;
+        blog.status="ADMIN_DRAFT";
+        await blog.save();
+
+      return res.json(blog);
+    }
+
+    const newPost = new Blog({
+      slug,
+      title,
+      content: compressedContent,
+      category,
+      authorDetails: req.session.currentuserId,
+      status: "ADMIN_DRAFT",
+      lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
+      tags,
+    });
+    const savedBlog = await newPost.save();
+
+    res.json(savedBlog);
+  } catch (error) {
+    console.error("Error creating new post by admin:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the post by admin" });
+  }
+}
+
+// Draft Blogs:
+
+exports.adminDraftBlogs = async (req, res) => {
+  try {
+    // Perform the search query based on the provided search query
+    const blogs = await Blog.find({
+      status: "ADMIN_DRAFT",
+    });
+    // console.log(blogs);
+
+    res.json(blogs);
+  } catch (error) {
+    console.error("Error searching draft blogs:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while searching draft blogs." });
+  }
+};
+
+// Admin Published
+exports.adminPublishedBlogs = async (req, res) => {
+  try {
+    // Perform the search query based on the provided search query
+    const blogs = await Blog.find({
+      status: "ADMIN_PUBLISHED",
+    });
+    // console.log(blogs);
+
+    res.json(blogs);
+  } catch (error) {
+    console.error("Error searching published blogs:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while searching published blogs." });
+  }
+};
+
+// Admin Discarded
+exports.adminDiscardedBlogs = async (req, res) => {
+  try {
+    // Perform the search query based on the provided search query
+    const blogs = await Blog.find({
+      status: "ADMIN_DISCARDED",
+    });
+    // console.log(blogs);
+
+    res.json(blogs);
+  } catch (error) {
+    console.error("Error searching discarded blogs:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while searching discarded blogs." });
+  }
+};
+
+exports.adminWrittenDiscardBlogFromDB = async (req, res) => {
+  const {id}= req.params;
+  try {
+    const blog = await Blog.findById({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+    blog.status="ADMIN_DISCARDED";
+    await blog.save();
+
+    const receiver = process.env.EMAIL;
+    const subject = "Admin Blog Discrded!";
+    const html = `Hi ${process.env.Email},
+              <p>Blog is discarded succesfully </p>
+              <p>Slug: ${req.body.slug} </p>
+                `;
+
+    res.json({ message: "Blog discarded successfully" });
+    await sendEmail(receiver, subject, html);
+  } catch (error) {
+    console.error("Error discarding blogs:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while discarding blogs." });
+  }
+};
+
+
+exports.adminBlogEdit = async (req, res) => {
+  try {
+    const blog = await Blog.findById({
+      _id: new mongoose.Types.ObjectId(req.params.id),
+    }).populate("authorDetails").exec();
+
+    if (!blog) {
+      console.error("The requested blog can't open in editable mode because it doesn't exist. ")
+      return res.status(404).json({ error: "blog not found" });
+    }
+
+    // Decompress the content before displaying it
+    const compressedContentBuffer = Buffer.from(blog.content, "base64");
+    const decompressedContent = pako.inflate(compressedContentBuffer, {
+      to: "string",
+    });
+    blog.content = decompressedContent;
+    console.debug("Blog opened in Edit mode. Blog title: "+ blog.title);
+
+    res.json(blog);
+  } catch (error) {
+    console.error("Error fetching blog blog:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.adminSaveEditedBlog = async (req, res) => {
+  try {
+    // const { id } = req.params;
+    const { slug, title, content, category } = req.body;
+
+    // Find the blog by ID
+    const blog = await Blog.findById({
+      _id: new mongoose.Types.ObjectId(req.params.id),
+    });
+
+    if (!blog) {
+      console.error("The blog: "+title+ " is not saved because it doesn't exist.")
+      return res.status(404).json({ error: "blog not found" });
+    }
+
+    // Compress the content before saving it
+    const compressedContentBuffer = pako.deflate(content, { to: "string" });
+    const compressedContent = Buffer.from(compressedContentBuffer).toString(
+      "base64"
+    );
+
+    // Update the blog fields
+    blog.slug = slug;
+    blog.title = title;
+    blog.content = compressedContent;
+    blog.category = category;
+    blog.status = "ADMIN_PUBLISHED";
+
+    // Save the updated blog
+    await blog.save();
+    console.debug("Blog updated successfully. Title: "+ blog.title);
+
+    res.json({ message: "blog updated successfully" });
+  } catch (error) {
+    console.error("Error updating blog:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

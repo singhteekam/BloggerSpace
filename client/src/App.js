@@ -31,6 +31,7 @@ import ViewCommunityPost from "components/Community/ViewCommunityPost.js";
 import AllBlogs from "components/Posts/AllBlogs/AllBlogs.js";
 import AuthSuccess from "utils/AuthSuccess.js";
 import ImproveBlog from "components/Posts/ImproveBlog/ImproveBlog.js";
+import AdminBlogs from "components/Posts/AdminBlogs/AdminBlogs";
 
 const App = () => {
   return (
@@ -114,8 +115,11 @@ const App = () => {
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/community/post/:communityPostId/:communityPostSlug" element={<ViewCommunityPost />} />
 
+            <Route path="/adminblogs" element={<AdminBlogs />} />
+
             <Route path="/auth-success" element={<AuthSuccess />} />
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<PageNotFound />} />
+            {/* <Route path="*" element={<Navigate to="/" />} /> */}
             {/* <Route element={<PageNotFound />} /> */}
           </Routes>
         </main>

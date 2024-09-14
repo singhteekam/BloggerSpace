@@ -162,7 +162,10 @@ exports.fetchBlogsByCategory = async (req, res) => {
 
 exports.addBlogViewsCounter= async (req, res)=>{
   try {
-    const blog= await Blog.findOne({slug: req.body.blogSlug, status:"PUBLISHED"});
+    const blog= await Blog.findOne({slug: req.body.blogSlug, status:{$in: ["PUBLISHED", "ADMIN_PUBLISHED"]}});
+    if(!blog)
+      return res.status(404).json({ error: "blog not found" });
+    
     blog.blogViews++;
     console.log("BlogViews: "+blog.blogViews);
     await blog.save();
@@ -179,7 +182,7 @@ exports.viewBlogRoute = async (req, res) => {
     // console.log("Searching for blog: "+ req.params.blogSlug);
     const blog = await Blog.findOne({
       slug: req.params.blogSlug,
-      status: "PUBLISHED",
+      status: {$in: ["PUBLISHED", "ADMIN_PUBLISHED"]},
     }).populate("authorDetails")
       // .populate("likes")
       .populate("blogLikes")
