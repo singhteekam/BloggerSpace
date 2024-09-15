@@ -120,7 +120,7 @@ const Footer = () => {
           <Col md={4}>
               <h6 class="color-mint">Quick Links:</h6>
               <hr />      
-              <div><Link to="#"  className="color-mint text-decoration-none"><b>Home</b></Link></div>
+              <div><Link to="/"  className="color-mint text-decoration-none"><b>Home</b></Link></div>
               <div><Link to="/blogs" className="color-mint text-decoration-none" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Blogs</b></Link></div>
               <div><Link to="/about" className="color-mint text-decoration-none" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>About</b></Link></div>
               <div><Link to="/privacypolicy" className="color-mint text-decoration-none" onClick={()=>window.scrollTo({ top: 0, behavior: 'smooth' })}><b>Privacy Policy</b></Link></div>

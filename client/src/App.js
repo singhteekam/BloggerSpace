@@ -32,6 +32,7 @@ import AllBlogs from "components/Posts/AllBlogs/AllBlogs.js";
 import AuthSuccess from "utils/AuthSuccess.js";
 import ImproveBlog from "components/Posts/ImproveBlog/ImproveBlog.js";
 import AdminBlogs from "components/Posts/AdminBlogs/AdminBlogs";
+import ScrollToTop from "utils/ScrollToTop";
 
 const App = () => {
   return (
@@ -83,6 +84,7 @@ const App = () => {
         </Helmet>
 
         <main>
+        <ScrollToTop />
           <Routes>
             <Route path="/" element={<HomePage />} exact />
             <Route path="/blogs" element={<AllBlogs />} />

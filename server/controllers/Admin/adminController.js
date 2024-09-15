@@ -768,3 +768,23 @@ exports.adminSaveEditedBlog = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// Newsletter
+exports.sendNewsletter = async (req, res) => {
+  try {
+
+    const {selectedUsers, subject, message}= req.body;
+    selectedUsers.forEach(async (receiver) => {
+      await sendEmail(receiver.value, subject, message);
+    });
+    // Sending mail to admin
+    await sendEmail(process.env.EMAIL, subject, message);
+    
+    res.json({ message: "Mail sent successfully!!" });
+  } catch (error) {
+    console.error("Error sending emails...", error);
+    res
+      .status(500)
+      .json({ error: "Error sending emails..." });
+  }
+};

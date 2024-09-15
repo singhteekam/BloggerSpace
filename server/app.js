@@ -107,7 +107,7 @@ app.get("/api/viewlogs", async (req, res) => {
 // addFollowingFields();
 
 // const PORT = process.env.PORT || 5000; // For development
-const PORT = 8183;  // For production
+const PORT = 8184;  // For production
 app.listen(PORT, console.log("Server started at " + PORT));
 
 exports.bloggerspacebackend = functions.https.onRequest(app);

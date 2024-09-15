@@ -1,3 +1,31 @@
 [2024-09-04T10:25:12.723Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
 [2024-09-04T10:25:16.007Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2024-09-04T10:54:41.009Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-09-16T00:11:46.661Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:11:46.661Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:11:46.661Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:11:46.710Z] [LOG] [DEBUG] - Searching for blog: dwfre
+[2024-09-16T00:11:46.871Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2024-09-16T00:11:46.871Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2024-09-16T00:11:46.938Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-09-16T00:11:46.944Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:11:46.944Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:11:46.944Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:11:47.007Z] [LOG] [DEBUG] - Searching for blog: dwfre
+[2024-09-16T00:11:47.089Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2024-09-16T00:11:47.089Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2024-09-16T00:11:47.090Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-09-16T00:19:34.704Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:19:34.704Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:19:34.704Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:19:35.014Z] [LOG] [DEBUG] - Searching for blog: 111jbj
+[2024-09-16T00:19:35.019Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:19:35.095Z] [LOG] [INFO] - Blog: 111jbj fetched. Content size is: 0.2890625 KB
+[2024-09-16T00:19:35.095Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-09-16T00:19:35.019Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:19:35.019Z] [LOG] [ERROR] - You are not logged in. Please login!!
+[2024-09-16T00:19:35.095Z] [LOG] [INFO] - Blog: 111jbj fetched. Content size is: 0.2890625 KB
+[2024-09-16T00:19:35.412Z] [LOG] [DEBUG] - Searching for blog: 111jbj
+[2024-09-16T00:19:35.491Z] [LOG] [INFO] - Blog: 111jbj fetched. Content size is: 0.2890625 KB
+[2024-09-16T00:19:35.491Z] [LOG] [INFO] - Blog: 111jbj fetched. Content size is: 0.2890625 KB
+[2024-09-16T00:19:35.491Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
