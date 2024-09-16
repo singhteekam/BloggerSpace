@@ -21,6 +21,7 @@ import blogTags from "../../../utils/blogTags.json";
 
 import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+import Select from "react-select";
 
 const NewBlog = () => {
   const [title, setTitle] = useState("");
@@ -286,6 +287,14 @@ const NewBlog = () => {
               disabled
             />
           </Form.Group>
+
+          {/* <Select
+                className="react-select-dropdown"
+                defaultValue={category}
+                onChange={setCategory}
+                options={blogCategory}
+                required
+              /> */}
 
           <Form.Group controlId="blogCategory" className="newblogfields">
             {" "}

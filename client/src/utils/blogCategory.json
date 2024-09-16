@@ -1,27 +1,155 @@
 [
   {
+    "value": "3D Animation",
+    "label": "3D Animation"
+  },
+  {
+    "value": "3D Modeling",
+    "label": "3D Modeling"
+  },
+  {
+    "value": "3D Printing",
+    "label": "3D Printing"
+  },
+  {
+    "value": "Accounting",
+    "label": "Accounting"
+  },
+  {
+    "value": "ActionScript",
+    "label": "ActionScript"
+  },
+  {
+    "value": "Advertising",
+    "label": "Advertising"
+  },
+  {
+    "value": "Aerospace Engineering",
+    "label": "Aerospace Engineering"
+  },
+  {
+    "value": "Agile Methodologies",
+    "label": "Agile Methodologies"
+  },
+  {
+    "value": "AI Ethics",
+    "label": "AI Ethics"
+  },
+  {
+    "value": "AI Tools",
+    "label": "AI Tools"
+  },
+  {
+    "value": "Algorithm Design",
+    "label": "Algorithm Design"
+  },
+  {
+    "value": "Amazon Web Services (AWS)",
+    "label": "Amazon Web Services (AWS)"
+  },
+  {
+    "value": "Analytics",
+    "label": "Analytics"
+  },
+  {
+    "value": "Android Development",
+    "label": "Android Development"
+  },
+  {
+    "value": "Angular",
+    "label": "Angular"
+  },
+  {
+    "value": "Animation",
+    "label": "Animation"
+  },
+  {
+    "value": "Anthropology",
+    "label": "Anthropology"
+  },
+  {
+    "value": "API Development",
+    "label": "API Development"
+  },
+  {
     "value": "App Development",
     "label": "App Development"
+  },
+  {
+    "value": "Arduino",
+    "label": "Arduino"
   },
   {
     "value": "Array",
     "label": "Array"
   },
   {
+    "value": "Art",
+    "label": "Art"
+  },
+  {
     "value": "Artificial Intelligence",
     "label": "Artificial Intelligence"
+  },
+  {
+    "value": "Astrophysics",
+    "label": "Astrophysics"
+  },
+  {
+    "value": "Astronomy",
+    "label": "Astronomy"
   },
   {
     "value": "Augmented Reality",
     "label": "Augmented Reality"
   },
   {
+    "value": "Automation",
+    "label": "Automation"
+  },
+  {
+    "value": "Azure",
+    "label": "Azure"
+  },
+  {
+    "value": "Back-end Development",
+    "label": "Back-end Development"
+  },
+  {
     "value": "Big Data",
     "label": "Big Data"
   },
   {
+    "value": "Bioinformatics",
+    "label": "Bioinformatics"
+  },
+  {
+    "value": "Biology",
+    "label": "Biology"
+  },
+  {
+    "value": "Biotechnology",
+    "label": "Biotechnology"
+  },
+  {
     "value": "Blockchain",
     "label": "Blockchain"
+  },
+  {
+    "value": "Blogging",
+    "label": "Blogging"
+  },
+  {
+    "value": "Branding",
+    "label": "Branding"
+  },
+  {
+    "value": "Business Analysis",
+    "label": "Business Analysis"
+  },
+  {
+    "value": "Business Development",
+    "label": "Business Development"
   },
   {
     "value": "C",
@@ -36,8 +164,52 @@
     "label": "C++"
   },
   {
+    "value": "Calculus",
+    "label": "Calculus"
+  },
+  {
+    "value": "Chemistry",
+    "label": "Chemistry"
+  },
+  {
     "value": "Cloud Computing",
     "label": "Cloud Computing"
+  },
+  {
+    "value": "Cloud Security",
+    "label": "Cloud Security"
+  },
+  {
+    "value": "Computer Architecture",
+    "label": "Computer Architecture"
+  },
+  {
+    "value": "Computer Graphics",
+    "label": "Computer Graphics"
+  },
+  {
+    "value": "Computer Networks",
+    "label": "Computer Networks"
+  },
+  {
+    "value": "Computer Vision",
+    "label": "Computer Vision"
+  },
+  {
+    "value": "Content Creation",
+    "label": "Content Creation"
+  },
+  {
+    "value": "Content Management Systems",
+    "label": "Content Management Systems"
+  },
+  {
+    "value": "Copywriting",
+    "label": "Copywriting"
+  },
+  {
+    "value": "Cryptography",
+    "label": "Cryptography"
   },
   {
     "value": "CSS",
@@ -48,12 +220,16 @@
     "label": "Cybersecurity"
   },
   {
-    "value": "Dart",
-    "label": "Dart"
-  },
-  {
     "value": "Data Analytics",
     "label": "Data Analytics"
+  },
+  {
+    "value": "Data Engineering",
+    "label": "Data Engineering"
+  },
+  {
+    "value": "Data Mining",
+    "label": "Data Mining"
   },
   {
     "value": "Data Science",
@@ -64,28 +240,144 @@
     "label": "Data Structures and Algorithms"
   },
   {
+    "value": "Database Administration",
+    "label": "Database Administration"
+  },
+  {
+    "value": "Database Design",
+    "label": "Database Design"
+  },
+  {
+    "value": "Dart",
+    "label": "Dart"
+  },
+  {
+    "value": "Deep Learning",
+    "label": "Deep Learning"
+  },
+  {
+    "value": "Design Patterns",
+    "label": "Design Patterns"
+  },
+  {
+    "value": "Design Thinking",
+    "label": "Design Thinking"
+  },
+  {
     "value": "DevOps",
     "label": "DevOps"
   },
   {
-    "value": "Dynamic Programming",
-    "label": "Dynamic Programming"
+    "value": "Digital Marketing",
+    "label": "Digital Marketing"
+  },
+  {
+    "value": "Digital Signal Processing",
+    "label": "Digital Signal Processing"
+  },
+  {
+    "value": "Django",
+    "label": "Django"
+  },
+  {
+    "value": "Docker",
+    "label": "Docker"
+  },
+  {
+    "value": "E-commerce",
+    "label": "E-commerce"
+  },
+  {
+    "value": "Economics",
+    "label": "Economics"
+  },
+  {
+    "value": "Electrical Engineering",
+    "label": "Electrical Engineering"
+  },
+  {
+    "value": "Embedded Systems",
+    "label": "Embedded Systems"
   },
   {
     "value": "English Grammar",
     "label": "English Grammar"
   },
   {
+    "value": "Entrepreneurship",
+    "label": "Entrepreneurship"
+  },
+  {
+    "value": "Ethical Hacking",
+    "label": "Ethical Hacking"
+  },
+  {
+    "value": "Excel",
+    "label": "Excel"
+  },
+  {
     "value": "Firebase",
     "label": "Firebase"
+  },
+  {
+    "value": "Finite Element Analysis",
+    "label": "Finite Element Analysis"
+  },
+  {
+    "value": "Finance",
+    "label": "Finance"
+  },
+  {
+    "value": "Financial Modeling",
+    "label": "Financial Modeling"
+  },
+  {
+    "value": "Game Development",
+    "label": "Game Development"
+  },
+  {
+    "value": "Genetics",
+    "label": "Genetics"
+  },
+  {
+    "value": "Geography",
+    "label": "Geography"
+  },
+  {
+    "value": "Git",
+    "label": "Git"
+  },
+  {
+    "value": "Graphic Design",
+    "label": "Graphic Design"
+  },
+  {
+    "value": "Hadoop",
+    "label": "Hadoop"
+  },
+  {
+    "value": "Health & Wellness",
+    "label": "Health & Wellness"
+  },
+  {
+    "value": "Holography",
+    "label": "Holography"
   },
   {
     "value": "HTML",
     "label": "HTML"
   },
   {
-    "value": "Hosting",
-    "label": "Hosting"
+    "value": "Human Resources",
+    "label": "Human Resources"
+  },
+  {
+    "value": "Information Security",
+    "label": "Information Security"
+  },
+  {
+    "value": "Information Systems",
+    "label": "Information Systems"
   },
   {
     "value": "Internet of Things",
@@ -96,12 +388,52 @@
     "label": "Interview Experience"
   },
   {
+    "value": "iOS Development",
+    "label": "iOS Development"
+  },
+  {
+    "value": "IT Management",
+    "label": "IT Management"
+  },
+  {
     "value": "Java",
     "label": "Java"
   },
   {
     "value": "JavaScript",
     "label": "JavaScript"
+  },
+  {
+    "value": "Jenkins",
+    "label": "Jenkins"
+  },
+  {
+    "value": "JIRA",
+    "label": "JIRA"
+  },
+  {
+    "value": "Joomla",
+    "label": "Joomla"
+  },
+  {
+    "value": "Journalism",
+    "label": "Journalism"
+  },
+  {
+    "value": "Kotlin",
+    "label": "Kotlin"
+  },
+  {
+    "value": "Kubernetes",
+    "label": "Kubernetes"
+  },
+  {
+    "value": "Laravel",
+    "label": "Laravel"
+  },
+  {
+    "value": "Linear Algebra",
+    "label": "Linear Algebra"
   },
   {
     "value": "Linked List",
@@ -112,8 +444,40 @@
     "label": "Machine Learning"
   },
   {
+    "value": "Marketing",
+    "label": "Marketing"
+  },
+  {
+    "value": "Mathematics",
+    "label": "Mathematics"
+  },
+  {
+    "value": "Mechanical Engineering",
+    "label": "Mechanical Engineering"
+  },
+  {
+    "value": "Media Studies",
+    "label": "Media Studies"
+  },
+  {
+    "value": "Meteorology",
+    "label": "Meteorology"
+  },
+  {
+    "value": "Microbiology",
+    "label": "Microbiology"
+  },
+  {
+    "value": "Microservices",
+    "label": "Microservices"
+  },
+  {
     "value": "MERN Stack",
     "label": "MERN Stack"
+  },
+  {
+    "value": "Mobile App Testing",
+    "label": "Mobile App Testing"
   },
   {
     "value": "Mobile Development",
@@ -124,12 +488,112 @@
     "label": "MongoDB"
   },
   {
+    "value": "Motivational",
+    "label": "Motivational"
+  },
+  {
+    "value": "Music Production",
+    "label": "Music Production"
+  },
+  {
+    "value": "Nanotechnology",
+    "label": "Nanotechnology"
+  },
+  {
+    "value": "Natural Language Processing",
+    "label": "Natural Language Processing"
+  },
+  {
+    "value": "Networking",
+    "label": "Networking"
+  },
+  {
     "value": "Node.js",
     "label": "Node.js"
   },
   {
-    "value": "Progressive web app",
-    "label": "Progressive web app"
+    "value": "Nuclear Physics",
+    "label": "Nuclear Physics"
+  },
+  {
+    "value": "Numerical Methods",
+    "label": "Numerical Methods"
+  },
+  {
+    "value": "Object-Oriented Programming",
+    "label": "Object-Oriented Programming"
+  },
+  {
+    "value": "Operating Systems",
+    "label": "Operating Systems"
+  },
+  {
+    "value": "Oracle",
+    "label": "Oracle"
+  },
+  {
+    "value": "Parallel Computing",
+    "label": "Parallel Computing"
+  },
+  {
+    "value": "Particle Physics",
+    "label": "Particle Physics"
+  },
+  {
+    "value": "Penetration Testing",
+    "label": "Penetration Testing"
+  },
+  {
+    "value": "Philosophy",
+    "label": "Philosophy"
+  },
+  {
+    "value": "Photography",
+    "label": "Photography"
+  },
+  {
+    "value": "Physics",
+    "label": "Physics"
+  },
+  {
+    "value": "PHP",
+    "label": "PHP"
+  },
+  {
+    "value": "Pinterest Marketing",
+    "label": "Pinterest Marketing"
+  },
+  {
+    "value": "Podcasting",
+    "label": "Podcasting"
+  },
+  {
+    "value": "Power BI",
+    "label": "Power BI"
+  },
+  {
+    "value": "Predictive Analytics",
+    "label": "Predictive Analytics"
+  },
+  {
+    "value": "Product Management",
+    "label": "Product Management"
+  },
+  {
+    "value": "Programming Languages",
+    "label": "Programming Languages"
+  },
+  {
+    "value": "Project Management",
+    "label": "Project Management"
+  },
+  {
+    "value": "Psychology",
+    "label": "Psychology"
+  },
+  {
+    "value": "Public Relations",
+    "label": "Public Relations"
   },
   {
     "value": "Python",
@@ -140,12 +604,100 @@
     "label": "Queue"
   },
   {
-    "value": "React.js",
-    "label": "React.js"
+    "value": "Quantum Computing",
+    "label": "Quantum Computing"
+  },
+  {
+    "value": "Quantum Mechanics",
+    "label": "Quantum Mechanics"
+  },
+  {
+    "value": "R Programming",
+    "label": "R Programming"
   },
   {
     "value": "React Native",
     "label": "React Native"
+  },
+  {
+    "value": "React.js",
+    "label": "React.js"
+  },
+  {
+    "value": "Recruitment",
+    "label": "Recruitment"
+  },
+  {
+    "value": "Relational Databases",
+    "label": "Relational Databases"
+  },
+  {
+    "value": "Religious",
+    "label": "Religious"
+  },
+  {
+    "value": "Religious Studies",
+    "label": "Religious Studies"
+  },
+  {
+    "value": "Renewable Energy",
+    "label": "Renewable Energy"
+  },
+  {
+    "value": "Robotics",
+    "label": "Robotics"
+  },
+  {
+    "value": "Ruby on Rails",
+    "label": "Ruby on Rails"
+  },
+  {
+    "value": "Sales",
+    "label": "Sales"
+  },
+  {
+    "value": "Scala",
+    "label": "Scala"
+  },
+  {
+    "value": "Science",
+    "label": "Science"
+  },
+  {
+    "value": "Scriptwriting",
+    "label": "Scriptwriting"
+  },
+  {
+    "value": "Search Engine Optimization (SEO)",
+    "label": "Search Engine Optimization (SEO)"
+  },
+  {
+    "value": "Self-Driving Cars",
+    "label": "Self-Driving Cars"
+  },
+  {
+    "value": "Serverless Computing",
+    "label": "Serverless Computing"
+  },
+  {
+    "value": "Social Media Marketing",
+    "label": "Social Media Marketing"
+  },
+  {
+    "value": "Software Architecture",
+    "label": "Software Architecture"
+  },
+  {
+    "value": "Software Development",
+    "label": "Software Development"
+  },
+  {
+    "value": "Software Testing",
+    "label": "Software Testing"
+  },
+  {
+    "value": "Solar Energy",
+    "label": "Solar Energy"
   },
   {
     "value": "SQL",
@@ -156,20 +708,108 @@
     "label": "Stack"
   },
   {
+    "value": "Startups",
+    "label": "Startups"
+  },
+  {
+    "value": "Statistical Analysis",
+    "label": "Statistical Analysis"
+  },
+  {
+    "value": "Statistics",
+    "label": "Statistics"
+  },
+  {
+    "value": "Stock Market",
+    "label": "Stock Market"
+  },
+  {
     "value": "String",
     "label": "String"
+  },
+  {
+    "value": "Swift",
+    "label": "Swift"
+  },
+  {
+    "value": "System Design",
+    "label": "System Design"
+  },
+  {
+    "value": "System Security",
+    "label": "System Security"
+  },
+  {
+    "value": "TensorFlow",
+    "label": "TensorFlow"
+  },
+  {
+    "value": "Theology",
+    "label": "Theology"
   },
   {
     "value": "UI/UX Design",
     "label": "UI/UX Design"
   },
   {
+    "value": "Unix",
+    "label": "Unix"
+  },
+  {
+    "value": "Urban Planning",
+    "label": "Urban Planning"
+  },
+  {
+    "value": "User Experience",
+    "label": "User Experience"
+  },
+  {
+    "value": "VFX",
+    "label": "VFX"
+  },
+  {
     "value": "Virtual Reality",
     "label": "Virtual Reality"
   },
   {
+    "value": "Visual Arts",
+    "label": "Visual Arts"
+  },
+  {
+    "value": "Web Analytics",
+    "label": "Web Analytics"
+  },
+  {
     "value": "Web Development",
     "label": "Web Development"
+  },
+  {
+    "value": "Web Scraping",
+    "label": "Web Scraping"
+  },
+  {
+    "value": "Web Security",
+    "label": "Web Security"
+  },
+  {
+    "value": "Wireless Communication",
+    "label": "Wireless Communication"
+  },
+  {
+    "value": "WordPress",
+    "label": "WordPress"
+  },
+  {
+    "value": "Writing",
+    "label": "Writing"
+  },
+  {
+    "value": "YouTube Marketing",
+    "label": "YouTube Marketing"
+  },
+  {
+    "value": "Zoology",
+    "label": "Zoology"
   },
   {
     "value": "Other",
