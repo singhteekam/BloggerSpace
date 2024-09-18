@@ -56,8 +56,6 @@ function Header() {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      
       if (isLoggedIn) {
         axios
           .get("/api/users/userinfo")
@@ -72,7 +70,6 @@ function Header() {
             }
           });
       }
-    }, 1500);
   }, [isLoggedIn]);
 
   return (
