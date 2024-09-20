@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Button, Container, ListGroup } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import PreLoader from "utils/PreLoader";
 
 const AdminBlogs = () => {
   const [adminBlogs, setAdminBlogs] = useState([]);
@@ -19,6 +20,12 @@ const AdminBlogs = () => {
   }, []);
 
   let k=0;
+
+  if(adminBlogs.length===0){
+    return (
+      <PreLoader isLoading="true" />
+    );
+  }
 
   return (
     <section className="newpage-section">

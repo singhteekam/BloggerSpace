@@ -15,14 +15,14 @@ export const LatestUpdates= [
     },
     {
         title: "Explore Reviewer Panel",
-        description: "If you want to review blogs written by other authors then register yourself and verify your account. After successful verification, Admin will approve your request within a day.",
+        description: "If you want to review blogs written by other authors then register yourself as Reviewer.",
         image: "",
         linkTitle:"Go to Reviewer Panel",
         link: "https://reviewbloggerspace.singhteekam.in/",
     },
     {
         title: "Community",
-        description: "If you want to share your opinion or want to ask any question then post it on Community page. There is no review process. The submitted posts will be published immediately.",
+        description: "If you want to share your opinion or want to ask any question then post it on Community page. ",
         image: "",
         linkTitle:"Go to Community",
         link: "http://bloggerspace.singhteekam.in/community",

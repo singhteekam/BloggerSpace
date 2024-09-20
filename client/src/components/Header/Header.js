@@ -160,7 +160,7 @@ function Header() {
 
           <div>
             <Button onClick={handleSearchClick} className="bs-button-outline">
-              <i className="fas fa-search"></i> Search
+              <i className="fas fa-search"></i>
             </Button>
             <SearchBlogs
               show={showSearchModal}

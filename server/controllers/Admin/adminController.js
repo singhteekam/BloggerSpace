@@ -788,3 +788,15 @@ exports.sendNewsletter = async (req, res) => {
       .json({ error: "Error sending emails..." });
   }
 };
+
+exports.updateSitemapXML = async (req, res) => {
+  try {
+    await generateSitemap();
+    
+    res.status(200).json({ message: "sitemap file updated!!" });
+  } catch (error) {
+    console.error("Error sending emails...", error);
+    res.status(500).json({ error: "Error updating sitemap file..." });
+  }
+};
+

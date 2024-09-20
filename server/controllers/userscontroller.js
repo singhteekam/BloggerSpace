@@ -419,13 +419,19 @@ exports.loggedInUserInfo = async (req, res) => {
     const userId = req.session.userId; // Assuming you're using sessions
     const token = req.session.token; // Assuming you're using sessions
 
-    // console.log("Tokn: " + req.session.token);
-    // console.log("userId: " + req.session.userId);
+    console.log("LoggedIn fn User: ", req.session.user);
+    console.log("LoggedIn fn Userid: ", req.session.userId);
+    console.log("LoggedIn fn token: ", req.session.token);
+    console.log("LoggedIn fn email: ", req.session.email);
+    console.log("LoggedIn fn userr: ", req.user);
+
+    console.log("Tokn: " + req.session.token);
+    console.log("userId: " + req.session.userId);
     // logger.info("logged in User info: " + req.session.userId);
 
     if (!userId && !token) {
-      logger.error("You are not logged in. Please login!!");
-      return res.status(404).json({ error: "Please login!!" });
+      logger.error("You are not logged in. Please login!!!!");
+      return res.status(404).json({ error: "Please login!!!!" });
     }
 
     // Fetch the user information from the database
@@ -733,6 +739,12 @@ exports.oauthGoogleCallback = async (req, res) => {
     req.session.userId = user._id;
     req.session.token = token;
     req.session.email = user.email;
+
+    console.log("User: ", req.session.user);
+    console.log("Userid: ", req.session.userId);
+    console.log("token: ", req.session.token);
+    console.log("email: ", req.session.email);
+    console.log("User 746: ", req.user);
   
     const encodedToken = encodeURIComponent(token);
     res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);

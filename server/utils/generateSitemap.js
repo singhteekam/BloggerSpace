@@ -5,6 +5,7 @@ const path = require('path');
 const Blog = require('../models/Blog');
 const {fetchSitemapFile, uploadSitemapToGitHub}= require('./../utils/uploadToGitHub');
 const axios = require("axios");
+const Community= require('../models/Community');
 
 async function generateSitemap() {
   const Links=[
@@ -13,9 +14,10 @@ async function generateSitemap() {
     "https://bloggerspace.singhteekam.in/signup",
     "https://bloggerspace.singhteekam.in/community",
     "https://bloggerspace.singhteekam.in/guidelines",
+    "https://bloggerspace.singhteekam.in/adminblogs",
     "https://bloggerspace.singhteekam.in/aboutdeveloper",
     "https://bloggerspace.singhteekam.in/forgotpassword",
-    "https://bloggerspace.singhteekam.in/sitemap"
+    "https://bloggerspace.singhteekam.in/sitemap",
   ];
 
   try {
@@ -44,6 +46,14 @@ async function generateSitemap() {
       });
     });
     // console.log("Sitemap content end");
+
+    // For community posts:
+    const communityPosts = await Community.find({ status: "PUBLISHED" });
+    communityPosts.forEach((post)=>{
+      sitemapStream.write({
+        url: `/community/post/${post.communityPostId}/${post.communityPostSlug}`, 
+        priority: 0.80,});
+    });
 
     sitemapStream.end();
     const sitemapXML = await streamToPromise(sitemapStream);

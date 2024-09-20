@@ -30,7 +30,8 @@ const {
   adminWrittenDiscardBlogFromDB,
   adminBlogEdit,
   adminSaveEditedBlog,
-  sendNewsletter
+  sendNewsletter,
+  updateSitemapXML
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -90,5 +91,7 @@ router.post("/blogs/adminblogdiscard/:id", adminMiddleware,adminWrittenDiscardBl
 router.get("/blogs/editblog/:id", adminMiddleware,adminBlogEdit);
 router.put("/blogs/editblog/save/:id", adminMiddleware,adminSaveEditedBlog);
 
-router.post("/newsletter/send", adminMiddleware, sendNewsletter)
+router.post("/newsletter/send", adminMiddleware, sendNewsletter);
+
+router.get("/updatesitemapxml", adminMiddleware, updateSitemapXML);
 module.exports = router;
