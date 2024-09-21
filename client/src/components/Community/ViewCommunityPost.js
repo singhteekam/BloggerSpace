@@ -217,12 +217,13 @@ const ViewCommunityPost = () => {
                       comment?.replyCommunityPostAuthor.profilePicture
                         ? `data:image/jpeg;base64,${comment?.replyCommunityPostAuthor.profilePicture}`
                         : "https://img.freepik.com/free-icon/user_318-159711.jpg"
+                        // : "https://img.freepik.com/free-icon/user_318-159711.jpg"
                     }
                     roundedCircle
                     className="avatar-icon"
                     style={{ width: "30px", height: "30px" }}
                   />
-                  )
+                  
                   <Link
                     to={`/profile/${comment?.replyCommunityPostAuthor.userName}`}
                     target="_blank"

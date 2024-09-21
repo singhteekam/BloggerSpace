@@ -53,6 +53,9 @@ const Footer = () => {
     </Tooltip>
   );
 
+  const year= new Date().getFullYear();
+  // console.log(year);
+
   return (
     // <footer className="footer bg-light">
     //   <div className="footer-container">
@@ -169,7 +172,7 @@ const Footer = () => {
         </Row>
         <hr />
         <Row>
-        <p>Copyright © 2024 BloggerSpace</p>
+        <p>Copyright © {year} BloggerSpace</p>
         </Row>
       </Container>
 

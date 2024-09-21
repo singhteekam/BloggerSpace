@@ -21,7 +21,7 @@ async function generateSitemap() {
   ];
 
   try {
-    const blogs = await Blog.find({ status: "PUBLISHED" }); // Fetch your published blogs from the database
+    const blogs = await Blog.find({ status: {$in: ["PUBLISHED", "ADMIN_PUBLISHED"]} }); // Fetch your published blogs from the database
 
     console.log("Saving sitemap...")
 

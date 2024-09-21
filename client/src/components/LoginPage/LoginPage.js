@@ -19,6 +19,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isDisabled, setIsDisabled]= useState(false);
 
   const navigate = useNavigate();
 
@@ -35,6 +36,7 @@ function LoginPage() {
   };
 
   const handleSubmit = (e) => {
+    setIsDisabled(true);
     e.preventDefault();
 
     // Create the request body
@@ -87,6 +89,7 @@ function LoginPage() {
             }, 1000);
           }
         } else {
+          setIsDisabled(false);
           toast.error("Login Failed.");
         }
       })
@@ -188,8 +191,9 @@ function LoginPage() {
                   type="submit"
                   className="bs-button"
                   block
+                  disabled={isDisabled}
                 >
-                  Login
+                  {isDisabled?"Please wait...":"Login"}
                 </Button>
                 <Button
                   type="submit"

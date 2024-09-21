@@ -355,10 +355,17 @@ html {
 /* =========== */
 
 .about-bloggerspace{
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
   justify-content: space-evenly;
   padding: 0 10px;
+}
+
+.about-bloggerspace a{
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: black;
+  font-weight: 600;
 }
 
 .about-bloggerspace div{

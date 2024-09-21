@@ -1,6 +1,8 @@
 import React from "react";
-import { Container } from "react-bootstrap";
+import { Container, Stack } from "react-bootstrap";
 import bsImg from "assets/BLOGGERSPACE.png";
+import { Link } from "react-router-dom";
+import { BsBoxArrowUpRight } from "react-icons/bs";
 
 const AboutBloggerSpace = () => {
   return (
@@ -48,6 +50,60 @@ const AboutBloggerSpace = () => {
                 Review-Awaiting author (if need modification)-Publish
               </li>
             </ul>
+          </div>
+        </div>
+        <hr />
+        <h4 className="about-bloggerspace">
+          <b>Panels:</b>
+        </h4>
+        <div className="about-bloggerspace">
+          <div>
+            <Link to={"/newblog"}>
+              Writing Panel <BsBoxArrowUpRight />
+            </Link>
+            <ul>
+              <li>Can view any blog</li>
+              <li>Can write new blog(should be logged in)</li>
+              <li>Can create new community post(should be logged in)</li>
+              <li>Like/comment on any blog</li>
+              <li>
+                Give feedback to the developer of BloggerSpace and give
+                suggestions(if any)
+              </li>
+            </ul>
+          </div>
+          <div>
+            <div>
+              <Link
+                to={"https://reviewbloggerspace.singhteekam.in/"}
+                target="_blank"
+              >
+                Reviewer Panel <BsBoxArrowUpRight />
+              </Link>
+              <ul>
+                <li>Eligible to review the assigned blogs</li>
+                <li>Provide the blog rating(only visible to reviewer/admin)</li>
+                <li>Directly contact with the Admin if facing any query</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div>
+              <Link to={"https://reviewbloggerspace.singhteekam.in/"}>
+                Admin Panel <BsBoxArrowUpRight />
+              </Link>
+              <ul>
+                <li>Assign new blogs to reviewers for review.</li>
+                <li>Publish blogs after 3 stage review process</li>
+                <li>Remove any user/reviewer</li>
+                <li>Appreciate users/reviewers via Email time to time</li>
+                <li>
+                  Remove any blog/post which don't follow the mentioned
+                  guidelines.
+                </li>
+                <li>Create the Admin Blogs.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </Container>
