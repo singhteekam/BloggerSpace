@@ -126,6 +126,10 @@ html {
     margin-bottom: 25px !important;
 }
 
+.header-offcanvas{
+  max-width: 300px !important;
+}
+
 
 /*=============*/
 /*  Homepage  */
@@ -563,6 +567,9 @@ html {
   margin-top: 10px;
 }
 
+.category-dropdown{
+  z-index: 99;
+}
 
 /*=============*/
 /*  EditBlog  */

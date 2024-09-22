@@ -109,7 +109,8 @@ const fetchLogsFile= async ()=>{
 // Create or update the sitemap file on GitHub
 const uploadSitemapToGitHub=async ()=> {
 
-  const sitemapFilepath= "./../sitemap.xml";
+  // const sitemapFilepath= "./../sitemap.xml";
+  const sitemapFilepath= path.join('/tmp', 'sitemap.xml'); // Firebase production
   const sitemapFileContent = fs.readFileSync(sitemapFilepath, "utf8");
 
   const apiUrl2 = `https://api.github.com/repos/${owner}/${repo}/contents/sitemap.xml`;

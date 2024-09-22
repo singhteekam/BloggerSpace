@@ -15,6 +15,7 @@ import { FaBook, FaGlobeAsia, FaHome, FaSitemap, FaUser } from "react-icons/fa";
 import { CgNotes } from "react-icons/cg";
 import { IoLogIn, IoLogInOutline, IoPeople, IoPerson } from "react-icons/io5";
 import { authheaderLinks, headerLinks } from "./HeaderItems";
+import { ToastContainer, toast } from "react-toastify";
 
 function Header() {
   const [user, setUser] = useState(null);
@@ -47,10 +48,13 @@ function Header() {
         localStorage.removeItem("token");
 
         // Redirect to the login page
-        navigate("/login");
+        // navigate("/login");
+        window.location.reload();
+        toast.info("Logged out!!");
       })
       .catch((error) => {
         // Handle any errors here
+        toast.error("Error occured: ", error);
         console.error("Logout failed:", error);
       });
   };
@@ -74,6 +78,7 @@ function Header() {
 
   return (
     <div className="bgcolor-teal-green">
+      <ToastContainer />
       {/* <Navbar bg="dark" data-bs-theme="dark" expand="lg" fixed="top" className="text-white"> */}
       <Navbar expand="lg" fixed="top" className="text-white bgcolor-teal-green">
         <Container>
@@ -86,7 +91,7 @@ function Header() {
             <Offcanvas
               show={showCanvas}
               onHide={handleCloseCanvas}
-              className="bgcolor-spearmint text-white"
+              className="bgcolor-spearmint text-white header-offcanvas"
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title className="color-teal-green">
@@ -122,7 +127,7 @@ function Header() {
             <Offcanvas
               show={showCanvas}
               onHide={handleCloseCanvas}
-              className="bgcolor-spearmint text-white"
+              className="bgcolor-spearmint text-white header-offcanvas"
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title className="color-teal-green">
@@ -130,7 +135,7 @@ function Header() {
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
-                <div className="d-grid gap-2 ">
+                <div className="d-grid gap-2">
                   {headerLinks.map((link) => (
                     <>
                       <Link

@@ -40,9 +40,20 @@ const NewBlog = () => {
   const [searchTitleResults, setTitleSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+const [blogTagsMapped, setBlogTagsMapped]= useState([]);
 
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("token");
+
+  useEffect(()=>{
+    blogTags.map((tag) => {
+      const ob = {
+        label: tag,
+        value: tag,
+      };
+      setBlogTagsMapped((blogTagsMapped) => [...blogTagsMapped, ob]);
+    });
+  },[]);
 
   useEffect(() => {
     axios
@@ -141,6 +152,7 @@ const NewBlog = () => {
   };
 
   const handleSaveAsDraft = async () => {
+
     if (!isUniqueTitle) {
       // setAlert({ type: "danger", message: "Title already exists" });
       toast.error("Title already exists");
@@ -174,8 +186,8 @@ const NewBlog = () => {
     }
   };
 
-  const handleSelectedTag = (e) => {
-    setSelectedTag(e.target.value);
+  const handleSelectedTag = (value) => {
+    setSelectedTag(value);
   };
 
   const handleTagDismiss = (tag) => {
@@ -210,6 +222,13 @@ const NewBlog = () => {
     }
   }
 
+
+  const handleSelectedTags= (selectedOptions) => {
+    const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    setTags(values);
+    console.log("All tags: ",tags);
+  };
+
   return (
     <div className="newpage-section">
       <Helmet>
@@ -217,7 +236,7 @@ const NewBlog = () => {
       </Helmet>
 
       <Container>
-      <h3 className="page-title">New Blog</h3>
+        <h3 className="page-title">New Blog</h3>
         <div className="heading-underline"></div>
         <ToastContainer />
         {/* {alert && (
@@ -288,17 +307,19 @@ const NewBlog = () => {
             />
           </Form.Group>
 
-          {/* <Select
-                className="react-select-dropdown"
-                defaultValue={category}
-                onChange={setCategory}
-                options={blogCategory}
-                required
-              /> */}
+          <p>Category:</p>
+          <Select
+            className="react-select-dropdown category-dropdown"
+            defaultValue={category}
+            onChange={(e) => {
+              console.log(e);
+              setCategory(e.value);
+            }}
+            options={blogCategory}
+            required
+          />
 
-          <Form.Group controlId="blogCategory" className="newblogfields">
-            {" "}
-            {/* New form group for category */}
+          {/* <Form.Group controlId="blogCategory" className="newblogfields">
             <Form.Label>Category:</Form.Label>
             <Form.Control
               as="select"
@@ -313,9 +334,8 @@ const NewBlog = () => {
                   {category.label}
                 </option>
               ))}
-              {/* Add more category options as needed */}
             </Form.Control>
-          </Form.Group>
+          </Form.Group> */}
 
           {category === "Other" ? (
             <Form.Group controlId="otherCategory" className="newblogfields">
@@ -332,12 +352,30 @@ const NewBlog = () => {
             </Form.Group>
           ) : null}
 
-          <Form.Group controlId="blogCategory" className="newblogfields">
+          <p>Tags:</p>
+          <Select
+            className="react-select-dropdown"
+            defaultValue={selectedTag}
+            onChange={handleSelectedTags}
+            options={blogTagsMapped}
+            required
+            isMulti
+          />
+          {/* <Button
+              variant="success"
+              size="sm"
+              onClick={handleTagAdd}
+              className="my-2"
+            >
+              Add Tag
+            </Button> */}
+
+          {/* <Form.Group controlId="blogCategory" className="newblogfields">
             <Form.Label>Tags:</Form.Label>
             <Form.Control
               as="select"
               value={selectedTag}
-              onChange={handleSelectedTag}
+              // onChange={handleSelectedTag}
               placeholder="Select tag"
             >
               <option value="">Select Tag</option>
@@ -365,7 +403,7 @@ const NewBlog = () => {
                 ></CloseButton>
               </Badge>
             ))}
-          </Form.Group>
+          </Form.Group> */}
 
           <Form.Group controlId="blogContent" className="newblogfields">
             <Form.Label>Content:</Form.Label>
@@ -405,7 +443,6 @@ const NewBlog = () => {
               Copy code
             </button>
             <br />
-
           </Form.Group>
           <h6>Content size: {contentSize} KB</h6>
           <Button

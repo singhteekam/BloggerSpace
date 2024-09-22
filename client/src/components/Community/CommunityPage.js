@@ -106,7 +106,7 @@ const Community = () => {
         <Form>
           <Form.Group controlId="topic" className="topicfield">
             <Form.Label>
-              <b>Topic:</b>
+              <b>Issue Title:</b>
             </Form.Label>
             <Form.Control
               type="text"
@@ -115,11 +115,11 @@ const Community = () => {
                 setTopic(e.target.value);
                 setSlug(slugify(e.target.value.trim()));
               }}
-              placeholder="Enter topic"
+              placeholder="Enter Issue title"
             />
           </Form.Group>
           <br />
-          <b>Content:</b>
+          <b>Explain the issue:</b>
           <div className="editor-div">
             {/* <TinymceEditor content={content} onContentChange={setContent} /> */}
 

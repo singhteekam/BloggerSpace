@@ -71,6 +71,9 @@ const Sitemap = () => {
                 <li>
                   <a href="/savedblogs">Saved Blogs</a>
                 </li>
+                <li>
+                  <a href="/adminblogs">Admin Blogs</a>
+                </li>
               </ul>
             </section>
             {/* <section>

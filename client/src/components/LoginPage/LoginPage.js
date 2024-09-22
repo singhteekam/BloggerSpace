@@ -95,6 +95,7 @@ function LoginPage() {
       })
       .catch((error) => {
         // Handle any errors here
+        setIsDisabled(false);
         console.error(error);
         toast.error(error.response.data.message);
       });
