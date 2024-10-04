@@ -56,10 +56,24 @@ router.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-router.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/' }),
-  oauthGoogleCallback
-);
+// router.get('/auth/google/callback', 
+//   passport.authenticate('google', { failureRedirect: '/' }),
+//   oauthGoogleCallback
+// );
+
+router.get("/auth/google/callback", passport.authenticate("google", {
+  successRedirect: "auth/login/success",
+  failureRedirect: "auth/login/failed"
+}), oauthGoogleCallback);
+
+router.get('/auth/google/auth/login/success', oauthGoogleCallback);
+
+router.get('/auth/login/failed', async(req, res) => {
+  return res.status(401).json({
+      success: false,
+      message: "Sign in with google failed"
+  })
+});
 
 
 // Logout route

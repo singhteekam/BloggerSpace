@@ -43,6 +43,9 @@ app.use(
       process.env.BLOGGERSPACE2,
       process.env.PANEL2BLOGGERSPACE1,
     ],
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    allowedHeaders: ["Content-Type", "Access-Control-Allow-Credentials"],
+    credentials: true, // mandoatory for google auths
   })
 );
 
@@ -57,9 +60,9 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { 
-      secure: false, 
-      maxAge: 1800000   // Set session expiration to 1 minute (60,000 ms) 1800000 means 30 minutes
+    cookie: {
+      secure: false,
+      maxAge: 1800000, // Set session expiration to 1 minute (60,000 ms) 1800000 means 30 minutes
     }, // Adjust this based on your deployment configuration (e.g., true for HTTPS)
     // cookie: { secure: true }, // Adjust this based on your deployment configuration (e.g., true for HTTPS)
   })

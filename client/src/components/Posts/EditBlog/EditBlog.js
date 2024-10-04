@@ -23,7 +23,7 @@ import blogTags from "utils/blogTags.json";
 
 import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-
+import Select from "react-select";
 
 const EditBlog = () => {
   const { id } = useParams();
@@ -50,6 +50,17 @@ const EditBlog = () => {
   const navigate = useNavigate();
 
   const [initialContent, setInitialContent]= useState("");
+
+  const [blogTagsMapped, setBlogTagsMapped]= useState([]);
+  useEffect(()=>{
+    blogTags.map((tag) => {
+      const ob = {
+        label: tag,
+        value: tag,
+      };
+      setBlogTagsMapped((blogTagsMapped) => [...blogTagsMapped, ob]);
+    });
+  },[]);
 
   useEffect(() => {
     if (titleOrig !== title) {
@@ -80,15 +91,32 @@ const EditBlog = () => {
           feedbackToAuthor,
           tags,
         } = response.data;
+        const initialCategory= response.data.category;
+        const initialTags= response.data.tags;
         setSlug(slug);
         setTitle(title);
         setTitleOrig(title);
         setAuthorDetails(authorDetails);
         setContent(content);
         setInitialContent(content);
+
+        // const obj1={
+        //   label:response.data.category,
+        //   value:response.data.category
+        // };
         setCategory(category);
+
         setFeedbackComments(feedbackToAuthor);
+
+        // const values=initialTags.map((tag) => {
+        //   const ob = {
+        //     label: tag,
+        //     value: tag,
+        //   };
+        //   return ob;
+        // });
         setTags(tags);
+        // console.log(tags);
         // setBlog(response.data);
         setIsLoading(false);
       } catch (error) {
@@ -110,8 +138,18 @@ const EditBlog = () => {
     findContentSize(content);
   }, [content]);
 
+  const catTagFun = (c, t)=>{
+    const c1=c.value;
+    const t1=t;
+    setCategory(c1);
+    const values = t1 ? t1.map(option => option.label) : [];
+    setTags(values);
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // catTagFun(category, tags);
 
     if (!isUniqueTitle) {
       // setAlert({ type: "danger", message: "Title already exists" });
@@ -154,6 +192,11 @@ const EditBlog = () => {
       toast.error("Title already exists");
       return null;
     }
+
+    // catTagFun(category, tags);
+    // console.log(category);
+    // console.log(tags);
+
     try {
       setIsDisabled(true);
       const response = await axios.post("/api/blogs/saveasdraft", {
@@ -231,6 +274,12 @@ const EditBlog = () => {
     }
   }
 
+  const handleSelectedTags= (selectedOptions) => {
+    const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    setTags(values);
+    console.log("All tags: ",tags);
+  };
+
   return (
     <section className="newpage-section">
       <Helmet>
@@ -299,6 +348,15 @@ const EditBlog = () => {
             />
           </Form.Group>
 
+          {/* <p>Category:</p>
+          <Select
+            className="react-select-dropdown category-dropdown"
+            defaultValue={category}
+            onChange={setCategory}
+            options={blogCategory}
+            required
+          /> */}
+
           <Form.Group controlId="blogCategory" className="editblogfields">
             <Form.Label>Category:</Form.Label>
             <Form.Control
@@ -308,13 +366,11 @@ const EditBlog = () => {
               placeholder="Select category"
               required
             >
-              {/* <option value="">Select Category</option> */}
               {blogCategory.map((category) => (
                 <option key={category.value} value={category.value}>
                   {category.label}
                 </option>
               ))}
-              {/* Add more category options as needed */}
             </Form.Control>
           </Form.Group>
 
@@ -332,6 +388,16 @@ const EditBlog = () => {
               />
             </Form.Group>
           ) : null}
+
+          {/* <p>Tags:</p>
+          <Select
+            className="react-select-dropdown"
+            defaultValue={tags}
+            onChange={setTags}
+            options={blogTagsMapped}
+            required
+            isMulti
+          /> */}
 
           <Form.Group controlId="blogCategory" className="newblogfields">
             <Form.Label>Tags:</Form.Label>

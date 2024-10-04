@@ -18,7 +18,7 @@ passport.use(
       // For now, we'll just return the profile object
 
       let user = await User.findOne({ email: profile.emails[0].value });
-      console.log(profile);
+      console.log("oauth2:", profile.emails[0].value);
 
       if (!user) {
         // If user does not exist, create a new user
@@ -84,19 +84,27 @@ passport.use(
 
       }
 
-      return done(null, profile);
+      return done(null, user);
     }
   )
 );
 
 // Serialize user to session
 passport.serializeUser((user, done) => {
-  done(null, user);
+  done(null, user._id);
+  // done(null, user);
 });
 
 // Deserialize user from session
-passport.deserializeUser((obj, done) => {
-  done(null, obj);
+passport.deserializeUser(async(id, done) => {
+  try{
+    const user = await User.findById(id);
+    done(null, user);
+}
+catch(err) {
+    done(err, null);
+}
+  // done(null, obj); 
 });
 
 module.exports = passport;

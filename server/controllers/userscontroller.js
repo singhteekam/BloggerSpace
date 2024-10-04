@@ -723,8 +723,8 @@ exports.contactUs = async (req, res) => {
 exports.oauthGoogleCallback = async (req, res) => {
   // Successful authentication, redirect to profile page
 
-  console.log("Email: ", req.user.emails[0].value);
-  User.findOne({ email: req.user.emails[0].value })
+  console.log("Email: ", req.user.email);
+  User.findOne({ email: req.user.email})
   .then((user) => {
     if (!user) {
       logger.error("User Not found G-auth ");
@@ -747,7 +747,8 @@ exports.oauthGoogleCallback = async (req, res) => {
     console.log("User 746: ", req.user);
   
     const encodedToken = encodeURIComponent(token);
-    res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
+    res.redirect(`${process.env.FRONTEND_URL}/auth-success`);
+    // res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
   })
   .catch((err) => {
     logger.error("Error when using G-Auth login");
