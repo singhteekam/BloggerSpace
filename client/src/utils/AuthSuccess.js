@@ -15,12 +15,12 @@ const AuthSuccess = () => {
 
     const navigate = useNavigate();
   const location = useLocation();
-  const token2="dhwwwwwwwww3y277gdug";
+  // const token2="dhwwwwwwwww3y277gdug";
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const token = token2;
-    // const token = params.get('token');
+    // const token = token2;
+    const token = params.get('token');
     // const decoded= decodeJWT(token);
 
     if (token) {

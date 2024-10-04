@@ -419,6 +419,8 @@ exports.loggedInUserInfo = async (req, res) => {
     const userId = req.session.userId; // Assuming you're using sessions
     const token = req.session.token; // Assuming you're using sessions
 
+    console.log("User info 422: ", req.user);
+
     console.log("LoggedIn fn User: ", req.session.user);
     console.log("LoggedIn fn Userid: ", req.session.userId);
     console.log("LoggedIn fn token: ", req.session.token);
@@ -747,7 +749,7 @@ exports.oauthGoogleCallback = async (req, res) => {
     console.log("User 746: ", req.user);
   
     const encodedToken = encodeURIComponent(token);
-    res.redirect(`${process.env.FRONTEND_URL}/auth-success`);
+    res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${token}`);
     // res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
   })
   .catch((err) => {
