@@ -122,6 +122,10 @@ function LoginPage() {
   //   });
   // };
 
+  const googleAuth= ()=>{
+    window.open(`${process.env.REACT_APP_BACKEND_URL2}/api/users/auth/google`, "_self")
+  }
+
 
   return (
     <div className="newpage-section">
@@ -208,16 +212,19 @@ function LoginPage() {
                   Don't have an account? <Link to="/signup">Sign up</Link>
                 </div>
 
-                {/* <Button
-                  variant="primary"
-                  onClick={handleGoogleAuth}
+                <center>or</center>
+
+                <Button
+                  variant="danger"
+                  onClick={googleAuth}
                   className="forgotpassbutton"
                   block
                 >
-                  Login with Google
-                </Button> */}
-                <center>or</center> <br />
-                <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link>
+                  <FaGoogle title="Google" className="mb-1" />
+                  {" "}Login with Google
+                </Button>
+                {/* <center>or</center> <br />
+                <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link> */}
                 {/* <Link className=" mx-2 btn btn-primary" to="#"><FaFacebook title="Facebook" className="mb-1"  /> Facebook</Link> */}
               </Form>
             </div>

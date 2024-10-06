@@ -10,7 +10,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
       clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      callbackURL: `${process.env.BACKEND_URL}/api/users/auth/google/callback`,
+      callbackURL: `/api/users/auth/google/callback`,
+      // callbackURL: `${process.env.BACKEND_URL}/api/users/auth/google/callback`,
     },
     async function (accessToken, refreshToken, profile, done) {
       // In a production app, you would want to associate the Google account with a user record in your database

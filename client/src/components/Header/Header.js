@@ -37,6 +37,7 @@ function Header() {
     setShowSearchModal(false);
   };
 
+
   const handleLogout = () => {
     axios
       .post("/api/users/logout")
@@ -58,6 +59,31 @@ function Header() {
         console.error("Logout failed:", error);
       });
   };
+
+  useEffect(()=>{
+    const getUser= ()=>{
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/login/success`,{
+        method:"GET",
+        credentials:"include",
+        headers:{
+          Accept:"application/json",
+          "Content-Type":"application/json",
+          "Access-Control-Allow-Credentials":true
+        }
+      }).then((response)=>{
+        if(response.status===200) return response.json();
+        throw new Error("Failed sign in");
+      }).then(resObj=>{
+        setUser(resObj.user);
+        localStorage.setItem('token', resObj.token);
+      }).catch((err)=>{
+        console.log(err);
+      })
+    }
+    getUser();
+  },[])
+
+  console.log("User::::: ", user);
 
   useEffect(() => {
       if (isLoggedIn) {

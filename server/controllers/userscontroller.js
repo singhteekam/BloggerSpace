@@ -419,8 +419,6 @@ exports.loggedInUserInfo = async (req, res) => {
     const userId = req.session.userId; // Assuming you're using sessions
     const token = req.session.token; // Assuming you're using sessions
 
-    console.log("User info 422: ", req.user);
-
     console.log("LoggedIn fn User: ", req.session.user);
     console.log("LoggedIn fn Userid: ", req.session.userId);
     console.log("LoggedIn fn token: ", req.session.token);
@@ -725,6 +723,9 @@ exports.contactUs = async (req, res) => {
 exports.oauthGoogleCallback = async (req, res) => {
   // Successful authentication, redirect to profile page
 
+  if(req.user){
+
+
   console.log("Email: ", req.user.email);
   User.findOne({ email: req.user.email})
   .then((user) => {
@@ -749,7 +750,13 @@ exports.oauthGoogleCallback = async (req, res) => {
     console.log("User 746: ", req.user);
   
     const encodedToken = encodeURIComponent(token);
-    res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${token}`);
+    return res.status(200).json({
+        success:true,
+        message: "successful",
+        user: user,
+        token:token,
+        cookies: req.cookies
+      });
     // res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
   })
   .catch((err) => {
@@ -757,6 +764,8 @@ exports.oauthGoogleCallback = async (req, res) => {
     console.log("Error when using G-Auth login");
     res.status(500).json({ error: err });
   });
+
+}
 
   // res.json({ token });
 };

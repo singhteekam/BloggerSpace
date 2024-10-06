@@ -32,7 +32,9 @@ const multer = require("multer");
 const { checkUserName } = require("../utils/checkUsername");
 const { discardBlogFromDB } = require("../utils/discardBlog");
 
-const passport = require('./../services/oauth2.js'); 
+// const passport = require('./../services/oauth2.js');  bkp
+
+const passport= require("passport");
 
 
 // Route for verifying the user account
@@ -62,11 +64,13 @@ router.get('/auth/google',
 // );
 
 router.get("/auth/google/callback", passport.authenticate("google", {
-  successRedirect: "auth/login/success",
-  failureRedirect: "auth/login/failed"
-}), oauthGoogleCallback);
+  successRedirect: `${process.env.FRONTEND_URL}`,
+  failureRedirect: "/auth/login/failed"
+}));
 
-router.get('/auth/google/auth/login/success', oauthGoogleCallback);
+// router.get('/auth/google/auth/login/success', oauthGoogleCallback);
+
+router.get('/auth/login/success', oauthGoogleCallback);
 
 router.get('/auth/login/failed', async(req, res) => {
   return res.status(401).json({
