@@ -123,7 +123,7 @@ function LoginPage() {
   // };
 
   const googleAuth= ()=>{
-    window.open(`${process.env.REACT_APP_BACKEND_URL2}/api/users/auth/google`, "_self")
+    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`, "_self")
   }
 
 
