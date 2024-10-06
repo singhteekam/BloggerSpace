@@ -23,6 +23,8 @@ const AuthSuccess = () => {
     const token = params.get('token');
     // const decoded= decodeJWT(token);
 
+    console.log("Token in auth success: ", token);
+
     if (token) {
       // Save token to localStorage
       localStorage.setItem('token', token);

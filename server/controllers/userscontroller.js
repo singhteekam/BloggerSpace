@@ -415,29 +415,48 @@ exports.uploadProfilePicture = async (req, res) => {
 // User Info
 exports.loggedInUserInfo = async (req, res) => {
   try {
-    // Get the user ID from the session or token (depending on your authentication setup)
-    const userId = req.session.userId; // Assuming you're using sessions
-    const token = req.session.token; // Assuming you're using sessions
 
-    console.log("LoggedIn fn User: ", req.session.user);
-    console.log("LoggedIn fn Userid: ", req.session.userId);
-    console.log("LoggedIn fn token: ", req.session.token);
-    console.log("LoggedIn fn email: ", req.session.email);
-    console.log("LoggedIn fn userr: ", req.user);
+    // Get the token from the Authorization header (Bearer <token>)
+    const token = req.headers.authorization?.split(' ')[1]; 
 
-    console.log("Tokn: " + req.session.token);
-    console.log("userId: " + req.session.userId);
-    // logger.info("logged in User info: " + req.session.userId);
-
-    if (!userId && !token) {
-      logger.error("You are not logged in. Please login!!!!");
-      return res.status(404).json({ error: "Please login!!!!" });
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required. Please login!' });
     }
 
+    // Verify and decode the JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
     // Fetch the user information from the database
-    const user = await User.findById({
-      _id: new mongoose.Types.ObjectId(userId),
-    });
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get the user ID from the session or token (depending on your authentication setup)
+    // const userId = req.session.userId; // Assuming you're using sessions
+    // const token = req.session.token; // Assuming you're using sessions
+
+    // console.log("LoggedIn fn User: ", req.session.user);
+    // console.log("LoggedIn fn Userid: ", req.session.userId);
+    // console.log("LoggedIn fn token: ", req.session.token);
+    // console.log("LoggedIn fn email: ", req.session.email);
+    // // console.log("LoggedIn fn userr: ", req.user);
+
+    // console.log("Tokn: " + req.session.token);
+    // console.log("userId: " + req.session.userId);
+    // logger.info("logged in User info: " + req.session.userId);
+
+    // if (!userId && !token) {
+    //   logger.error("You are not logged in. Please login!!!!");
+    //   return res.status(404).json({ error: "Please login!!!!" });
+    // }
+
+    // Fetch the user information from the database
+    // const user = await User.findById({
+    //   _id: new mongoose.Types.ObjectId(userId),
+    // });
 
     // Return the user information as the response
     const userDetails = {
@@ -723,10 +742,11 @@ exports.contactUs = async (req, res) => {
 exports.oauthGoogleCallback = async (req, res) => {
   // Successful authentication, redirect to profile page
 
+  console.log("Inside oauthcallback: ", req.user);
   if(req.user){
+    console.log("Inside if of oauthcallback: ", req.user);
 
-
-  console.log("Email: ", req.user.email);
+  console.log("Inside if of oauthcallback Email 728: ", req.user.email);
   User.findOne({ email: req.user.email})
   .then((user) => {
     if (!user) {
@@ -734,30 +754,31 @@ exports.oauthGoogleCallback = async (req, res) => {
       console.log("User not found G-Auth");
     return res.redirect(`${process.env.FRONTEND_URL}/login`);
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "15m", // Token expiration time
+    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token expiration time
     });
   
-    req.session.user = user; // Will remove in future
-    req.session.userId = user._id;
-    req.session.token = token;
-    req.session.email = user.email;
+    // req.session.user = user; // Will remove in future
+    // req.session.userId = user._id;
+    // req.session.token = token;
+    // req.session.email = user.email;
 
-    console.log("User: ", req.session.user);
-    console.log("Userid: ", req.session.userId);
-    console.log("token: ", req.session.token);
-    console.log("email: ", req.session.email);
-    console.log("User 746: ", req.user);
+    // console.log("User: ", req.session.user);
+    // console.log("Userid: ", req.session.userId);
+    // console.log("token: ", req.session.token);
+    // console.log("email: ", req.session.email);
+    // console.log("User 746: ", req.user);
+    console.log("Tokenn: ", token)
   
     const encodedToken = encodeURIComponent(token);
-    return res.status(200).json({
-        success:true,
-        message: "successful",
-        user: user,
-        token:token,
-        cookies: req.cookies
-      });
-    // res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
+    // return res.status(200).json({
+    //     success:true,
+    //     message: "successful",
+    //     user: user,
+    //     token:token,
+    //     cookies: req.cookies
+    //   });
+    return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
   })
   .catch((err) => {
     logger.error("Error when using G-Auth login");

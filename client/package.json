@@ -12,11 +12,13 @@
     "@tinymce/tinymce-react": "^5.0.0",
     "axios": "^1.4.0",
     "bootstrap": "^5.2.3",
+    "ckeditor5-custom-build": "file:ckeditor5",
     "compressorjs": "^1.2.1",
     "draft-js": "^0.11.7",
     "draft-js-export-html": "^1.4.1",
     "framer-motion": "^11.2.6",
     "image-compressor.js": "^1.1.4",
+    "query-string": "^9.1.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.2.0",
@@ -30,7 +32,6 @@
     "react-select": "^5.8.0",
     "react-share": "^5.1.0",
     "react-toastify": "^10.0.5",
-    "ckeditor5-custom-build": "file:ckeditor5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

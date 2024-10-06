@@ -38,7 +38,11 @@ const MyBlogs = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get("/api/users/userinfo");
+        const response = await axios.get("/api/users/userinfo",{
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the request
+          },
+        });
         setUserProfile(response.data);
         setLoading(false);
       } catch (error) {

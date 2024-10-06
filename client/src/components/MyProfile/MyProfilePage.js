@@ -35,7 +35,11 @@ const MyProfilePage = () => {
 
   useEffect(() => {
     axios
-      .get("/api/users/userinfo")
+      .get("/api/users/userinfo", {
+        headers: {
+          Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
+        },
+      })
       .then((response) => {
         const userData = response.data;
 

@@ -88,7 +88,11 @@ function Header() {
   useEffect(() => {
       if (isLoggedIn) {
         axios
-          .get("/api/users/userinfo")
+          .get("/api/users/userinfo", {
+            headers: {
+              Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
+            },
+          })
           .then((response) => {
             const userData = response.data;
             setUser(userData);
@@ -96,7 +100,8 @@ function Header() {
           .catch((error) => {
             console.error("Error fetching user information:", error);
             if (error.response.status === 404) {
-              handleLogout();
+              // handleLogout();
+              console.log("Error in log out: ", error);
             }
           });
       }

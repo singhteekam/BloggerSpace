@@ -10,8 +10,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
       clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-      callbackURL: `/api/users/auth/google/callback`,
-      // callbackURL: `${process.env.BACKEND_URL}/api/users/auth/google/callback`,
+      // callbackURL: `/api/users/auth/google/callback`,
+      callbackURL: `${process.env.BACKEND_URL}/api/users/auth/google/callback`,
     },
     async function (accessToken, refreshToken, profile, done) {
       // In a production app, you would want to associate the Google account with a user record in your database
@@ -92,19 +92,21 @@ passport.use(
 
 // Serialize user to session
 passport.serializeUser((user, done) => {
-  done(null, user._id);
-  // done(null, user);
+  // done(null, user._id);
+  console.log("In serialize: ", user);
+  done(null, user);
 });
 
 // Deserialize user from session
-passport.deserializeUser(async(id, done) => {
-  try{
-    const user = await User.findById(id);
-    done(null, user);
-}
-catch(err) {
-    done(err, null);
-}
+passport.deserializeUser((user, done) => {
+  console.log("In deserialize : ", user);
+  done(null, user);
+//   try{
+//     // const user = await User.findById(id);
+// }
+// catch(err) {
+//     done(err, null);
+// }
   // done(null, obj); 
 });
 
