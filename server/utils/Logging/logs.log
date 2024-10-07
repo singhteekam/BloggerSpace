@@ -1307,3 +1307,475 @@
 [2024-10-07T09:45:43.747Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2024-10-07T09:45:47.215Z] [LOG] [DEBUG] - Topic is available: 
 [2024-10-07T09:45:47.233Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-07T23:00:39.824Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-07T23:00:39.824Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-07T23:00:39.824Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-07T23:00:39.887Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-07T23:00:39.887Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-07T23:00:39.887Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-07T23:00:40.319Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-07T23:00:40.323Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-07T23:05:58.732Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-07T23:05:59.079Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-07T23:06:18.629Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-07T23:06:18.960Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-07T23:06:29.294Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.294Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.633Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.633Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.638Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.638Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.643Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.648Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.643Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.648Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.717Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:29.717Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:30.033Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:30.033Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:30.042Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:30.042Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:30.059Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:30.059Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:30.143Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:30.143Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:40.230Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:40.230Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:40.235Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:40.242Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:40.235Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:40.242Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:40.252Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:40.252Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.476Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.476Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.480Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.480Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.487Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.487Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.491Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.491Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.816Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:41.816Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:42.249Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:42.249Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:58.690Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:58.690Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:58.694Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:58.694Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:58.985Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:58.985Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.007Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.007Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.013Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.013Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.121Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.121Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.125Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.125Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.451Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.451Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.463Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.463Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.544Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:06:59.544Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:36.994Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:36.994Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.307Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.307Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.315Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.315Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.319Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.319Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.321Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.321Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.407Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.407Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.793Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.793Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.854Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.854Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.857Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.857Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.902Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:58:37.902Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:03.684Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:03.684Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:03.688Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:03.688Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:03.997Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:03.997Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:03.999Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.001Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:03.999Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.001Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.098Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.098Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.371Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.371Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.406Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.406Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.417Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.417Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.475Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:04.475Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.543Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.543Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.860Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.860Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.863Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.863Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.867Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.869Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.867Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.869Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.965Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:14.965Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:15.280Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:15.280Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:15.282Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:15.284Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:15.282Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:15.284Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:15.381Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:15.381Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.111Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.111Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.471Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.471Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.474Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.476Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.478Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.474Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.476Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.478Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.676Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:33.676Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:34.084Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:34.084Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:34.086Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:34.088Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:34.086Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:34.088Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:34.289Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-07T23:59:34.289Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.222Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.222Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.225Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.225Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.228Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.228Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.540Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.540Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.544Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.544Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.677Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.677Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.681Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.686Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.681Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.686Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.984Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:14.984Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:15.113Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:02:15.113Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.347Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.347Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.351Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.351Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.678Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.678Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.684Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.684Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.690Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.690Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.793Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.793Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.799Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:25.799Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:26.132Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:26.132Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:26.137Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:26.137Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:26.228Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:26.228Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.067Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.067Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.071Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.071Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.079Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.079Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.388Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.388Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.395Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.395Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.522Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.522Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.531Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.531Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.537Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.537Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.843Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.843Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.953Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:05:56.953Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.216Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.216Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.222Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.222Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.227Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.227Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.530Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.530Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.535Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.535Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.656Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.656Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.668Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.668Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.675Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.675Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.961Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:05.961Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:06.077Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:09:06.077Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:05.826Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:05.826Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:05.831Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:05.831Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.155Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.155Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.159Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.165Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.159Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.165Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.247Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.247Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.253Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.253Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.578Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.578Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.593Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.593Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.686Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:06.686Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:10:21.213Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:10:21.226Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:13:36.540Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.540Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.546Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.546Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.856Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.856Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.860Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.860Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.868Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.868Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.981Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.981Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.986Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:36.986Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:37.281Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:37.281Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:37.305Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:37.305Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:37.411Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:37.411Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.200Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.200Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.209Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.209Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.521Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.521Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.526Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.530Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.526Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.530Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.653Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.653Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.656Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.656Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.972Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.972Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.977Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:56.977Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:57.092Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:13:57.092Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2024-10-08T00:14:02.240Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-08T00:15:30.985Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:15:31.218Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:18:34.754Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:18:34.777Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:18:39.786Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-08T00:18:42.067Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:18:42.342Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:21:29.934Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-08T00:36:09.221Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:36:09.670Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:39:49.218Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:39:49.226Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:39:49.226Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:39:49.226Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:39:49.397Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:39:49.397Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:39:49.397Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:39:49.418Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:39:49.418Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:39:49.418Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:39:49.589Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:39:49.714Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:39:49.714Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:39:49.715Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:40:57.262Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:40:57.262Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:40:57.262Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:40:57.518Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:40:57.538Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:40:57.538Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:40:57.538Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:40:57.673Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:40:57.673Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:40:57.674Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:41:00.612Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:41:00.761Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:00.761Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:00.762Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:41:00.889Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:00.889Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:00.889Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:03.781Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:41:03.937Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:03.937Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:03.937Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:41:04.065Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:04.065Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:04.065Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:04.385Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:41:04.525Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:04.525Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:04.526Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:41:12.019Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:12.019Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:12.019Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:12.113Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:41:12.258Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:12.258Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:12.259Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:41:20.183Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:20.183Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:20.183Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:20.445Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:41:20.612Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:20.612Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:20.636Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:20.613Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:41:20.636Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:20.636Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:41:21.060Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:41:21.224Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:21.224Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:41:21.224Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:44:08.999Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:44:09.029Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:44:09.029Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:44:09.029Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:44:09.165Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:44:09.165Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:44:09.166Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:44:09.305Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:44:09.305Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:44:09.305Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:44:09.486Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:44:09.613Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:44:09.613Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:44:09.614Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:53:29.585Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:53:29.803Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:53:29.803Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:53:29.804Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:53:29.837Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:29.837Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:29.837Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:30.013Z] [LOG] [DEBUG] - Searching for blog: gcjjhv
+[2024-10-08T00:53:30.123Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:53:30.123Z] [LOG] [INFO] - Blog: gcjjhv fetched. Content size is: 0.29296875 KB
+[2024-10-08T00:53:30.124Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2024-10-08T00:53:30.188Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:30.188Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:30.188Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:45.985Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:45.985Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:45.985Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:46.051Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:46.051Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:53:46.051Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:56:06.310Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:56:06.584Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:56:06.584Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:56:06.584Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:56:06.620Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:56:06.628Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:56:06.628Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:56:06.628Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-08T00:56:14.578Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-08T00:56:16.899Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:56:16.902Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:57:05.123Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:57:05.130Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:57:05.368Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:57:05.436Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:57:31.976Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:57:32.019Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:57:32.227Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:57:32.473Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:11.004Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:11.033Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:11.040Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:11.172Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:19.422Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:19.685Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:19.695Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:20.196Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:26.527Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:26.723Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:26.780Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:26.820Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:26.954Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:27.154Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:27.465Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:27.471Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:27.885Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:41.627Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:41.849Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:41.857Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:42.092Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:42.166Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:48.890Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:49.148Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:58:49.154Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:58:49.414Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:59:19.860Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:59:20.111Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:59:20.115Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:59:20.275Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:59:27.630Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:59:27.646Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T00:59:27.942Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T00:59:28.087Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:00:07.030Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:08.538Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:08.541Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:09.687Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:09.814Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:14.223Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:18.316Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:20.122Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:27.362Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:33.063Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:33.101Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:00:33.332Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:00:33.565Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:02:05.887Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:02:05.894Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:02:15.262Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:02:15.442Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh

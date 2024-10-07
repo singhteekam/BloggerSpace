@@ -51,6 +51,13 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
   const location= useLocation();
 
   useEffect(()=>{
+    if(user){
+      setAuthor(user?.userName);
+      setAuthorEmail(user?.email);
+    }
+  },[user]);
+
+  useEffect(()=>{
     blogTags.map((tag) => {
       const ob = {
         label: tag,
@@ -116,8 +123,7 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
 
     if (!user) {
       logout();
-      navigate("/login");
-      return null; // or display a loading indicator while redirecting
+      return <Navigate to="/login" state={{ from: location }} replace />
     }
     if (!isUniqueTitle) {
       // setAlert({ type: "danger", message: "Title already exists" });

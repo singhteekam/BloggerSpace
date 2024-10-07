@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import {
@@ -35,7 +35,10 @@ import ViewBlogRightSection from "./MostViewedBlogs";
 import TableOfContent from "./TOC/TableOfContent";
 import PreLoader from "utils/PreLoader";
 
+import { AuthContext } from "contexts/AuthContext";
+
 const ViewBlog = () => {
+  const { user, logout } = useContext(AuthContext);
   const { blogSlug } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,6 +60,21 @@ const ViewBlog = () => {
   const token = localStorage.getItem("token");
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      setDisableFollowButton(false);
+      for (let index = 0; index < user.savedBlogs.length; index++) {
+        if (
+          user.savedBlogs[index].slug ===
+          window.location.href.slice(window.location.href.lastIndexOf("/") + 1)
+        ) {
+          setIsBlogSaved(true);
+          break;
+        }
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchBlogViews = async () => {
@@ -81,34 +99,34 @@ const ViewBlog = () => {
       }
     };
 
-    const fetchLoggedInUser = async () => {
-      await axios
-        .get("/api/users/userinfo", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          const user = response.data;
-          // console.log(user);
-          setUserInfo(user);
-          setDisableFollowButton(false);
-          for (let index = 0; index < user.savedBlogs.length; index++) {
-            if (
-              user.savedBlogs[index].slug ===
-              window.location.href.slice(
-                window.location.href.lastIndexOf("/") + 1
-              )
-            ) {
-              setIsBlogSaved(true);
-              break;
-            }
-          }
-          // setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching user information:", error);
-          // setLoading(false);
-        });
-    };
+    // const fetchLoggedInUser = async () => {
+    //   await axios
+    //     .get("/api/users/userinfo", {
+    //       headers: { Authorization: `Bearer ${token}` },
+    //     })
+    //     .then((response) => {
+    //       const user = response.data;
+    //       // console.log(user);
+    //       setUserInfo(user);
+    //       setDisableFollowButton(false);
+    //       for (let index = 0; index < user.savedBlogs.length; index++) {
+    //         if (
+    //           user.savedBlogs[index].slug ===
+    //           window.location.href.slice(
+    //             window.location.href.lastIndexOf("/") + 1
+    //           )
+    //         ) {
+    //           setIsBlogSaved(true);
+    //           break;
+    //         }
+    //       }
+    //       // setLoading(false);
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error fetching user information:", error);
+    //       // setLoading(false);
+    //     });
+    // };
 
     // const fetchBlog = async () => {
     //   try {
@@ -135,7 +153,7 @@ const ViewBlog = () => {
     //   }
     // };
 
-    fetchLoggedInUser();
+    // fetchLoggedInUser();
     fetchBlog();
     // fetchComments();
     fetchBlogViews();
@@ -418,16 +436,16 @@ const ViewBlog = () => {
                 <h6>
                   <FaEye size="20px" /> {blog.blogViews} views
                 </h6>
-                {blog.status==="PUBLISHED" && (
+                {blog.status === "PUBLISHED" && (
                   <div>
-                  <Link
-                    className="btn bs-button-outline"
-                    // to={`/improveblog/${blog.blogId}`}
-                    to="#"
-                  >
-                    <i className="fa-solid fa-pen-to-square"></i> Improve Blog
-                  </Link>
-                </div>
+                    <Link
+                      className="btn bs-button-outline"
+                      // to={`/improveblog/${blog.blogId}`}
+                      to="#"
+                    >
+                      <i className="fa-solid fa-pen-to-square"></i> Improve Blog
+                    </Link>
+                  </div>
                 )}
                 <br />
                 <Card.Footer className="d-flex justify-content-left">
@@ -486,7 +504,9 @@ const ViewBlog = () => {
                     </div>
                   ) : (
                     <div className="mx-2 my-2">
-                      <h5 className="color-teal-green"><b>Admin</b></h5>
+                      <h5 className="color-teal-green">
+                        <b>Admin</b>
+                      </h5>
                     </div>
                   )}
 

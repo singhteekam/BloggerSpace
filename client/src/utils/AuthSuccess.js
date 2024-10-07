@@ -14,7 +14,9 @@ const decodeJWT = (token) => {
 const AuthSuccess = () => {
 
     const navigate = useNavigate();
+    
   const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
   // const token2="dhwwwwwwwww3y277gdug";
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const AuthSuccess = () => {
       // Save token to localStorage
       localStorage.setItem('token', token);
       // Redirect to homepage
-      navigate('/');
+      navigate(from, { replace: true });
     } else {
       // Handle login failure
       navigate('/login');

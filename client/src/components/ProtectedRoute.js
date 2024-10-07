@@ -12,7 +12,7 @@ const location = useLocation();
     console.log("11user",user?.email);
     if(!loading && !user){
         logout();
-        return <Navigate to="/login" state={{ from: location }} replace />
+        <Navigate to="/login" state={{ from: location }} replace />
     }
   },[loading]);
 

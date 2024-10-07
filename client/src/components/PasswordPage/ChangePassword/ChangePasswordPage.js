@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 
+
 function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -16,16 +17,7 @@ function ChangePasswordPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const isLoggedIn = localStorage.getItem("token");
-
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return; // or display a loading indicator while redirecting
-    }
-  }, [isLoggedIn]);
 
   const handleOldPasswordChange = (e) => {
     setOldPassword(e.target.value);

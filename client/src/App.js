@@ -95,7 +95,7 @@ const App = () => {
             {/* <Route path="/mynotes" element={<SignupPage />} /> */}
             <Route path="/:blogSlug" element={<ViewBlog />} />
             <Route path="/newblog" element={<ProtectedRoute><NewBlog /></ProtectedRoute>} />
-            <Route path="/editblog/:id" element={<EditBlog />} />
+            <Route path="/editblog/:id" element={<ProtectedRoute><EditBlog /></ProtectedRoute>} />
             <Route path="/verify-account" element={<VerifyAccountPage />} />
             <Route
               path="/myprofile"
@@ -112,12 +112,12 @@ const App = () => {
               path="/resetpassword/:resetToken"
               element={<ResetPasswordPage />}
             />
-            <Route path="/changepassword" element={<ChangePasswordPage />} />
+            <Route path="/changepassword" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
             <Route path="/myblogs" element={<ProtectedRoute><MyBlogs /></ProtectedRoute>} />
             <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
             <Route path="/guidelines" element={<WritingGuidelines />} />
             <Route path="/savedblogs" element={<ProtectedRoute><SavedBlogs /></ProtectedRoute>} />
-            <Route path="/improveblog/:blogId" element={<ImproveBlog />} />
+            <Route path="/improveblog/:blogId" element={<ProtectedRoute><ImproveBlog /></ProtectedRoute>} />
             <Route path="/sitemap" element={<Sitemap />} />
             <Route path="/privacypolicy" element={<PrivacyPolicy />} />
             <Route

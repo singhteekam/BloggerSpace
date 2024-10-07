@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Form,
   Button,
@@ -15,7 +15,10 @@ import { ToastContainer, toast } from "react-toastify";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
 
+import { AuthContext } from "contexts/AuthContext";
+
 function LoginPage() {
+  const { user, setUser, loading, logout } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -67,6 +70,7 @@ function LoginPage() {
         if (response.status === 200) {
           // setSuccess("Login successful");
           // setError("");
+          setUser(response.data);
 
           const headers = {
             Authorization: `Bearer ${token}`,
