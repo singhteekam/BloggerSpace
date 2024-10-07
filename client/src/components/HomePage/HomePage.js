@@ -14,11 +14,8 @@ import CarouselSection from "./CarouselSection";
 import PreLoader from "utils/PreLoader";
 
 function HomePage() {
-  const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
-  const isLoggedIn = localStorage.getItem("token");
 
   useEffect(() => {
     setTimeout(() => {

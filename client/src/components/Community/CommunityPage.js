@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { Helmet } from "react-helmet";
 import Select from "react-select";
 import axios from "axios";
@@ -19,30 +19,32 @@ import Editor from "ckeditor5-custom-build/build/ckeditor";
 // import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 
+import { AuthContext } from "contexts/AuthContext";
+
 const Community = () => {
+  const { user } = useContext(AuthContext);
   const [slug, setSlug] = useState("");
   const [topic, setTopic] = useState("");
   const [category, setCategory] = useState(null);
   const [content, setContent] = useState("");
-  const [userInfo, setUserInfo] = useState(null);
+  // const [user, setuser] = useState(null);
 
   const [allPosts, setAllPosts] = useState(null);
 
-  const isLoggedIn = localStorage.getItem("token");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchLoggedInUser = async () => {
-      await axios
-        .get("/api/users/userinfo")
-        .then((response) => {
-          const user = response.data;
-          setUserInfo(user);
-        })
-        .catch((error) => {
-          console.error("Error fetching user information:", error);
-        });
-    };
+    // const fetchLoggedInUser = async () => {
+    //   await axios
+    //     .get("/api/users/user")
+    //     .then((response) => {
+    //       const user = response.data;
+    //       setuser(user);
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error fetching user information:", error);
+    //     });
+    // };
 
     const getCommunityPosts = async (req, res) => {
       try {
@@ -52,7 +54,7 @@ const Community = () => {
         console.log("Error getting posts.....");
       }
     };
-    fetchLoggedInUser();
+    // fetchLoggedInUser();
     getCommunityPosts();
   }, []);
 
@@ -63,7 +65,7 @@ const Community = () => {
       toast.error("Please enter required details..");
     }
 
-    if (!isLoggedIn) {
+    if (!user) {
       navigate("/login");
       return null; // or display a loading indicator while redirecting
     }
@@ -141,7 +143,7 @@ const Community = () => {
             required
           />
           <br />
-          {userInfo === null ? (
+          {user === null ? (
             <b>
               You are not logged in. Please login to post anything you want.
             </b>
@@ -154,7 +156,7 @@ const Community = () => {
             onClick={handlePostSubmit}
             className="bs-button"
             size="sm"
-            disabled={userInfo === null ? true : false}
+            disabled={user === null ? true : false}
           >
             Post
           </Button>

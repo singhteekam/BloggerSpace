@@ -54,6 +54,7 @@ const ViewBlog = () => {
   // const [notFound, setNotFound] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const token = localStorage.getItem("token");
 
   const navigate = useNavigate();
 
@@ -82,7 +83,9 @@ const ViewBlog = () => {
 
     const fetchLoggedInUser = async () => {
       await axios
-        .get("/api/users/userinfo")
+        .get("/api/users/userinfo", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then((response) => {
           const user = response.data;
           // console.log(user);

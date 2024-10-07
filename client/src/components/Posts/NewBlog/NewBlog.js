@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Container,
   Form,
@@ -15,7 +15,7 @@ import TinymceEditor from "utils/TinymceEditor";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate, useLocation } from "react-router-dom";
 import blogCategory from "../../../utils/blogCategory.json";
 import blogTags from "../../../utils/blogTags.json";
 
@@ -23,11 +23,16 @@ import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Select from "react-select";
 
+import { AuthContext } from "contexts/AuthContext";
+
+import PreLoader from "utils/PreLoader";
+
 const NewBlog = () => {
+  const { user,loading, logout } = useContext(AuthContext);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
-  const [author, setAuthor] = useState("");
-  const [authorEmail, setAuthorEmail] = useState("");
+  const [author, setAuthor] = useState(user?.userName);
+  const [authorEmail, setAuthorEmail] = useState(user?.email);
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
   const [alert, setAlert] = useState(null);
@@ -38,12 +43,12 @@ const NewBlog = () => {
   const [contentSize, setContentSize] = useState(0);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [searchTitleResults, setTitleSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 const [blogTagsMapped, setBlogTagsMapped]= useState([]);
 
   const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem("token");
+  const location= useLocation();
 
   useEffect(()=>{
     blogTags.map((tag) => {
@@ -69,32 +74,32 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
       });
   }, [title]);
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return; // or display a loading indicator while redirecting
-    }
+  // useEffect(() => {
+  //   if (!isLoggedIn) {
+  //     navigate("/login");
+  //     return; // or display a loading indicator while redirecting
+  //   }
 
-    axios
-      .get("/api/users/userinfo")
-      .then((response) => {
-        const user = response.data;
-        console.log(user);
-        setAuthorEmail(user.email);
-        // Handle the user data as needed
-        if (!user.isVerified) {
-          navigate("/verify-account", {
-            state: { email: user.email, fullName: user.fullName },
-          });
-        }
-        setAuthor(user.userName);
-        console.log(author);
-      })
-      .catch((error) => {
-        console.error("Error fetching user information:", error);
-        // Handle the error
-      });
-  }, [isLoggedIn, navigate, author]);
+  //   axios
+  //     .get("/api/users/userinfo")
+  //     .then((response) => {
+  //       const user = response.data;
+  //       console.log(user);
+  //       setAuthorEmail(user.email);
+  //       // Handle the user data as needed
+  //       if (!user.isVerified) {
+  //         navigate("/verify-account", {
+  //           state: { email: user.email, fullName: user.fullName },
+  //         });
+  //       }
+  //       setAuthor(user.userName);
+  //       console.log(author);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching user information:", error);
+  //       // Handle the error
+  //     });
+  // }, [isLoggedIn, navigate, author]);
 
   //  Size of the content
   useEffect(() => {
@@ -109,7 +114,8 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isLoggedIn) {
+    if (!user) {
+      logout();
       navigate("/login");
       return null; // or display a loading indicator while redirecting
     }
@@ -211,14 +217,14 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
 
   async function searchSimilarTitles(searchQuery) {
     try {
-      setLoading(true);
+      // setLoading(true);
       const response = await axios.get(`/api/blogs/searchblogs/${searchQuery}`);
       console.log(response.data);
       setTitleSearchResults(response.data);
-      setLoading(false);
+      // setLoading(false);
     } catch (error) {
       console.error("Error searching similar blogs:", error);
-      setLoading(false);
+      // setLoading(false);
     }
   }
 
@@ -228,6 +234,15 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
     setTags(values);
     console.log("All tags: ",tags);
   };
+
+  if (loading) {
+    return <PreLoader isLoading={loading} />
+  }
+  if(!user && !loading){
+    console.log("Inside if");
+    logout();
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
 
   return (
     <div className="newpage-section">

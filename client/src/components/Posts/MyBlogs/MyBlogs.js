@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { Link, useLocation, Navigate } from "react-router-dom";
 import {
   Container,
   Card,
@@ -16,9 +16,13 @@ import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
 
+import { AuthContext } from "contexts/AuthContext";
+import PreLoader from "utils/PreLoader";
+
 const MyBlogs = () => {
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, logout } = useContext(AuthContext);
+  // const [user, setuser] = useState(null);
+  // const [loading, setLoading] = useState(true);
   const [awaitingAuthorBlogs, setAwaitingAuthorBlogs] = useState(null);
   const [authorPublishedBlogs, setAuthorPublishedBlogs] = useState(null);
   const [pendingReviewBlogs, setPendingReviewBlogs] = useState(null);
@@ -27,7 +31,8 @@ const MyBlogs = () => {
   const [alert, setAlert] = useState(null);
   const [isDisabled, setIsDisabled]= useState(false);
 
-  const token = localStorage.getItem("token");
+  const location= useLocation();
+
 
   var i = 0,
     j = 0,
@@ -36,20 +41,20 @@ const MyBlogs = () => {
     m = 0;
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axios.get("/api/users/userinfo",{
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the request
-          },
-        });
-        setUserProfile(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-        setLoading(false);
-      }
-    };
+    // const fetchuser = async () => {
+    //   try {
+    //     const response = await axios.get("/api/users/userinfo",{
+    //       headers: {
+    //         Authorization: `Bearer ${token}`, // Include the token in the request
+    //       },
+    //     });
+    //     setuser(response.data);
+    //     setLoading(false);
+    //   } catch (error) {
+    //     console.error("Error fetching user profile:", error);
+    //     setLoading(false);
+    //   }
+    // };
 
     const fetchSavedDraftBlogs = async () => {
       try {
@@ -105,7 +110,7 @@ const MyBlogs = () => {
       }
     };
 
-    fetchUserProfile();
+    // fetchuser();
     fetchSavedDraftBlogs();
     fetchPendingReviewBlogs();
     fetchUnderReviewBlogs();
@@ -140,11 +145,12 @@ const MyBlogs = () => {
   };
 
   if (loading) {
-    return (
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="primary" />
-      </Container>
-    );
+    return <PreLoader isLoading={loading} />
+  }
+  if(!user && !loading){
+    console.log("Inside if");
+    logout();
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   return (
@@ -170,8 +176,8 @@ const MyBlogs = () => {
         )}
         {/* <Card>
         <Card.Body>
-          <Card.Title>{userProfile?.fullName}</Card.Title>
-          <Card.Text>Email: {userProfile?.email}</Card.Text>
+          <Card.Title>{user?.fullName}</Card.Title>
+          <Card.Text>Email: {user?.email}</Card.Text>
         </Card.Body>
       </Card> */}
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Button, Offcanvas } from "react-bootstrap";
 import { Container, ListGroup } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
@@ -17,11 +17,14 @@ import { IoLogIn, IoLogInOutline, IoPeople, IoPerson } from "react-icons/io5";
 import { authheaderLinks, headerLinks } from "./HeaderItems";
 import { ToastContainer, toast } from "react-toastify";
 
+import { AuthContext } from "contexts/AuthContext";
+
 function Header() {
-  const [user, setUser] = useState(null);
+  const { user, setUser, logout } = useContext(AuthContext);
+  // const [user, setUser] = useState(null);
   // Placeholder for user login status
-  const isLoggedIn = localStorage.getItem("token"); // Set to true if user is logged in, false otherwise
-  const navigate = useNavigate();
+  // const isLoggedIn = localStorage.getItem("token"); // Set to true if user is logged in, false otherwise
+  // const navigate = useNavigate();
 
   const [showCanvas, setShowCanvas] = useState(false);
 
@@ -38,27 +41,27 @@ function Header() {
   };
 
 
-  const handleLogout = () => {
-    axios
-      .post("/api/users/logout")
-      .then((response) => {
-        // Handle the logout response here
-        console.log(response.data.message);
+  // const handleLogout = () => {
+  //   axios
+  //     .post("/api/users/logout")
+  //     .then((response) => {
+  //       // Handle the logout response here
+  //       console.log(response.data.message);
 
-        // Remove the token from localStorage
-        localStorage.removeItem("token");
+  //       // Remove the token from localStorage
+  //       localStorage.removeItem("token");
 
-        // Redirect to the login page
-        // navigate("/login");
-        window.location.reload();
-        toast.info("Logged out!!");
-      })
-      .catch((error) => {
-        // Handle any errors here
-        toast.error("Error occured: ", error);
-        console.error("Logout failed:", error);
-      });
-  };
+  //       // Redirect to the login page
+  //       // navigate("/login");
+  //       window.location.reload();
+  //       toast.info("Logged out!!");
+  //     })
+  //     .catch((error) => {
+  //       // Handle any errors here
+  //       toast.error("Error occured: ", error);
+  //       console.error("Logout failed:", error);
+  //     });
+  // };
 
   useEffect(()=>{
     const getUser= ()=>{
@@ -76,36 +79,40 @@ function Header() {
       }).then(resObj=>{
         setUser(resObj.user);
         localStorage.setItem('token', resObj.token);
+        toast.success("Sign in with Google success!!")
       }).catch((err)=>{
         console.log(err);
+        toast.error("Error occured when sign in with google", err);
       })
     }
     getUser();
-  },[])
+  },[]);
 
-  console.log("User::::: ", user);
 
-  useEffect(() => {
-      if (isLoggedIn) {
-        axios
-          .get("/api/users/userinfo", {
-            headers: {
-              Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
-            },
-          })
-          .then((response) => {
-            const userData = response.data;
-            setUser(userData);
-          })
-          .catch((error) => {
-            console.error("Error fetching user information:", error);
-            if (error.response.status === 404) {
-              // handleLogout();
-              console.log("Error in log out: ", error);
-            }
-          });
-      }
-  }, [isLoggedIn]);
+
+  // console.log("User::::: ", user);
+
+  // useEffect(() => {
+  //     if (isLoggedIn) {
+  //       axios
+  //         .get("/api/users/userinfo", {
+  //           headers: {
+  //             Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
+  //           },
+  //         })
+  //         .then((response) => {
+  //           const userData = response.data;
+  //           setUser(userData);
+  //         })
+  //         .catch((error) => {
+  //           console.error("Error fetching user information:", error);
+  //           if (error.response.status === 404) {
+  //             // handleLogout();
+  //             console.log("Error in log out: ", error);
+  //           }
+  //         });
+  //     }
+  // }, [isLoggedIn]);
 
   return (
     <div className="bgcolor-teal-green">
@@ -118,7 +125,7 @@ function Header() {
             className="mx-2 mt-1"
             onClick={handleShowCanvas}
           />
-          {isLoggedIn ? (
+          {user ? (
             <Offcanvas
               show={showCanvas}
               onHide={handleCloseCanvas}
@@ -143,7 +150,7 @@ function Header() {
                         onClick={
                           link.onclick === "closeCanvas"
                             ? handleCloseCanvas
-                            : handleLogout
+                            : logout
                         }
                       >
                         {link.icon} {link.name}
@@ -176,7 +183,7 @@ function Header() {
                         onClick={
                           link.onclick === "closeCanvas"
                             ? handleCloseCanvas
-                            : handleLogout
+                            : logout
                         }
                       >
                         {link.icon} {link.name}

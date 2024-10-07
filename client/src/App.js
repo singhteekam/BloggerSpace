@@ -34,9 +34,12 @@ import ImproveBlog from "components/Posts/ImproveBlog/ImproveBlog.js";
 import AdminBlogs from "components/Posts/AdminBlogs/AdminBlogs";
 import ScrollToTop from "utils/ScrollToTop";
 
+import { AuthProvider } from "contexts/AuthContext";
+import ProtectedRoute from "components/ProtectedRoute";
+
 const App = () => {
   return (
-    <>
+    <AuthProvider>
       <BrowserRouter>
         <Header />
 
@@ -61,10 +64,7 @@ const App = () => {
     users, View public profile of any user, Change username, like and comment, visitors count, admin dashboard. This website is developed by Teekam Singh"
           />
           <meta property="og:image" content="%PUBLIC_URL%/BLOGGERSPACE.png" />
-          <meta
-            property="og:url"
-            content={window.location.href}
-          />
+          <meta property="og:url" content={window.location.href} />
           <meta property="og:type" content="website" />
 
           <meta name="twitter:card" content="summary_large_image" />
@@ -79,24 +79,33 @@ const App = () => {
 
           <link rel="canonical" href={window.location.href} />
 
-          
-        <script charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=0737793c1d093bd321e4d7"></script>
+          <script
+            charset="utf-8"
+            src="//cdn.iframe.ly/embed.js?api_key=0737793c1d093bd321e4d7"
+          ></script>
         </Helmet>
 
         <main>
-        <ScrollToTop />
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<HomePage />} exact />
             <Route path="/blogs" element={<AllBlogs />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/mynotes" element={<SignupPage />} />
+            {/* <Route path="/mynotes" element={<SignupPage />} /> */}
             <Route path="/:blogSlug" element={<ViewBlog />} />
-            <Route path="/newblog" element={<NewBlog />} />
+            <Route path="/newblog" element={<ProtectedRoute><NewBlog /></ProtectedRoute>} />
             <Route path="/editblog/:id" element={<EditBlog />} />
             <Route path="/verify-account" element={<VerifyAccountPage />} />
-            <Route path="/myprofile" element={<MyProfilePage />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route
+              path="/myprofile"
+              element={
+                <ProtectedRoute>
+                  <MyProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
             <Route path="/profile/:username" element={<UserProfile />} />
             <Route
@@ -104,18 +113,24 @@ const App = () => {
               element={<ResetPasswordPage />}
             />
             <Route path="/changepassword" element={<ChangePasswordPage />} />
-            <Route path="/myblogs" element={<MyBlogs />} />
+            <Route path="/myblogs" element={<ProtectedRoute><MyBlogs /></ProtectedRoute>} />
             <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
             <Route path="/guidelines" element={<WritingGuidelines />} />
-            <Route path="/savedblogs" element={<SavedBlogs />} />
+            <Route path="/savedblogs" element={<ProtectedRoute><SavedBlogs /></ProtectedRoute>} />
             <Route path="/improveblog/:blogId" element={<ImproveBlog />} />
             <Route path="/sitemap" element={<Sitemap />} />
             <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-            <Route path="/termsandconditions" element={<TermsAndConditions />} />
+            <Route
+              path="/termsandconditions"
+              element={<TermsAndConditions />}
+            />
             <Route path="/about" element={<AboutBloggerSpace />} />
-            
+
             <Route path="/community" element={<CommunityPage />} />
-            <Route path="/community/post/:communityPostId/:communityPostSlug" element={<ViewCommunityPost />} />
+            <Route
+              path="/community/post/:communityPostId/:communityPostSlug"
+              element={<ViewCommunityPost />}
+            />
 
             <Route path="/adminblogs" element={<AdminBlogs />} />
 
@@ -127,7 +142,7 @@ const App = () => {
         </main>
         <Footer />
       </BrowserRouter>
-    </>
+    </AuthProvider>
   );
 };
 

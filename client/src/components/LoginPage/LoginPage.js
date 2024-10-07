@@ -8,7 +8,7 @@ import {
   FloatingLabel,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
@@ -20,6 +20,10 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isDisabled, setIsDisabled]= useState(false);
+
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/";
 
   const navigate = useNavigate();
 
@@ -76,8 +80,8 @@ function LoginPage() {
 
             // Redirect to the homepage
             setTimeout(() => {
-              navigate("/");
-            }, 2000);
+              navigate(from, { replace: true });
+            }, 1500);
           } else {
             setTimeout(() => {
               navigate("/verify-account", {
@@ -101,26 +105,6 @@ function LoginPage() {
       });
   };
 
-
-  // const handleGoogleAuth= async()=>{
-  //   try {
-  //     const response= await axios.get('/api/users/auth/google');
-  //     console.log(response);
-  //     toast.success("Logged in");
-  //   } catch (error) {
-  //     console.log(error);
-  //     toast.error("Error occured"+error);
-  //   }
-  // }
-
-  // const handleGoogleAuth = () => {
-  //   const popup = window.open('http://localhost:5000/api/users/auth/google', 'GoogleSignIn', 'width=500,height=600');
-  //   window.addEventListener('message', (event) => {
-  //     if (event.origin === 'http://localhost:3000' && event.data === 'success') {
-  //       navigate('/');
-  //     }
-  //   });
-  // };
 
   const googleAuth= ()=>{
     window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`, "_self")

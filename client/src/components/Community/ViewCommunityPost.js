@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { Helmet } from "react-helmet";
 import Select from "react-select";
 import axios from "axios";
@@ -28,31 +28,34 @@ import blogCategory from "../../utils/blogCategory.json";
 import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 
+import { AuthContext } from "contexts/AuthContext";
+
 const ViewCommunityPost = () => {
+  const { user, logout } = useContext(AuthContext);
   const { communityPostSlug, communityPostId } = useParams();
 
   const [communityPost, setCommunityPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [content, setContent] = useState("");
-  const [userInfo, setUserInfo] = useState(null);
+  // const [user, setuser] = useState(null);
 
   const isLoggedIn = localStorage.getItem("token");
   const navigate = useNavigate();
 
   useEffect(() => {
 
-    const fetchLoggedInUser = async () => {
-        await axios
-          .get("/api/users/userinfo")
-          .then((response) => {
-            const user = response.data;
-            setUserInfo(user);
-          })
-          .catch((error) => {
-            console.error("Error fetching user information:", error);
-          });
-      };
+    // const fetchLoggedInUser = async () => {
+    //     await axios
+    //       .get("/api/users/user")
+    //       .then((response) => {
+    //         const user = response.data;
+    //         setuser(user);
+    //       })
+    //       .catch((error) => {
+    //         console.error("Error fetching user information:", error);
+    //       });
+    //   };
 
     const fetchCommunityPost = async () => {
       try {
@@ -65,7 +68,7 @@ const ViewCommunityPost = () => {
         console.log("Error fetching post");
       }
     };
-    fetchLoggedInUser();
+    // fetchLoggedInUser();
     fetchCommunityPost();
   }, []);
 
@@ -98,7 +101,8 @@ const ViewCommunityPost = () => {
   const handleCommunityPostReply = async (e) => {
     e.preventDefault();
 
-    if (!isLoggedIn) {
+    if (!user) {
+      logout();
       navigate("/login");
       return null; // or display a loading indicator while redirecting
     }
@@ -262,12 +266,12 @@ const ViewCommunityPost = () => {
               }}
             />
             <br />
-            {userInfo===null?<b>You are not logged in. Please login to post your response.</b>:false} <br />
+            {user===null?<b>You are not logged in. Please login to post your response.</b>:false} <br />
             <Button
               className="bs-button"
               size="sm"
               onClick={handleCommunityPostReply}
-              disabled={userInfo===null?true:false}
+              disabled={user===null?true:false}
             >
               Post this reply
             </Button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Container,
   Card,
@@ -11,33 +11,36 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 
+import { AuthContext } from "contexts/AuthContext";
+
 const Settings = () => {
-  const [user, setUser] = useState(null);
+  const { user, loading, logout } = useContext(AuthContext);
+  // const [user, setUser] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const isLoggedIn = localStorage.getItem("token");
+  // const [loading, setloading] = useState(true);
+  // const isLoggedIn = localStorage.getItem("token");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      axios
-        .get("/api/users/userinfo", {
-          headers: {
-            Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
-          },
-        })
-        .then((response) => {
-          const userData = response.data;
-          setIsLoading(false);
-          setUser(userData);
-        })
-        .catch((error) => {
-          setIsLoading(false);
-          console.error("Error fetching user information:", error);
-        });
-    }
-  }, [isLoggedIn]);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     axios
+  //       .get("/api/users/userinfo", {
+  //         headers: {
+  //           Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
+  //         },
+  //       })
+  //       .then((response) => {
+  //         const userData = response.data;
+  //         setloading(false);
+  //         setUser(userData);
+  //       })
+  //       .catch((error) => {
+  //         setloading(false);
+  //         console.error("Error fetching user information:", error);
+  //       });
+  //   }
+  // }, [isLoggedIn]);
 
   const handleVerifyAccount = () => {
     navigate("/verify-account", {
@@ -72,13 +75,14 @@ const Settings = () => {
       });
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <Container className="d-flex justify-content-center align-items-center vh-100">
         <Spinner animation="border" variant="primary" />
       </Container>
     );
   }
+  
 
   return (
     <section className="newpage-section">

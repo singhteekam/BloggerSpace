@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext,useState, useEffect } from "react";
 import {
   Container,
   Card,
@@ -14,10 +14,13 @@ import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
 import ImageCompressor from "image-compressor.js";
 import { MdVerified } from "react-icons/md";
+import PreLoader from "utils/PreLoader";
 
+import { AuthContext } from "contexts/AuthContext";
 
 const MyProfilePage = () => {
-  const [user, setUser] = useState(null);
+  const { user, loading } = useContext(AuthContext);
+  // const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
@@ -25,36 +28,51 @@ const MyProfilePage = () => {
   const isLoggedIn = localStorage.getItem("token");
   const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [userName, setUserName] = useState("");
+  const [fullName, setFullName] = useState(user?.fullName);
+  const [userName, setUserName] = useState(user?.userName);
   const [userNameAvailable, setUserNameAvailable] = useState(null);
   const [showSuccess, setShowSuccess] = useState(null);
   const [showError, setShowError] = useState(null);
 
   let i = 0;
 
-  useEffect(() => {
-    axios
-      .get("/api/users/userinfo", {
-        headers: {
-          Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
-        },
-      })
-      .then((response) => {
-        const userData = response.data;
+  // useEffect(() => {
+  //   if (!user) {
+  //     console.log("User not found")
+  //     // If no user is found, log them out and redirect to login page
+  //     logout();
+  //     navigate("/login");
+  //   }
+  //   console.log("Current user: ", user);
+  // }, [user, logout, navigate]);
 
-        setIsLoading(false);
-        setUser(userData);
-        setFullName(userData?.fullName);
-        setUserName(userData?.userName);
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        console.error("Error fetching user information:", error);
-        // localStorage.removeItem("token");
-        // navigate("/login");
-      });
-  }, []);
+  if (!user && loading) {
+    return <PreLoader isLoading={loading} /> // This can be a loading indicator
+  }
+
+
+  // useEffect(() => {
+  //   axios
+  //     .get("/api/users/userinfo", {
+  //       headers: {
+  //         Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
+  //       },
+  //     })
+  //     .then((response) => {
+  //       const userData = response.data;
+
+  //       setIsLoading(false);
+  //       setUser(userData);
+  //       setFullName(userData?.fullName);
+  //       setUserName(userData?.userName);
+  //     })
+  //     .catch((error) => {
+  //       setIsLoading(false);
+  //       console.error("Error fetching user information:", error);
+  //       // localStorage.removeItem("token");
+  //       // navigate("/login");
+  //     });
+  // }, []);
 
   const checkUserNameAvailable = async (userName) => {
     await axios
@@ -137,13 +155,13 @@ const MyProfilePage = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <Container className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="primary" />
-      </Container>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <Container className="d-flex justify-content-center align-items-center vh-100">
+  //       <Spinner animation="border" variant="primary" />
+  //     </Container>
+  //   );
+  // }
 
   const handleshowEditPersonalDetailsModal = () => {
     setShowConfirmModal(true); // Show the confirmation modal
