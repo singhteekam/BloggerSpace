@@ -1779,3 +1779,102 @@
 [2024-10-08T01:02:05.894Z] [LOG] [DEBUG] - Topic is available: 
 [2024-10-08T01:02:15.262Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2024-10-08T01:02:15.442Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:03:26.431Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:03:26.545Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:03:38.322Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:03:38.325Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-08T01:03:51.998Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:03:52.269Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:05:12.145Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:05:12.562Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:05:38.799Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-08T01:05:39.218Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:07:27.559Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:07:27.559Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:07:27.559Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:07:27.800Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:07:27.800Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:07:27.800Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:09:27.178Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:09:27.178Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:09:27.178Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:09:27.204Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:09:27.486Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:09:27.486Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:09:27.486Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-12T15:09:27.512Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:09:38.147Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:09:38.523Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:12:52.953Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:12:53.254Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:12:53.261Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:12:53.323Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:13:01.909Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:13:02.139Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:13:06.109Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-12T15:13:08.487Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:13:08.493Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:14:30.389Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:14:57.496Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:14:57.751Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:14:57.774Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:14:57.933Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:15:06.553Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:15:06.782Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:15:13.698Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-12T15:15:16.032Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:15:16.035Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:17:11.357Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:17:15.914Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:17:53.007Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:17:53.280Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:17:53.287Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:17:53.444Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:18:21.917Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:18:21.925Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:18:23.216Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-12T15:18:26.207Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:18:26.459Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:19:44.645Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:19:44.659Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:19:48.215Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-12T15:19:50.711Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:19:50.963Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:20:51.445Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:20:51.535Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:20:56.735Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-12T15:20:59.300Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:20:59.303Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:23:58.531Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:23:58.576Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:24:03.641Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
+[2024-10-12T15:24:06.090Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:24:06.132Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:34:34.128Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:34:34.505Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:34:41.553Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:34:41.561Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:37:35.277Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:37:35.902Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:37:35.915Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:37:36.088Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:37:46.996Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:37:47.006Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:37:52.662Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:37:52.899Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:38:22.090Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:38:22.108Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:38:27.460Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:38:27.467Z] [LOG] [DEBUG] - Topic is available: 
+[2024-10-12T15:44:56.070Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:44:56.297Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:45:27.434Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:45:27.883Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:52:00.830Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T15:52:01.301Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T22:11:56.772Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T22:11:57.152Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T22:24:07.593Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T22:24:07.956Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T22:26:19.217Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-12T22:26:19.302Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh

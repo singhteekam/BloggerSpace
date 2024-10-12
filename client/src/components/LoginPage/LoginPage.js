@@ -70,7 +70,7 @@ function LoginPage() {
         if (response.status === 200) {
           // setSuccess("Login successful");
           // setError("");
-          setUser(response.data);
+          setUser(response.data.userDetails);
 
           const headers = {
             Authorization: `Bearer ${token}`,
@@ -78,9 +78,9 @@ function LoginPage() {
           console.log(headers);
 
           if (response.data.userDetails.isVerified) {
-            await axios.get("/api/blogs", { headers });
+            // await axios.get("/api/blogs", { headers });
 
-            toast.success("Login successful!");
+            // toast.success("Login successful!");
 
             // Redirect to the homepage
             setTimeout(() => {
@@ -112,6 +112,9 @@ function LoginPage() {
 
   const googleAuth= ()=>{
     window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`, "_self")
+  }
+  const facebookAuth= ()=>{
+    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/facebook`, "_self")
   }
 
 
@@ -209,7 +212,16 @@ function LoginPage() {
                   block
                 >
                   <FaGoogle title="Google" className="mb-1" />
-                  {" "}Login with Google
+                  {" "}Sign in with Google
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={facebookAuth}
+                  className="forgotpassbutton"
+                  block
+                >
+                  <FaFacebook title="Google" className="mb-1" />
+                  {" "}Sign in with Facebook
                 </Button>
                 {/* <center>or</center> <br />
                 <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link> */}

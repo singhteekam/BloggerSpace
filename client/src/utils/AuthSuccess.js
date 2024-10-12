@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
+import PreLoader from './PreLoader';
 
 const decodeJWT = (token) => {
     const base64Url = token.split('.')[1];
@@ -14,7 +15,7 @@ const decodeJWT = (token) => {
 const AuthSuccess = () => {
 
     const navigate = useNavigate();
-    
+
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
   // const token2="dhwwwwwwwww3y277gdug";
@@ -38,7 +39,7 @@ const AuthSuccess = () => {
     }
   }, [navigate, location]);
 
-  return <div>Loading...</div>;
+  return <PreLoader isLoading="true" />;
 };
 
 export default AuthSuccess

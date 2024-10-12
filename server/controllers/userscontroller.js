@@ -140,7 +140,7 @@ exports.signup = async (req, res) => {
 
 // Login controller
 exports.login = async (req, res) => {
-  console.log("Session Id: " + req.sessionID);
+  // console.log("Session Id: " + req.sessionID);
   try {
     const { email, password } = req.body;
 
@@ -165,18 +165,22 @@ exports.login = async (req, res) => {
     });
     // console.log(token);
     const userDetails = {
-      email: user.email,
+      _id: user._id,
       fullName: user.fullName,
+      userName: user.userName,
+      email: user.email,
       isVerified: user.isVerified,
+      profilePicture: user.profilePicture,
+      savedBlogs: user.savedBlogs,
     };
 
-    req.session.user = user; // Will remove in future
-    req.session.userId = user._id;
-    req.session.token = token;
-    req.session.email = user.email;
-    console.log("userId: " + req.session.userId);
+    // req.session.user = user; // Will remove in future
+    // req.session.userId = user._id;
+    // req.session.token = token;
+    // req.session.email = user.email;
+    // console.log("userId: " + req.session.userId);
 
-    logger.debug("New user logged in: " + user.fullName);
+    // logger.debug("New user logged in: " + user.fullName);
     res.status(200).json({ message: "Login successful", token, userDetails });
   } catch (error) {
     logger.error("Login failed: " + error.message);
@@ -790,3 +794,34 @@ exports.oauthGoogleCallback = async (req, res) => {
 
   // res.json({ token });
 };
+
+
+// Facebook login
+exports.authFacebookCallback = async (req, res) => {
+  console.log("Inside authFacebook: ", req.user?.email);
+  if(req.user){
+    console.log("Inside if of authFacebook: ", req.user?.email);
+
+  console.log("Inside if of authFacebook Email 806: ", req.user.email);
+  User.findOne({ email: req.user.email})
+  .then((user) => {
+    if (!user) {
+      logger.error("User Not found Facebook ");
+      console.log("User not found Facebook");
+    return res.redirect(`${process.env.FRONTEND_URL}/login`);
+    }
+    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token expiration time
+    });
+  
+    console.log("Tokenn facebook: ", token);  
+    const encodedToken = encodeURIComponent(token);
+
+    return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
+  })
+  .catch((err) => {
+    logger.error("Error when using Facebook login");
+    console.log("Error when using Facebook login");
+    res.status(500).json({ error: err });
+  });
+}};

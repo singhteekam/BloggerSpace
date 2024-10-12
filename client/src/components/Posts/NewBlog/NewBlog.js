@@ -31,8 +31,8 @@ const NewBlog = () => {
   const { user,loading, logout } = useContext(AuthContext);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
-  const [author, setAuthor] = useState(user?.userName);
-  const [authorEmail, setAuthorEmail] = useState(user?.email);
+  const [author, setAuthor] = useState("");
+  const [authorEmail, setAuthorEmail] = useState("");
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
   const [alert, setAlert] = useState(null);
@@ -51,11 +51,12 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
   const location= useLocation();
 
   useEffect(()=>{
+    console.log(user);
     if(user){
       setAuthor(user?.userName);
       setAuthorEmail(user?.email);
     }
-  },[user]);
+  },[user, loading]);
 
   useEffect(()=>{
     blogTags.map((tag) => {

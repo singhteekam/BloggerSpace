@@ -25,6 +25,7 @@ const {
   contactUs,
   oauthGoogleSuccess,
   oauthGoogleCallback,
+  authFacebookCallback,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -58,16 +59,22 @@ router.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-// router.get('/auth/google/callback', 
-//   passport.authenticate('google', { failureRedirect: '/' }),
-//   oauthGoogleCallback
-// );
-
 router.get("/auth/google/callback", passport.authenticate("google", {
   session: false, // Disable session in callback
   // successRedirect: `${process.env.FRONTEND_URL}`,
   // failureRedirect: "/auth/login/failed"
 }), oauthGoogleCallback);
+
+// Login with Facebook
+router.get('/auth/facebook',
+  passport.authenticate('facebook', { scope: ['email'] })
+);
+
+router.get("/auth/facebook/callback", passport.authenticate("facebook", {
+  session: false, // Disable session in callback
+}), authFacebookCallback);
+
+
 
 // router.get('/auth/google/auth/login/success', oauthGoogleCallback);
 
