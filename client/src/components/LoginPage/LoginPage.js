@@ -113,18 +113,18 @@ function LoginPage() {
   const googleAuth= ()=>{
     window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`, "_self")
   }
-  const facebookAuth= ()=>{
-    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/facebook`, "_self")
-  }
+  // const facebookAuth= ()=>{
+  //   window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/facebook`, "_self")
+  // }
   const githubAuth= ()=>{
     window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/github`, "_self")
   }
-  const linkedinAuth= ()=>{
-    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/linkedin`, "_self")
-  }
-  const twitterAuth= ()=>{
-    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/twitter`, "_self")
-  }
+  // const linkedinAuth= ()=>{
+  //   window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/linkedin`, "_self")
+  // }
+  // const twitterAuth= ()=>{
+  //   window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/twitter`, "_self")
+  // }
 
 
   return (
@@ -223,7 +223,7 @@ function LoginPage() {
                   <FaGoogle title="Google" className="mb-1" />
                   {" "}Sign in with Google
                 </Button>
-                <Button
+                {/* <Button
                   variant="primary"
                   onClick={facebookAuth}
                   className="forgotpassbutton"
@@ -231,9 +231,9 @@ function LoginPage() {
                 >
                   <FaFacebook title="Google" className="mb-1" />
                   {" "}Sign in with Facebook
-                </Button>
+                </Button> */}
                 <Button
-                  variant="primary"
+                  variant="dark"
                   onClick={githubAuth}
                   className="forgotpassbutton"
                   block
@@ -241,7 +241,7 @@ function LoginPage() {
                   <FaGithub title="Github" className="mb-1" />
                   {" "}Sign in with Github
                 </Button>
-                <Button
+                {/* <Button
                   variant="primary"
                   onClick={linkedinAuth}
                   className="forgotpassbutton"
@@ -249,8 +249,8 @@ function LoginPage() {
                 >
                   <FaGithub title="Linkedin" className="mb-1" />
                   {" "}Sign in with Linkedin
-                </Button>
-                <Button
+                </Button> */}
+                {/* <Button
                   variant="primary"
                   onClick={twitterAuth}
                   className="forgotpassbutton"
@@ -258,7 +258,7 @@ function LoginPage() {
                 >
                   <FaGithub title="Linkedin" className="mb-1" />
                   {" "}Sign in with Twitter
-                </Button>
+                </Button> */}
                 {/* <center>or</center> <br />
                 <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link> */}
                 {/* <Link className=" mx-2 btn btn-primary" to="#"><FaFacebook title="Facebook" className="mb-1"  /> Facebook</Link> */}

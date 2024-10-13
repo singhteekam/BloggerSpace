@@ -13,6 +13,7 @@
   "author": "Teekam Singh",
   "license": "ISC",
   "dependencies": {
+    "@superfaceai/passport-twitter-oauth2": "^1.2.4",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
@@ -34,7 +35,6 @@
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
     "passport-linkedin-oauth2": "^2.0.0",
-    "passport-twitter": "^1.0.4",
     "sitemap": "^7.1.1",
     "uuid": "^9.0.0",
     "winston": "^3.11.0"

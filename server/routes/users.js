@@ -68,14 +68,6 @@ router.get("/auth/google/callback", passport.authenticate("google", {
   // failureRedirect: "/auth/login/failed"
 }), oauthGoogleCallback);
 
-// Login with Facebook
-router.get('/auth/facebook',
-  passport.authenticate('facebook', { scope: ['email'] })
-);
-
-router.get("/auth/facebook/callback", passport.authenticate("facebook", {
-  session: false, // Disable session in callback
-}), authFacebookCallback);
 
 // Login with Github
 router.get('/auth/github',
@@ -86,25 +78,34 @@ router.get("/auth/github/callback", passport.authenticate("github", {
   session: false, // Disable session in callback
 }), authGithubCallback);
 
-// Login with Linkedin
-router.get('/auth/linkedin',
-  passport.authenticate('linkedin',{ scope: ['r_basicprofile', 'r_emailaddress'] })
-);
 
-router.get("/auth/linkedin/callback", passport.authenticate("linkedin", {
-  session: false, // Disable session in callback
-}), authLinkedinCallback);
+// // Login with Facebook
+// router.get('/auth/facebook',
+//   passport.authenticate('facebook', { scope: ['email'] })
+// );
 
-// Login with Twitter
-router.get('/auth/twitter',
-  passport.authenticate('twitter',{ scope: ['profile', 'email'] })
-);
-
-router.get("/auth/twitter/callback", passport.authenticate("twitter", {
-  session: false, // Disable session in callback
-}), authTwitterCallback);
+// router.get("/auth/facebook/callback", passport.authenticate("facebook", {
+//   session: false, // Disable session in callback
+// }), authFacebookCallback);
 
 
+// // Login with Linkedin
+// router.get('/auth/linkedin',
+//   passport.authenticate('linkedin',{ scope: ['r_basicprofile', 'r_emailaddress'] })
+// );
+
+// router.get("/auth/linkedin/callback", passport.authenticate("linkedin", {
+//   session: false, // Disable session in callback
+// }), authLinkedinCallback);
+
+// // Login with Twitter
+// router.get('/auth/twitter',
+//   passport.authenticate('twitter',{ scope: ['tweet.read', 'users.read', 'offline.access'] })
+// );
+
+// router.get("/auth/twitter/callback", passport.authenticate("twitter", {
+//   session: false, // Disable session in callback
+// }), authTwitterCallback);
 
 // router.get('/auth/google/auth/login/success', oauthGoogleCallback);
 
@@ -120,7 +121,7 @@ router.get("/auth/twitter/callback", passport.authenticate("twitter", {
 //     })
 //   }
 // });
-router.get('/auth/login/success', oauthGoogleCallback);
+// router.get('/auth/login/success', oauthGoogleCallback);
 
 router.get('/auth/login/failed', async(req, res) => {
   return res.status(401).json({

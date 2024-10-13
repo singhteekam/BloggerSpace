@@ -13,7 +13,7 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
+import { FaGoogle, FaFacebook, FaGithub } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
 
 function SignupPage() {
@@ -119,6 +119,13 @@ function SignupPage() {
         }
       });
   };
+
+  const googleAuth= ()=>{
+    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`, "_self")
+  }
+  const githubAuth= ()=>{
+    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/github`, "_self")
+  }
 
   return (
     <div className="newpage-section">
@@ -238,9 +245,31 @@ function SignupPage() {
                 <div>
                   Already have an account? <Link to="/login">Login</Link>
                 </div>
+                <center>or</center>
 
-                <center>or</center> <br />
-                <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link>
+                <Button
+                  variant="danger"
+                  onClick={googleAuth}
+                  className="forgotpassbutton"
+                  block
+                >
+                  <FaGoogle title="Google" className="mb-1" />
+                  {" "}Sign in with Google
+                </Button>
+
+                <Button
+                  variant="dark"
+                  onClick={githubAuth}
+                  className="forgotpassbutton mx-1"
+                  block
+                >
+                  <FaGithub title="Github" className="mb-1" />
+                  {" "}Sign in with Github
+                </Button>
+
+                {/* <center>or</center> <br />
+                <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link> */}
+                
               </Form>
             </div>{" "}
           </Col>
