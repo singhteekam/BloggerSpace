@@ -825,3 +825,93 @@ exports.authFacebookCallback = async (req, res) => {
     res.status(500).json({ error: err });
   });
 }};
+
+// GitHub login
+exports.authGithubCallback = async (req, res) => {
+  console.log("Inside authGithub: ", req.user?.email);
+  if(req.user){
+    console.log("Inside if of authGithub: ", req.user?.email);
+
+  console.log("Inside if of authGithub Email 835: ", req.user.email);
+  User.findOne({ email: req.user.email})
+  .then((user) => {
+    if (!user) {
+      logger.error("User Not found Github ");
+      console.log("User not found Github");
+    return res.redirect(`${process.env.FRONTEND_URL}/login`);
+    }
+    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token expiration time
+    });
+  
+    console.log("Tokenn github: ", token);  
+    const encodedToken = encodeURIComponent(token);
+
+    return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
+  })
+  .catch((err) => {
+    logger.error("Error when using github login");
+    console.log("Error when using github login");
+    res.status(500).json({ error: err });
+  });
+}};
+
+// Linkedin login
+exports.authLinkedinCallback = async (req, res) => {
+  console.log("Inside authLinkedin: ", req.user?.email);
+  if(req.user){
+    console.log("Inside if of authLinkedin: ", req.user?.email);
+
+  console.log("Inside if of authLinkedin Email 835: ", req.user.email);
+  User.findOne({ email: req.user.email})
+  .then((user) => {
+    if (!user) {
+      logger.error("User Not found authLinkedin ");
+      console.log("User not found authLinkedin");
+    return res.redirect(`${process.env.FRONTEND_URL}/login`);
+    }
+    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token expiration time
+    });
+  
+    console.log("Tokenn authLinkedin: ", token);  
+    const encodedToken = encodeURIComponent(token);
+
+    return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
+  })
+  .catch((err) => {
+    logger.error("Error when using linkedin login");
+    console.log("Error when using linkedin login");
+    res.status(500).json({ error: err });
+  });
+}};
+
+// Linkedin login
+exports.authTwitterCallback = async (req, res) => {
+  console.log("Inside twitter: ", req.user?.email);
+  if(req.user){
+    console.log("Inside if of twitter: ", req.user?.email);
+
+  console.log("Inside if of twitter Email 895: ", req.user.email);
+  User.findOne({ email: req.user.email})
+  .then((user) => {
+    if (!user) {
+      logger.error("User Not found twitter ");
+      console.log("User not found twitter");
+    return res.redirect(`${process.env.FRONTEND_URL}/login`);
+    }
+    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token expiration time
+    });
+  
+    console.log("Tokenn twitter: ", token);  
+    const encodedToken = encodeURIComponent(token);
+
+    return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
+  })
+  .catch((err) => {
+    logger.error("Error when using twitter login");
+    console.log("Error when using twitter login");
+    res.status(500).json({ error: err });
+  });
+}};

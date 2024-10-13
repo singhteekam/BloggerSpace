@@ -26,6 +26,9 @@ const {
   oauthGoogleSuccess,
   oauthGoogleCallback,
   authFacebookCallback,
+  authGithubCallback,
+  authLinkedinCallback,
+  authTwitterCallback,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -73,6 +76,33 @@ router.get('/auth/facebook',
 router.get("/auth/facebook/callback", passport.authenticate("facebook", {
   session: false, // Disable session in callback
 }), authFacebookCallback);
+
+// Login with Github
+router.get('/auth/github',
+  passport.authenticate('github', { scope: [ 'user:email' ] })
+);
+
+router.get("/auth/github/callback", passport.authenticate("github", {
+  session: false, // Disable session in callback
+}), authGithubCallback);
+
+// Login with Linkedin
+router.get('/auth/linkedin',
+  passport.authenticate('linkedin',{ scope: ['r_basicprofile', 'r_emailaddress'] })
+);
+
+router.get("/auth/linkedin/callback", passport.authenticate("linkedin", {
+  session: false, // Disable session in callback
+}), authLinkedinCallback);
+
+// Login with Twitter
+router.get('/auth/twitter',
+  passport.authenticate('twitter',{ scope: ['profile', 'email'] })
+);
+
+router.get("/auth/twitter/callback", passport.authenticate("twitter", {
+  session: false, // Disable session in callback
+}), authTwitterCallback);
 
 
 
