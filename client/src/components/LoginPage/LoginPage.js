@@ -12,7 +12,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { ToastContainer, toast } from "react-toastify";
-import { FaGoogle, FaFacebook, FaGithub } from "react-icons/fa";
+import { FaGoogle, FaFacebook, FaGithub, FaMicrosoft } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
 
 import { AuthContext } from "contexts/AuthContext";
@@ -119,6 +119,9 @@ function LoginPage() {
   const githubAuth= ()=>{
     window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/github`, "_self")
   }
+  const microsoftAuth= ()=>{
+    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/microsoft`, "_self")
+  }
   // const linkedinAuth= ()=>{
   //   window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/linkedin`, "_self")
   // }
@@ -214,7 +217,8 @@ function LoginPage() {
 
                 <center>or</center>
 
-                <Button
+                <center>
+                  <Button
                   variant="danger"
                   onClick={googleAuth}
                   className="forgotpassbutton"
@@ -241,6 +245,15 @@ function LoginPage() {
                   <FaGithub title="Github" className="mb-1" />
                   {" "}Sign in with Github
                 </Button>
+                <Button
+                  variant="primary"
+                  onClick={microsoftAuth}
+                  className="forgotpassbutton"
+                  block
+                >
+                  <FaMicrosoft title="Github" className="mb-1" />
+                  {" "}Sign in with Microsoft
+                </Button>
                 {/* <Button
                   variant="primary"
                   onClick={linkedinAuth}
@@ -259,6 +272,7 @@ function LoginPage() {
                   <FaGithub title="Linkedin" className="mb-1" />
                   {" "}Sign in with Twitter
                 </Button> */}
+                </center>
                 {/* <center>or</center> <br />
                 <Link className="btn btn-danger" to={`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/google`}><FaGoogle title="Google" className="mb-1" /> Sign in with Google</Link> */}
                 {/* <Link className=" mx-2 btn btn-primary" to="#"><FaFacebook title="Facebook" className="mb-1"  /> Facebook</Link> */}

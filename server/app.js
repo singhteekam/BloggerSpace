@@ -10,11 +10,11 @@ const path = require("path");
 
 const functions = require("firebase-functions");
 
-// require("dotenv").config(); // Load environment variables from .env file - Production mode
-require("dotenv").config({ path: ".env.local" }); // development mode
+require("dotenv").config(); // Load environment variables from .env file - Production mode
+// require("dotenv").config({ path: ".env.local" }); // development mode
 
-const PORT = process.env.PORT || 5000; // For development
-// const PORT = 8183;  // For production
+// const PORT = process.env.PORT || 5000; // For development
+const PORT = 8183;  // For production
 
 
 const connectDB = require("./db/db");
@@ -27,7 +27,7 @@ const communityRoutes = require("./routes/community");
 
 const sitemapRouter = require("./routes/sitemap");
 
-const passport = require("./services/oauth2.js");
+const passport = require("./services/passportAuth.js");
 
 app.use("/api", sitemapRouter);
 

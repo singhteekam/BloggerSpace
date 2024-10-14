@@ -23,12 +23,9 @@ const {
   followUser,
   unfollowUser,
   contactUs,
-  oauthGoogleSuccess,
   oauthGoogleCallback,
-  authFacebookCallback,
   authGithubCallback,
-  authLinkedinCallback,
-  authTwitterCallback,
+  authPassportCallback,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -61,22 +58,27 @@ router.post("/login", login);
 router.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
-
 router.get("/auth/google/callback", passport.authenticate("google", {
   session: false, // Disable session in callback
   // successRedirect: `${process.env.FRONTEND_URL}`,
   // failureRedirect: "/auth/login/failed"
-}), oauthGoogleCallback);
-
+}), authPassportCallback);
 
 // Login with Github
 router.get('/auth/github',
   passport.authenticate('github', { scope: [ 'user:email' ] })
 );
-
 router.get("/auth/github/callback", passport.authenticate("github", {
   session: false, // Disable session in callback
-}), authGithubCallback);
+}), authPassportCallback);
+
+// Login with Microsoft
+router.get('/auth/microsoft',
+  passport.authenticate('azuread-openidconnect')
+);
+router.post("/auth/microsoft/callback", passport.authenticate("azuread-openidconnect", {
+  session: false, // Disable session in callback
+}), authPassportCallback);
 
 
 // // Login with Facebook

@@ -9,7 +9,7 @@ const sendEmail = require("../services/mailer");
 const validateUsername = require("../utils/validateUsername");
 const Visit = require("../models/Visitor");
 const logger = require("./../utils/Logging/logs");
-const passport = require("./../services/oauth2.js");
+const passport = require("../services/passportAuth.js");
 
 // verifyAccount controller
 exports.verifyAccount = async (req, res) => {
@@ -791,125 +791,33 @@ exports.oauthGoogleCallback = async (req, res) => {
   });
 }};
 
-// GitHub login
-exports.authGithubCallback = async (req, res) => {
-  console.log("Inside authGithub: ", req.user?.email);
-  if(req.user){
-    console.log("Inside if of authGithub: ", req.user?.email);
 
-  console.log("Inside if of authGithub Email 835: ", req.user.email);
+// Passport Login Callback
+exports.authPassportCallback = async (req, res) => {
+  console.log("Inside auth passport callback: ", req.user?.email);
+  if(req.user){
+    console.log("Inside if of auth passport callback: ", req.user?.email);
+
+  console.log("Inside if of auth passport callback Email 830: ", req.user.email);
   User.findOne({ email: req.user.email})
   .then((user) => {
     if (!user) {
-      logger.error("User Not found Github ");
-      console.log("User not found Github");
+      logger.error("User Not found!!");
+      console.log("User not found!!");
     return res.redirect(`${process.env.FRONTEND_URL}/login`);
     }
     const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
       expiresIn: "1h", // Token expiration time
     });
   
-    console.log("Tokenn github: ", token);  
+    console.log("Token generated: ", token);  
     const encodedToken = encodeURIComponent(token);
 
     return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
   })
   .catch((err) => {
-    logger.error("Error when using github login");
-    console.log("Error when using github login");
+    logger.error("Error when using passport login");
+    console.log("Error when using passport login");
     res.status(500).json({ error: err });
   });
 }};
-
-
-
-// Facebook login
-// exports.authFacebookCallback = async (req, res) => {
-//   console.log("Inside authFacebook: ", req.user?.email);
-//   if(req.user){
-//     console.log("Inside if of authFacebook: ", req.user?.email);
-
-//   console.log("Inside if of authFacebook Email 806: ", req.user.email);
-//   User.findOne({ email: req.user.email})
-//   .then((user) => {
-//     if (!user) {
-//       logger.error("User Not found Facebook ");
-//       console.log("User not found Facebook");
-//     return res.redirect(`${process.env.FRONTEND_URL}/login`);
-//     }
-//     const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
-//       expiresIn: "1h", // Token expiration time
-//     });
-  
-//     console.log("Tokenn facebook: ", token);  
-//     const encodedToken = encodeURIComponent(token);
-
-//     return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
-//   })
-//   .catch((err) => {
-//     logger.error("Error when using Facebook login");
-//     console.log("Error when using Facebook login");
-//     res.status(500).json({ error: err });
-//   });
-// }};
-
-
-// Linkedin login
-// exports.authLinkedinCallback = async (req, res) => {
-//   console.log("Inside authLinkedin: ", req.user?.email);
-//   if(req.user){
-//     console.log("Inside if of authLinkedin: ", req.user?.email);
-
-//   console.log("Inside if of authLinkedin Email 835: ", req.user.email);
-//   User.findOne({ email: req.user.email})
-//   .then((user) => {
-//     if (!user) {
-//       logger.error("User Not found authLinkedin ");
-//       console.log("User not found authLinkedin");
-//     return res.redirect(`${process.env.FRONTEND_URL}/login`);
-//     }
-//     const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
-//       expiresIn: "1h", // Token expiration time
-//     });
-  
-//     console.log("Tokenn authLinkedin: ", token);  
-//     const encodedToken = encodeURIComponent(token);
-
-//     return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
-//   })
-//   .catch((err) => {
-//     logger.error("Error when using linkedin login");
-//     console.log("Error when using linkedin login");
-//     res.status(500).json({ error: err });
-//   });
-// }};
-
-// Linkedin login
-// exports.authTwitterCallback = async (req, res) => {
-//   console.log("Inside twitter: ", req.user?.email);
-//   if(req.user){
-//     console.log("Inside if of twitter: ", req.user?.email);
-
-//   console.log("Inside if of twitter Email 895: ", req.user.email);
-//   User.findOne({ email: req.user.email})
-//   .then((user) => {
-//     if (!user) {
-//       logger.error("User Not found twitter ");
-//       console.log("User not found twitter");
-//     return res.redirect(`${process.env.FRONTEND_URL}/login`);
-//     }
-//     const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
-//       expiresIn: "1h", // Token expiration time
-//     });
-  
-//     console.log("Tokenn twitter: ", token);  
-//     const encodedToken = encodeURIComponent(token);
-
-//     return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
-//   })
-//   .catch((err) => {
-//     logger.error("Error when using twitter login");
-//     console.log("Error when using twitter login");
-//     res.status(500).json({ error: err });
-//   });
-// }};

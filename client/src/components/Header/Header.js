@@ -63,30 +63,30 @@ function Header() {
   //     });
   // };
 
-  useEffect(()=>{
-    const getUser= ()=>{
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/login/success`,{
-        method:"GET",
-        credentials:"include",
-        headers:{
-          Accept:"application/json",
-          "Content-Type":"application/json",
-          "Access-Control-Allow-Credentials":true
-        }
-      }).then((response)=>{
-        if(response.status===200) return response.json();
-        throw new Error("Failed sign in");
-      }).then(resObj=>{
-        setUser(resObj.user);
-        localStorage.setItem('token', resObj.token);
-        toast.success("Sign in with Google success!!")
-      }).catch((err)=>{
-        console.log(err);
-        toast.error("Error occured when sign in with google", err);
-      })
-    }
-    getUser();
-  },[]);
+  // useEffect(()=>{
+  //   const getUser= ()=>{
+  //     fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/login/success`,{
+  //       method:"GET",
+  //       credentials:"include",
+  //       headers:{
+  //         Accept:"application/json",
+  //         "Content-Type":"application/json",
+  //         "Access-Control-Allow-Credentials":true
+  //       }
+  //     }).then((response)=>{
+  //       if(response.status===200) return response.json();
+  //       throw new Error("Failed sign in");
+  //     }).then(resObj=>{
+  //       setUser(resObj.user);
+  //       localStorage.setItem('token', resObj.token);
+  //       toast.success("Sign in with Google success!!")
+  //     }).catch((err)=>{
+  //       console.log(err);
+  //       toast.error("Error occured when sign in with google", err);
+  //     })
+  //   }
+  //   getUser();
+  // },[]);
 
 
 
