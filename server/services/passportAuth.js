@@ -186,104 +186,104 @@ passport.use(
   )
 );
 
-// Microsoft
-passport.use( new OIDCStrategy({
-  identityMetadata: `${process.env.MICROSOFT_CLOUD_INSTANCE}${process.env.MICROSOFT_AZURE_TENANT_ID}/.well-known/openid-configuration`,
-  clientID: process.env.MICROSOFT_CLIENT_ID,
-  clientSecret: process.env.MICROSOFT_CLIENT_SECRET, 
-  responseType: process.env.MICROSOFT_RESPONSE_TYPE,
-  responseMode: process.env.MICROSOFT_RESPONSE_MODE,
-  redirectUrl: `${process.env.BACKEND_URL}/api/users/auth/microsoft/callback`, 
-  allowHttpForRedirectUrl: true, // Set to true for local development
-  isB2C: false, // Set to true if using Azure AD B2C
-  validateIssuer: false,  // Set to true if you want to validate the issuer
-  passReqToCallback: true,
-  useCookieInsteadOfSession: false, // Use cookies for session management
-  scope: ['openid', 'profile', 'email'], // Specify the required scopes
-  loggingLevel: 'info', // Adjust logging level as needed
-}, async(req,iss, sub, profile, accessToken, refreshToken, done) => {
-  if ( accessToken ) {
-      console.log( 'Received accessToken - ' + accessToken );
-  }
-  if ( refreshToken ) {
-      console.log( 'Received refreshToken - ' + refreshToken );
-  }
-  if ( !profile.oid ) {
-      //console.log( 'Received accessToken - ' + accessToken );
-      return done( new Error( "No oid found" ), null );
-  }
-  console.log("profileeeee: ", profile);
-  //Saving user to db
-  let user = await User.findOne({ email: profile._json.upn });
-      console.log("email microsoft:", profile._json.upn);
+// // Microsoft
+// passport.use( new OIDCStrategy({
+//   identityMetadata: `${process.env.MICROSOFT_CLOUD_INSTANCE}${process.env.MICROSOFT_AZURE_TENANT_ID}/.well-known/openid-configuration`,
+//   clientID: process.env.MICROSOFT_CLIENT_ID,
+//   clientSecret: process.env.MICROSOFT_CLIENT_SECRET, 
+//   responseType: process.env.MICROSOFT_RESPONSE_TYPE,
+//   responseMode: process.env.MICROSOFT_RESPONSE_MODE,
+//   redirectUrl: `${process.env.BACKEND_URL}/api/users/auth/microsoft/callback`, 
+//   allowHttpForRedirectUrl: true, // Set to true for local development
+//   isB2C: false, // Set to true if using Azure AD B2C
+//   validateIssuer: false,  // Set to true if you want to validate the issuer
+//   passReqToCallback: true,
+//   useCookieInsteadOfSession: false, // Use cookies for session management
+//   scope: ['openid', 'profile', 'email'], // Specify the required scopes
+//   loggingLevel: 'info', // Adjust logging level as needed
+// }, async(req,iss, sub, profile, accessToken, refreshToken, done) => {
+//   if ( accessToken ) {
+//       console.log( 'Received accessToken - ' + accessToken );
+//   }
+//   if ( refreshToken ) {
+//       console.log( 'Received refreshToken - ' + refreshToken );
+//   }
+//   if ( !profile.oid ) {
+//       //console.log( 'Received accessToken - ' + accessToken );
+//       return done( new Error( "No oid found" ), null );
+//   }
+//   console.log("profileeeee: ", profile);
+//   //Saving user to db
+//   let user = await User.findOne({ email: profile._json.upn });
+//       console.log("email microsoft:", profile._json.upn);
 
-      if (!user) {
-        // If user does not exist, create a new user
+//       if (!user) {
+//         // If user does not exist, create a new user
 
-        var chars =
-          "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        var passwordLength = 8;
-        var password = "";
-        for (var i = 0; i < passwordLength; i++) {
-          var randomNumber = Math.floor(Math.random() * chars.length);
-          password += chars.substring(randomNumber, randomNumber + 1);
-        }
-        console.log(password);
+//         var chars =
+//           "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//         var passwordLength = 8;
+//         var password = "";
+//         for (var i = 0; i < passwordLength; i++) {
+//           var randomNumber = Math.floor(Math.random() * chars.length);
+//           password += chars.substring(randomNumber, randomNumber + 1);
+//         }
+//         console.log(password);
 
-        // const response = await axios.get(profile.photos[0].value, {
-        //   responseType: "arraybuffer",
-        // });
+//         // const response = await axios.get(profile.photos[0].value, {
+//         //   responseType: "arraybuffer",
+//         // });
 
-        user = new User({
-          // googleId: profile.id,
-          fullName: profile.displayName,
-          userName: profile._json.upn
-            .substring(0, profile._json.upn.indexOf("@"))
-            .replace(/[^a-zA-Z0-9 ]/g, ""),
-          email: profile._json.upn,
-          // profilePicture: Buffer.from(response.data, "binary").toString(
-          //   "base64"
-          // ),
-          password: await bcrypt.hash(password, 10),
-          isVerified: "true",
-          authType: "Microsoft",
-        });
-        console.log("User MS: ", user);
-        await user.save();
+//         user = new User({
+//           // googleId: profile.id,
+//           fullName: profile.displayName,
+//           userName: profile._json.upn
+//             .substring(0, profile._json.upn.indexOf("@"))
+//             .replace(/[^a-zA-Z0-9 ]/g, ""),
+//           email: profile._json.upn,
+//           // profilePicture: Buffer.from(response.data, "binary").toString(
+//           //   "base64"
+//           // ),
+//           password: await bcrypt.hash(password, 10),
+//           isVerified: "true",
+//           authType: "Microsoft",
+//         });
+//         console.log("User MS: ", user);
+//         await user.save();
 
 
-      const receiver = profile._json.upn;
-      const receiver2 = process.env.EMAIL;
-      const subject = "Sign up success";
-      const html = `<div>
-      <b>Hi ${profile.displayName},</b>
-      <p>Sign in with Google success!!.</p>
-      <p>Sign in with Google or you can use your Email and default password to sign in.</p>
-      <p><b>Note: </b>Please change your default password to sign in with Email & password.\n\nDefault password: ${password}</p>
-      </div>`;
-      sendEmail(receiver, subject, html)
-        .then((response) => {
-          console.log(`Email sent to ${receiver}:`, response);
-          // Handle success
-        })
-        .catch((error) => {
-          console.error("Error sending email:", error);
-          // Handle error
-        });
-      sendEmail(receiver2, subject, html)
-        .then((response) => {
-          console.log(`Email sent to ${receiver2}:`, response);
-          // Handle success
-        })
-        .catch((error) => {
-          console.error("Error sending email:", error);
-          // Handle error
-        });
+//       const receiver = profile._json.upn;
+//       const receiver2 = process.env.EMAIL;
+//       const subject = "Sign up success";
+//       const html = `<div>
+//       <b>Hi ${profile.displayName},</b>
+//       <p>Sign in with Google success!!.</p>
+//       <p>Sign in with Google or you can use your Email and default password to sign in.</p>
+//       <p><b>Note: </b>Please change your default password to sign in with Email & password.\n\nDefault password: ${password}</p>
+//       </div>`;
+//       sendEmail(receiver, subject, html)
+//         .then((response) => {
+//           console.log(`Email sent to ${receiver}:`, response);
+//           // Handle success
+//         })
+//         .catch((error) => {
+//           console.error("Error sending email:", error);
+//           // Handle error
+//         });
+//       sendEmail(receiver2, subject, html)
+//         .then((response) => {
+//           console.log(`Email sent to ${receiver2}:`, response);
+//           // Handle success
+//         })
+//         .catch((error) => {
+//           console.error("Error sending email:", error);
+//           // Handle error
+//         });
 
-      }
+//       }
 
-  return done(null, user);
-}));
+//   return done(null, user);
+// }));
 
 
 

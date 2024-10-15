@@ -119,9 +119,9 @@ function LoginPage() {
   const githubAuth= ()=>{
     window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/github`, "_self")
   }
-  const microsoftAuth= ()=>{
-    window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/microsoft`, "_self")
-  }
+  // const microsoftAuth= ()=>{
+  //   window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/microsoft`, "_self")
+  // }
   // const linkedinAuth= ()=>{
   //   window.open(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/linkedin`, "_self")
   // }
@@ -225,7 +225,7 @@ function LoginPage() {
                   block
                 >
                   <FaGoogle title="Google" className="mb-1" />
-                  {" "}Sign in with Google
+                  {" "}Continue with Google
                 </Button>
                 {/* <Button
                   variant="primary"
@@ -243,9 +243,9 @@ function LoginPage() {
                   block
                 >
                   <FaGithub title="Github" className="mb-1" />
-                  {" "}Sign in with Github
+                  {" "}Continue with Github
                 </Button>
-                <Button
+                {/* <Button
                   variant="primary"
                   onClick={microsoftAuth}
                   className="forgotpassbutton"
@@ -253,7 +253,7 @@ function LoginPage() {
                 >
                   <FaMicrosoft title="Github" className="mb-1" />
                   {" "}Sign in with Microsoft
-                </Button>
+                </Button> */}
                 {/* <Button
                   variant="primary"
                   onClick={linkedinAuth}

@@ -132,12 +132,12 @@ function SignupPage() {
       "_self"
     );
   };
-  const microsoftAuth = () => {
-    window.open(
-      `${process.env.REACT_APP_BACKEND_URL}/api/users/auth/microsoft`,
-      "_self"
-    );
-  };
+  // const microsoftAuth = () => {
+  //   window.open(
+  //     `${process.env.REACT_APP_BACKEND_URL}/api/users/auth/microsoft`,
+  //     "_self"
+  //   );
+  // };
 
   return (
     <div className="newpage-section">
@@ -266,7 +266,7 @@ function SignupPage() {
                     className="forgotpassbutton"
                     block
                   >
-                    <FaGoogle title="Google" className="mb-1" /> Sign in with
+                    <FaGoogle title="Google" className="mb-1" /> Continue with
                     Google
                   </Button>
 
@@ -276,10 +276,10 @@ function SignupPage() {
                     className="forgotpassbutton mx-1"
                     block
                   >
-                    <FaGithub title="Github" className="mb-1" /> Sign in with
+                    <FaGithub title="Github" className="mb-1" /> Continue with
                     Github
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="primary"
                     onClick={microsoftAuth}
                     className="forgotpassbutton"
@@ -287,7 +287,7 @@ function SignupPage() {
                   >
                     <FaMicrosoft title="Github" className="mb-1" /> Sign in with
                     Microsoft
-                  </Button>
+                  </Button> */}
                 </center>
 
                 {/* <center>or</center> <br />

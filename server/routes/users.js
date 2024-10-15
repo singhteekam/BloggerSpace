@@ -72,13 +72,13 @@ router.get("/auth/github/callback", passport.authenticate("github", {
   session: false, // Disable session in callback
 }), authPassportCallback);
 
-// Login with Microsoft
-router.get('/auth/microsoft',
-  passport.authenticate('azuread-openidconnect')
-);
-router.post("/auth/microsoft/callback", passport.authenticate("azuread-openidconnect", {
-  session: false, // Disable session in callback
-}), authPassportCallback);
+// // Login with Microsoft
+// router.get('/auth/microsoft',
+//   passport.authenticate('azuread-openidconnect')
+// );
+// router.post("/auth/microsoft/callback", passport.authenticate("azuread-openidconnect", {
+//   session: false, // Disable session in callback
+// }), authPassportCallback);
 
 
 // // Login with Facebook
