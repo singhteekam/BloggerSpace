@@ -253,7 +253,7 @@ exports.viewBlogRoute = async (req, res) => {
 
 exports.saveAsDraftBlog= async (req, res)=>{
   try {
-    const { slug, title, content, category, tags } = req.body;
+    const { slug, title, content, category, tags,  userId, authorEmail  } = req.body;
 
     // Compress the content before saving it
     const compressedContentBuffer = pako.deflate(content, { to: "string" });
@@ -274,7 +274,7 @@ exports.saveAsDraftBlog= async (req, res)=>{
     );
 
     const blog = await Blog.findById({
-    _id: new mongoose.Types.ObjectId(req.body.id),
+    _id: new mongoose.Types.ObjectId(req.body.userId),
   });
     if(blog){
         blog.slug= slug;
@@ -294,7 +294,7 @@ exports.saveAsDraftBlog= async (req, res)=>{
       title,
       content: compressedContent,
       category,
-      authorDetails: req.session.userId,
+      authorDetails: userId,
       status: "DRAFT",
       lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
       tags,
@@ -333,7 +333,7 @@ exports.isUniqueTitle= async (req, res)=>{
 
 exports.createNewBlog = async (req, res) => {
   try {
-    const { slug, title, content, category, tags } = req.body;
+    const { slug, title, content, category, tags, userId, authorEmail } = req.body;
 
     // Compress the content before saving it
     const compressedContentBuffer = pako.deflate(content, { to: "string" });
@@ -359,7 +359,8 @@ exports.createNewBlog = async (req, res) => {
       title,
       content: compressedContent,
       category,
-      authorDetails: req.session.userId,
+      authorDetails: userId,
+      // authorDetails: req.session.userId,
       // lastUpdatedAt: Date.now(),
       lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
       tags,
@@ -368,7 +369,7 @@ exports.createNewBlog = async (req, res) => {
     logger.debug("New blog created in Pending status. Title: "+ title);
 
     // Sending mail to author
-    const receiver = req.session.email;
+    const receiver = authorEmail;
     const subject = "Blog submitted for review";
     const html = "<p>New blog submitted successfully for review</p>";
 
@@ -501,7 +502,7 @@ exports.postNewBlogComment = async (req, res) => {
 
     const newComment = {
       content,
-      user: req.session.userId,
+      user: req.body.userId,
     };
 
     blog.comments.push(newComment);
@@ -513,7 +514,7 @@ exports.postNewBlogComment = async (req, res) => {
 
     // Get the newly added comment with user details
     const addedComment = blog.comments.findLast((comment) =>
-      comment.user._id.equals(req.session.userId)
+      comment.user._id.equals(req.body.userId)
     );
 
     if (!addedComment) {
@@ -551,7 +552,7 @@ exports.postNewBlogReplyComment = async (req, res) => {
 
     const newReplyComment = {
       replyCommentContent: replyCommentContent,
-      replyCommentUser: req.session.userId,
+      replyCommentUser: req.body.userId,
     };
     console.log(newReplyComment)
 
@@ -631,7 +632,7 @@ exports.authorSavedDraftBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.session.userId,
+      authorDetails: req.body.userId,
       status: "DRAFT",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -649,7 +650,7 @@ exports.authorPendingReviewBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.session.userId,
+      authorDetails: req.body.userId,
       status: "PENDING_REVIEW",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -667,7 +668,7 @@ exports.authorUnderReviewBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.session.userId,
+      authorDetails: req.body.userId,
       status: "UNDER_REVIEW",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -687,7 +688,7 @@ exports.awaitingAuthorBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.session.userId,
+      authorDetails: req.body.userId,
       status: "AWAITING_AUTHOR",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -705,7 +706,7 @@ exports.authorPublishedBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.session.userId,
+      authorDetails: req.body.userId,
       status: "PUBLISHED",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -737,21 +738,21 @@ exports.blogLikes=async (req,res)=>{
     if(thumbColor==="regular"){
       // blog.likes.push(req.session.userId);
       blog.blogLikes.push({
-        userId: new mongoose.Types.ObjectId(req.session.userId),
+        userId: new mongoose.Types.ObjectId(req.body.userId),
         likedTime: new Date(new Date().getTime() + 330 * 60000),
       });
       newThumbColor = "solid";
     }
     else if(thumbColor==="solid"){
       // blog.likes.splice(blog.likes.indexOf(req.session.userId),1);
-      blog.blogLikes.splice(blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.session.userId)),1);
+      blog.blogLikes.splice(blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.body.userId)),1);
       newThumbColor = "regular";
     }
     // blog.likes=[];
     await blog.save();
     
-    console.log("blogLiked: "+blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.session.userId)));
-    console.log(req.session.userId);
+    console.log("blogLiked: "+blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.body.userId)));
+    console.log(req.body.userId);
     // console.log(blog.likes.indexOf(req.session.userId));
     // console.log(blog.likes[1].toString());
 
@@ -817,10 +818,10 @@ exports.blogCommentLikes = async (req, res) => {
 
     var newCommentThumbColor;
     if (commentThumbColor === "regular") {
-      blog.comments.find(comment=> comment._id.toString()===commentId).likes.push(req.session.userId);
+      blog.comments.find(comment=> comment._id.toString()===commentId).likes.push(req.body.userId);
       newCommentThumbColor = "solid";
     } else if (commentThumbColor === "solid") {
-      blog.comments.find((comment) => comment._id.toString() === commentId).likes.splice(blog.comments.find((comment) => comment._id.toString() === commentId).likes.indexOf(req.session.userId));
+      blog.comments.find((comment) => comment._id.toString() === commentId).likes.splice(blog.comments.find((comment) => comment._id.toString() === commentId).likes.indexOf(req.body.userId));
       newCommentThumbColor = "regular";
     }
 

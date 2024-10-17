@@ -81,7 +81,7 @@ const EditBlog = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(`/api/blogs/editblog/${id}`);
+        const response = await axios.get(`/api/blogs/editblog/${id}`, {userId:id});
         const {
           slug,
           title,
@@ -165,6 +165,7 @@ const EditBlog = () => {
         content,
         category,
         tags,
+        userId:id
       });
       console.log(response.data);
       // Handle success or redirect to a different page

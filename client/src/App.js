@@ -113,7 +113,7 @@ const App = () => {
               element={<ResetPasswordPage />}
             />
             <Route path="/changepassword" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
-            <Route path="/myblogs" element={<ProtectedRoute><MyBlogs /></ProtectedRoute>} />
+            <Route path="/myblogs" element={<MyBlogs />} />
             <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
             <Route path="/guidelines" element={<WritingGuidelines />} />
             <Route path="/savedblogs" element={<ProtectedRoute><SavedBlogs /></ProtectedRoute>} />

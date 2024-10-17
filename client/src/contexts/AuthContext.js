@@ -19,8 +19,9 @@ export const AuthProvider = ({ children }) => {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
-          setUser(response.data);
+          setUser((user)=>response.data);
           setLoading(false);
+          // console.log("Logged in with: ", response.data?._id);
         })
         .catch((error) => {
           console.error("Error fetching user information:", error);

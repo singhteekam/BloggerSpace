@@ -22,6 +22,8 @@ const Settings = () => {
   // const isLoggedIn = localStorage.getItem("token");
   const navigate = useNavigate();
 
+  // console.log(user);
+
   // useEffect(() => {
   //   if (isLoggedIn) {
   //     axios
@@ -82,7 +84,7 @@ const Settings = () => {
       </Container>
     );
   }
-  
+
 
   return (
     <section className="newpage-section">

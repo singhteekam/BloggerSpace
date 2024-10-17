@@ -31,11 +31,11 @@ const NewBlog = () => {
   const { user,loading, logout } = useContext(AuthContext);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
+  const [authorId, setAuthorId] = useState("");
   const [author, setAuthor] = useState("");
   const [authorEmail, setAuthorEmail] = useState("");
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
-  const [alert, setAlert] = useState(null);
   const [otherCategory, setOtherCategory] = useState(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [tags, setTags] = useState([]);
@@ -53,6 +53,7 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
   useEffect(()=>{
     console.log(user);
     if(user){
+      setAuthorId(user?._id);
       setAuthor(user?.userName);
       setAuthorEmail(user?.email);
     }
@@ -122,10 +123,10 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user) {
-      logout();
-      return <Navigate to="/login" state={{ from: location }} replace />
-    }
+    // if (!user) {
+    //   logout();
+    //   return <Navigate to="/login" state={{ from: location }} replace />
+    // }
     if (!isUniqueTitle) {
       // setAlert({ type: "danger", message: "Title already exists" });
       toast.error("Title already exists");
@@ -140,6 +141,8 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
         content,
         category: category === "Other" ? otherCategory : category,
         tags,
+        userId: authorId,
+        authorEmail
       });
       console.log(response.data);
 
@@ -180,6 +183,8 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
         content,
         category: category === "Other" ? otherCategory : category,
         tags,
+        userId: authorId,
+        authorEmail
       });
       console.log(response.data);
 

@@ -263,7 +263,7 @@ function SignupPage() {
                   <Button
                     variant="danger"
                     onClick={googleAuth}
-                    className="forgotpassbutton"
+                    className="forgotpassbutton m-1"
                     block
                   >
                     <FaGoogle title="Google" className="mb-1" /> Continue with
@@ -273,7 +273,7 @@ function SignupPage() {
                   <Button
                     variant="dark"
                     onClick={githubAuth}
-                    className="forgotpassbutton mx-1"
+                    className="forgotpassbutton m-1"
                     block
                   >
                     <FaGithub title="Github" className="mb-1" /> Continue with

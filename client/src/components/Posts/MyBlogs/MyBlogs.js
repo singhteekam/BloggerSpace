@@ -30,8 +30,14 @@ const MyBlogs = () => {
   const [savedDraftBlogs, setSavedDraftBlogs] = useState(null);
   const [alert, setAlert] = useState(null);
   const [isDisabled, setIsDisabled]= useState(false);
+  const [userId, setUserId]= useState(null);
 
   const location= useLocation();
+
+  useEffect(()=>{
+      setUserId(user?._id);
+      console.log(userId);
+  },[user]);
 
 
   var i = 0,
@@ -56,9 +62,10 @@ const MyBlogs = () => {
     //   }
     // };
 
+
     const fetchSavedDraftBlogs = async () => {
       try {
-        const response = await axios.get("/api/blogs/myblogs/saveddraft");
+        const response = await axios.get("/api/blogs/myblogs/saveddraft", {userId});
         setSavedDraftBlogs(response.data);
         console.log(savedDraftBlogs);
       } catch (error) {
@@ -68,7 +75,7 @@ const MyBlogs = () => {
 
     const fetchPendingReviewBlogs = async () => {
       try {
-        const response = await axios.get("/api/blogs/myblogs/pendingreview");
+        const response = await axios.get("/api/blogs/myblogs/pendingreview", {userId});
         setPendingReviewBlogs(response.data);
         console.log(pendingReviewBlogs);
       } catch (error) {
@@ -78,7 +85,7 @@ const MyBlogs = () => {
 
     const fetchUnderReviewBlogs = async () => {
       try {
-        const response = await axios.get("/api/blogs/myblogs/underreview");
+        const response = await axios.get("/api/blogs/myblogs/underreview", {userId});
         setUnderReviewBlogs(response.data);
         console.log(underReviewBlogs);
       } catch (error) {
@@ -89,7 +96,7 @@ const MyBlogs = () => {
     const fetchAwaitingAuthorBlogs = async () => {
       try {
         const response = await axios.get(
-          "/api/blogs/myblogs/awaitingauthorblogs"
+          "/api/blogs/myblogs/awaitingauthorblogs", {userId}
         );
         setAwaitingAuthorBlogs(response.data);
         console.log(awaitingAuthorBlogs);
@@ -101,7 +108,7 @@ const MyBlogs = () => {
     const fetchAuthorPublishedBlogs = async () => {
       try {
         const response = await axios.get(
-          "/api/blogs/myblogs/authorpublishedblogs"
+          "/api/blogs/myblogs/authorpublishedblogs", {userId}
         );
         setAuthorPublishedBlogs(response.data);
         console.log(authorPublishedBlogs);
@@ -146,11 +153,6 @@ const MyBlogs = () => {
 
   if (loading) {
     return <PreLoader isLoading={loading} />
-  }
-  if(!user && !loading){
-    console.log("Inside if");
-    logout();
-    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   return (

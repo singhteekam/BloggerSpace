@@ -184,6 +184,7 @@ const ViewBlog = () => {
     try {
       const response = await axios.post(`/api/blogs/${blogSlug}/comments`, {
         content: commentContent,
+        userId:user?._id
       });
       fetchBlog();
       setCommentContent("");
@@ -207,6 +208,7 @@ const ViewBlog = () => {
         {
           repliedToCommentId: commentId,
           replyCommentContent: replyCommentContent,
+          userId: user?._id
         }
       );
       fetchBlog();
@@ -228,6 +230,7 @@ const ViewBlog = () => {
       setDisableLikeButton(true);
       const response = await axios.post(`/api/blogs/bloglikes/${blog._id}`, {
         thumbColor,
+        userId:user?._id
       });
       setThumbColor(response.data.newThumbColor);
       setBlog((prevBlog) => ({

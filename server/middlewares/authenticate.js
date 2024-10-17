@@ -1,13 +1,15 @@
 // authMiddleware.js
 const logger= require("./../utils/Logging/logs");
 const authenticate = (req, res, next) => {
-  console.log("Time: ", Date.now());
-  console.log("Cookie expire time: ", req.session.cookie.expires);
-  console.log("Is Cookie expired: ", req.session.cookie.expires < Date.now());
-  console.log(req.isAuthenticated());
+  // console.log("Time: ", Date.now());
+  // console.log("Cookie expire time: ", req.session.cookie.expires);
+  // console.log("Is Cookie expired: ", req.session.cookie.expires < Date.now());
+  // console.log(req.isAuthenticated());
   // if (req.session && req.session.userId) {
   // if (req.session && req.session.userId && req.isAuthenticated() && req.session.cookie.expires > Date.now()) {
-  if (req.session && req.session.userId && req.session.cookie.expires > Date.now()) {
+  // if (req.session && req.session.userId && req.session.cookie.expires > Date.now()) {
+  console.log("Useridd: ", req.body.userId);
+  if (req.body.userId) {
     // User is authenticated, proceed to the next middleware or route handler
     // logger.info("Authentication successful!!");
     next();
