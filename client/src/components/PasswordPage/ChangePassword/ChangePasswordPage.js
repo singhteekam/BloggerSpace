@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Form, Button, Alert, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-
+import { AuthContext } from "contexts/AuthContext";
 
 function ChangePasswordPage() {
+  const { user, logout } = useContext(AuthContext);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -18,6 +19,13 @@ function ChangePasswordPage() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const [userId, setUserId]= useState(null);
+
+  useEffect(()=>{
+    setUserId(user?._id);
+    console.log(user?._id);
+},[user]);
 
   const handleOldPasswordChange = (e) => {
     setOldPassword(e.target.value);
@@ -68,7 +76,7 @@ function ChangePasswordPage() {
 
     // Send the password reset request to the backend
     axios
-      .post("/api/users/changepassword", requestBody)
+      .post(`/api/users/changepassword?userId=${userId}`, requestBody)
       .then((response) => {
         setSuccess("Password Changed successful");
         setLoading(false);

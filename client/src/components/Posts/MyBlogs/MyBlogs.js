@@ -30,13 +30,13 @@ const MyBlogs = () => {
   const [savedDraftBlogs, setSavedDraftBlogs] = useState(null);
   const [alert, setAlert] = useState(null);
   const [isDisabled, setIsDisabled]= useState(false);
-  const [userId, setUserId]= useState(null);
+  const [userId, setUserId]= useState(user?._id);
 
   const location= useLocation();
 
   useEffect(()=>{
       setUserId(user?._id);
-      console.log(userId);
+      console.log(user?._id);
   },[user]);
 
 
@@ -65,7 +65,7 @@ const MyBlogs = () => {
 
     const fetchSavedDraftBlogs = async () => {
       try {
-        const response = await axios.get("/api/blogs/myblogs/saveddraft", {userId});
+        const response = await axios.get(`/api/blogs/myblogs/saveddraft?userId=${userId}`);
         setSavedDraftBlogs(response.data);
         console.log(savedDraftBlogs);
       } catch (error) {
@@ -75,7 +75,7 @@ const MyBlogs = () => {
 
     const fetchPendingReviewBlogs = async () => {
       try {
-        const response = await axios.get("/api/blogs/myblogs/pendingreview", {userId});
+        const response = await axios.get(`/api/blogs/myblogs/pendingreview?userId=${userId}`);
         setPendingReviewBlogs(response.data);
         console.log(pendingReviewBlogs);
       } catch (error) {
@@ -85,7 +85,7 @@ const MyBlogs = () => {
 
     const fetchUnderReviewBlogs = async () => {
       try {
-        const response = await axios.get("/api/blogs/myblogs/underreview", {userId});
+        const response = await axios.get(`/api/blogs/myblogs/underreview?userId=${userId}`);
         setUnderReviewBlogs(response.data);
         console.log(underReviewBlogs);
       } catch (error) {
@@ -96,7 +96,7 @@ const MyBlogs = () => {
     const fetchAwaitingAuthorBlogs = async () => {
       try {
         const response = await axios.get(
-          "/api/blogs/myblogs/awaitingauthorblogs", {userId}
+          `/api/blogs/myblogs/awaitingauthorblogs?userId=${userId}`
         );
         setAwaitingAuthorBlogs(response.data);
         console.log(awaitingAuthorBlogs);
@@ -108,7 +108,7 @@ const MyBlogs = () => {
     const fetchAuthorPublishedBlogs = async () => {
       try {
         const response = await axios.get(
-          "/api/blogs/myblogs/authorpublishedblogs", {userId}
+          `/api/blogs/myblogs/authorpublishedblogs?userId=${userId}`
         );
         setAuthorPublishedBlogs(response.data);
         console.log(authorPublishedBlogs);

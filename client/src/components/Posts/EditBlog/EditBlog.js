@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   Container,
@@ -23,9 +23,12 @@ import blogTags from "utils/blogTags.json";
 
 import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
+
+import { AuthContext } from "contexts/AuthContext";
 import Select from "react-select";
 
 const EditBlog = () => {
+  const { user, logout } = useContext(AuthContext);
   const { id } = useParams();
   // const [blog, setBlog] = useState(null);
   const [titleOrig, setTitleOrig] = useState("");
@@ -52,6 +55,14 @@ const EditBlog = () => {
   const [initialContent, setInitialContent]= useState("");
 
   const [blogTagsMapped, setBlogTagsMapped]= useState([]);
+
+  const [userId, setUserId]= useState(user?._id);
+
+//   useEffect(()=>{
+//     setUserId(user?._id);
+//     console.log(user?._id);
+// },[user]);
+
   useEffect(()=>{
     blogTags.map((tag) => {
       const ob = {
@@ -81,7 +92,7 @@ const EditBlog = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(`/api/blogs/editblog/${id}`, {userId:id});
+        const response = await axios.get(`/api/blogs/editblog/${id}?userId=${userId}`);
         const {
           slug,
           title,
@@ -159,7 +170,7 @@ const EditBlog = () => {
 
     try {
       setIsDisabled(true);
-      const response = await axios.put(`/api/blogs/editblog/save/${id}`, {
+      const response = await axios.put(`/api/blogs/editblog/save/${id}?userId=${userId}`, {
         slug,
         title,
         content,
@@ -200,7 +211,7 @@ const EditBlog = () => {
 
     try {
       setIsDisabled(true);
-      const response = await axios.post("/api/blogs/saveasdraft", {
+      const response = await axios.post(`/api/blogs/saveasdraft?userId=${userId}`, {
         id,
         slug,
         title,

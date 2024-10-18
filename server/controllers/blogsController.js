@@ -237,7 +237,7 @@ exports.viewBlogRoute = async (req, res) => {
     //   blog.blogLikes.map(e=>e.userId).findIndex((like) => like._id.toString()===(req.session.userId))
     // );
     const alreadyLiked = blog.blogLikes.map(e=>e.userId).findIndex((like) =>
-      like._id.toString()===(req.session.userId)
+      like._id.toString()===(req.query.userId)
     )!==-1?true:false;
 
     // console.log("Liked? :"+ alreadyLiked);
@@ -552,7 +552,7 @@ exports.postNewBlogReplyComment = async (req, res) => {
 
     const newReplyComment = {
       replyCommentContent: replyCommentContent,
-      replyCommentUser: req.body.userId,
+      replyCommentUser: req.query.userId,
     };
     console.log(newReplyComment)
 
@@ -632,7 +632,7 @@ exports.authorSavedDraftBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.body.userId,
+      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
       status: "DRAFT",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -650,7 +650,7 @@ exports.authorPendingReviewBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.body.userId,
+      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
       status: "PENDING_REVIEW",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -668,7 +668,7 @@ exports.authorUnderReviewBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.body.userId,
+      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
       status: "UNDER_REVIEW",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -688,7 +688,7 @@ exports.awaitingAuthorBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.body.userId,
+      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
       status: "AWAITING_AUTHOR",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -706,7 +706,7 @@ exports.authorPublishedBlogs = async (req, res) => {
   try {
     // Perform the search query based on the provided search query
     const blogs = await Blog.find({
-      authorDetails: req.body.userId,
+      authorDetails:  new mongoose.Types.ObjectId(req.query.userId),
       status: "PUBLISHED",
     }).populate("authorDetails").exec();
     // console.log(blogs);
@@ -738,21 +738,21 @@ exports.blogLikes=async (req,res)=>{
     if(thumbColor==="regular"){
       // blog.likes.push(req.session.userId);
       blog.blogLikes.push({
-        userId: new mongoose.Types.ObjectId(req.body.userId),
+        userId: new mongoose.Types.ObjectId(req.query.userId),
         likedTime: new Date(new Date().getTime() + 330 * 60000),
       });
       newThumbColor = "solid";
     }
     else if(thumbColor==="solid"){
       // blog.likes.splice(blog.likes.indexOf(req.session.userId),1);
-      blog.blogLikes.splice(blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.body.userId)),1);
+      blog.blogLikes.splice(blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.query.userId)),1);
       newThumbColor = "regular";
     }
     // blog.likes=[];
     await blog.save();
     
-    console.log("blogLiked: "+blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.body.userId)));
-    console.log(req.body.userId);
+    console.log("blogLiked: "+blog.blogLikes.map(e=>e.userId).indexOf(new mongoose.Types.ObjectId(req.query.userId)));
+    console.log(req.query.userId);
     // console.log(blog.likes.indexOf(req.session.userId));
     // console.log(blog.likes[1].toString());
 

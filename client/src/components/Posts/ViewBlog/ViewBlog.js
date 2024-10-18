@@ -58,11 +58,13 @@ const ViewBlog = () => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const token = localStorage.getItem("token");
+  const [userId, setUserId]= useState(user?._id);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
+      setUserId(user?._id);
       setDisableFollowButton(false);
       for (let index = 0; index < user.savedBlogs.length; index++) {
         if (
@@ -182,9 +184,8 @@ const ViewBlog = () => {
     }
 
     try {
-      const response = await axios.post(`/api/blogs/${blogSlug}/comments`, {
+      const response = await axios.post(`/api/blogs/${blogSlug}/comments?userId=${userId}`, {
         content: commentContent,
-        userId:user?._id
       });
       fetchBlog();
       setCommentContent("");
@@ -204,11 +205,10 @@ const ViewBlog = () => {
 
     try {
       const response = await axios.post(
-        `/api/blogs/${blogSlug}/comments/reply`,
+        `/api/blogs/${blogSlug}/comments/reply?userId=${userId}`,
         {
           repliedToCommentId: commentId,
           replyCommentContent: replyCommentContent,
-          userId: user?._id
         }
       );
       fetchBlog();
@@ -228,9 +228,8 @@ const ViewBlog = () => {
     }
     try {
       setDisableLikeButton(true);
-      const response = await axios.post(`/api/blogs/bloglikes/${blog._id}`, {
+      const response = await axios.post(`/api/blogs/bloglikes/${blog._id}?userId=${userId}`, {
         thumbColor,
-        userId:user?._id
       });
       setThumbColor(response.data.newThumbColor);
       setBlog((prevBlog) => ({
@@ -259,7 +258,7 @@ const ViewBlog = () => {
       console.log(commentId);
       setDisableCommentLikeButton(true);
       const response = await axios.post(
-        `/api/blogs/blogcommentlike/${blog._id}`,
+        `/api/blogs/blogcommentlike/${blog._id}?userId=${userId}`,
         { commentId, commentThumbColor }
       );
       console.log(response.data);
@@ -281,7 +280,7 @@ const ViewBlog = () => {
         tags: blog.tags,
       };
       const response = await axios.patch(
-        `/api/users/addtosavedblogs`,
+        `/api/users/addtosavedblogs?userId=${userId}`,
         blogDetails
       );
       setIsBlogSaved(true);
@@ -295,7 +294,7 @@ const ViewBlog = () => {
   const removeFromSavedBlogs = async () => {
     try {
       const response = await axios.delete(
-        `/api/users/removefromsavedblogs/${blog.slug}`
+        `/api/users/removefromsavedblogs/${blog.slug}?userId=${userId}`
       );
       console.log("Removed from savedBlogs");
       setIsBlogSaved(false);
@@ -308,7 +307,7 @@ const ViewBlog = () => {
   const handleFollowUser = async (idToFollow) => {
     try {
       setDisableFollowButton(true);
-      const response = await axios.patch(`/api/users/follow/${idToFollow}`);
+      const response = await axios.patch(`/api/users/follow/${idToFollow}?userId=${userId}`);
       toast.success("Following.");
       console.log("Following....");
       setIsFollowing(true);
@@ -325,7 +324,7 @@ const ViewBlog = () => {
   const handleUnfollowUser = async (idToUnfollow) => {
     try {
       setDisableFollowButton(true);
-      const response = await axios.patch(`/api/users/unfollow/${idToUnfollow}`);
+      const response = await axios.patch(`/api/users/unfollow/${idToUnfollow}?userId=${userId}`);
       toast.success("Unfollowed.");
       console.log("Unfollowed....");
       setIsFollowing(false);

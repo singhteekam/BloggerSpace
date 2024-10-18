@@ -34,6 +34,13 @@ const MyProfilePage = () => {
   const [showSuccess, setShowSuccess] = useState(null);
   const [showError, setShowError] = useState(null);
 
+  const [userId, setUserId]= useState(user?._id);
+
+//   useEffect(()=>{
+//     setUserId(user?._id);
+//     console.log(user?._id);
+// },[user]);
+
   let i = 0;
 
   // useEffect(() => {
@@ -134,7 +141,7 @@ const MyProfilePage = () => {
       formData.append("profilePicture", selectedFile);
 
       axios
-        .post("/api/users/uploadprofilepicture", formData, {
+        .post(`/api/users/uploadprofilepicture?userId=${userId}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -169,7 +176,7 @@ const MyProfilePage = () => {
 
   const updatePersonalDetails = async () => {
     try {
-      const response = await axios.patch("/api/users/updateusername", {
+      const response = await axios.patch(`/api/users/updateusername?userId=${userId}`, {
         fullName,
         userName,
       });

@@ -204,7 +204,7 @@ exports.logout = (req, res) => {
 exports.deleteAccount = async (req, res) => {
   try {
     // Get the userId from the session or request body, depending on your implementation
-    const userId = req.session.userId || req.body.userId;
+    const userId = req.query.userId || req.body.userId;
 
     // Delete the user account from the database
     await User.findByIdAndDelete(userId);
@@ -352,7 +352,7 @@ exports.resetPassword = (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const userId = req.session.userId;
+    const userId = req.query.userId;
 
     // Find the user by their ID
     const user = await User.findById({
@@ -393,7 +393,7 @@ exports.changePassword = async (req, res) => {
 exports.uploadProfilePicture = async (req, res) => {
   try {
     // Get the user ID from the authenticated user (you may have your own authentication logic)
-    const userId = req.session.userId;
+    const userId = req.query.userId;
 
     // Get the uploaded file from the request
     const profilePicture = req.file;
@@ -541,7 +541,7 @@ exports.updateUserPersonalDetails = async (req, res) => {
     }
 
     const updatedUser = await User.findById({
-      _id: new mongoose.Types.ObjectId(req.session.userId),
+      _id: new mongoose.Types.ObjectId(req.query.userId),
     });
     updatedUser.fullName = fullName;
     updatedUser.userName = userName;
@@ -561,7 +561,7 @@ exports.updateUserPersonalDetails = async (req, res) => {
 // Add to SavedBlogs
 exports.addBlogToSavedBlogs = async (req, res) => {
   try {
-    const userId = req.session.userId;
+    const userId = req.query.userId;
     const user = await User.findById(userId);
     const { title, slug, category, tags } = req.body;
 
@@ -585,7 +585,7 @@ exports.addBlogToSavedBlogs = async (req, res) => {
 // Remove from SavedBlogs
 exports.removeBlogFromSavedBlogs = async (req, res) => {
   try {
-    const userId = req.session.userId;
+    const userId = req.query.userId;
     const user = await User.findById(userId);
 
     user.savedBlogs.splice(
@@ -606,7 +606,7 @@ exports.removeBlogFromSavedBlogs = async (req, res) => {
 // Get Saved blogs
 exports.getSavedBlogsOfUser = async (req, res) => {
   try {
-    const userId = req.session.userId;
+    const userId = req.query.userId;
     const user = await User.findById(userId);
 
     // Return a success message
@@ -621,19 +621,19 @@ exports.getSavedBlogsOfUser = async (req, res) => {
 // Follow and Unfollow users
 exports.followUser = async (req, res) => {
   try {
-    if (!req.session.userId) {
+    if (!req.query.userId) {
       console.log("You are not logged in..");
       return res.status(404).json("You are not logged in..");
     }
     const response = await User.findByIdAndUpdate(
       { _id: new mongoose.Types.ObjectId(req.params.idToFollow) },
       {
-        $push: { followers: req.session.userId },
+        $push: { followers: req.query.userId },
       },
       { new: true }
     );
     const response2 = await User.findByIdAndUpdate(
-      { _id: new mongoose.Types.ObjectId(req.session.userId) },
+      { _id: new mongoose.Types.ObjectId(req.query.userId) },
       {
         $push: { following: req.params.idToFollow },
       },
@@ -650,19 +650,19 @@ exports.followUser = async (req, res) => {
 
 exports.unfollowUser = async (req, res) => {
   try {
-    if (!req.session.userId) {
+    if (!req.query.userId) {
       console.log("You are not logged in..");
       return res.status(404).json("You are not logged in..");
     }
     const response = await User.findByIdAndUpdate(
       { _id: new mongoose.Types.ObjectId(req.params.idToUnfollow) },
       {
-        $pull: { followers: req.session.userId },
+        $pull: { followers: req.query.userId },
       },
       { new: true }
     );
     const response2 = await User.findByIdAndUpdate(
-      { _id: new mongoose.Types.ObjectId(req.session.userId) },
+      { _id: new mongoose.Types.ObjectId(req.query.userId) },
       {
         $pull: { following: req.params.idToUnfollow },
       },

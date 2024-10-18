@@ -52,7 +52,7 @@ exports.createCommunityPost = async (req, res) => {
       communityPostTopic,
       communityPostCategory,
       communityPostContent: compressedContent,
-      communityPostAuthor: req.session.userId,
+      communityPostAuthor: req.query.userId,
       communityPostStatus:"PUBLISHED",
       lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
     });
@@ -131,7 +131,7 @@ exports.addReplyToCommunityPost = async (req, res) => {
 
     const newCommunityPostReply = {
       replyCommunityPostContent: compressedContent,
-      replyCommunityPostAuthor: req.session.userId,
+      replyCommunityPostAuthor: req.query.userId,
       lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
     };
     post.communityPostComments.push(newCommunityPostReply);

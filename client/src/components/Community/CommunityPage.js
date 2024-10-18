@@ -28,10 +28,16 @@ const Community = () => {
   const [category, setCategory] = useState(null);
   const [content, setContent] = useState("");
   // const [user, setuser] = useState(null);
+  const [userId, setUserId]= useState(user?._id);
 
   const [allPosts, setAllPosts] = useState(null);
 
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    setUserId(user?._id);
+    console.log(user?._id);
+},[user]);
 
   useEffect(() => {
     // const fetchLoggedInUser = async () => {
@@ -48,7 +54,7 @@ const Community = () => {
 
     const getCommunityPosts = async (req, res) => {
       try {
-        const response = await axios.get("/api/community/communityposts");
+        const response = await axios.get(`/api/community/communityposts?userId=${userId}`);
         setAllPosts(response.data);
       } catch (error) {
         console.log("Error getting posts.....");
@@ -71,7 +77,7 @@ const Community = () => {
     }
 
     try {
-      const response = await axios.post("/api/community/newpost", {
+      const response = await axios.post(`/api/community/newpost?userId=${userId}`, {
         communityPostSlug: slug,
         communityPostTopic: topic,
         communityPostContent: content,

@@ -22,6 +22,13 @@ const Settings = () => {
   // const isLoggedIn = localStorage.getItem("token");
   const navigate = useNavigate();
 
+  const [userId, setUserId]= useState(user?._id);
+
+//   useEffect(()=>{
+//     setUserId(user?._id);
+//     console.log(user?._id);
+// },[user]);
+
   // console.log(user);
 
   // useEffect(() => {
@@ -61,7 +68,7 @@ const Settings = () => {
     // Remove the token from localStorage
     localStorage.removeItem("token");
     axios
-      .delete("/api/users/delete")
+      .delete(`/api/users/delete?userId=${userId}`)
       .then((response) => {
         console.log(response.data.message);
         setShowConfirmModal(false);

@@ -31,7 +31,7 @@ const NewBlog = () => {
   const { user,loading, logout } = useContext(AuthContext);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
-  const [authorId, setAuthorId] = useState("");
+  const [authorId, setAuthorId] = useState(user?._id);
   const [author, setAuthor] = useState("");
   const [authorEmail, setAuthorEmail] = useState("");
   const [category, setCategory] = useState("");
@@ -135,7 +135,7 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
 
     try {
       setIsDisabled(true);
-      const response = await axios.post("/api/blogs/newblog", {
+      const response = await axios.post(`/api/blogs/newblog?userId=${authorId}`, {
         slug,
         title,
         content,
@@ -177,7 +177,7 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
     console.log("Content: " + content);
     try {
       setIsDisabled(true);
-      const response = await axios.post("/api/blogs/saveasdraft", {
+      const response = await axios.post(`/api/blogs/saveasdraft?userId=${authorId}`, {
         slug,
         title,
         content,

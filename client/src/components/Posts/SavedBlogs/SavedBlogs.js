@@ -1,14 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Card, Button, Container } from "react-bootstrap";
 import axios from "axios";
+import { AuthContext } from "contexts/AuthContext";
 
 const SavedBlogs = () => {
+  const { user, logout } = useContext(AuthContext);
   const [savedBlogs, setSavedBlogs] = useState([]);
+  const [userId, setUserId]= useState(user?._id);
+
+//   useEffect(()=>{
+//     setUserId(user?._id);
+//     console.log(user?._id);
+// },[user]);
 
   useEffect(() => {
     const fetchSavedBlogs = async () => {
       try {
-        const response = await axios.get("/api/users/savedblogs");
+        const response = await axios.get(`/api/users/savedblogs?userId=${userId}`);
         setSavedBlogs(response.data);
         console.log(response.data);
       } catch (error) {
@@ -23,7 +31,7 @@ const SavedBlogs = () => {
       return;
     try {
       const response = await axios.delete(
-        `/api/users/removefromsavedblogs/${slug}`
+        `/api/users/removefromsavedblogs/${slug}?userId=${userId}`
       );
       console.log("Removed from savedBlogs");
       window.location.reload();

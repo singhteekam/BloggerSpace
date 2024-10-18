@@ -8,8 +8,8 @@ const authenticate = (req, res, next) => {
   // if (req.session && req.session.userId) {
   // if (req.session && req.session.userId && req.isAuthenticated() && req.session.cookie.expires > Date.now()) {
   // if (req.session && req.session.userId && req.session.cookie.expires > Date.now()) {
-  console.log("Useridd: ", req.body.userId);
-  if (req.body.userId) {
+  console.log("Useridd: ", req.query.userId);
+  if (req.query.userId) {
     // User is authenticated, proceed to the next middleware or route handler
     // logger.info("Authentication successful!!");
     next();
