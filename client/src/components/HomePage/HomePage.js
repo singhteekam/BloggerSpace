@@ -12,6 +12,7 @@ import DeveloperInfo from "./DeveloperInfo";
 import TechStack from "./TechStack";
 import CarouselSection from "./CarouselSection";
 import PreLoader from "utils/PreLoader";
+import { ImArrowUpRight2 } from "react-icons/im";
 
 function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +55,21 @@ function HomePage() {
                   Read more
                 </Link>
               </motion.div>
+            </Col>
+          </Row>
+          <br />
+          <Row>
+            <Col md={12} className="text-center">
+            <Link to="/blogs" className="btn mx-1 bs-button ">
+                  All Blogs <ImArrowUpRight2  />
+                </Link>
+                <Link to="/community" className="btn mx-1 bs-button">
+                  Community <ImArrowUpRight2  />
+                </Link>
+            <Link to="/guidelines" className="btn mx-1 bs-button">
+                  Guidelines <ImArrowUpRight2  />
+                </Link>
+            
             </Col>
           </Row>
         </Container>

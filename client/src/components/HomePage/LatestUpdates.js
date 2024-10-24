@@ -1,7 +1,7 @@
 export const LatestUpdates= [
     {
         title: "Welcome to BloggerSpace",
-        description: "Write on any topic of your choice. Please refer the basic guidelines so that we can review your blog and publish it.",
+        description: "Write on any topic of your choice.",
         image: "",
         linkTitle:"",
         link: null,
@@ -29,7 +29,14 @@ export const LatestUpdates= [
     },
     {
         title: "Latest updates",
-        description: "Admin Blogs, Newsletter, Google Sign-in, Table of content, Most Viewed blogs",
+        description: "Admin Blogs, Newsletter, Google Sign-in, Github Sign in, Table of content, Most Viewed blogs",
+        image: "",
+        linkTitle:"",
+        link: null,
+    },
+    {
+        title: "Coming soon...",
+        description: "BS score: Your blogging score.",
         image: "",
         linkTitle:"",
         link: null,
