@@ -123,7 +123,7 @@ const MyBlogs = () => {
     fetchUnderReviewBlogs();
     fetchAwaitingAuthorBlogs();
     fetchAuthorPublishedBlogs();
-  }, []);
+  }, [userId]);
 
   const handleDiscardBlog = async (blogId, authorEmail, slug) => {
     const confirmDiscard = window.confirm(

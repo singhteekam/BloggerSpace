@@ -145,7 +145,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     // Find the blog by ID
     const blog = await Blog.findById({
       _id: new mongoose.Types.ObjectId(req.params.id),
-    });
+    }).populate("authorDetails").exec();
 
     if (!blog) {
       return res.status(404).json({ error: "blog not found" });
@@ -187,6 +187,51 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     // Save the updated blog
     await blog.save();
     await generateSitemap();
+
+    // Sending mail to author
+    const receiver = blog.authorDetails.email;
+    const subject = "Published!!";
+    const html = `
+  <div class="content">
+    <h2>Hello, ${blog.authorDetails.fullName}!</h2>
+    <p>Congratulations!! Your blog is published.</p>
+    <p>Topic: <span style="color:#167d7f; font-weight:bold">${title}</span></p>
+    <p>Published Link: <a href="${process.env.FRONTEND_URL}/${slug}">${process.env.FRONTEND_URL}/${slug}</a></p>
+  </div>
+    `;
+
+    sendEmail(receiver, subject, html)
+      .then((response) => {
+        console.log(`Email sent to ${receiver}:`, response);
+        // Handle success
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+        // Handle error
+      });
+
+    // Sending mail to admin
+    const receiver2 = process.env.EMAIL;
+    const subject2 = "Blog Published!!";
+    const html2 = `
+    <div class="content">
+    <h2>Hello, Admin!</h2>
+    <p>Congratulations!! New blog is published.</p>
+    <p>Topic: <span style="color:#167d7f; font-weight:bold">${title}</span></p>
+    <p>Published Link: <a href="${process.env.FRONTEND_URL}/${slug}">${process.env.FRONTEND_URL}/${slug}</a></p>
+  </div>
+    `;
+
+    sendEmail(receiver2, subject2, html2)
+      .then((response) => {
+        console.log(`Email sent to ${receiver}:`, response);
+        // Handle success
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+        // Handle error
+      });
+
 
     res.json({ message: "blog updated successfully" });
   } catch (error) {
@@ -775,7 +820,7 @@ exports.sendNewsletter = async (req, res) => {
 
     const {selectedUsers, subject, message}= req.body;
     selectedUsers.forEach(async (receiver) => {
-      await sendEmail(receiver.value, subject, message);
+      await sendEmail(receiver.value, subject, `<div class="content">${message}</div>`);
     });
     // Sending mail to admin
     await sendEmail(process.env.EMAIL, subject, message);
