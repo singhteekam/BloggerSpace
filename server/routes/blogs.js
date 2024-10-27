@@ -42,7 +42,7 @@ router.get("/:blogSlug", viewBlogRoute);
 
 router.get("/fetchblog/:blogId", fetchBlogByBlogId);
 
-router.post("/saveasdraft", saveAsDraftBlog);
+router.post("/saveasdraft",authenticate, saveAsDraftBlog);
 
 router.post("/newblog", authenticate, createNewBlog);
 

@@ -24,8 +24,14 @@ passport.use(
       // In a production app, you'd save the profile information to the database
       // For now, we'll just return the profile object
 
+      console.log("Google oauth2: ", profile);
+
       let user = await User.findOne({ email: profile.emails[0].value });
       console.log("oauth2:", profile.emails[0].value);
+
+      const response = await axios.get(profile.photos[0].value, {
+        responseType: "arraybuffer",
+      });
 
       if (!user) {
         // If user does not exist, create a new user
@@ -39,10 +45,6 @@ passport.use(
           password += chars.substring(randomNumber, randomNumber + 1);
         }
         console.log(password);
-
-        const response = await axios.get(profile.photos[0].value, {
-          responseType: "arraybuffer",
-        });
 
         user = new User({
           // googleId: profile.id,
@@ -64,11 +66,12 @@ passport.use(
       const receiver = profile.emails[0].value;
       const receiver2 = process.env.EMAIL;
       const subject = "Sign up success";
-      const html = `<div>
+      const html = `<div class="content">
       <b>Hi ${profile.displayName},</b>
       <p>Sign in with Google success!!.</p>
       <p>Sign in with Google or you can use your Email and default password to sign in.</p>
-      <p><b>Note: </b>Please change your default password to sign in with Email & password.\n\nDefault password: ${password}</p>
+      <p><b>Note: </b>Please use your default password to sign in with Email & password.</p>
+      <p>Default password: <span class="teal-green">${password}</span></p>
       </div>`;
       sendEmail(receiver, subject, html)
         .then((response) => {
@@ -89,6 +92,34 @@ passport.use(
           // Handle error
         });
 
+      }
+
+      if(user && user.authType!=="Google"){
+          user.fullName= profile.displayName;
+          user.userName= profile.emails[0].value
+            .substring(0, profile.emails[0].value.indexOf("@"))
+            .replace(/[^a-zA-Z0-9 ]/g, "");
+          user.profilePicture= Buffer.from(response.data, "binary").toString(
+            "base64"
+          );
+          user.isVerified= profile.emails[0].verified;
+          user.authType= "Google";
+        await user.save();
+
+      const receiver = profile.emails[0].value;
+      const subject = "Sign in with Google success";
+      const html = `<div class="content">
+      <b>Hi ${profile.displayName},</b>
+      <p>You have signed in with Google!!.</p>
+       <p>Your primary auth type is now: <span class="teal-green">Google</span></p>
+      </div>`;
+      sendEmail(receiver, subject, html)
+        .then((response) => {
+          console.log(`Email sent to ${receiver}:`, response);
+        })
+        .catch((error) => {
+          console.error("Error sending email:", error);
+        });
       }
 
       return done(null, user);
@@ -118,6 +149,10 @@ passport.use(
 
       let user = await User.findOne({ email: emailResponse.data[0].email });
 
+      const response = await axios.get(profile.photos[0].value, {
+        responseType: "arraybuffer",
+      });
+
       if (!user) {
         // If user does not exist, create a new user
 
@@ -131,15 +166,11 @@ passport.use(
         }
         console.log(password);
 
-        const response = await axios.get(profile.photos[0].value, {
-          responseType: "arraybuffer",
-        });
-
         user = new User({
           // googleId: profile.id,
           fullName: profile.displayName,
           userName: emailResponse.data[0].email
-            .substring(0, profile.emails[0].value.indexOf("@"))
+            .substring(0, emailResponse.data[0].email.indexOf("@"))
             .replace(/[^a-zA-Z0-9 ]/g, ""),
           email: emailResponse.data[0].email,
           profilePicture: Buffer.from(response.data, "binary").toString(
@@ -155,11 +186,12 @@ passport.use(
       const receiver = emailResponse.data[0].email;
       const receiver2 = process.env.EMAIL;
       const subject = "Sign up success";
-      const html = `<div>
+      const html = `<div class="content">
       <b>Hi ${profile.displayName},</b>
       <p>Sign in with Github success!!.</p>
       <p>Sign in with Github or you can use your Email and default password to sign in.</p>
-      <p><b>Note: </b>Please change your default password to sign in with Email & password.\n\nDefault password: ${password}</p>
+      <p><b>Note: </b>Please use your default password to sign in with Email & password.</p>
+      <p>Default password: <span class="teal-green">${password}</span></p>
       </div>`;
       sendEmail(receiver, subject, html)
         .then((response) => {
@@ -181,6 +213,35 @@ passport.use(
         });
 
       }
+
+      if(user && user.authType!=="Github"){
+        user.fullName= profile.displayName;
+        user.userName= emailResponse.data[0].email
+          .substring(0, emailResponse.data[0].email.indexOf("@"))
+          .replace(/[^a-zA-Z0-9 ]/g, "");
+        user.profilePicture= Buffer.from(response.data, "binary").toString(
+          "base64"
+        );
+        user.isVerified= "true";
+        user.authType= "Github";
+      await user.save();
+
+    const receiver = emailResponse.data[0].email;
+    const subject = "Sign in with Github success";
+    const html = `<div class="content">
+    <b>Hi ${profile.displayName},</b>
+    <p>You have signed in with Github!!.</p>
+    <p>Your primary auth type is now: <span class="teal-green">Github</span></p>
+    </div>`;
+    sendEmail(receiver, subject, html)
+      .then((response) => {
+        console.log(`Email sent to ${receiver}:`, response);
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+      });
+    }
+
       return done(null, user);
     }
   )

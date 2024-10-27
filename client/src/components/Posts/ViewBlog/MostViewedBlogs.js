@@ -29,8 +29,8 @@ const MostViewedBlogs = () => {
             {mostViewed===null? <PreLoader isLoading={true} />:
                 <ul>
                 {mostViewed && mostViewed.map((blog)=>(
-                    <li key={blog}>
-                        <Link to={`/${blog.slug}`} target='_blank'>{blog.title} <BsBoxArrowUpRight /></Link> <br />
+                    <li key={blog.blogId}>
+                        <Link to={`/${blog.slug}`} >{blog.title} <BsBoxArrowUpRight /></Link> <br />
                         <FaEye className="color-teal-green" /> <span className="color-teal-green">{blog.blogViews}{"  "}</span>
                         {/* <FaHeart className="color-teal-green" /> <span className="color-teal-green">{blog.blogLikes.length}</span> */}
                     </li>

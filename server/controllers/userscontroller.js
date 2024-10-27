@@ -247,11 +247,19 @@ exports.forgetPassword = async (req, res) => {
 
     // Create the password reset email
     // const resetUrl = `http://localhost:3000/resetpassword/${resetToken}`;
-    const resetUrl = `${process.env.BLOGGERSPACE1}/resetpassword/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
 
     const receiver = email;
     const subject = "Password Reset Request";
-    const html = `<p>You are receiving this email because you (or someone else) has requested to reset the password for your account.\n\nPlease click on the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n</p>`;
+    const html = `
+    <div class="content">
+      <h2>Hello, ${email}!</h2>
+      <p>You are receiving this email because you (or someone else) has requested to reset the password for your account.Please click on the following link to reset your password:</p>
+      <b>${resetUrl}</b>
+      <br /> <br />
+      <b>Note: If you did not request this, please ignore this email and your password will remain unchanged.</b>
+    </div>
+    `;
     sendEmail(receiver, subject, html)
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);

@@ -115,6 +115,33 @@ app.get("/api/viewlogs", async (req, res) => {
 // addFollowersFields();
 // addFollowingFields();
 
-app.listen(PORT, console.log("Server started at " + PORT));
+// app.get("/heavy", (req, res) => {
+//   let total = 0;
+//   for (let i = 0; i < 5_000_000; i++) {
+//     total++;
+//   }
+//   res.send(`The result of the CPU intensive task is ${total}\n`);
+// });
+
+// const cluster = require('cluster');
+// const os = require('os');
+// const numCPUs = os.cpus().length;
+
+// if (cluster.isMaster) {
+//   console.log(`Master process ${process.pid} is running`);
+
+//   for (let i = 0; i < numCPUs; i++) {
+//     cluster.fork();
+//   }
+
+//   cluster.on('exit', (worker, code, signal) => {
+//     console.log(`Worker process ${worker.process.pid} died. Restarting...`);
+//     cluster.fork();
+//   });
+// }
+// else{
+// }
+app.listen(PORT, console.log("Server started at " + PORT+ " and pid: "+ process.pid));
+
 
 exports.bloggerspacebackend = functions.https.onRequest(app);

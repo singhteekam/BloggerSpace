@@ -13,18 +13,18 @@ const SavedBlogs = () => {
 //     console.log(user?._id);
 // },[user]);
 
+const fetchSavedBlogs = async () => {
+  try {
+    const response = await axios.get(`/api/users/savedblogs?userId=${userId}`);
+    setSavedBlogs(response.data);
+    console.log(response.data);
+  } catch (error) {
+    console.log("Error occured when fetching saved blogs");
+  }
+};
   useEffect(() => {
-    const fetchSavedBlogs = async () => {
-      try {
-        const response = await axios.get(`/api/users/savedblogs?userId=${userId}`);
-        setSavedBlogs(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.log("Error occured when fetching saved blogs");
-      }
-    };
     fetchSavedBlogs();
-  }, []);
+  }, [userId]);
 
   const removeSavedBlog = async (slug) => {
     if (!window.confirm("Do you want to remove this blog from saved blogs?"))
@@ -34,7 +34,8 @@ const SavedBlogs = () => {
         `/api/users/removefromsavedblogs/${slug}?userId=${userId}`
       );
       console.log("Removed from savedBlogs");
-      window.location.reload();
+      fetchSavedBlogs();
+      // window.location.reload();
     } catch (error) {
       console.error("Error removing blog from savedBlogs:", error);
     }

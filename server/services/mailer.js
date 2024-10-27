@@ -36,6 +36,7 @@ const emailTemplate = (content) => {
     .footer a { color: #4CAF50; text-decoration: none; }
     .social-icons img { width: 24px; height: 24px; margin: 0 5px; }
     .blog-content{ background-color: #f1f1f1; border: 2px solid black}
+    .teal-green{ color:#167d7f}
   </style>
 </head>
 <body>

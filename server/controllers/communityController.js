@@ -140,8 +140,15 @@ exports.addReplyToCommunityPost = async (req, res) => {
 
     // Sending mail to Admin
     const receiver = process.env.EMAIL;
-    const subject = "New community post created!!";
-    const html = `<p>Reply: ${communityPostContent}</p>`;
+    const subject = "New community post comment!!";
+    const html = `
+    <div class="content">
+      <h2>Hello, Admin</h2>
+      <p>New comment added on post: <span class="teal-green">${post.communityPostSlug}</span></p>
+      <p>Reply: ${communityPostContent}</p>
+      <p>Community post link: <a href=${process.env.FRONTEND_URL}/community/post/${post.communityPostId}/${post.communityPostSlug}>${process.env.FRONTEND_URL}/community/post/${post.communityPostId}/${post.communityPostSlug}</a></p>
+    </div>
+    `;
 
     sendEmail(receiver, subject, html)
       .then((response) => {

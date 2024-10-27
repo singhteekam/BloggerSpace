@@ -59,8 +59,28 @@ exports.blogsHomepage = async (req, res) => {
       .populate("authorDetails") // Populate the author field with the User document
       .exec();
 
+      let allBlogs=[];
+
+      blogs.map((blog)=>{
+        const x={
+          _id: blog._id,
+          slug: blog.slug,
+          title: blog.title,
+          category: blog.category,
+          tags: blog.tags,
+          content: blog.content,
+          blogViews: blog.blogViews,
+          blogLikes: blog.blogLikes,
+          lastUpdatedAt: blog.lastUpdatedAt,
+          authorDetails:{
+            userName: blog.authorDetails.userName
+          }
+        };
+        allBlogs.push(x);
+      })
+
     // console.log(decompressedblogs);
-    res.json(blogs);
+    res.json(allBlogs);
   } catch (error) {
     logger.error("Error fetching blogs:" + error);
     console.error("Error fetching blogs:", error);
@@ -304,7 +324,7 @@ exports.saveAsDraftBlog = async (req, res) => {
     );
 
     const blog = await Blog.findById({
-      _id: new mongoose.Types.ObjectId(req.body.userId),
+      _id: new mongoose.Types.ObjectId(req.body.id),
     });
     if (blog) {
       blog.slug = slug;

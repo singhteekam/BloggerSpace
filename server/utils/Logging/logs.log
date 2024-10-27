@@ -1,2 +1,1 @@
-[2024-09-04T10:25:12.723Z] [LOG] [DEBUG] - New user logged in: Teekam Singh
-[2024-09-04T10:25:16.007Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2024-10-26T21:40:50.535Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired

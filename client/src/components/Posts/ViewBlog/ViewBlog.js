@@ -159,7 +159,7 @@ const ViewBlog = () => {
     fetchBlog();
     // fetchComments();
     fetchBlogViews();
-  }, []);
+  }, [blogSlug]);
 
   const fetchBlog = async () => {
     try {
@@ -221,7 +221,7 @@ const ViewBlog = () => {
   };
 
   const handleBlogLikes = async () => {
-    if (!userInfo) {
+    if (!userId) {
       toast.error("Please login to like the blog");
       return;
       // return <LoginPageModal show={true} handleClose={null} />;
@@ -306,6 +306,7 @@ const ViewBlog = () => {
 
   const handleFollowUser = async (idToFollow) => {
     try {
+      console.log("Userid: ",userId);
       setDisableFollowButton(true);
       const response = await axios.patch(`/api/users/follow/${idToFollow}?userId=${userId}`);
       toast.success("Following.");
@@ -475,9 +476,9 @@ const ViewBlog = () => {
                         <b className="mx-3">{blog?.authorDetails.userName}</b>
                       </Link>
                       <br />
-                      {/* <i className="mx-3">{blog?.lastUpdatedAt?.slice(0, 10)}</i> */}
-                      {blog.authorDetails.followers.find(
-                        (element) => element === userInfo?._id
+                      
+                      {blog.authorDetails._id=== userId?"": blog.authorDetails.followers.find(
+                        (element) => element === userId
                       ) ? (
                         <Button
                           variant="secondary"

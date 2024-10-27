@@ -39,36 +39,29 @@ const ViewCommunityPost = () => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [content, setContent] = useState("");
   // const [user, setuser] = useState(null);
+  const [userId, setUserId]= useState(user?._id);
+  const [disable, setDisable]= useState(false);
 
-  const isLoggedIn = localStorage.getItem("token");
+
   const navigate = useNavigate();
 
+  useEffect(()=>{
+      setUserId(user?._id);
+  }, [user]);
+
+  const fetchCommunityPost = async () => {
+    try {
+      const response = await axios.get(
+        `/api/community/post/${communityPostSlug}`
+      );
+      setCommunityPost(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.log("Error fetching post");
+    }
+  };
+
   useEffect(() => {
-
-    // const fetchLoggedInUser = async () => {
-    //     await axios
-    //       .get("/api/users/user")
-    //       .then((response) => {
-    //         const user = response.data;
-    //         setuser(user);
-    //       })
-    //       .catch((error) => {
-    //         console.error("Error fetching user information:", error);
-    //       });
-    //   };
-
-    const fetchCommunityPost = async () => {
-      try {
-        const response = await axios.get(
-          `/api/community/post/${communityPostSlug}`
-        );
-        setCommunityPost(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.log("Error fetching post");
-      }
-    };
-    // fetchLoggedInUser();
     fetchCommunityPost();
   }, []);
 
@@ -101,15 +94,16 @@ const ViewCommunityPost = () => {
   const handleCommunityPostReply = async (e) => {
     e.preventDefault();
 
-    if (!user) {
-      logout();
-      navigate("/login");
+    setDisable(true);
+
+    if (!userId) {
+      toast.error("Error when posting comment!")
       return null; // or display a loading indicator while redirecting
     }
 
     try {
       const response = await axios.post(
-        `/api/community/${communityPostId}/addreply`,
+        `/api/community/${communityPostId}/addreply?userId=${userId}`,
         {
           communityPostContent: content,
         }
@@ -117,13 +111,14 @@ const ViewCommunityPost = () => {
       console.log(response.data);
 
       toast.success("Replied to this post !!");
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      setContent("");
+      setDisable(false);
+      fetchCommunityPost();
       //   setCommunityPost(...communityPost, response.data);
     } catch (error) {
       toast.error("Error replying on this post!!");
       console.error("Error replying on this post:", error);
+      setDisable(false);
     }
   };
 
@@ -260,7 +255,8 @@ const ViewCommunityPost = () => {
             {/* <TinymceEditor content={content} onContentChange={setContent} /> */}
             <CKEditor
               editor={Editor}
-              data="<p></p>"
+              // data="<p></p>"
+              data={content}
               onChange={(event, editor) => {
                 setContent(editor.getData());
               }}
@@ -271,7 +267,7 @@ const ViewCommunityPost = () => {
               className="bs-button"
               size="sm"
               onClick={handleCommunityPostReply}
-              disabled={user===null?true:false}
+              disabled={user===null?true:false || disable}
             >
               Post this reply
             </Button>
