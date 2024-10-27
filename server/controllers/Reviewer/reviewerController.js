@@ -37,15 +37,22 @@ exports.reviewerSignup = async (req, res) => {
 
     const receiver = process.env.EMAIL;
     const subject = "New pending request of reviewer";
-    const html = `Hi Admin,
-              <p>New user is signed up as reviewer. Please verify and approve the request.</p>
-                `;
+    const html = `
+              <div class="content">
+                <h2>Hi Admin,</h2>
+                <p>New user is signed up as reviewer. Please verify and approve the request.</p>
+                <p>Name: ${fullName}</p>
+                <p>Email: ${email}</p>
+              </div>`;
 
     const receiver2 = email;
     const subject2 = "Signup successful!!";
-    const html2 = `Hi ${fullName},
-              <p>Thank you so much for signup on reviewer panel. Your request will be approved by the admin soon.</p>
-                `;
+    const html2 = `
+              <div class="content">
+                <h2>Hi ${fullName},</h2>
+                <p>Congratulations!! You are now a part of BloggerSpace Reviewer Panel. Your request will be approved by the admin soon.</p>
+                <p>Reply to this email by responding "Yes" to get verified.</p>
+              </div>`;
 
     res.status(201).json({ message: "Signup successful" });
     await sendEmail(receiver, subject, html);

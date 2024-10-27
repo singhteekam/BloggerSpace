@@ -30,7 +30,7 @@ exports.getAllCommunityPosts = async (req, res) => {
 
 
 exports.createCommunityPost = async (req, res) => {
-  let iframely;
+
   try {
     const {
       communityPostSlug,
@@ -62,7 +62,17 @@ exports.createCommunityPost = async (req, res) => {
     // Sending mail to Admin
     const receiver = process.env.EMAIL;
     const subject = "New community post created!!";
-    const html = `<p>Post title: ${communityPostTopic}</p>`;
+    const html = `
+          <div class="content">
+            <h2>Hi Admin,</h2>
+            <p>New community post created. Post details are given below:</p>
+            <p>Post title: <b class="teal-green">${communityPostTopic}</b></p>
+            <p>Post Category: <b class="teal-green">${communityPostCategory}</b></p>
+            <p>Content:</p> 
+            <div class="blog-content">${communityPostContent}</div>
+            <p>Community Post link: <a href=${process.env.FRONTEND_URL}/community/post/${savedPost.communityPostId}/${communityPostSlug}>${process.env.FRONTEND_URL}/community/post/${savedPost.communityPostId}/${communityPostSlug}</a></p>
+          </div>
+          `;
 
     sendEmail(receiver, subject, html)
       .then((response) => {

@@ -38,31 +38,30 @@ exports.verifyAccount = async (req, res) => {
     // const verificationLink = `${req.protocol}://${req.get(
     //   "host"
     // )}/api/users/verify-account?token=${verificationToken}`;
-    const verificationLink = `${process.env.BLOGGERSPACE1}/api/users/verify-account?token=${verificationToken}`;
+    const verificationLink = `${process.env.FRONTEND_URL}/api/users/verify-account?token=${verificationToken}`;
 
     const receiver = email;
-    const subject = "Account Verification";
+    const subject = "VerifY your Account - BloggerSpace";
     const html = `
-              <p>Please click the following link to verify your account:</p>
-              <a href="${verificationLink}">${verificationLink}</a>
+              <div class="content">
+                <h2>Hi ${email},</h2>
+                <p>Please click the following link to verify your account:</p>
+                <a href="${verificationLink}">${verificationLink}</a>
+                <br />
+                <b>Note: Ignore this mail if not requested by you.</b>
+              </div>
                 `;
 
     sendEmail(receiver, subject, html)
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);
         logger.debug("Verification emails sent successfully.");
-        // Handle success
-        return res.status(200).json({ message: "Verification email sent" });
       })
       .catch((error) => {
         console.error("Error sending email:", error);
         logger.error(
           "Error sending verification emails to receivers. Error: " + error
         );
-        // Handle error
-        return res
-          .status(500)
-          .json({ message: "Failed to send verification email" });
       });
   } catch (error) {
     console.error("Error sending verification email:", error);
@@ -129,6 +128,28 @@ exports.signup = async (req, res) => {
     console.log(newUser);
 
     await newUser.save();
+
+    const receiver = email;
+    const subject = "Signup Success!!";
+    const html = `
+              <div class="content">
+                <h2>Hi ${email},</h2>
+                <p>Your account has been created successfully.</p>
+                <p>You will be asked to verify your account in next step. If not, login with your email and password to get verification link on your registered email id. </p>
+              </div>
+                `;
+
+    sendEmail(receiver, subject, html)
+      .then((response) => {
+        console.log(`Email sent to ${receiver}:`, response);
+        logger.debug("Sign up successful.");
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+        logger.error(
+          "Error Sign up. Error: " + error
+        );
+      });
 
     logger.debug("New user added. Signup successful.");
     res.status(201).json({ message: "Signup successful" });
@@ -264,16 +285,13 @@ exports.forgetPassword = async (req, res) => {
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);
         logger.debug("Sending Password Reset url Email sent to receiver.");
-        // Handle success
       })
       .catch((error) => {
         console.error("Error sending email:", error);
         logger.error("Error sending email: " + error.message);
-        // Handle error
       });
 
     logger.debug("Password reset email sent successfully.");
-    // Email sent successfully
     return res.status(200).json({ message: "Password reset email sent" });
   } catch (error) {
     // An error occurred, return an error message
@@ -427,12 +445,13 @@ exports.uploadProfilePicture = async (req, res) => {
 // User Info
 exports.loggedInUserInfo = async (req, res) => {
   try {
-
     // Get the token from the Authorization header (Bearer <token>)
-    const token = req.headers.authorization?.split(' ')[1]; 
+    const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
-      return res.status(401).json({ error: 'Authentication required. Please login!' });
+      return res
+        .status(401)
+        .json({ error: "Authentication required. Please login!" });
     }
 
     // Verify and decode the JWT token
@@ -443,7 +462,7 @@ exports.loggedInUserInfo = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     // Get the user ID from the session or token (depending on your authentication setup)
@@ -531,7 +550,6 @@ exports.userProfile = async (req, res) => {
     logger.info("Returning from user profile route with data.");
     res.json(userProfile);
   } catch (error) {
-    // console.error("Error fetching user profile:", error);
     logger.error("Error fetching user profile: " + error);
     res.status(500).json({ message: "Internal server error" });
   }
@@ -558,7 +576,6 @@ exports.updateUserPersonalDetails = async (req, res) => {
     logger.debug("Information updated succesfully for user: " + userName);
     res.json({ message: "Username updated successfully", user: updatedUser });
   } catch (error) {
-    // console.error("Error updating username:", error);
     logger.error("Error updating username:" + error);
     res
       .status(500)
@@ -570,6 +587,12 @@ exports.updateUserPersonalDetails = async (req, res) => {
 exports.addBlogToSavedBlogs = async (req, res) => {
   try {
     const userId = req.query.userId;
+    console.log(userId);
+    
+    if (userId=="undefined") {
+      return res.status(404).json({ message: "You are not logged in!!" });
+    }
+
     const user = await User.findById(userId);
     const { title, slug, category, tags } = req.body;
 
@@ -617,8 +640,6 @@ exports.getSavedBlogsOfUser = async (req, res) => {
     const userId = req.query.userId;
     const user = await User.findById(userId);
 
-    // Return a success message
-    // console.log(user.savedBlogs);
     res.json(user.savedBlogs);
   } catch (error) {
     logger.error("Error getting saved blogs: " + error.message);
@@ -737,8 +758,14 @@ exports.contactUs = async (req, res) => {
     const { email, mobileNo, message } = req.body;
     sendEmail(
       process.env.EMAIL,
-      "New contact us email",
-      `<div><p>Details of the form submitted user:</p><p>Email: ${email}</p><p>MobileNo: ${mobileNo}</p><p>Message: ${message}</p></div>`
+      "New contact us form",
+      `<div class="content">
+          <h2>Hi Admin,</h2>
+          <p>Form details:</p>
+          <p>Email: <b class="teal-green">${email}</b></p>
+          <p>MobileNo: <b class="teal-green">${mobileNo}</b></p>
+          <p>Message: <b class="teal-green">${message}</b></p>
+        </div>`
     )
       .then((response) => {
         console.log("Email sent!!!");
@@ -755,77 +782,93 @@ exports.oauthGoogleCallback = async (req, res) => {
   // Successful authentication, redirect to profile page
 
   console.log("Inside oauthcallback: ", req.user);
-  if(req.user){
+  if (req.user) {
     console.log("Inside if of oauthcallback: ", req.user);
 
-  console.log("Inside if of oauthcallback Email 728: ", req.user.email);
-  User.findOne({ email: req.user.email})
-  .then((user) => {
-    if (!user) {
-      logger.error("User Not found G-auth ");
-      console.log("User not found G-Auth");
-    return res.redirect(`${process.env.FRONTEND_URL}/login`);
-    }
-    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token expiration time
-    });
-  
-    // req.session.user = user; // Will remove in future
-    // req.session.userId = user._id;
-    // req.session.token = token;
-    // req.session.email = user.email;
+    console.log("Inside if of oauthcallback Email 728: ", req.user.email);
+    User.findOne({ email: req.user.email })
+      .then((user) => {
+        if (!user) {
+          logger.error("User Not found G-auth ");
+          console.log("User not found G-Auth");
+          return res.redirect(`${process.env.FRONTEND_URL}/login`);
+        }
+        const token = jwt.sign(
+          { userId: user._id, email: user.email },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "1h", // Token expiration time
+          }
+        );
 
-    // console.log("User: ", req.session.user);
-    // console.log("Userid: ", req.session.userId);
-    // console.log("token: ", req.session.token);
-    // console.log("email: ", req.session.email);
-    // console.log("User 746: ", req.user);
-    console.log("Tokenn: ", token)
-  
-    const encodedToken = encodeURIComponent(token);
-    // return res.status(200).json({
-    //     success:true,
-    //     message: "successful",
-    //     user: user,
-    //     token:token,
-    //     cookies: req.cookies
-    //   });
-    return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
-  })
-  .catch((err) => {
-    logger.error("Error when using G-Auth login");
-    console.log("Error when using G-Auth login");
-    res.status(500).json({ error: err });
-  });
-}};
+        // req.session.user = user; // Will remove in future
+        // req.session.userId = user._id;
+        // req.session.token = token;
+        // req.session.email = user.email;
 
+        // console.log("User: ", req.session.user);
+        // console.log("Userid: ", req.session.userId);
+        // console.log("token: ", req.session.token);
+        // console.log("email: ", req.session.email);
+        // console.log("User 746: ", req.user);
+        console.log("Tokenn: ", token);
+
+        const encodedToken = encodeURIComponent(token);
+        // return res.status(200).json({
+        //     success:true,
+        //     message: "successful",
+        //     user: user,
+        //     token:token,
+        //     cookies: req.cookies
+        //   });
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`
+        );
+      })
+      .catch((err) => {
+        logger.error("Error when using G-Auth login");
+        console.log("Error when using G-Auth login");
+        res.status(500).json({ error: err });
+      });
+  }
+};
 
 // Passport Login Callback
 exports.authPassportCallback = async (req, res) => {
   console.log("Inside auth passport callback: ", req.user?.email);
-  if(req.user){
+  if (req.user) {
     console.log("Inside if of auth passport callback: ", req.user?.email);
 
-  console.log("Inside if of auth passport callback Email 830: ", req.user.email);
-  User.findOne({ email: req.user.email})
-  .then((user) => {
-    if (!user) {
-      logger.error("User Not found!!");
-      console.log("User not found!!");
-    return res.redirect(`${process.env.FRONTEND_URL}/login`);
-    }
-    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token expiration time
-    });
-  
-    console.log("Token generated: ", token);  
-    const encodedToken = encodeURIComponent(token);
+    console.log(
+      "Inside if of auth passport callback Email 830: ",
+      req.user.email
+    );
+    User.findOne({ email: req.user.email })
+      .then((user) => {
+        if (!user) {
+          logger.error("User Not found!!");
+          console.log("User not found!!");
+          return res.redirect(`${process.env.FRONTEND_URL}/login`);
+        }
+        const token = jwt.sign(
+          { userId: user._id, email: user.email },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "1h", // Token expiration time
+          }
+        );
 
-    return res.redirect(`${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`);
-  })
-  .catch((err) => {
-    logger.error("Error when using passport login");
-    console.log("Error when using passport login");
-    res.status(500).json({ error: err });
-  });
-}};
+        console.log("Token generated: ", token);
+        const encodedToken = encodeURIComponent(token);
+
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`
+        );
+      })
+      .catch((err) => {
+        logger.error("Error when using passport login");
+        console.log("Error when using passport login");
+        res.status(500).json({ error: err });
+      });
+  }
+};

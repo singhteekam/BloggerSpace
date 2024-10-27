@@ -1,1 +1,6 @@
 [2024-10-26T21:40:50.535Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2024-10-27T21:30:56.240Z] [LOG] [DEBUG] - Searching for blog: blogs
+[2024-10-27T21:30:56.455Z] [LOG] [ERROR] - blog not found. Slug: blogs
+[2024-10-27T21:30:56.455Z] [LOG] [ERROR] - blog not found. Slug: blogs
+[2024-10-27T21:30:56.455Z] [LOG] [ERROR] - blog not found. Slug: blogs
+[2024-10-27T21:30:56.766Z] [LOG] [DEBUG] - Searching for blog: blogs

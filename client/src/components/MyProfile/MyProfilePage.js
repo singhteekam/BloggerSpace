@@ -36,22 +36,7 @@ const MyProfilePage = () => {
 
   const [userId, setUserId]= useState(user?._id);
 
-//   useEffect(()=>{
-//     setUserId(user?._id);
-//     console.log(user?._id);
-// },[user]);
-
   let i = 0;
-
-  // useEffect(() => {
-  //   if (!user) {
-  //     console.log("User not found")
-  //     // If no user is found, log them out and redirect to login page
-  //     logout();
-  //     navigate("/login");
-  //   }
-  //   console.log("Current user: ", user);
-  // }, [user, logout, navigate]);
 
   if (!user && loading) {
     return <PreLoader isLoading={loading} /> // This can be a loading indicator

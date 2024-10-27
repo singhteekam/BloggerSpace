@@ -56,7 +56,7 @@ const AllBlogs = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `/api/blogs/allblogs?page=${page}&limit=${limit}&`
+        `/api/blogs/allblogs?page=${page}&limit=${limit}`
       );
       setBlogs(response.data.blogs);
       setTotal(response.data.total);

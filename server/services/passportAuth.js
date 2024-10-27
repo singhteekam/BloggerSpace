@@ -1,10 +1,10 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
+// const FacebookStrategy = require('passport-facebook').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
-const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
-const TwitterStrategy = require('@superfaceai/passport-twitter-oauth2').Strategy;
-const { OIDCStrategy } = require('passport-azure-ad');
+// const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
+// const TwitterStrategy = require('@superfaceai/passport-twitter-oauth2').Strategy;
+// const { OIDCStrategy } = require('passport-azure-ad');
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const axios = require("axios");

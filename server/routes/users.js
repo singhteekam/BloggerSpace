@@ -36,7 +36,6 @@ const { discardBlogFromDB } = require("../utils/discardBlog");
 // const passport = require('./../services/oauth2.js');  bkp
 
 const passport= require("passport");
-const jwt = require("jsonwebtoken");
 
 // Route for verifying the user account
 router.post("/verify-account", verifyAccount);

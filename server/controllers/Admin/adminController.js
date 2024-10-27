@@ -193,7 +193,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     const subject = "Published!!";
     const html = `
   <div class="content">
-    <h2>Hello, ${blog.authorDetails.fullName}!</h2>
+    <h2>Hi ${blog.authorDetails.fullName},</h2>
     <p>Congratulations!! Your blog is published.</p>
     <p>Topic: <span style="color:#167d7f; font-weight:bold">${title}</span></p>
     <p>Published Link: <a href="${process.env.FRONTEND_URL}/${slug}">${process.env.FRONTEND_URL}/${slug}</a></p>
@@ -215,7 +215,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     const subject2 = "Blog Published!!";
     const html2 = `
     <div class="content">
-    <h2>Hello, Admin!</h2>
+    <h2>Hi Admin,</h2>
     <p>Congratulations!! New blog is published.</p>
     <p>Topic: <span style="color:#167d7f; font-weight:bold">${title}</span></p>
     <p>Published Link: <a href="${process.env.FRONTEND_URL}/${slug}">${process.env.FRONTEND_URL}/${slug}</a></p>
@@ -317,16 +317,14 @@ exports.updateReviewerAssignment = async (req, res) => {
 
     const receiver = assignedUser;
     const subject = "New blog assigned to you for review";
-    const html = `Hi,
-              <p>New blog is assigned to you for review. Please review it within 3 days.
-              </p>
-              <p>
-              Blog Title: ${blog.title}
-              </p>
-              <p>
-              <b>BloggerSpace Reviewer panel:</b> ${process.env.REVIEWER_PANEL_URL}
-              </p>
-                `;
+    const html = `
+          <div class="content">
+            <h2>Hi ${assignedUser}</h2>
+            <p>New blog is assigned to you for review. Please review it within 3 days.</p>
+            <p>Title: ${blog.title}</p>
+            <p>BloggerSpace Reviewer panel: <span>${process.env.REVIEWER_PANEL_URL}</span></p> 
+          </div>
+          `;
 
     
     sendEmail(receiver, subject, html)
@@ -430,9 +428,14 @@ exports.approveReviewerRequest= async(req, res)=>{
 
     const receiver = reviewer.email;
     const subject = "Congratulations! Your request is approved";
-    const html = `Hi ${reviewer.fullName},
-              <p>Your reviewer request is approved. You can now review the assiged blogs. </p>
-                `;
+    const html = `
+            <div class="content">
+            <h2>Hi ${reviewer.fullName},</h2>
+            <p>Congratulations!! Your Reviewer request is approved and you are now a Reviewer.</p>
+            <p>Kindly review the assigned blogs before deadline. If failed to review then that blog will be assigned to some other Reviewer. Repeating the same practice multiple times could revoke your Reviewer access.</p>
+            <p>BloggerSpace Reviewer panel: <span>${process.env.REVIEWER_PANEL_URL}</span></p> 
+          </div>
+          `;
 
     res.json({ message: "Reviewer verified successfully" });
     await sendEmail(receiver, subject, html);
@@ -450,8 +453,12 @@ exports.removeFromReviewerRole= async(req, res)=>{
 
     const receiver = reviewer.email;
     const subject = "Sorry to say Goodbye!";
-    const html = `Hi ${reviewer.fullName},
-              <p>You are no longer reviewer now. If you wish to re-apply for reviewer then send reminder again to verify your account. </p>
+    const html = `
+          <div class="content">
+            <h2>Hi ${reviewer.fullName},</h2>
+            <p>You are no longer a reviewer now. If you wish to re-apply for reviewer then send reminder again to verify your account. </p>
+            <p>BloggerSpace Reviewer panel: <span>${process.env.REVIEWER_PANEL_URL}</span></p> 
+          </div>
                 `;
 
     res.json({ message: "Reviewer removed successfully" });
@@ -478,9 +485,12 @@ exports.deleteUserAccount = async (req, res) => {
 
     const receiver = req.body.email;
     const subject = "Sorry to say Goodbye!";
-    const html = `Hi,
-              <p>Your account is deleted by admin. If you have any query then please mail to the below email id.\nEmail:${process.env.EMAIL}</p>
-                `;
+    const html = `
+          <div class="content">
+            <h2>Hi ${req.body.email},</h2>
+            <p>Your account is deleted by admin. If you have any query then please drop a mail to below email id.\nEmail:${process.env.EMAIL}</p>
+          </div>
+          `;
 
     res.json({ message: "User Account deleted by admin successfully" });
     await sendEmail(receiver, subject, html);
@@ -528,9 +538,13 @@ exports.deleteCommunityPost = async (req, res) => {
 
     const receiver = process.env.EMAIL;
     const subject = `Community post ${id} deleted`;
-    const html = `Hi,
-              <p>Post deleted ${id}</p>
-                `;
+    const html = `
+          <div class="content">
+            <h2>Hi Admin,</h2>
+            <p>Community post deleted successfully.</p>
+            <p>Post deleted ${id}</p>
+          </div>
+          `;
 
     res.json({ message: "post deleted by admin successfully" });
     await sendEmail(receiver, subject, html);
@@ -577,27 +591,6 @@ exports.adminNewBlog = async (req, res) => {
       status: "ADMIN_PUBLISHED"
     });
     const savedBlog = await newPost.save();
-
-    // Sending mail to admin
-    // const blogLink = `http://localhost:3000/api/blogs/${slug}`;
-    const blogLink = `${process.env.FRONTEND_URL}/${slug}`;
-    const receiver2 = process.env.EMAIL;
-    const subject2 = "New Blog available for review";
-    const html2 = `
-    <p>New blog available for review</p>
-    <p>Title: ${title}</p>
-    <a href="${blogLink}">${blogLink}</a>
-    `;
-
-    sendEmail(receiver2, subject2, html2)
-      .then((response) => {
-        console.log(`Email sent to ${receiver2}:`, response);
-        // Handle success
-      })
-      .catch((error) => {
-        console.error("Error sending email:", error);
-        // Handle error
-      });
 
     res.json(savedBlog);
   } catch (error) {
@@ -731,15 +724,7 @@ exports.adminWrittenDiscardBlogFromDB = async (req, res) => {
     blog.status="ADMIN_DISCARDED";
     await blog.save();
 
-    const receiver = process.env.EMAIL;
-    const subject = "Admin Blog Discrded!";
-    const html = `Hi ${process.env.Email},
-              <p>Blog is discarded succesfully </p>
-              <p>Slug: ${req.body.slug} </p>
-                `;
-
     res.json({ message: "Blog discarded successfully" });
-    await sendEmail(receiver, subject, html);
   } catch (error) {
     console.error("Error discarding blogs:", error);
     res
