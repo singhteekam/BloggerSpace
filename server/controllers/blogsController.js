@@ -94,14 +94,14 @@ exports.fetchAllBlogs = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-    const blogs = await Blog.find({ status: "PUBLISHED" })
+    const blogs = await Blog.find({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
       .skip(skip)
       .limit(limit)
-      .sort({ blogViews: -1 })
+      .sort({ lastUpdatedAt: -1 })
       .populate("authorDetails") // Populate the author field with the User document
       .exec();
 
-    const total = await Blog.countDocuments({ status: "PUBLISHED" });
+    const total = await Blog.countDocuments({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } });
 
     res.json({
       blogs,
@@ -118,11 +118,11 @@ exports.fetchAllBlogs = async (req, res) => {
 
 exports.fetchMostViewedBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find({ status: "PUBLISHED" })
+    const blogs = await Blog.find({ status:{ $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
       .limit(15)
-      .sort({ blogViews: -1 })
-      .populate("authorDetails") // Populate the author field with the User document
-      .exec();
+      .sort({ blogViews: -1 });
+      // .populate("authorDetails")
+      // .exec();
 
     res.json(blogs);
   } catch (error) {
@@ -205,7 +205,7 @@ exports.addBlogViewsCounter = async (req, res) => {
     if (!blog) return res.status(404).json({ error: "blog not found" });
 
     blog.blogViews++;
-    console.log("BlogViews: " + blog.blogViews);
+    // console.log("BlogViews: " + blog.blogViews);
     await blog.save();
     res.json({ totalViews: blog.blogViews });
   } catch (error) {
