@@ -56,6 +56,10 @@ const userSchema = new mongoose.Schema({
     // default: Date.now,
     default: () => new Date(new Date().getTime() + IST_OFFSET * 60000),
   },
+  lastLogin:{
+    type:Date,
+    default:()=> new Date(new Date().getTime() + IST_OFFSET * 60000),
+  }
 });
 
 userSchema.methods.generateVerificationToken = function () {

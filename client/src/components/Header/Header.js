@@ -138,6 +138,7 @@ function Header() {
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
+                <small className="color-teal-green">Last Login: <em>{localStorage.getItem('lastLogin')?.slice(11,19)} {localStorage.getItem('lastLogin')?.slice(0,10)}</em> </small>
                 <div className="d-grid gap-2">
                   {authheaderLinks.map((link) => (
                     <>

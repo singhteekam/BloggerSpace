@@ -65,6 +65,7 @@ function LoginPage() {
 
         // Store the token in localStorage
         localStorage.setItem("token", token);
+        localStorage.setItem('lastLogin', response.data.previousLogin);
 
         // Check if the login was successful
         if (response.status === 200) {

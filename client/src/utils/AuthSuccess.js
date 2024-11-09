@@ -31,6 +31,7 @@ const AuthSuccess = () => {
     if (token) {
       // Save token to localStorage
       localStorage.setItem('token', token);
+      localStorage.setItem('lastLogin', params.get('lastLogin'));
       // Redirect to homepage
       navigate(from, { replace: true });
     } else {

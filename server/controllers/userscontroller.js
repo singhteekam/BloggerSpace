@@ -179,6 +179,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
+    // Updating user's last login
+    const previousLogin= user.lastLogin;
+    user.lastLogin= new Date(new Date().getTime() + 330 * 60000);
+    await user.save();
+
     // You can generate a JWT token here if you want to implement authentication
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -202,7 +207,7 @@ exports.login = async (req, res) => {
     // console.log("userId: " + req.session.userId);
 
     // logger.debug("New user logged in: " + user.fullName);
-    res.status(200).json({ message: "Login successful", token, userDetails });
+    res.status(200).json({ message: "Login successful", token, userDetails, previousLogin });
   } catch (error) {
     logger.error("Login failed: " + error.message);
     res.status(500).json({ message: "Login failed", error: error.message });
@@ -844,12 +849,18 @@ exports.authPassportCallback = async (req, res) => {
       req.user.email
     );
     User.findOne({ email: req.user.email })
-      .then((user) => {
+      .then(async (user) => {
         if (!user) {
           logger.error("User Not found!!");
           console.log("User not found!!");
           return res.redirect(`${process.env.FRONTEND_URL}/login`);
         }
+
+        // updating last login
+        const previousLogin=user.lastLogin;
+        user.lastLogin= new Date(new Date().getTime() + 330 * 60000);
+        await user.save();
+
         const token = jwt.sign(
           { userId: user._id, email: user.email },
           process.env.JWT_SECRET,
@@ -862,7 +873,7 @@ exports.authPassportCallback = async (req, res) => {
         const encodedToken = encodeURIComponent(token);
 
         return res.redirect(
-          `${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}`
+          `${process.env.FRONTEND_URL}/auth-success?token=${encodedToken}&lastLogin=${previousLogin}`
         );
       })
       .catch((err) => {

@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }) => {
   // Function to handle user logout
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("lastLogin");
     setUser(null);
     // toast.info("Logged out success!!");
   };
