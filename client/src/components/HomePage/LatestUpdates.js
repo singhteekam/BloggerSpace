@@ -29,7 +29,7 @@ export const LatestUpdates= [
     },
     {
         title: "Latest updates",
-        description: "Admin Blogs, Newsletter, Google Sign-in, Github Sign in, Table of content, Most Viewed blogs",
+        description: "Admin Blogs, Newsletter, Google Sign-in, Github Sign in, Table of content, Most Viewed blogs, Last login, Related blogs",
         image: "",
         linkTitle:"",
         link: null,

@@ -26,6 +26,7 @@ const {
   fetchBlogsByCategory,
   fetchBlogByBlogId,
   fetchMostViewedBlogs,
+  fetchRelatedBlogs,
 } = require("../controllers/blogsController");
 
 router.get("/", blogsHomepage);
@@ -37,6 +38,9 @@ router.get("/allblogs/category/:filterCategory", fetchBlogsByCategory);
 
 // Most Viewed blogs
 router.get("/mostviewedblogs", fetchMostViewedBlogs);
+
+// Related Blogs
+router.get("/relatedblogs/:blogId", fetchRelatedBlogs);
 
 router.get("/:blogSlug", viewBlogRoute);
 

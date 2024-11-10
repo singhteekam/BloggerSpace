@@ -132,6 +132,36 @@ exports.fetchMostViewedBlogs = async (req, res) => {
   }
 };
 
+exports.fetchRelatedBlogs = async (req, res) => {
+  try {
+    const blogId= req.params.blogId;
+    if(!blogId){
+      return res.status(404).send({message:"Blog id is required"});
+    }
+
+    const currentBlog= await Blog.findById(blogId);
+    if(!currentBlog){
+      return res.status(404).send({message:"Blog not found"});
+    }
+
+    const stopwords = ["a", "the", "in", "as", "of", "on", "for", "and", "to", "by", "with"];
+    const words = currentBlog.title.split(" ").filter(word => !stopwords.includes(word.toLowerCase()));
+    const titleRegex = new RegExp("\\b(" + words.join("|") + ")\\b", "i");
+
+    const relatedBlogs= await Blog.find({
+      _id: {$ne: blogId}, //Exclude current blog
+      title:{$regex:titleRegex},
+      status:{ $in: ["PUBLISHED", "ADMIN_PUBLISHED"] }
+    }).limit(15).sort({ lastUpdatedAt: -1 });
+
+    res.json(relatedBlogs);
+  } catch (error) {
+    logger.error("Error fetching related blogs..:" + error);
+    console.error("Error fetching related blogs..:", error);
+    res.status(500).json({ error: "Server error.." });
+  }
+};
+
 exports.fetchBlogByBlogId = async (req, res) => {
   try {
     const blog = await Blog.findOne({

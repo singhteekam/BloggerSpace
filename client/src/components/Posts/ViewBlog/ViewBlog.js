@@ -31,11 +31,12 @@ import { FaEye, FaReply } from "react-icons/fa";
 import LoginPageModal from "../../../utils/LoginPageModal";
 import PageNotFound from "../../PageNotFound/PageNotFound";
 import { motion, useScroll, useSpring } from "framer-motion";
-import ViewBlogRightSection from "./MostViewedBlogs";
 import TableOfContent from "./TOC/TableOfContent";
 import PreLoader from "utils/PreLoader";
 
 import { AuthContext } from "contexts/AuthContext";
+import MostViewedBlogs from "./MostViewedBlogs";
+import RelatedBlogs from "./RelatedBlogs";
 
 const ViewBlog = () => {
   const { user, logout } = useContext(AuthContext);
@@ -826,7 +827,8 @@ const ViewBlog = () => {
             </div>
             <div className="viewblog-flex2 bgcolor-mint">
               <TableOfContent />
-              <ViewBlogRightSection />
+              <RelatedBlogs blogId={blog?._id} />
+              <MostViewedBlogs />
             </div>
           </div>
         )}
