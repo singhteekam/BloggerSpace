@@ -20,7 +20,7 @@ const RelatedBlogs = (props) => {
     
     useEffect(()=>{
         fetchRelatedBlogs();
-    },[]);
+    },[props.blogId]);
 
   return (
     <div>

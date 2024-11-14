@@ -75,7 +75,7 @@ function SignupPage() {
     // Create the request body
     const requestBody = {
       fullName: fullName,
-      email: email,
+      email: email.toLowerCase(),
       password: password,
     };
     console.log(requestBody);
