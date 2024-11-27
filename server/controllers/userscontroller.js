@@ -1,5 +1,8 @@
 // controllers/users.js
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const path = require("path");
+const axios = require("axios");
 const User = require("../models/User");
 // const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
@@ -146,9 +149,7 @@ exports.signup = async (req, res) => {
       })
       .catch((error) => {
         console.error("Error sending email:", error);
-        logger.error(
-          "Error Sign up. Error: " + error
-        );
+        logger.error("Error Sign up. Error: " + error);
       });
 
     logger.debug("New user added. Signup successful.");
@@ -180,8 +181,8 @@ exports.login = async (req, res) => {
     }
 
     // Updating user's last login
-    const previousLogin= user.lastLogin;
-    user.lastLogin= new Date(new Date().getTime() + 330 * 60000);
+    const previousLogin = user.lastLogin;
+    user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
     await user.save();
 
     // You can generate a JWT token here if you want to implement authentication
@@ -207,7 +208,9 @@ exports.login = async (req, res) => {
     // console.log("userId: " + req.session.userId);
 
     // logger.debug("New user logged in: " + user.fullName);
-    res.status(200).json({ message: "Login successful", token, userDetails, previousLogin });
+    res
+      .status(200)
+      .json({ message: "Login successful", token, userDetails, previousLogin });
   } catch (error) {
     logger.error("Login failed: " + error.message);
     res.status(500).json({ message: "Login failed", error: error.message });
@@ -593,8 +596,8 @@ exports.addBlogToSavedBlogs = async (req, res) => {
   try {
     const userId = req.query.userId;
     console.log(userId);
-    
-    if (userId=="undefined") {
+
+    if (userId == "undefined") {
       return res.status(404).json({ message: "You are not logged in!!" });
     }
 
@@ -857,8 +860,8 @@ exports.authPassportCallback = async (req, res) => {
         }
 
         // updating last login
-        const previousLogin=user.lastLogin;
-        user.lastLogin= new Date(new Date().getTime() + 330 * 60000);
+        const previousLogin = user.lastLogin;
+        user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
         await user.save();
 
         const token = jwt.sign(
@@ -881,5 +884,82 @@ exports.authPassportCallback = async (req, res) => {
         console.log("Error when using passport login");
         res.status(500).json({ error: err });
       });
+  }
+};
+
+exports.fileUpload = async (req, res) => {
+  try {
+    const fileBuffer = req.file.buffer; // Buffer of the file
+    let fileName = req.file.originalname;
+
+    const ext = path.extname(fileName); // Get the file extension (e.g., .jpg)
+    const name = path.basename(fileName, ext); // Get the base name without extension
+    const timestamp = Date.now(); // Generate a unique timestamp
+    fileName = `${timestamp}_${name}${ext}`; // Append timestamp to filename
+
+    const fileUrl = `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/${process.env.GITHUBBRANCH}/uploads/${fileName}`;
+
+    // Create the file on GitHub repository
+    const uploadResponse = await axios.put(
+      `https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/contents/uploads/${fileName}`,
+      {
+        message: `Upload ${new Date(new Date().getTime())} `,
+        content: fileBuffer.toString("base64"),
+        branch: process.env.GITHUBBRANCH,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.GITHUBACCESSTOKEN}`,
+        },
+      }
+    );
+    // Return the raw file URL from GitHub
+    res.json({ success: true, imageUrl: fileUrl });
+  } catch (error) {
+    console.error("Error uploading file to GitHub:", error);
+    res.status(500).json({ success: false, message: "Failed to upload." });
+  }
+};
+
+exports.fetchUploadedFiles = async (req, res) => {
+  try {
+    // Fetch the contents of the uploads folder in the GitHub repo
+    const response = await axios.get(
+      `https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/contents/uploads`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.GITHUBACCESSTOKEN}`,
+        },
+      }
+    );
+
+    // Extract image URLs (filter out only image files)
+    const images = response.data
+      .filter((item) => {
+        return (
+          item.type === "file" &&
+          (item.name.endsWith(".jpg") ||
+            item.name.endsWith(".jpeg") ||
+            item.name.endsWith(".png") ||
+            item.name.endsWith(".gif"))
+        );
+      })
+      .map((item) => ({
+        fileName: item.name,
+        fileUrl: item.download_url, // Raw file URL from GitHub
+        filePreview: `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/${process.env.GITHUBBRANCH}/uploads/${item.name}`, // Preview URL
+      }));
+
+      const sortedImages = images.sort((a, b) => {
+        //  Sort by numbers. 
+        const numA = parseInt(a.fileName.split('_')[0], 10);
+        const numB = parseInt(b.fileName.split('_')[0], 10);
+        return numB - numA;
+      });
+
+    res.json({ success: true, images: sortedImages });
+  } catch (error) {
+    console.error("Error fetching images from GitHub:", error);
+    throw error;
   }
 };

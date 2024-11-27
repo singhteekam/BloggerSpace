@@ -26,6 +26,8 @@ const {
   oauthGoogleCallback,
   authGithubCallback,
   authPassportCallback,
+  fileUpload,
+  fetchUploadedFiles,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -185,5 +187,9 @@ router.post("/contactus",contactUs);
 // Visitors
 router.get("/visitors", getVisitorCount);
 router.post("/addvisitor",incrementVisitCount);
+
+router.post("/fileupload", upload.single("file"), fileUpload);
+
+router.get("/uploadedfiles/fetch", fetchUploadedFiles);
 
 module.exports = router;

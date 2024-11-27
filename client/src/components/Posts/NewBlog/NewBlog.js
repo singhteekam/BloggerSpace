@@ -26,6 +26,7 @@ import Select from "react-select";
 import { AuthContext } from "contexts/AuthContext";
 
 import PreLoader from "utils/PreLoader";
+import FileUpload from "./FileUpload";
 
 const NewBlog = () => {
   const { user,loading, logout } = useContext(AuthContext);
@@ -275,6 +276,10 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
             {alert.message}
           </Alert>
         )} */}
+
+
+        
+
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="blogTitle" className="newblogfields">
             {/* <Form.Label>This article url after publish: {slug}</Form.Label> <br /> */}
@@ -432,6 +437,7 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
             ))}
           </Form.Group> */}
 
+
           <Form.Group controlId="blogContent" className="newblogfields">
             <Form.Label>Content:</Form.Label>
             {/* <QuillEditor content={content} onContentChange={setContent} /> */}
@@ -444,6 +450,9 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
                 setContent(editor.getData());
               }}
             />
+
+            <br />
+            <FileUpload />
 
             <br />
             <b>Note:</b>

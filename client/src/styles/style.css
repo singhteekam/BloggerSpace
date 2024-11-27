@@ -676,3 +676,26 @@ html {
   background-color: var(--color-mint) !important;
   padding: 10px !important;
 }
+
+/*=============*/
+/*  File upload Modal  */
+/* =========== */
+
+.fileupload-card:hover{
+  background-color: var(--color-mint);
+}
+.card-image{
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+}
+
+.card-footer-button{
+  background-color: var(--color-teal) !important;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+}
+.card-footer-button:hover{
+  background-color:  var(--color-spearmint) !important;
+}

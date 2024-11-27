@@ -21,11 +21,12 @@ import { ToastContainer, toast } from "react-toastify";
 import blogCategory from "utils/blogCategory.json";
 import blogTags from "utils/blogTags.json";
 
-import Editor from 'ckeditor5-custom-build/build/ckeditor';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
+import Editor from "ckeditor5-custom-build/build/ckeditor";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 
 import { AuthContext } from "contexts/AuthContext";
 import Select from "react-select";
+import FileUpload from "../NewBlog/FileUpload";
 
 const EditBlog = () => {
   const { user, logout } = useContext(AuthContext);
@@ -48,22 +49,22 @@ const EditBlog = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [searchTitleResults, setTitleSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isDisabled, setIsDisabled]= useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const navigate = useNavigate();
 
-  const [initialContent, setInitialContent]= useState("");
+  const [initialContent, setInitialContent] = useState("");
 
-  const [blogTagsMapped, setBlogTagsMapped]= useState([]);
+  const [blogTagsMapped, setBlogTagsMapped] = useState([]);
 
-  const [userId, setUserId]= useState(user?._id);
+  const [userId, setUserId] = useState(user?._id);
 
-//   useEffect(()=>{
-//     setUserId(user?._id);
-//     console.log(user?._id);
-// },[user]);
+  //   useEffect(()=>{
+  //     setUserId(user?._id);
+  //     console.log(user?._id);
+  // },[user]);
 
-  useEffect(()=>{
+  useEffect(() => {
     blogTags.map((tag) => {
       const ob = {
         label: tag,
@@ -71,7 +72,7 @@ const EditBlog = () => {
       };
       setBlogTagsMapped((blogTagsMapped) => [...blogTagsMapped, ob]);
     });
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (titleOrig !== title) {
@@ -92,7 +93,9 @@ const EditBlog = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(`/api/blogs/editblog/${id}?userId=${userId}`);
+        const response = await axios.get(
+          `/api/blogs/editblog/${id}?userId=${userId}`
+        );
         const {
           slug,
           title,
@@ -102,8 +105,8 @@ const EditBlog = () => {
           feedbackToAuthor,
           tags,
         } = response.data;
-        const initialCategory= response.data.category;
-        const initialTags= response.data.tags;
+        const initialCategory = response.data.category;
+        const initialTags = response.data.tags;
         setSlug(slug);
         setTitle(title);
         setTitleOrig(title);
@@ -149,13 +152,13 @@ const EditBlog = () => {
     findContentSize(content);
   }, [content]);
 
-  const catTagFun = (c, t)=>{
-    const c1=c.value;
-    const t1=t;
+  const catTagFun = (c, t) => {
+    const c1 = c.value;
+    const t1 = t;
     setCategory(c1);
-    const values = t1 ? t1.map(option => option.label) : [];
+    const values = t1 ? t1.map((option) => option.label) : [];
     setTags(values);
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -170,14 +173,17 @@ const EditBlog = () => {
 
     try {
       setIsDisabled(true);
-      const response = await axios.put(`/api/blogs/editblog/save/${id}?userId=${userId}`, {
-        slug,
-        title,
-        content,
-        category,
-        tags,
-        userId:id
-      });
+      const response = await axios.put(
+        `/api/blogs/editblog/save/${id}?userId=${userId}`,
+        {
+          slug,
+          title,
+          content,
+          category,
+          tags,
+          userId: id,
+        }
+      );
       console.log(response.data);
       // Handle success or redirect to a different page
       // Show success alert
@@ -211,14 +217,17 @@ const EditBlog = () => {
 
     try {
       setIsDisabled(true);
-      const response = await axios.post(`/api/blogs/saveasdraft?userId=${userId}`, {
-        id,
-        slug,
-        title,
-        content,
-        category: category === "Other" ? otherCategory : category,
-        tags,
-      });
+      const response = await axios.post(
+        `/api/blogs/saveasdraft?userId=${userId}`,
+        {
+          id,
+          slug,
+          title,
+          content,
+          category: category === "Other" ? otherCategory : category,
+          tags,
+        }
+      );
       console.log(response.data);
 
       toast.success("Blog saved successfully!!");
@@ -286,10 +295,12 @@ const EditBlog = () => {
     }
   }
 
-  const handleSelectedTags= (selectedOptions) => {
-    const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+  const handleSelectedTags = (selectedOptions) => {
+    const values = selectedOptions
+      ? selectedOptions.map((option) => option.value)
+      : [];
     setTags(values);
-    console.log("All tags: ",tags);
+    console.log("All tags: ", tags);
   };
 
   return (
@@ -452,13 +463,40 @@ const EditBlog = () => {
             {/* <TinymceEditor content={content} onContentChange={setContent} initialValue={initialContent} /> */}
 
             <CKEditor
-                    editor={ Editor }
-                    data={initialContent}
-                    onChange={ ( event, editor ) => {
-                        setContent(editor.getData());
-                    } }
-                />
+              editor={Editor}
+              data={initialContent}
+              onChange={(event, editor) => {
+                setContent(editor.getData());
+              }}
+            />
+            
+            <FileUpload />
 
+            <br />
+            <b>Note:</b>
+            <small>
+              If you want to embed youtube video then copy the below code and
+              use Insert HTML toolbar item. Replace VIDEO_ID with your youtube
+              video id. Ex: https://youtu.be/cfbepul-yHY?si=Xt6YWbm1M2AgWfjx
+              VIDEO_ID: cfbepul-yHY?si=Xt6YWbm1M2AgWfjx
+            </small>
+            <br />
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`
+          <div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID"
+                style="position: absolute; width: 100%;height:100%; top: 0; left: 0;"
+                frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+            </iframe>
+          </div>
+          `);
+                toast.success("Copied to clipboard");
+              }}
+            >
+              Copy code
+            </button>
+            <br />
           </Form.Group>
 
           <h6>Content size: {contentSize} KB</h6>
@@ -491,7 +529,12 @@ const EditBlog = () => {
           >
             Save Draft
           </Button>
-          <Button variant="primary" type="submit" className="submit-editedblog" disabled={isDisabled}>
+          <Button
+            variant="primary"
+            type="submit"
+            className="submit-editedblog"
+            disabled={isDisabled}
+          >
             Save
           </Button>
           <Button
