@@ -28,6 +28,7 @@ const {
   authPassportCallback,
   fileUpload,
   fetchUploadedFiles,
+  uploadProfilePicture2,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -36,8 +37,12 @@ const { checkUserName } = require("../utils/checkUsername");
 const { discardBlogFromDB } = require("../utils/discardBlog");
 
 // const passport = require('./../services/oauth2.js');  bkp
-
 const passport= require("passport");
+
+const storage = multer.memoryStorage(); // Use memory storage for storing the uploaded file
+const upload = multer({ storage });
+
+////////////////////////////////////////////////////////////////////////////////
 
 // Route for verifying the user account
 router.post("/verify-account", verifyAccount);
@@ -149,10 +154,23 @@ router.post("/resetpassword", resetPassword);
 //Change Password
 router.post("/changepassword", authenticate, changePassword);
 
+
+const { fileParser } = require("express-multipart-file-parser");
+
+// Use the fileParser middleware
+router.use(fileParser({
+  rawBodyOptions: {
+      limit: '10mb', // Adjust the size limit as needed
+  },
+  busboyOptions: {
+      limits: {
+          fileSize: 5 * 1024 * 1024, // 5MB file size limit
+      },
+  },
+}));
 //Update Profil pic
-const storage = multer.memoryStorage(); // Use memory storage for storing the uploaded file
-const upload = multer({ storage });
-router.post("/uploadprofilepicture", upload.single("profilePicture"), uploadProfilePicture);
+router.post("/uploadprofilepicture", uploadProfilePicture2);
+// router.post("/uploadprofilepicture", upload.single("profilePicture"), uploadProfilePicture);
 
 // User Info
 router.get("/userinfo", loggedInUserInfo);

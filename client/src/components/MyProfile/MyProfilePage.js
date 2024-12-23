@@ -38,6 +38,11 @@ const MyProfilePage = () => {
 
   let i = 0;
 
+    useEffect(()=>{
+    setUserId(user?._id);
+    console.log(user?._id);
+},[user]);
+
   if (!user && loading) {
     return <PreLoader isLoading={loading} /> // This can be a loading indicator
   }
@@ -124,6 +129,7 @@ const MyProfilePage = () => {
     if (selectedFile) {
       const formData = new FormData();
       formData.append("profilePicture", selectedFile);
+      console.log("Formdata userid:  ", userId);
 
       axios
         .post(`/api/users/uploadprofilepicture?userId=${userId}`, formData, {

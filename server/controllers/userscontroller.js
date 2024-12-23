@@ -428,27 +428,69 @@ exports.uploadProfilePicture = async (req, res) => {
   try {
     // Get the user ID from the authenticated user (you may have your own authentication logic)
     const userId = req.query.userId;
+    console.log("Userid pp:", userId);
+    console.log("File is: ", req.body.formData);
 
     // Get the uploaded file from the request
     const profilePicture = req.file;
+    console.log("File pp: ", profilePicture);
 
     // Convert the file data to a string
     // const profilePictureData = profilePicture.toString();
     const profilePictureData = profilePicture.buffer.toString("base64");
+    // console.log("File2 pp: ", profilePictureData);
 
     // Save the profile picture URL to the database
     const user = await User.findById(userId);
+    console.log("User pp: ", user.fullName);
     user.profilePicture = profilePictureData;
     await user.save();
 
     logger.debug(user.fullName + ": Profile picture uploaded successfully.");
     res.status(200).json({ message: "Profile picture uploaded successfully" });
   } catch (error) {
-    // console.error("Error uploading profile picture:", error);
+    console.error("Error uploading profile picture pp:", error);
     logger.error("Error uploading profile picture: " + error);
     res.status(500).json({ error: "Failed to upload profile picture" });
   }
 };
+
+exports.uploadProfilePicture2 = async (req, res) => {
+  try {
+      const userId = req.query.userId;
+      console.log("UserID:", userId);
+
+      // Access the uploaded file from req.files
+      const profilePicture = req.files.find(file => file.fieldname === "profilePicture");
+
+      if (!profilePicture) {
+          return res.status(400).json({ error: "No profile picture uploaded" });
+      }
+
+      console.log("File uploaded:", profilePicture);
+
+      // Convert the file buffer to a Base64 string
+      const profilePictureData = profilePicture.buffer.toString("base64");
+
+      // Save the profile picture to the user's database record
+      console.log("user idddd:  ", userId);
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      user.profilePicture = profilePictureData;
+      await user.save();
+
+      logger.debug(`${user.fullName}: Profile picture uploaded successfully.`);
+      res.status(200).json({ message: "Profile picture uploaded successfully", user: user });
+  } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      logger.error(`Error uploading profile picture: ${error.message}`);
+      res.status(500).json({ error: "Failed to upload profile picture" });
+  }
+};
+
 
 // User Info
 exports.loggedInUserInfo = async (req, res) => {
