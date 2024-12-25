@@ -37,6 +37,7 @@ import PreLoader from "utils/PreLoader";
 import { AuthContext } from "contexts/AuthContext";
 import MostViewedBlogs from "./MostViewedBlogs";
 import RelatedBlogs from "./RelatedBlogs";
+import { MdDownload } from "react-icons/md";
 
 const ViewBlog = () => {
   const { user, logout } = useContext(AuthContext);
@@ -340,6 +341,35 @@ const ViewBlog = () => {
     }
   };
 
+  const handleDownloadBlog= async()=>{
+    const pdfData={
+      title: blog.title,
+      category: blog.category,
+      lastUpdated: blog.lastUpdatedAt,
+      tags: blog.tags,
+      content:stripHtmlTags(blog.content),
+      author: blog.authorDetails.fullName
+    }
+    console.log(pdfData);
+    axios.post('/api/blogs/downloadblog', pdfData, {
+      responseType: 'blob', // important to handle binary data (PDF file)
+    })
+    .then(response => {
+      // Create a Blob from the PDF data
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      
+      // Create a temporary link element to trigger the file download
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${blog.slug}.pdf`); // Specify file name
+      document.body.appendChild(link);
+      link.click(); // Trigger the download
+    })
+    .catch(error => {
+      console.error('Error generating PDF report', error);
+    });
+  }
+
   if (loading || disableLikeButton) {
     return <PreLoader isLoading={loading} />;
   }
@@ -517,6 +547,14 @@ const ViewBlog = () => {
                   {/* <img src={blog.authorDetails.profilePicture} alt="No Image" /> */}
                 </Card.Footer>
               </Card>
+              <br />
+
+              <div>
+                <Button className="bs-button-outline" size="sm" onClick={handleDownloadBlog}>
+                  <MdDownload title="Download" />
+                  Download blog
+                </Button>
+              </div>
               <br />
 
               <div>

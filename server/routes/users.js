@@ -42,6 +42,21 @@ const passport= require("passport");
 const storage = multer.memoryStorage(); // Use memory storage for storing the uploaded file
 const upload = multer({ storage });
 
+// Using express-multipart-file-parser for file upload. Firebase-functions doesn't support multer.
+const { fileParser } = require("express-multipart-file-parser");
+
+// Use the fileParser middleware
+router.use(fileParser({
+  rawBodyOptions: {
+      limit: '10mb', // Adjust the size limit as needed
+  },
+  busboyOptions: {
+      limits: {
+          fileSize: 5 * 1024 * 1024, // 5MB file size limit
+      },
+  },
+}));
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // Route for verifying the user account
@@ -154,20 +169,6 @@ router.post("/resetpassword", resetPassword);
 //Change Password
 router.post("/changepassword", authenticate, changePassword);
 
-
-const { fileParser } = require("express-multipart-file-parser");
-
-// Use the fileParser middleware
-router.use(fileParser({
-  rawBodyOptions: {
-      limit: '10mb', // Adjust the size limit as needed
-  },
-  busboyOptions: {
-      limits: {
-          fileSize: 5 * 1024 * 1024, // 5MB file size limit
-      },
-  },
-}));
 //Update Profil pic
 router.post("/uploadprofilepicture", uploadProfilePicture2);
 // router.post("/uploadprofilepicture", upload.single("profilePicture"), uploadProfilePicture);
@@ -206,7 +207,8 @@ router.post("/contactus",contactUs);
 router.get("/visitors", getVisitorCount);
 router.post("/addvisitor",incrementVisitCount);
 
-router.post("/fileupload", upload.single("file"), fileUpload);
+router.post("/fileupload", fileUpload);
+// router.post("/fileupload", upload.single("file"), fileUpload);
 
 router.get("/uploadedfiles/fetch", fetchUploadedFiles);
 

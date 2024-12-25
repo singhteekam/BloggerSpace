@@ -9,7 +9,8 @@ const mongoose = require("mongoose");
 const pako = require("pako");
 const sendEmail = require("../../services/mailer");
 const generateSitemap = require('../../utils/generateSitemap');
-
+const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
 
 exports.adminSignup = async (req, res) => {
   try {
@@ -830,3 +831,118 @@ exports.updateSitemapXML = async (req, res) => {
   }
 };
 
+
+exports.downloadExcelReport = async (req,res)=>{
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Report');
+
+  // Add some headers to the Excel file
+  worksheet.columns = [
+    { header: 'Name', key: 'name', width: 30 },
+    { header: 'Age', key: 'age', width: 10 },
+    { header: 'Email', key: 'email', width: 30 },
+  ];
+
+  // Sample data to populate in the report
+  const data = [
+    { name: 'John Doe', age: 29, email: 'johndoe@example.com' },
+    { name: 'Jane Smith', age: 34, email: 'janesmith@example.com' },
+    // add more data as required
+  ];
+
+  // Add rows to the worksheet
+  worksheet.addRows(data);
+
+  // Create a buffer to store the Excel data
+  const buffer = await workbook.xlsx.writeBuffer();
+
+  // Sending mail to Admin
+  const receiver = process.env.EMAIL;
+  const subject = `Excel Report generated at ${new Date()} `;
+  const html = `
+<div class="content">
+  <h2>Hi Admin</h2>
+  <p>Please find the attached Excel report..</p>
+ </div>
+  `;
+  const attachments= [
+    {
+      filename: 'report.xlsx',
+      content: buffer,
+      encoding: 'base64', // Make sure content is correctly encoded
+    },
+  ];
+
+  sendEmail(receiver, subject, html, attachments)
+    .then((response) => {
+      console.log(`Email sent to ${receiver}:`, response);
+      // Handle success
+    })
+    .catch((error) => {
+      console.error("Error sending email:", error);
+      // Handle error
+    });
+
+  // Set the response header to indicate it's a downloadable Excel file
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename="report.xlsx"');
+
+  // Write the Excel file to the response
+  await workbook.xlsx.write(res);
+  res.end();
+}
+
+exports.downloadPDFReport= async (req, res)=>{
+  const doc = new PDFDocument();
+
+  // res.setHeader('Content-Type', 'application/pdf');
+  // res.setHeader('Content-Disposition', 'attachment; filename="report.pdf"');
+
+  // Pipe the PDF to the response
+  doc.pipe(res);
+
+  // Add content to the PDF
+  doc.fontSize(25).text('Interactive Report', { align: 'center' });
+  doc.moveDown();
+  doc.fontSize(14).text('Here is a sample report:');
+  doc.text('Name: John Doe');
+  doc.text('Age: 29');
+  doc.text('Email: johndoe@example.com');
+
+  // Create buffer to download pdf report
+  let pdfBuffer = [];
+  doc.on('data', (chunk) => pdfBuffer.push(chunk));
+  doc.on('end', () => {
+    pdfBuffer = Buffer.concat(pdfBuffer);
+
+      // Sending mail to Admin
+  const receiver = process.env.EMAIL;
+  const subject = `PDF Report generated at ${new Date()} `;
+  const html = `
+  <div class="content">
+    <h2>Hi Admin</h2>
+    <p>Please find the attached PDF report..</p>
+  </div>
+  `;
+  const attachments= [
+    {
+      filename: 'report.pdf',
+      content: pdfBuffer,
+      encoding: 'base64', // Make sure content is correctly encoded
+    },
+  ];
+
+  sendEmail(receiver, subject, html, attachments)
+    .then((response) => {
+      console.log(`Email sent to ${receiver}:`, response);
+      // Handle success
+    })
+    .catch((error) => {
+      console.error("Error sending email:", error);
+      // Handle error
+    });
+  })
+
+  // Finalize the PDF and end the response
+  doc.end();
+}

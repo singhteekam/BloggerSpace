@@ -28,6 +28,7 @@ const {
   fetchMostViewedBlogs,
   fetchRelatedBlogs,
 } = require("../controllers/blogsController");
+const { downloadBlog } = require("../controllers/userscontroller");
 
 router.get("/", blogsHomepage);
 
@@ -80,6 +81,8 @@ router.post("/bloglikes/:id",authenticate, blogLikes);
 router.post("/blogcommentlike/:id", authenticate, blogCommentLikes);
 
 router.patch("/updateblogviews", addBlogViewsCounter);
+
+router.post("/downloadblog", downloadBlog);
 
 module.exports = router;
 

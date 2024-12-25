@@ -31,7 +31,9 @@ const {
   adminBlogEdit,
   adminSaveEditedBlog,
   sendNewsletter,
-  updateSitemapXML
+  updateSitemapXML,
+  downloadExcelReport,
+  downloadPDFReport
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -94,4 +96,8 @@ router.put("/blogs/editblog/save/:id", adminMiddleware,adminSaveEditedBlog);
 router.post("/newsletter/send", adminMiddleware, sendNewsletter);
 
 router.get("/updatesitemapxml", adminMiddleware, updateSitemapXML);
+
+router.get("/dashboard/downloadexcel",adminMiddleware, downloadExcelReport)
+router.get("/dashboard/downloadpdf", adminMiddleware, downloadPDFReport)
+
 module.exports = router;

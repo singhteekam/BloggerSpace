@@ -13,6 +13,7 @@ const validateUsername = require("../utils/validateUsername");
 const Visit = require("../models/Visitor");
 const logger = require("./../utils/Logging/logs");
 const passport = require("../services/passportAuth.js");
+const PDFDocument = require('pdfkit');
 
 // verifyAccount controller
 exports.verifyAccount = async (req, res) => {
@@ -424,36 +425,36 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-exports.uploadProfilePicture = async (req, res) => {
-  try {
-    // Get the user ID from the authenticated user (you may have your own authentication logic)
-    const userId = req.query.userId;
-    console.log("Userid pp:", userId);
-    console.log("File is: ", req.body.formData);
+// exports.uploadProfilePicture = async (req, res) => {
+//   try {
+//     // Get the user ID from the authenticated user (you may have your own authentication logic)
+//     const userId = req.query.userId;
+//     console.log("Userid pp:", userId);
+//     console.log("File is: ", req.body.formData);
 
-    // Get the uploaded file from the request
-    const profilePicture = req.file;
-    console.log("File pp: ", profilePicture);
+//     // Get the uploaded file from the request
+//     const profilePicture = req.file;
+//     console.log("File pp: ", profilePicture);
 
-    // Convert the file data to a string
-    // const profilePictureData = profilePicture.toString();
-    const profilePictureData = profilePicture.buffer.toString("base64");
-    // console.log("File2 pp: ", profilePictureData);
+//     // Convert the file data to a string
+//     // const profilePictureData = profilePicture.toString();
+//     const profilePictureData = profilePicture.buffer.toString("base64");
+//     // console.log("File2 pp: ", profilePictureData);
 
-    // Save the profile picture URL to the database
-    const user = await User.findById(userId);
-    console.log("User pp: ", user.fullName);
-    user.profilePicture = profilePictureData;
-    await user.save();
+//     // Save the profile picture URL to the database
+//     const user = await User.findById(userId);
+//     console.log("User pp: ", user.fullName);
+//     user.profilePicture = profilePictureData;
+//     await user.save();
 
-    logger.debug(user.fullName + ": Profile picture uploaded successfully.");
-    res.status(200).json({ message: "Profile picture uploaded successfully" });
-  } catch (error) {
-    console.error("Error uploading profile picture pp:", error);
-    logger.error("Error uploading profile picture: " + error);
-    res.status(500).json({ error: "Failed to upload profile picture" });
-  }
-};
+//     logger.debug(user.fullName + ": Profile picture uploaded successfully.");
+//     res.status(200).json({ message: "Profile picture uploaded successfully" });
+//   } catch (error) {
+//     console.error("Error uploading profile picture pp:", error);
+//     logger.error("Error uploading profile picture: " + error);
+//     res.status(500).json({ error: "Failed to upload profile picture" });
+//   }
+// };
 
 exports.uploadProfilePicture2 = async (req, res) => {
   try {
@@ -929,33 +930,77 @@ exports.authPassportCallback = async (req, res) => {
   }
 };
 
+// exports.fileUpload = async (req, res) => {
+//   try {
+//     const fileBuffer = req.file.buffer; // Buffer of the file
+//     let fileName = req.file.originalname;
+
+//     const ext = path.extname(fileName); // Get the file extension (e.g., .jpg)
+//     const name = path.basename(fileName, ext); // Get the base name without extension
+//     const timestamp = Date.now(); // Generate a unique timestamp
+//     fileName = `${timestamp}_${name}${ext}`; // Append timestamp to filename
+
+//     const fileUrl = `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/${process.env.GITHUBBRANCH}/uploads/${fileName}`;
+
+//     // Create the file on GitHub repository
+//     const uploadResponse = await axios.put(
+//       `https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/contents/uploads/${fileName}`,
+//       {
+//         message: `Upload ${new Date(new Date().getTime())} `,
+//         content: fileBuffer.toString("base64"),
+//         branch: process.env.GITHUBBRANCH,
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.GITHUBACCESSTOKEN}`,
+//         },
+//       }
+//     );
+//     // Return the raw file URL from GitHub
+//     res.json({ success: true, imageUrl: fileUrl });
+//   } catch (error) {
+//     console.error("Error uploading file to GitHub:", error);
+//     res.status(500).json({ success: false, message: "Failed to upload." });
+//   }
+// };
+
 exports.fileUpload = async (req, res) => {
   try {
-    const fileBuffer = req.file.buffer; // Buffer of the file
-    let fileName = req.file.originalname;
+    // Ensure a file was uploaded
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
 
+    // Extract file data from the parsed request
+    const file = req.files[0]; // Access the first uploaded file
+    const fileBuffer = file.buffer; // Buffer of the file
+    let fileName = file.originalname;
+
+    // Process file name
     const ext = path.extname(fileName); // Get the file extension (e.g., .jpg)
     const name = path.basename(fileName, ext); // Get the base name without extension
     const timestamp = Date.now(); // Generate a unique timestamp
     fileName = `${timestamp}_${name}${ext}`; // Append timestamp to filename
 
+    // Construct the file URL
     const fileUrl = `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/${process.env.GITHUBBRANCH}/uploads/${fileName}`;
 
-    // Create the file on GitHub repository
+    // Upload the file to GitHub repository
     const uploadResponse = await axios.put(
       `https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/contents/uploads/${fileName}`,
       {
-        message: `Upload ${new Date(new Date().getTime())} `,
-        content: fileBuffer.toString("base64"),
+        message: `Upload ${new Date().toISOString()}`, // Commit message
+        content: fileBuffer.toString("base64"), // Encode file content to Base64
         branch: process.env.GITHUBBRANCH,
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.GITHUBACCESSTOKEN}`,
+          Authorization: `Bearer ${process.env.GITHUBACCESSTOKEN}`, // GitHub authentication token
         },
       }
     );
-    // Return the raw file URL from GitHub
+
+    // Respond with the raw file URL
     res.json({ success: true, imageUrl: fileUrl });
   } catch (error) {
     console.error("Error uploading file to GitHub:", error);
@@ -1005,3 +1050,37 @@ exports.fetchUploadedFiles = async (req, res) => {
     throw error;
   }
 };
+
+exports.downloadBlog= async (req, res)=>{
+  const doc = new PDFDocument();
+  const {title, content, tags, lastUpdated, category, author}= req.body;
+
+  // res.setHeader('Content-Type', 'application/pdf');
+  // res.setHeader('Content-Disposition', 'attachment; filename="report.pdf"');
+
+  // Pipe the PDF to the response
+  doc.pipe(res);
+
+  doc.fontSize(10).fillColor('gray').text('BloggerSpace', 50, 20, {
+    align: 'left',
+  });
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 50, 20, {
+    align: 'right',
+  });
+
+  // Add content to the PDF
+  doc.fontSize(25).fillColor('black').text(title, { align: 'center' });
+  doc.moveDown();
+  doc.fontSize(10).fillColor('black').text(`Category: ${category}`);
+  doc.moveDown();
+  doc.fontSize(10).fillColor('black').text(`Tags: ${tags}`);
+  doc.moveDown();
+  doc.fontSize(10).fillColor('black').text(`Last updated: ${lastUpdated}`);
+  doc.moveDown();
+  doc.fontSize(12).fillColor('black').text(`Author: ${author}`);
+  doc.moveDown();
+  doc.fillColor('black').text(content, {align:'justify'});
+
+  // Finalize the PDF and end the response
+  doc.end();
+}

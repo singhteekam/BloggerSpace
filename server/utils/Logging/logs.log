@@ -1,6 +1,1 @@
 [2024-10-26T21:40:50.535Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
-[2024-12-03T00:09:09.748Z] [LOG] [DEBUG] - Topic is available: 
-[2024-12-03T00:09:09.753Z] [LOG] [DEBUG] - Topic is available: 
-[2024-12-03T00:12:35.091Z] [LOG] [DEBUG] - Topic is available: 
-[2024-12-03T00:12:35.115Z] [LOG] [DEBUG] - Topic is available: 
-[2024-12-03T00:12:35.174Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
