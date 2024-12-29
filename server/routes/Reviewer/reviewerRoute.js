@@ -13,7 +13,6 @@ const {
   changeUsername,
   discardQueueBlog,
 } = require("../../controllers/Reviewer/reviewerController");
-const multer = require("multer");
 const reviewerMiddleware = require("../../middlewares/reviewerMiddleware");
 const { changeAccountPassword } = require("../../utils/changeAccountPassword");
 const { forgotPassword } = require("../../utils/forgotPassword");
@@ -26,11 +25,8 @@ router.post("/login", reviewerLogin);
 //Currently logged in user details
 router.get("/userdetails", userDetails);
 
-// Update Profil pic
-const storage = multer.memoryStorage(); // Use memory storage for storing the uploaded file
-const upload = multer({ storage });
-router.post("/uploaduserprofilepicture",upload.single("profilePicture"), uploadUserProfilePicture);
-
+// Profile picture
+router.post("/uploaduserprofilepicture", uploadUserProfilePicture);
 
 // Pending for Review
 router.get("/pendingreviewblogs",reviewerMiddleware, pendingReviewBlogs);

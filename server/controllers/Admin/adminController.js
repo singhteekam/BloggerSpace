@@ -68,7 +68,7 @@ exports.adminLogin=async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { currentuserId: admin._id },
-      process.env.JWT_SECRET,
+      process.env.CURRENT_JWT_SECRET,
       {
         expiresIn: "1h", // Token expiration time
       }
@@ -81,11 +81,11 @@ exports.adminLogin=async (req, res) => {
       role: admin.role
     };
 
-    req.session.currentuserId = admin._id;
-    req.session.currenttoken = token;
-    req.session.currentemail = admin.email;
-    req.session.currentrole = admin.role;
-    console.log("userId: " + req.session.currentuserId);
+    // req.session.currentuserId = admin._id;
+    // req.session.currenttoken = token;
+    // req.session.currentemail = admin.email;
+    // req.session.currentrole = admin.role;
+    // console.log("userId: " + req.session.currentuserId);
 
     res.status(200).json({ message: "Login successful", token, adminDetails });
   } catch (error) {
@@ -96,7 +96,8 @@ exports.adminLogin=async (req, res) => {
 
 exports.inReviewBlogs = async (req, res) => {
   try {
-    if (req.session.currentemail) {
+    // if (req.session.currentemail) {
+    if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
       const pendingBlogs = await Blog.find({
         status: "IN_REVIEW",
@@ -143,10 +144,16 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     const { slug, title, content, category, rating, reviewRemarks, tags } =
       req.body;
 
+      console.log(req.query.userId);
+      console.log(req.query.role);
+      console.log(req.query.email);
+
     // Find the blog by ID
     const blog = await Blog.findById({
       _id: new mongoose.Types.ObjectId(req.params.id),
     }).populate("authorDetails").exec();
+
+    console.log("Line 156", blog.authorDetails._id);
 
     if (!blog) {
       return res.status(404).json({ error: "blog not found" });
@@ -171,9 +178,9 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     blog.reviewedBy.push({
       // ReviewedBy: req.session.currentemail,
       ReviewedBy: {
-        Id: new mongoose.Types.ObjectId(req.session.currentuserId),
-        Email: req.session.currentemail,
-        Role: req.session.currentrole,
+        Id: new mongoose.Types.ObjectId(req.query.userId),
+        Email: req.query.email,
+        Role: req.query.role,
       },
       Revision:"NA",
       Rating: rating,
@@ -244,7 +251,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
 
 exports.publishedBlogs = async (req, res) => {
   try {
-    if (req.session.currentemail) {
+    if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
       const pendingBlogs = await Blog.find({
         status: "PUBLISHED",
@@ -263,7 +270,7 @@ exports.publishedBlogs = async (req, res) => {
 
 exports.allReviewersFromDB = async (req, res) => {
   try {
-    if (req.session.currentemail) {
+    if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
       const allReviewers = await Reviewer.find({isVerified:true});
 
@@ -279,7 +286,7 @@ exports.allReviewersFromDB = async (req, res) => {
 
 exports.allPendingBlogsfromDB = async (req, res) => {
   try {
-    if (req.session.currentemail) {
+    if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
       const allPendingBlogs = await Blog.find({
         status: "PENDING_REVIEW",
@@ -345,7 +352,7 @@ exports.updateReviewerAssignment = async (req, res) => {
 
 exports.allUnderReviewBlogsfromDB = async (req, res) => {
   try {
-    if (req.session.currentemail) {
+    if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
       const allUnderReviewBlogs = await Blog.find({
         status: "UNDER_REVIEW",
@@ -364,7 +371,7 @@ exports.allUnderReviewBlogsfromDB = async (req, res) => {
 
 exports.fetchDiscardQueueBlogsFromDB = async (req, res) => {
   try {
-    if (req.session.currentemail) {
+    if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
       const allDiscardQueueBlogs = await Blog.find({
         status: "DISCARD_QUEUE",
@@ -384,7 +391,7 @@ exports.fetchDiscardQueueBlogsFromDB = async (req, res) => {
 
 exports.fetchAwaitingAuthorFromDB = async (req, res) => {
   try {
-    if (req.session.currentemail) {
+    if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
       const allAwaitingAuthorBlogs = await Blog.find({
         status: "AWAITING_AUTHOR",
@@ -585,7 +592,7 @@ exports.adminNewBlog = async (req, res) => {
       title,
       content: compressedContent,
       category,
-      authorDetails: req.session.currentuserId,
+      authorDetails: req.query.userId,
       // lastUpdatedAt: Date.now(),
       lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
       tags,
@@ -645,7 +652,7 @@ exports.adminSaveAsDraftBlog= async (req, res)=>{
       title,
       content: compressedContent,
       category,
-      authorDetails: req.session.currentuserId,
+      authorDetails: req.query.userId,
       status: "ADMIN_DRAFT",
       lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
       tags,

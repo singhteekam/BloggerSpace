@@ -6,8 +6,8 @@ const bcrypt = require("bcrypt");
 exports.changeAccountPassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const userId = req.session.currentuserId;
-    const role= req.session.currentrole;
+    const userId = req.query.userId;
+    const role= req.query.role;
     var user;
     if(role==="Admin"){
       user = await Admin.findById({

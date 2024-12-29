@@ -21,11 +21,6 @@ import { AuthContext } from "contexts/AuthContext";
 
 function Header() {
   const { user, setUser, logout } = useContext(AuthContext);
-  // const [user, setUser] = useState(null);
-  // Placeholder for user login status
-  // const isLoggedIn = localStorage.getItem("token"); // Set to true if user is logged in, false otherwise
-  // const navigate = useNavigate();
-
   const [showCanvas, setShowCanvas] = useState(false);
 
   const handleCloseCanvas = () => setShowCanvas(false);
@@ -39,80 +34,6 @@ function Header() {
   const handleSearchModalClose = () => {
     setShowSearchModal(false);
   };
-
-
-  // const handleLogout = () => {
-  //   axios
-  //     .post("/api/users/logout")
-  //     .then((response) => {
-  //       // Handle the logout response here
-  //       console.log(response.data.message);
-
-  //       // Remove the token from localStorage
-  //       localStorage.removeItem("token");
-
-  //       // Redirect to the login page
-  //       // navigate("/login");
-  //       window.location.reload();
-  //       toast.info("Logged out!!");
-  //     })
-  //     .catch((error) => {
-  //       // Handle any errors here
-  //       toast.error("Error occured: ", error);
-  //       console.error("Logout failed:", error);
-  //     });
-  // };
-
-  // useEffect(()=>{
-  //   const getUser= ()=>{
-  //     fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/auth/login/success`,{
-  //       method:"GET",
-  //       credentials:"include",
-  //       headers:{
-  //         Accept:"application/json",
-  //         "Content-Type":"application/json",
-  //         "Access-Control-Allow-Credentials":true
-  //       }
-  //     }).then((response)=>{
-  //       if(response.status===200) return response.json();
-  //       throw new Error("Failed sign in");
-  //     }).then(resObj=>{
-  //       setUser(resObj.user);
-  //       localStorage.setItem('token', resObj.token);
-  //       toast.success("Sign in with Google success!!")
-  //     }).catch((err)=>{
-  //       console.log(err);
-  //       toast.error("Error occured when sign in with google", err);
-  //     })
-  //   }
-  //   getUser();
-  // },[]);
-
-
-
-  // console.log("User::::: ", user);
-
-  // useEffect(() => {
-  //     if (isLoggedIn) {
-  //       axios
-  //         .get("/api/users/userinfo", {
-  //           headers: {
-  //             Authorization: `Bearer ${isLoggedIn}`, // Include the token in the request
-  //           },
-  //         })
-  //         .then((response) => {
-  //           const userData = response.data;
-  //           setUser(userData);
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error fetching user information:", error);
-  //           if (error.response.status === 404) {
-  //             // handleLogout();
-  //             console.log("Error in log out: ", error);
-  //           }
-  //         });
-  //     }
-  // }, [isLoggedIn]);
 
   return (
     <div className="bgcolor-teal-green">

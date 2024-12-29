@@ -1,10 +1,11 @@
 // adminMiddleware.js
 const reviewerMiddleware = (req, res, next) => {
-  if (
-    req.session &&
-    req.session.currentuserId &&
-    req.session.currentrole === "Reviewer"
-  ) {
+  // if (
+  //   req.session &&
+  //   req.session.currentuserId &&
+  //   req.session.currentrole === "Reviewer"
+  // ) {
+  if (req.query.userId && req.query.role==="Reviewer") {
     // User is authenticated, proceed to the next middleware or route handler
     next();
   } else {

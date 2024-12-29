@@ -42,21 +42,6 @@ const passport= require("passport");
 const storage = multer.memoryStorage(); // Use memory storage for storing the uploaded file
 const upload = multer({ storage });
 
-// Using express-multipart-file-parser for file upload. Firebase-functions doesn't support multer.
-const { fileParser } = require("express-multipart-file-parser");
-
-// Use the fileParser middleware
-router.use(fileParser({
-  rawBodyOptions: {
-      limit: '10mb', // Adjust the size limit as needed
-  },
-  busboyOptions: {
-      limits: {
-          fileSize: 5 * 1024 * 1024, // 5MB file size limit
-      },
-  },
-}));
-
 ////////////////////////////////////////////////////////////////////////////////
 
 // Route for verifying the user account

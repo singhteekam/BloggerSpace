@@ -90,7 +90,7 @@ exports.reviewerLogin = async (req, res) => {
         expiresIn: "1h", // Token expiration time
       }
     );
-    console.log(token);
+    // console.log(token);
     const reviewerDetails = {
       email: reviewer.email,
       fullName: reviewer.fullName,
@@ -98,11 +98,11 @@ exports.reviewerLogin = async (req, res) => {
       role: reviewer.role,
     };
 
-    req.session.currentuserId = reviewer._id;
-    req.session.currenttoken = token;
-    req.session.currentemail = reviewer.email;
-    req.session.currentrole = reviewer.role;
-    console.log("userId: " + req.session.currentuserId);
+    // req.session.currentuserId = reviewer._id;
+    // req.session.currenttoken = token;
+    // req.session.currentemail = reviewer.email;
+    // req.session.currentrole = reviewer.role;
+    // console.log("userId: " + req.session.currentuserId);
 
     res
       .status(200)
@@ -114,36 +114,29 @@ exports.reviewerLogin = async (req, res) => {
 
 exports.uploadUserProfilePicture = async (req, res) => {
   try {
-    // Get the user ID from the authenticated user (you may have your own authentication logic)
-    const userId = req.session.currentuserId;
+    const userId = req.query.userId;
+    const profilePicture = req.files.find(file => file.fieldname === "profilePicture");
 
-    // Get the uploaded file from the request
-    const profilePicture = req.file;
+    if (!profilePicture) {
+      return res.status(400).json({ error: "No profile picture uploaded" });
+  }
 
-    // Convert the file data to a string
-    // const profilePictureData = profilePicture.toString();
-    const profilePictureData = profilePicture.buffer.toString("base64");
+  const profilePictureData = profilePicture.buffer.toString("base64");
 
-    // Save the profile picture URL to the database
-    if (req.session.currentuserId && req.session.currentrole === "Admin") {
+    if (req.query.userId && req.query.role === "Admin") {
       const user = await Admin.findById(userId);
       user.profilePicture = profilePictureData;
       await user.save();
-    } else if (
-      req.session.currentuserId &&
-      req.session.currentrole === "Reviewer"
-    ) {
+    } 
+    else if (req.query.userId &&req.query.role === "Reviewer") {
       const user = await Reviewer.findById(userId);
       user.profilePicture = profilePictureData;
       await user.save();
     } else {
-      res.status(500).json({ error: "Failed to upload profile picture" });
+      return res.status(500).json({ error: "Failed to upload profile picture" });
     }
-    // const user = await Reviewer.findById(userId);
-    // user.profilePicture = profilePictureData;
-    // await user.save();
 
-    res.status(200).json({ message: "Profile picture uploaded successfully" });
+    res.status(200).json({newPicture:profilePictureData, message: "Profile picture uploaded successfully" });
   } catch (error) {
     console.error("Error uploading profile picture:", error);
     res.status(500).json({ error: "Failed to upload profile picture" });
@@ -153,11 +146,11 @@ exports.uploadUserProfilePicture = async (req, res) => {
 // Pending Review
 exports.pendingReviewBlogs = async (req, res) => {
   try {
-    if (req.session.currentemail) {
+    if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
       const pendingBlogs = await Blog.find({
         status: "UNDER_REVIEW",
-        currentReviewer: req.session.currentemail,
+        currentReviewer: req.query.email,
       }).populate("authorDetails").exec();
 
       res.json(pendingBlogs);
@@ -225,9 +218,9 @@ exports.saveEditedPendingBlog = async (req, res) => {
     blog.reviewedBy.push({
       // ReviewedBy: req.session.currentemail,
       ReviewedBy: {
-        Id: new mongoose.Types.ObjectId(req.session.currentuserId),
-        Email: req.session.currentemail,
-        Role: req.session.currentrole,
+        Id: new mongoose.Types.ObjectId(req.query.userId),
+        Email: req.query.email,
+        Role: req.query.role,
       },
       Revision: content,
       Rating: rating,
@@ -250,7 +243,7 @@ exports.saveEditedPendingBlog = async (req, res) => {
       BlogSlug: slug,
       BlogReviewedTime: new Date(new Date().getTime() + 330 * 60000)
     };
-    const user = await Reviewer.findById(req.session.currentuserId);
+    const user = await Reviewer.findById(req.query.userId);
     user.reviewedBlogs.push(reviewedBlog);
     // user.reviewedBlogs = removeDuplicates(user.reviewedBlogs, "slug");
     await user.save();
@@ -273,10 +266,25 @@ exports.saveEditedPendingBlog = async (req, res) => {
 exports.userDetails = async (req, res) => {
   try {
     // Get the user ID from the session or token (depending on your authentication setup)
-    const userId = req.session.currentuserId; // Assuming you're using sessions
-    const token = req.session.currenttoken; // Assuming you're using sessions
-    const role = req.session.currentrole;
+    // const userId = req.session.currentuserId; // Assuming you're using sessions
+    // const token = req.session.currenttoken; // Assuming you're using sessions
+    // const role = req.session.currentrole;
     // console.log("Tokn: " + req.session.currenttoken);
+
+    const role= req.query.role;
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ error: "Authentication required. Please login!" });
+    }
+
+    console.log("Role: ", role)
+    console.log("Token: ", token)
+
+    const decoded = jwt.verify(token, process.env.CURRENT_JWT_SECRET);
+    const userId = decoded.currentuserId;
 
     if (!userId && !token) {
       return res.status(404).json({ error: "Please login!!....." });
@@ -286,6 +294,7 @@ exports.userDetails = async (req, res) => {
         _id: new mongoose.Types.ObjectId(userId),
       });
       const userDetails = {
+        _id: user._id,
         fullName: user.fullName,
         userName: user.userName,
         email: user.email,
@@ -299,6 +308,7 @@ exports.userDetails = async (req, res) => {
         _id: new mongoose.Types.ObjectId(userId),
       });
       const userDetails = {
+        _id: user._id,
         fullName: user.fullName,
         userName: user.userName,
         email: user.email,
@@ -311,19 +321,66 @@ exports.userDetails = async (req, res) => {
     } else {
       return res.status(404).json({ error: "Please login!!" });
     }
-
   } catch (error) {
     console.error("Error fetching user information:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
+// exports.userDetails = async (req, res) => {
+//   try {
+//     // Get the user ID from the session or token (depending on your authentication setup)
+//     const userId = req.session.currentuserId; // Assuming you're using sessions
+//     const token = req.session.currenttoken; // Assuming you're using sessions
+//     const role = req.session.currentrole;
+//     // console.log("Tokn: " + req.session.currenttoken);
+
+//     if (!userId && !token) {
+//       return res.status(404).json({ error: "Please login!!....." });
+//     }
+//     if (userId && token && role === "Admin") {
+//       const user = await Admin.findById({
+//         _id: new mongoose.Types.ObjectId(userId),
+//       });
+//       const userDetails = {
+//         fullName: user.fullName,
+//         userName: user.userName,
+//         email: user.email,
+//         isVerified: user.isVerified,
+//         profilePicture: user.profilePicture,
+//         role: user.role,
+//       };
+//       res.json(userDetails);
+//     } else if (userId && token && role === "Reviewer") {
+//       const user = await Reviewer.findById({
+//         _id: new mongoose.Types.ObjectId(userId),
+//       });
+//       const userDetails = {
+//         fullName: user.fullName,
+//         userName: user.userName,
+//         email: user.email,
+//         isVerified: user.isVerified,
+//         profilePicture: user.profilePicture,
+//         role: user.role,
+//         reviewedBlogs: user.reviewedBlogs,
+//       };
+//       res.json(userDetails);
+//     } else {
+//       return res.status(404).json({ error: "Please login!!" });
+//     }
+
+//   } catch (error) {
+//     console.error("Error fetching user information:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
 // Delete Account permanently
 exports.deleteReviewerAccount = async (req, res) => {
   try {
     // Get the userId from the session or request body, depending on your implementation
-    const currentrole = req.session.currentrole;
-    const currentuserId = req.session.currentuserId;
+    const currentrole = req.query.role;
+    const currentuserId = req.query.userId;
 
     // Delete the user account from the database
     if (currentrole === "Admin") await Admin.findByIdAndDelete(currentuserId);
@@ -344,7 +401,7 @@ exports.feedbackToAuthor = async (req, res) => {
     const feedback = req.body.feedback;
     const blogId = req.body.id;
     // Get the userId from the session or request body, depending on your implementation
-    const currentReviewer = req.session.currentemail;
+    const currentReviewer = req.query.email;
     // const currentuserId = req.session.currentuserId;
 
     // Find the blog by ID
@@ -355,7 +412,7 @@ exports.feedbackToAuthor = async (req, res) => {
     // blog.lastUpdatedAt = Date.now();
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     blog.feedbackToAuthor.push({
-      ReviewerId: new mongoose.Types.ObjectId(req.session.currentuserId),
+      ReviewerId: new mongoose.Types.ObjectId(req.query.userId),
       ReviewerEmail: currentReviewer,
       Feedback: feedback,
       LastUpdated: new Date(new Date().getTime() + 330 * 60000)
@@ -366,7 +423,7 @@ exports.feedbackToAuthor = async (req, res) => {
 
     // Sending mail
     const receiver1 = blog.authorDetails.email;
-    const receiver2 = req.session.currentemail;
+    const receiver2 = req.query.email;
     const subject = "Blog status updated- AWAITING_AUTHOR";
     const html = `Hi,
               <p>Blog status updated: AWAITING_AUTHOR</p>
@@ -397,16 +454,16 @@ exports.changeUsername = async (req, res) => {
       return res.status(400).json({ error: validationError });
     }
 
-    if (req.session.currentrole === "Admin") {
+    if (req.query.role === "Admin") {
       const updatedUser = await Admin.findById({
-        _id: new mongoose.Types.ObjectId(req.session.currentuserId),
+        _id: new mongoose.Types.ObjectId(req.query.userId),
       });
       updatedUser.fullName = fullName;
       updatedUser.userName = userName;
       await updatedUser.save();
-    } else if (req.session.currentrole === "Reviewer") {
+    } else if (req.query.role === "Reviewer") {
       const updatedUser = await Reviewer.findById({
-        _id: new mongoose.Types.ObjectId(req.session.currentuserId),
+        _id: new mongoose.Types.ObjectId(req.query.userId),
       });
       updatedUser.fullName = fullName;
       updatedUser.userName = userName;
@@ -443,9 +500,9 @@ exports.discardQueueBlog = async (req, res) => {
     blog.reviewedBy.push({
       // ReviewedBy: req.session.currentemail,
       ReviewedBy: {
-        Id: new mongoose.Types.ObjectId(req.session.currentuserId),
-        Email: req.session.currentemail,
-        Role: req.session.currentrole,
+        Id: new mongoose.Types.ObjectId(req.query.userId),
+        Email: req.query.email,
+        Role: req.query.role,
       },
       Rating: rating,
       Remarks: reviewRemarks,
@@ -455,7 +512,6 @@ exports.discardQueueBlog = async (req, res) => {
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
 
     await blog.save();
-
 
     console.log("Blog discarded");
     res.json({ message: "Blog moved to discard queue" });

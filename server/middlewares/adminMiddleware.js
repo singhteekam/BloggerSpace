@@ -1,6 +1,7 @@
 // adminMiddleware.js
 const adminMiddleware = (req, res, next) => {
-  if (req.session && req.session.currentuserId && req.session.currentrole==="Admin") {
+  // if (req.session && req.session.currentuserId && req.session.currentrole==="Admin") {
+    if (req.query.userId && req.query.role==="Admin") {
     // User is authenticated, proceed to the next middleware or route handler
     next();
   } else {
