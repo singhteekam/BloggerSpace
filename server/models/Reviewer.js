@@ -32,6 +32,14 @@ const reviewerSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  status: {
+    type: String,
+    default: "INACTIVE",
+  },
   // reviewedBlogs: [
   //   {
   //     title: {

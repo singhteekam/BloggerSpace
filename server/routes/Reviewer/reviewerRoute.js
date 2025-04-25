@@ -36,7 +36,7 @@ router.get("/blog/editblog/:id",reviewerMiddleware, editPendingBlog);
 router.put("/blog/editblog/save/:id",reviewerMiddleware, saveEditedPendingBlog);
 
 // Delete Account
-router.delete("/account/delete",reviewerMiddleware, deleteReviewerAccount);
+router.put("/account/delete",reviewerMiddleware, deleteReviewerAccount);
 
 router.post("/feedbacktoauthor",reviewerMiddleware, feedbackToAuthor);
 

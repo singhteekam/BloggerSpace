@@ -79,6 +79,9 @@ const App = () => {
 
           <link rel="canonical" href={window.location.href} />
 
+          <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.REACT_APP_ADSENSE_ID}`}
+              crossorigin="anonymous"></script>
+
           <script
             charset="utf-8"
             src="//cdn.iframe.ly/embed.js?api_key=0737793c1d093bd321e4d7"

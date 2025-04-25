@@ -236,8 +236,9 @@ exports.deleteAccount = async (req, res) => {
     // Get the userId from the session or request body, depending on your implementation
     const userId = req.query.userId || req.body.userId;
 
-    // Delete the user account from the database
-    await User.findByIdAndDelete(userId);
+    const user= await User.findById(userId);
+    user.status="DELETED";
+    await user.save();
 
     // Return a success message
     res.json({ message: "Account deleted successfully" });

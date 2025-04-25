@@ -74,7 +74,7 @@ router.patch("/dashboard/removefromreviewer/:id", adminMiddleware, removeFromRev
 
 router.get("/dashboard/allusers", adminMiddleware, fetchAllUsers);
 
-router.delete("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
+router.put("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
 
 router.get("/community", adminMiddleware, getCommunityPosts);
 

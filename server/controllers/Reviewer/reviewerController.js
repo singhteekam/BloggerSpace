@@ -92,6 +92,7 @@ exports.reviewerLogin = async (req, res) => {
     );
     // console.log(token);
     const reviewerDetails = {
+      _id: reviewer._id,
       email: reviewer.email,
       fullName: reviewer.fullName,
       isVerified: reviewer.isVerified,
@@ -215,6 +216,7 @@ exports.saveEditedPendingBlog = async (req, res) => {
     blog.currentReviewer = "";
     blog.status = "IN_REVIEW";
     // blog.reviewedBy.push(req.session.currentemail);
+    console.log(req.query.userId)
     blog.reviewedBy.push({
       // ReviewedBy: req.session.currentemail,
       ReviewedBy: {
@@ -317,6 +319,7 @@ exports.userDetails = async (req, res) => {
         role: user.role,
         reviewedBlogs: user.reviewedBlogs,
       };
+      console.log("321: ", userDetails._id)
       res.json(userDetails);
     } else {
       return res.status(404).json({ error: "Please login!!" });
@@ -383,9 +386,16 @@ exports.deleteReviewerAccount = async (req, res) => {
     const currentuserId = req.query.userId;
 
     // Delete the user account from the database
-    if (currentrole === "Admin") await Admin.findByIdAndDelete(currentuserId);
-    else await Reviewer.findByIdAndDelete(currentuserId);
-
+    if (currentrole === "Admin") {
+      const admin= await Admin.findById(currentuserId);
+      admin.status="DELETED";
+      await admin.save();
+    }  
+    else {
+      const reviewer= await Reviewer.findById(currentuserId);
+      reviewer.status="DELETED";
+      await reviewer.save();
+    }
     // Return a success message
     res.json({ message: "Account deleted successfully" });
   } catch (error) {

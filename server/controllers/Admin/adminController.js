@@ -75,6 +75,7 @@ exports.adminLogin=async (req, res) => {
     );
     console.log(token);
     const adminDetails = {
+      _id: admin._id,
       email: admin.email,
       fullName: admin.fullName,
       isVerified: admin.isVerified,
@@ -477,8 +478,9 @@ exports.removeFromReviewerRole= async(req, res)=>{
 }
 
 exports.fetchAllUsers= async(req, res)=>{
+
   try {
-    const allUsers = await User.find({});
+    const allUsers = await User.find({status:"ACTIVE"});
     res.json(allUsers);
   } catch (error) {
     console.log("Error fetching all users")
@@ -489,13 +491,16 @@ exports.fetchAllUsers= async(req, res)=>{
 exports.deleteUserAccount = async (req, res) => {
   const { id } = req.params;
   try {
-    await User.findByIdAndDelete(id);
+    const user= await User.findById(id);
+    user.status="DELETED";
+    await user.save();
+    // await User.findByIdAndDelete(id);
 
-    const receiver = req.body.email;
+    const receiver = req.query.useremail;
     const subject = "Sorry to say Goodbye!";
     const html = `
           <div class="content">
-            <h2>Hi ${req.body.email},</h2>
+            <h2>Hi ${req.query.useremail},</h2>
             <p>Your account is deleted by admin. If you have any query then please drop a mail to below email id.\nEmail:${process.env.EMAIL}</p>
           </div>
           `;
