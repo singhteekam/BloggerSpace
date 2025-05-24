@@ -1,15 +1,18 @@
+import img1 from "assets/carousel/img1.jpg";
+import img2 from "assets/carousel/img2.jpg";
+
 export const LatestUpdates= [
     {
         title: "Welcome to BloggerSpace",
         description: "Write on any topic of your choice.",
-        image: "",
+        image: {img1},
         linkTitle:"",
         link: null,
     },
     {
         title: "Features to explore",
         description: "Create new blog, save as draft the blog, Change password, Email verification for new users, View public profile of users, etc",
-        image: "",
+        image: {img2},
         linkTitle:"",
         link: null,
     },

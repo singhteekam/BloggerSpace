@@ -241,7 +241,7 @@ exports.deleteAccount = async (req, res) => {
     await user.save();
 
     // Return a success message
-    res.json({ message: "Account deleted successfully" });
+    res.json({ message: "Account deleted successfully." });
   } catch (error) {
     // Handle any errors
     console.error("Account deletion failed:", error);

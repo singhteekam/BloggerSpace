@@ -5,14 +5,14 @@ import { Link } from 'react-router-dom';
 import { carouselVariant } from 'utils/motionVariants/variants';
 import {LatestUpdates} from './LatestUpdates';
 
-
 const CarouselSection = () => {
   return (
     <section>
         <Carousel>
           {LatestUpdates.map((item)=>(
             <Carousel.Item>
-            <div className="carousel-image"></div>
+            <div className="carousel-image">
+            </div>
             <Carousel.Caption className="color-teal-green">
               <motion.h3
                 variants={carouselVariant}

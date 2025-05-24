@@ -142,8 +142,8 @@ html {
 .carousel-image{
     width: 100%;
     min-height: 250px;
-    background-color: var(--color-mint);
-    /* background-image: url("./../assets/bs_bg_img.svg"); */
+    /* background-color: var(--color-mint); */
+    background-image: url("./../assets/bs_bg_img.svg");
     /* background-repeat: no-repeat; */
 }
 

@@ -433,6 +433,7 @@ exports.approveReviewerRequest= async(req, res)=>{
   try {
     const reviewer= await Reviewer.findById(id);
     reviewer.isVerified=true;
+    reviewer.status="ACTIVE";
     await reviewer.save();
 
     const receiver = reviewer.email;
@@ -458,6 +459,7 @@ exports.removeFromReviewerRole= async(req, res)=>{
   try {
     const reviewer= await Reviewer.findById(id);
     reviewer.isVerified=false;
+    reviewer.status="INACTIVE";
     await reviewer.save();
 
     const receiver = reviewer.email;

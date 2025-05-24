@@ -66,9 +66,9 @@ function HomePage() {
                 <Link to="/community" className="btn mx-1 bs-button">
                   Community <ImArrowUpRight2  />
                 </Link>
-            <Link to="/guidelines" className="btn mx-1 bs-button">
+            {/* <Link to="/guidelines" className="btn mx-1 bs-button">
                   Guidelines <ImArrowUpRight2  />
-                </Link>
+                </Link> */}
             
             </Col>
           </Row>
