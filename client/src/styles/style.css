@@ -146,7 +146,7 @@ html {
 .carousel-image{
     width: 100%;
     min-height: 250px;
-    max-height: 70vh;
+    max-height: 50vh;
     object-fit: cover;
     opacity: 0.3;
     z-index: -1;
@@ -235,9 +235,13 @@ html {
   overflow-x: hidden;
 }
 
+.users-review-text{
+  text-wrap: wrap;
+}
+
 .usersreview-container-slide{
   position: absolute;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   text-wrap: wrap;
 
 }

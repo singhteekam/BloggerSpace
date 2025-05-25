@@ -1,6 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { marqueUserReviewVar, marqueVariants } from "utils/motionVariants/variants";
+import {
+  marqueUserReviewVar,
+  marqueVariants,
+} from "utils/motionVariants/variants";
 import { Container, Card, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import mohitsharmaImg from "assets/users/mohit.jpeg";
@@ -49,11 +52,13 @@ const UsersReviewData = [
 ];
 
 const BSUsersReview = () => {
-    const duplicatedCards = [...UsersReviewData, ...UsersReviewData];
+  const duplicatedCards = [...UsersReviewData, ...UsersReviewData];
   return (
     <section className="page-new-section">
       <Container>
-        <h3 className="new-section-heading text-center">Reviews from the Users</h3>
+        <h3 className="new-section-heading text-center">
+          Reviews from the Users
+        </h3>
         <div className="heading-underline mx-auto mb-3"></div>
         <div className="usersreview-container">
           <motion.div
@@ -82,7 +87,7 @@ const BSUsersReview = () => {
                   <div className="heading-underline"></div>
 
                   <p>
-                    <cite>{user.review}</cite>
+                    <cite className="users-review-text">{user.review}</cite>
                   </p>
                 </Card.Body>
                 {/* <Card.Footer>

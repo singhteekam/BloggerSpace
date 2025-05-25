@@ -62,7 +62,7 @@ export const carouselVariant = {
         x: {
           repeat: Infinity,
           repeatType: "loop",
-          duration: 15,
+          duration: 20,
           ease: "linear",
           stiffness: 500,
         },
