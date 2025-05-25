@@ -7,11 +7,16 @@ import {LatestUpdates} from './LatestUpdates';
 
 const CarouselSection = () => {
   return (
-    <section>
+    <section className='carousel-section'>
         <Carousel>
           {LatestUpdates.map((item)=>(
             <Carousel.Item>
             <div className="carousel-image">
+              <img
+                className=""
+                src={item.image}
+                alt={item.title}
+                />
             </div>
             <Carousel.Caption className="color-teal-green">
               <motion.h3
@@ -40,4 +45,4 @@ const CarouselSection = () => {
   )
 }
 
-export default CarouselSection
+export default CarouselSection;

@@ -13,6 +13,7 @@ import TechStack from "./TechStack";
 import CarouselSection from "./CarouselSection";
 import PreLoader from "utils/PreLoader";
 import { ImArrowUpRight2 } from "react-icons/im";
+import BSUsersReview from "./BSUsersReview";
 
 function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +22,7 @@ function HomePage() {
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 300);
   }, []);
 
   if (isLoading) {
@@ -80,8 +81,10 @@ function HomePage() {
       <WhatYouCanDo />
 
       {/* Users Review */}
-      <UsersReview />
+      {/* <UsersReview /> */}
+      <BSUsersReview />
       {/* Users Review end */}
+
 
       {/* Tech stack used */}
       <TechStack />

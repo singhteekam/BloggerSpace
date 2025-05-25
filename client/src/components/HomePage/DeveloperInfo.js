@@ -5,7 +5,7 @@ import { FaLocationArrow } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { imageHoverVariant } from 'utils/motionVariants/variants';
 import { ToastContainer, toast } from "react-toastify";
-import myImg from "assets/my_image.jpg";
+import myImg from "assets/my_image_bg.jpeg";
 
 const DeveloperInfo = () => {
   return (

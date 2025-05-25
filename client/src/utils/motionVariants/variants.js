@@ -42,12 +42,27 @@ export const carouselVariant = {
   
   export const marqueVariants = {
     animate: {
-      x: [-25, -1000],
+      x: ["-50%","0%"],
       transition: {
         x: {
           repeat: Infinity,
           repeatType: "loop",
           duration: 6,
+          ease: "linear",
+          stiffness: 500,
+        },
+      },
+    },
+  };
+
+  export const marqueUserReviewVar = {
+    animate: {
+      x: ["0%","-50%"],
+      transition: {
+        x: {
+          repeat: Infinity,
+          repeatType: "loop",
+          duration: 15,
           ease: "linear",
           stiffness: 500,
         },
