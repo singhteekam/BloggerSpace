@@ -16,30 +16,35 @@ const UsersReviewData = [
   {
     name: "Mohit Sharma",
     image: mohitsharmaImg,
+    publicURL: "https://bloggerspace.singhteekam.in/profile/mohitnsr882",
     review:
       "❝ My experience as a reviewer and writer has reached new heights. The platform’s draft and editing tools feature allowing me to focus on creating high-quality content. ❞",
   },
   {
     name: "Saksham Kumar",
     image: sakshamImg,
+    publicURL: "https://bloggerspace.singhteekam.in/profile/kums6765",
     review:
       "❝ BloggerSpace has exceeded my expectations with its exceptional writing features and user-friendly interface. ❞",
   },
   {
     name: "Swaranjali",
     image: swaraImg,
+    publicURL: "https://bloggerspace.singhteekam.in/profile/drswaranjalii",
     review:
       "❝ The platform's focus on enhancing the writing process through innovative features sets it apart in the blogging landscape. ❞",
   },
   {
     name: "Abhay Chaudhary",
     image: abhayImg,
+    publicURL: "https://bloggerspace.singhteekam.in/profile/abhayc041",
     review:
       "❝ The supportive community further enhance the overall experience, making BloggerSpace a standout choice. ❞",
   },
   {
     name: "Harendra Singh",
     image: harendraImg,
+    publicURL: "https://bloggerspace.singhteekam.in/profile/harendrasingh2021",
     review:
       "❝ My experience with BloggerSpace has been nothing short of exceptional. The platform's user-friendly interface and advanced features have made blogging a breeze. ❞",
   },
@@ -77,7 +82,7 @@ const BSUsersReview = () => {
                   <b>
                     {user.name}
                     <Link
-                      to="#"
+                      to={user.publicURL}
                       className="btn bs-button-outline mx-1"
                       style={{ fontSize: "0.8rem" }}
                     >

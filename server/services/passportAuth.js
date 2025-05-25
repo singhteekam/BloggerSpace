@@ -59,6 +59,7 @@ passport.use(
           password: await bcrypt.hash(password, 10),
           isVerified: profile.emails[0].verified,
           authType: "Google",
+          status: "ACTIVE",
         });
         await user.save();
 
@@ -71,6 +72,7 @@ passport.use(
       <p>Sign in with Google success!!.</p>
       <p>Sign in with Google or you can use your Email and default password to sign in.</p>
       <p><b>Note: </b>Please use your default password to sign in with Email & password.</p>
+      <p>Email: <span class="teal-green">${receiver}</span></p>
       <p>Default password: <span class="teal-green">${password}</span></p>
       </div>`;
       sendEmail(receiver, subject, html)
@@ -179,6 +181,7 @@ passport.use(
           password: await bcrypt.hash(password, 10),
           isVerified: "true",
           authType: "Github",
+          status: "ACTIVE",
         });
         await user.save();
 
@@ -191,6 +194,7 @@ passport.use(
       <p>Sign in with Github success!!.</p>
       <p>Sign in with Github or you can use your Email and default password to sign in.</p>
       <p><b>Note: </b>Please use your default password to sign in with Email & password.</p>
+      <p>Email: <span class="teal-green">${receiver}</span></p>
       <p>Default password: <span class="teal-green">${password}</span></p>
       </div>`;
       sendEmail(receiver, subject, html)

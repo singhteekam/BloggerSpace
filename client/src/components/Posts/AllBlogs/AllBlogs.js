@@ -199,7 +199,7 @@ const AllBlogs = () => {
                               {blog.status==="ADMIN_PUBLISHED"?<i className="text-muted">
                                 Author: ADMIN
                               </i>:<i className="text-muted">
-                                Author: {blog.authorDetails.userName}
+                                Author: {blog.authorDetails?.userName}
                               </i>}
                               
                               <br />

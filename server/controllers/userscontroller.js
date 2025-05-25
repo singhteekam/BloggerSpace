@@ -127,6 +127,7 @@ exports.signup = async (req, res) => {
         .replace(/[^a-zA-Z0-9 ]/g, ""),
       email,
       password: hashedPassword,
+      status: "ACTIVE",
     });
 
     console.log(newUser);

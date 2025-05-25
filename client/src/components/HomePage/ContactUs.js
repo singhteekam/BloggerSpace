@@ -23,10 +23,10 @@ const ContactUs = () => {
       toast.info("Please fill mandatory fields");
       return;
     }
-    if (mobileNo < 0 || mobileNo.length < 10) {
-      toast.info("Please enter a valid mobile number");
-      return;
-    }
+    // if (mobileNo!==0 && (mobileNo < 0 || mobileNo.length < 10 || mobileNo.length > 10)) {
+    //   toast.info("Please enter a valid mobile number");
+    //   return;
+    // }
     try {
       const response = await axios.post("/api/users/contactus", {
         email,
@@ -158,10 +158,10 @@ const ContactUs = () => {
                           navigator.clipboard.writeText(
                             "https://www.facebook.com/profile.php?id=61573089591301&mibextid=JRoKGi"
                           );
-                          toast.success("Email Copied to clipboard");
+                          toast.success("Link Copied to clipboard");
                         }}
                       >
-                        Copy Email
+                        Copy Link
                       </Button>
                     </div>
                   </Col>
