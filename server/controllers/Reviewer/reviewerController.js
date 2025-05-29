@@ -87,7 +87,7 @@ exports.reviewerLogin = async (req, res) => {
       { currentuserId: reviewer._id },
       process.env.CURRENT_JWT_SECRET,
       {
-        expiresIn: "1h", // Token expiration time
+        expiresIn: "3d", // Token expiration time
       }
     );
     // console.log(token);

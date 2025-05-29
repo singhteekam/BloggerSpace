@@ -135,6 +135,7 @@ exports.signup = async (req, res) => {
     await newUser.save();
 
     const receiver = email;
+    const receiver2= process.env.EMAIL;
     const subject = "Signup Success!!";
     const html = `
               <div class="content">
@@ -190,7 +191,7 @@ exports.login = async (req, res) => {
     // You can generate a JWT token here if you want to implement authentication
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "24h", // Token expiration time
+      expiresIn: "3d", // Token expiration time
     });
     // console.log(token);
     const userDetails = {

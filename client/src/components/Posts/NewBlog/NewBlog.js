@@ -29,7 +29,7 @@ import PreLoader from "utils/PreLoader";
 import FileUpload from "./FileUpload";
 
 const NewBlog = () => {
-  const { user,loading, logout } = useContext(AuthContext);
+  const { user, loading, logout } = useContext(AuthContext);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [authorId, setAuthorId] = useState(user?._id);
@@ -46,21 +46,21 @@ const NewBlog = () => {
   const [searchTitleResults, setTitleSearchResults] = useState([]);
   // const [loading, setLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-const [blogTagsMapped, setBlogTagsMapped]= useState([]);
+  const [blogTagsMapped, setBlogTagsMapped] = useState([]);
 
   const navigate = useNavigate();
-  const location= useLocation();
+  const location = useLocation();
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(user);
-    if(user){
+    if (user) {
       setAuthorId(user?._id);
       setAuthor(user?.userName);
       setAuthorEmail(user?.email);
     }
-  },[user, loading]);
+  }, [user, loading]);
 
-  useEffect(()=>{
+  useEffect(() => {
     blogTags.map((tag) => {
       const ob = {
         label: tag,
@@ -68,7 +68,7 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
       };
       setBlogTagsMapped((blogTagsMapped) => [...blogTagsMapped, ob]);
     });
-  },[]);
+  }, []);
 
   useEffect(() => {
     axios
@@ -136,15 +136,18 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
 
     try {
       setIsDisabled(true);
-      const response = await axios.post(`/api/blogs/newblog?userId=${authorId}`, {
-        slug,
-        title,
-        content,
-        category: category === "Other" ? otherCategory : category,
-        tags,
-        userId: authorId,
-        authorEmail
-      });
+      const response = await axios.post(
+        `/api/blogs/newblog?userId=${authorId}`,
+        {
+          slug,
+          title,
+          content,
+          category: category === "Other" ? otherCategory : category,
+          tags,
+          userId: authorId,
+          authorEmail,
+        }
+      );
       console.log(response.data);
 
       toast.success("New blog created with pending review status!!");
@@ -169,7 +172,6 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
   };
 
   const handleSaveAsDraft = async () => {
-
     if (!isUniqueTitle) {
       // setAlert({ type: "danger", message: "Title already exists" });
       toast.error("Title already exists");
@@ -178,15 +180,18 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
     console.log("Content: " + content);
     try {
       setIsDisabled(true);
-      const response = await axios.post(`/api/blogs/saveasdraft?userId=${authorId}`, {
-        slug,
-        title,
-        content,
-        category: category === "Other" ? otherCategory : category,
-        tags,
-        userId: authorId,
-        authorEmail
-      });
+      const response = await axios.post(
+        `/api/blogs/saveasdraft?userId=${authorId}`,
+        {
+          slug,
+          title,
+          content,
+          category: category === "Other" ? otherCategory : category,
+          tags,
+          userId: authorId,
+          authorEmail,
+        }
+      );
       console.log(response.data);
 
       toast.success("New blog saved as draft!!");
@@ -241,20 +246,21 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
     }
   }
 
-
-  const handleSelectedTags= (selectedOptions) => {
-    const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+  const handleSelectedTags = (selectedOptions) => {
+    const values = selectedOptions
+      ? selectedOptions.map((option) => option.value)
+      : [];
     setTags(values);
-    console.log("All tags: ",tags);
+    console.log("All tags: ", tags);
   };
 
   if (loading) {
-    return <PreLoader isLoading={loading} />
+    return <PreLoader isLoading={loading} />;
   }
-  if(!user && !loading){
+  if (!user && !loading) {
     console.log("Inside if");
     logout();
-    return <Navigate to="/login" state={{ from: location }} replace />
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return (
@@ -276,9 +282,6 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
             {alert.message}
           </Alert>
         )} */}
-
-
-        
 
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="blogTitle" className="newblogfields">
@@ -436,7 +439,6 @@ const [blogTagsMapped, setBlogTagsMapped]= useState([]);
               </Badge>
             ))}
           </Form.Group> */}
-
 
           <Form.Group controlId="blogContent" className="newblogfields">
             <Form.Label>Content:</Form.Label>

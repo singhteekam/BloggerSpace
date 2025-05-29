@@ -70,7 +70,7 @@ exports.adminLogin=async (req, res) => {
       { currentuserId: admin._id },
       process.env.CURRENT_JWT_SECRET,
       {
-        expiresIn: "1h", // Token expiration time
+        expiresIn: "3d", // Token expiration time
       }
     );
     console.log(token);
@@ -606,6 +606,7 @@ exports.adminNewBlog = async (req, res) => {
       status: "ADMIN_PUBLISHED"
     });
     const savedBlog = await newPost.save();
+    await generateSitemap();
 
     res.json(savedBlog);
   } catch (error) {
@@ -805,6 +806,7 @@ exports.adminSaveEditedBlog = async (req, res) => {
 
     // Save the updated blog
     await blog.save();
+    await generateSitemap();
     console.debug("Blog updated successfully. Title: "+ blog.title);
 
     res.json({ message: "blog updated successfully" });
