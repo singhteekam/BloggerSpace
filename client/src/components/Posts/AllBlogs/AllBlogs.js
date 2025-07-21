@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Container,
   Card,
@@ -7,6 +7,9 @@ import {
   Badge,
   Button,
   Row,
+  InputGroup,
+  Form,
+  FormControl,
   Col,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
@@ -41,7 +44,9 @@ const blogItemVariant = {
 const AllBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filterCategory, setFilterCategory] = useState(null);
+  const [filterCategory, setFilterCategory] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
   const navigate = useNavigate();
 
   const [total, setTotal] = useState(0);
@@ -66,6 +71,12 @@ const AllBlogs = () => {
     }
   };
 
+  const filteredBlogs = useMemo(() => {
+    return blogs.filter((blog) =>
+      blog.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [blogs, searchTerm]);
+
   const fetchBlogsByCategory = async (filterCategory) => {
     console.log(filterCategory);
     try {
@@ -86,9 +97,7 @@ const AllBlogs = () => {
   }, [page]);
 
   if (isLoading) {
-    return (
-      <PreLoader isLoading={isLoading} />
-    );
+    return <PreLoader isLoading={isLoading} />;
   }
 
   const prePage = () => {
@@ -119,7 +128,11 @@ const AllBlogs = () => {
           Showing total results: {total}, Page {page} of {totalPages}
         </i>
         <div>
-          <b>Filter by category: </b>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>Search by title</InputGroup.Text>
+            <Form.Control placeholder="Search any blog..." onChange={(e) => setSearchTerm(e.target.value)} aria-label="First name" />
+          </InputGroup>
+          {/* <b>Filter by category: </b>
           <Select
             className="react-select-dropdown m-1"
             defaultValue={filterCategory}
@@ -145,7 +158,7 @@ const AllBlogs = () => {
             }}
           >
             Reset
-          </Button>
+          </Button> */}
         </div>
 
         {blogs?.length === 0 ? (
@@ -153,7 +166,7 @@ const AllBlogs = () => {
         ) : (
           <>
             <Row className="m-3">
-              {blogs?.map((blog) => (
+              {filteredBlogs?.map((blog) => (
                 <Col md={4}>
                   <div key={blog.slug} className="mb-2 border blogitem">
                     <motion.div
@@ -196,12 +209,13 @@ const AllBlogs = () => {
                                 </Badge>
                               ))}
                             <p>
-                              {blog.status==="ADMIN_PUBLISHED"?<i className="text-muted">
-                                Author: ADMIN
-                              </i>:<i className="text-muted">
-                                Author: {blog.authorDetails?.userName}
-                              </i>}
-                              
+                              {blog.status === "ADMIN_PUBLISHED" ? (
+                                <i className="text-muted">Author: ADMIN</i>
+                              ) : (
+                                <i className="text-muted">
+                                  Author: {blog.authorDetails?.userName}
+                                </i>
+                              )}
                               <br />
                               <i className="text-muted">
                                 Last Updated: {blog.lastUpdatedAt.slice(11, 19)}

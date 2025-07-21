@@ -1,46 +1,67 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { FaEye, FaHeart } from 'react-icons/fa';
-import { Link, Navigate } from 'react-router-dom';
-import { BsBoxArrowUpRight } from "react-icons/bs";
+import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { FaEye } from 'react-icons/fa';
+import { BsBoxArrowUpRight } from 'react-icons/bs';
 import PreLoader from 'utils/PreLoader';
+import { useBlogs } from 'contexts/BlogContext';
 
-const RelatedBlogs = (props) => {
+const RelatedBlogs = ({ blogId }) => {
+  const { blogs, loading } = useBlogs();
 
-    const [relatedBlogs, setRelatedBlogs]= useState(null);
+  const currentBlog = blogs.find((blog) => blog._id === blogId);
 
-    const fetchRelatedBlogs = async ()=>{
-        try {
-            const response= await axios.get(`/api/blogs/relatedblogs/${props.blogId}`);
-            setRelatedBlogs(response.data);
-        } catch (error) {
-            console.log("Error fetching related blogs: ", error);
-        }
-    }
-    
-    useEffect(()=>{
-        fetchRelatedBlogs();
-    },[props.blogId]);
+  const extractKeywords = (title) => {
+    const stopWords = ["the", "a", "an", "and", "or", "in", "on", "of", "to", "for", "with"];
+    return title
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((word) => !stopWords.includes(word) && word.length > 2);
+  };
+
+  const relatedBlogs = useMemo(() => {
+    if (!currentBlog || !currentBlog.title) return [];
+
+    const currentKeywords = extractKeywords(currentBlog.title);
+
+    return blogs
+      .filter((blog) => blog._id !== blogId)
+      .map((blog) => {
+        const otherKeywords = extractKeywords(blog.title);
+        const commonWords = otherKeywords.filter((word) =>
+          currentKeywords.includes(word)
+        );
+        return { ...blog, matchScore: commonWords.length };
+      })
+      .filter((blog) => blog.matchScore > 0)
+      .sort((a, b) => b.matchScore - a.matchScore) // highest match first
+      .slice(0, 5); // top 5 matches
+  }, [blogs, currentBlog, blogId]);
 
   return (
     <div>
-        <h5 className='color-teal-green' >Related Blogs:</h5>
-        <div className='view-blog-most-viewed'>
-            {relatedBlogs===null? <PreLoader isLoading={true} />:
-                <ul>
-                {relatedBlogs && relatedBlogs.map((blog)=>(
-                    <li key={blog.blogId}>
-                        <Link to={`/${blog.slug}`} >{blog.title} <BsBoxArrowUpRight /></Link> <br />
-                        <FaEye className="color-teal-green" /> <span className="color-teal-green">{blog.blogViews}{"  "}</span>
-                        {/* <FaHeart className="color-teal-green" /> <span className="color-teal-green">{blog.blogLikes.length}</span> */}
-                    </li>
-                ))}
-            </ul>
-            }
-            
-        </div>
+      <h5 className="color-teal-green">Related Blogs:</h5>
+      <div className="view-blog-most-viewed">
+        {loading || !currentBlog ? (
+          <PreLoader isLoading={true} />
+        ) : relatedBlogs.length === 0 ? (
+          <p className="text-muted">No related blogs found.</p>
+        ) : (
+          <ul>
+            {relatedBlogs.map((blog) => (
+              <li key={blog._id}>
+                <Link to={`/${blog.slug}`}>
+                  {blog.title} <BsBoxArrowUpRight />
+                </Link>
+                <br />
+                <FaEye className="color-teal-green" />{" "}
+                <span className="color-teal-green">{blog.blogViews}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default RelatedBlogs;

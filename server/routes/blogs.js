@@ -27,12 +27,15 @@ const {
   fetchBlogByBlogId,
   fetchMostViewedBlogs,
   fetchRelatedBlogs,
+  fetchAllBlogsFromDB,
 } = require("../controllers/blogsController");
 const { downloadBlog } = require("../controllers/userscontroller");
 
 router.get("/", blogsHomepage);
 
 router.get("/allblogs", fetchAllBlogs);
+
+router.get("/fetchallblogs", fetchAllBlogsFromDB);
 
 // fetch Blogs by category filter 
 router.get("/allblogs/category/:filterCategory", fetchBlogsByCategory);

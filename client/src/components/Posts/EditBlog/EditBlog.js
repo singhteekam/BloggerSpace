@@ -380,7 +380,7 @@ const EditBlog = () => {
             required
           /> */}
 
-          <Form.Group controlId="blogCategory" className="editblogfields">
+          {/* <Form.Group controlId="blogCategory" className="editblogfields">
             <Form.Label>Category:</Form.Label>
             <Form.Control
               as="select"
@@ -395,7 +395,19 @@ const EditBlog = () => {
                 </option>
               ))}
             </Form.Control>
-          </Form.Group>
+          </Form.Group> */}
+
+          <p>Category:</p>
+          <Select
+            className="react-select-dropdown category-dropdown"
+            value={{ value: category, label: category }}
+            onChange={(e) => {
+              console.log(e);
+              setCategory(e.value);
+            }}
+            options={blogCategory}
+            required
+          />
 
           {category === "Other" ? (
             <Form.Group controlId="otherCategory" className="newblogfields">
@@ -422,7 +434,7 @@ const EditBlog = () => {
             isMulti
           /> */}
 
-          <Form.Group controlId="blogCategory" className="newblogfields">
+          {/* <Form.Group controlId="blogCategory" className="newblogfields">
             <Form.Label>Tags:</Form.Label>
             <Form.Control
               as="select"
@@ -455,7 +467,20 @@ const EditBlog = () => {
                 ></CloseButton>
               </Badge>
             ))}
-          </Form.Group>
+          </Form.Group> */}
+
+          <p>Tags:</p>
+          <Select
+            className="react-select-dropdown"
+            value={tags.map((tag) => ({
+              value: tag,
+              label: tag,
+            }))}
+            onChange={handleSelectedTags}
+            options={blogTagsMapped}
+            required
+            isMulti
+          />
 
           <Form.Group controlId="blogContent" className="editblogfields">
             <Form.Label>Content:</Form.Label>
@@ -469,7 +494,7 @@ const EditBlog = () => {
                 setContent(editor.getData());
               }}
             />
-            
+
             <FileUpload />
 
             <br />
@@ -535,7 +560,7 @@ const EditBlog = () => {
             className="submit-editedblog"
             disabled={isDisabled}
           >
-            Save
+            Submit
           </Button>
           <Button
             variant="primary"

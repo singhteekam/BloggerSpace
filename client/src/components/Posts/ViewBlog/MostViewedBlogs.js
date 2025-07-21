@@ -1,46 +1,43 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { FaEye, FaHeart } from 'react-icons/fa';
-import { Link, Navigate } from 'react-router-dom';
-import { BsBoxArrowUpRight } from "react-icons/bs";
+import React, { useContext, useMemo } from 'react';
+import { FaEye } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { BsBoxArrowUpRight } from 'react-icons/bs';
 import PreLoader from 'utils/PreLoader';
+import { useBlogs } from 'contexts/BlogContext';
 
 const MostViewedBlogs = () => {
+  const { blogs, loading } = useBlogs();
 
-    const [mostViewed, setMostViewed]= useState(null);
+  const topViewedBlogs = useMemo(() => {
+    if (!blogs) return [];
+    return [...blogs]
+      .sort((a, b) => b.blogViews - a.blogViews)
+      .slice(0, 10);
+  }, [blogs]);
 
-    const mostViewedBlogs = async ()=>{
-        try {
-            const response= await axios.get("/api/blogs/mostviewedblogs");
-            setMostViewed(response.data);
-        } catch (error) {
-            console.log("Error fetching most viewed blogs: ", error);
-        }
-    }
-    
-    useEffect(()=>{
-        mostViewedBlogs();
-    },[]);
+  if (loading || !blogs) {
+    return <PreLoader isLoading={true} />;
+  }
 
   return (
     <div>
-        <h5 className='color-teal-green' >Most Viewed Blogs:</h5>
-        <div className='view-blog-most-viewed'>
-            {mostViewed===null? <PreLoader isLoading={true} />:
-                <ul>
-                {mostViewed && mostViewed.map((blog)=>(
-                    <li key={blog.blogId}>
-                        <Link to={`/${blog.slug}`} >{blog.title} <BsBoxArrowUpRight /></Link> <br />
-                        <FaEye className="color-teal-green" /> <span className="color-teal-green">{blog.blogViews}{"  "}</span>
-                        {/* <FaHeart className="color-teal-green" /> <span className="color-teal-green">{blog.blogLikes.length}</span> */}
-                    </li>
-                ))}
-            </ul>
-            }
-            
-        </div>
+      <h5 className="color-teal-green">Most Viewed Blogs:</h5>
+      <div className="view-blog-most-viewed">
+        <ul>
+          {topViewedBlogs.map((blog) => (
+            <li key={blog._id}>
+              <Link to={`/${blog.slug}`}>
+                {blog.title} <BsBoxArrowUpRight />
+              </Link>
+              <br />
+              <FaEye className="color-teal-green" />{' '}
+              <span className="color-teal-green">{blog.blogViews}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default MostViewedBlogs
+export default MostViewedBlogs;

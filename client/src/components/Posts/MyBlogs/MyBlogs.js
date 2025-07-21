@@ -132,7 +132,7 @@ const MyBlogs = () => {
     if (confirmDiscard) {
       setIsDisabled(true);
       try {
-        const response = await axios.post(`/api/users/discard/blog/${blogId}`, {
+        const response = await axios.post(`/api/users/discard/blog/${blogId}?userId=${userId}`, {
           authorEmail,
           slug,
         });

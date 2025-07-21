@@ -914,7 +914,7 @@ exports.authPassportCallback = async (req, res) => {
           { userId: user._id, email: user.email },
           process.env.JWT_SECRET,
           {
-            expiresIn: "1h", // Token expiration time
+            expiresIn: "3d", // Token expiration time
           }
         );
 

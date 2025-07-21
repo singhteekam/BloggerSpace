@@ -59,25 +59,25 @@ exports.blogsHomepage = async (req, res) => {
       .populate("authorDetails") // Populate the author field with the User document
       .exec();
 
-      let allBlogs=[];
+    let allBlogs = [];
 
-      blogs.map((blog)=>{
-        const x={
-          _id: blog._id,
-          slug: blog.slug,
-          title: blog.title,
-          category: blog.category,
-          tags: blog.tags,
-          content: blog.content,
-          blogViews: blog.blogViews,
-          blogLikes: blog.blogLikes,
-          lastUpdatedAt: blog.lastUpdatedAt,
-          authorDetails:{
-            userName: blog.authorDetails.userName
-          }
-        };
-        allBlogs.push(x);
-      })
+    blogs.map((blog) => {
+      const x = {
+        _id: blog._id,
+        slug: blog.slug,
+        title: blog.title,
+        category: blog.category,
+        tags: blog.tags,
+        content: blog.content,
+        blogViews: blog.blogViews,
+        blogLikes: blog.blogLikes,
+        lastUpdatedAt: blog.lastUpdatedAt,
+        authorDetails: {
+          userName: blog.authorDetails.userName,
+        },
+      };
+      allBlogs.push(x);
+    });
 
     // console.log(decompressedblogs);
     res.json(allBlogs);
@@ -94,14 +94,18 @@ exports.fetchAllBlogs = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-    const blogs = await Blog.find({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
+    const blogs = await Blog.find({
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    })
       .skip(skip)
       .limit(limit)
       .sort({ lastUpdatedAt: -1 })
-      .populate("authorDetails") // Populate the author field with the User document
+      .populate("authorDetails")
       .exec();
 
-    const total = await Blog.countDocuments({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } });
+    const total = await Blog.countDocuments({
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    });
 
     res.json({
       blogs,
@@ -116,13 +120,31 @@ exports.fetchAllBlogs = async (req, res) => {
   }
 };
 
+exports.fetchAllBlogsFromDB = async (req, res) => {
+  try {
+    const blogs = await Blog.find({
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    }).populate("authorDetails").exec();
+
+    res.json({
+      blogs,
+    });
+  } catch (error) {
+    logger.error("Error fetching blogs..:" + error);
+    console.error("Error fetching blogs..:", error);
+    res.status(500).json({ error: "Server error.." });
+  }
+};
+
 exports.fetchMostViewedBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find({ status:{ $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
+    const blogs = await Blog.find({
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    })
       .limit(15)
       .sort({ blogViews: -1 });
-      // .populate("authorDetails")
-      // .exec();
+    // .populate("authorDetails")
+    // .exec();
 
     res.json(blogs);
   } catch (error) {
@@ -134,25 +156,41 @@ exports.fetchMostViewedBlogs = async (req, res) => {
 
 exports.fetchRelatedBlogs = async (req, res) => {
   try {
-    const blogId= req.params.blogId;
-    if(!blogId){
-      return res.status(404).send({message:"Blog id is required"});
+    const blogId = req.params.blogId;
+    if (!blogId) {
+      return res.status(404).send({ message: "Blog id is required" });
     }
 
-    const currentBlog= await Blog.findById(blogId);
-    if(!currentBlog){
-      return res.status(404).send({message:"Blog not found"});
+    const currentBlog = await Blog.findById(blogId);
+    if (!currentBlog) {
+      return res.status(404).send({ message: "Blog not found" });
     }
 
-    const stopwords = ["a", "the", "in", "as", "of", "on", "for", "and", "to", "by", "with"];
-    const words = currentBlog.title.split(" ").filter(word => !stopwords.includes(word.toLowerCase()));
+    const stopwords = [
+      "a",
+      "the",
+      "in",
+      "as",
+      "of",
+      "on",
+      "for",
+      "and",
+      "to",
+      "by",
+      "with",
+    ];
+    const words = currentBlog.title
+      .split(" ")
+      .filter((word) => !stopwords.includes(word.toLowerCase()));
     const titleRegex = new RegExp("\\b(" + words.join("|") + ")\\b", "i");
 
-    const relatedBlogs= await Blog.find({
-      _id: {$ne: blogId}, //Exclude current blog
-      title:{$regex:titleRegex},
-      status:{ $in: ["PUBLISHED", "ADMIN_PUBLISHED"] }
-    }).limit(15).sort({ lastUpdatedAt: -1 });
+    const relatedBlogs = await Blog.find({
+      _id: { $ne: blogId }, //Exclude current blog
+      title: { $regex: titleRegex },
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    })
+      .limit(15)
+      .sort({ lastUpdatedAt: -1 });
 
     res.json(relatedBlogs);
   } catch (error) {
@@ -251,8 +289,7 @@ exports.viewBlogRoute = async (req, res) => {
     const blog = await Blog.findOne({
       slug: req.params.blogSlug,
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
-    })
-      .populate("authorDetails")
+    }).populate("authorDetails")
       // .populate("likes")
       .populate("blogLikes")
       // .populate("comments")
@@ -549,7 +586,9 @@ exports.saveEditedBlog = async (req, res) => {
     // Find the blog by ID
     const blog = await Blog.findById({
       _id: new mongoose.Types.ObjectId(req.params.id),
-    }).populate("authorDetails").exec();
+    })
+      .populate("authorDetails")
+      .exec();
 
     if (!blog) {
       logger.error(
@@ -624,7 +663,6 @@ exports.saveEditedBlog = async (req, res) => {
         console.error("Error sending email:", error);
         // Handle error
       });
-
 
     res.json({ message: "blog updated successfully" });
   } catch (error) {
