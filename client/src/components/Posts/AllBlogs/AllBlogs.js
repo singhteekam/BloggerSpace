@@ -14,6 +14,7 @@ import { FaEye, FaHeart } from "react-icons/fa";
 import "styles/style.css"; // Assuming you have a CSS file for styles
 import PreLoader from "utils/PreLoader";
 import { useBlogs } from "contexts/BlogContext";
+import Pagination from "react-bootstrap/Pagination";
 
 const blogItemVariant = {
   hover: {
@@ -33,14 +34,16 @@ const AllBlogs = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
 
-  const filteredBlogs = useMemo(() => {
+  let filteredBlogs = useMemo(() => {
+    setPage(1); // Reset to first page on search
+    if (!searchTerm) return blogs;
     return blogs.filter((blog) =>
       blog.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [blogs, searchTerm]);
 
   const totalPages = Math.ceil(filteredBlogs.length / limit);
-  const currentBlogs = useMemo(() => {
+   filteredBlogs = useMemo(() => {
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     return filteredBlogs.slice(startIndex, endIndex);
@@ -50,23 +53,46 @@ const AllBlogs = () => {
     return <PreLoader isLoading={loading} />;
   }
 
+  // logic start for simple pagination
+  // const totalPages = Math.ceil(blogs.length / limit);
   const prePage = () => {
     if (page > 1) {
       setPage(page - 1);
     }
   };
-
   const changeCPage = (id) => {
     setPage(id);
   };
-
   const nextPage = () => {
     if (page < totalPages) {
       setPage(page + 1);
     }
   };
-
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
+  // logic end for simple pagination
+
+  // const totalPages = Math.ceil(filteredBlogs.length / limit);
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisible = 3;
+
+    let startPage = page - 1;
+    if (startPage < 1) startPage = 1;
+
+    let endPage = startPage + maxVisible - 1;
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = endPage - maxVisible + 1;
+      if (startPage < 1) startPage = 1;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
+  };
 
   return (
     <section className="newpage-section">
@@ -87,12 +113,12 @@ const AllBlogs = () => {
           />
         </InputGroup>
 
-        {currentBlogs.length === 0 ? (
+        {filteredBlogs.length === 0 ? (
           <div>No blogs found</div>
         ) : (
           <Row className="m-3">
-            {currentBlogs.map((blog) => (
-              <Col md={4} key={blog.slug}>
+            {filteredBlogs.map((blog) => (
+              <Col md={4} key={blog.blogId}>
                 <div className="mb-2 border blogitem">
                   <motion.div
                     variants={blogItemVariant}
@@ -125,7 +151,7 @@ const AllBlogs = () => {
                               >
                                 {tag}
                               </Badge>
-                            ))}
+                            )).slice(0,2)}
                           <p>
                             {blog.status === "ADMIN_PUBLISHED" ? (
                               <i className="text-muted">Author: ADMIN</i>
@@ -160,7 +186,7 @@ const AllBlogs = () => {
         )}
 
         {/* Pagination */}
-        <nav>
+        {/* <nav>
           <ul className="pagination">
             <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
               <button
@@ -172,13 +198,30 @@ const AllBlogs = () => {
               </button>
             </li>
 
-            {numbers.map((n) => (
-              <li className={`page-item ${page === n ? "active" : ""}`} key={n}>
-                <button className="page-link" onClick={() => changeCPage(n)}>
-                  {n}
-                </button>
-              </li>
-            ))}
+            {numbers.slice(0, 3).map((n, i) => (
+                    <li
+                      className={`page-item ${page === n ? "active" : ""}`}
+                      key={i}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => changeCPage(n)}
+                      >
+                        {n}
+                      </button>
+                    </li>
+                  ))}
+                  <li className="page-item">
+                    <button className="page-link">...</button>
+                  </li>
+                  <li className="page-item">
+                    <button
+                      className="page-link"
+                      onClick={() => changeCPage(totalPages)}
+                    >
+                      {totalPages}
+                    </button>
+                  </li>
 
             <li
               className={`page-item ${page === totalPages ? "disabled" : ""}`}
@@ -192,7 +235,45 @@ const AllBlogs = () => {
               </button>
             </li>
           </ul>
-        </nav>
+        </nav> */}
+
+        <Pagination className="justify-content-center mt-3">
+          <Pagination.First onClick={() => setPage(1)} disabled={page === 1} />
+
+          <Pagination.Prev
+            onClick={() => page > 1 && setPage(page - 1)}
+            disabled={page === 1}
+          />
+
+          {getPageNumbers().map((n) => (
+            <Pagination.Item
+              key={n}
+              active={n === page}
+              onClick={() => setPage(n)}
+            >
+              {n}
+            </Pagination.Item>
+          ))}
+
+          {getPageNumbers().slice(-1)[0] < totalPages && (
+            <>
+              <Pagination.Ellipsis disabled />
+              <Pagination.Item onClick={() => setPage(totalPages)}>
+                {totalPages}
+              </Pagination.Item>
+            </>
+          )}
+
+          <Pagination.Next
+            onClick={() => page < totalPages && setPage(page + 1)}
+            disabled={page === totalPages}
+          />
+
+          <Pagination.Last
+            onClick={() => setPage(totalPages)}
+            disabled={page === totalPages}
+          />
+        </Pagination>
       </Container>
     </section>
   );

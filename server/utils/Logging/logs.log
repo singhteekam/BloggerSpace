@@ -1171,3 +1171,7 @@
 [2025-07-23T12:29:52.756Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
 [2025-07-23T12:33:06.496Z] [LOG] [DEBUG] - Topic is available: 
 [2025-07-23T12:33:06.524Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:46:49.841Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:46:50.084Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:46:50.100Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:46:50.483Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
