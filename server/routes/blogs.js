@@ -28,6 +28,7 @@ const {
   fetchMostViewedBlogs,
   fetchRelatedBlogs,
   fetchAllBlogsFromDB,
+  createNewAIBlog,
 } = require("../controllers/blogsController");
 const { downloadBlog } = require("../controllers/userscontroller");
 
@@ -53,6 +54,8 @@ router.get("/fetchblog/:blogId", fetchBlogByBlogId);
 router.post("/saveasdraft",authenticate, saveAsDraftBlog);
 
 router.post("/newblog", authenticate, createNewBlog);
+
+router.post("/generateblog", authenticate, createNewAIBlog);
 
 router.post("/isuniquetitle", isUniqueTitle);
 

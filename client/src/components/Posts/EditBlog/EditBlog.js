@@ -25,6 +25,7 @@ import Editor from "ckeditor5-custom-build/build/ckeditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 
 import { AuthContext } from "contexts/AuthContext";
+import { MdStars } from "react-icons/md";
 import Select from "react-select";
 import FileUpload from "../NewBlog/FileUpload";
 
@@ -303,6 +304,30 @@ const EditBlog = () => {
     console.log("All tags: ", tags);
   };
 
+  const handleAIGenerate = async () => {
+    if (!title) {
+      toast.error("Please enter a title before generating content.");
+      return;
+    }
+    toast.info("Generating content with AI...");
+    try {
+      const response = await axios.post(
+        `/api/blogs/generateblog?userId=${userId}`,
+        {
+          title,
+          user,
+        }
+      );
+      console.log("AI Generated Content: ", response.data);
+      setInitialContent(response.data);
+      setSlug(slugify(title.trim()));
+      toast.success("Content generated successfully!");
+    } catch (error) {
+      console.error("Error generating content:", error);
+      toast.error("Failed to generate content. Please try again.");
+    }
+  };
+
   return (
     <section className="newpage-section">
       <Helmet>
@@ -336,6 +361,10 @@ const EditBlog = () => {
               placeholder="Enter blog title"
             />
           </Form.Group>
+
+          <Button className="m-1 " onClick={handleAIGenerate}>
+            <MdStars /> Generate with AI
+          </Button>
 
           <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey="0">

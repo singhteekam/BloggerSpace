@@ -888,3 +888,286 @@
 [2025-07-21T18:26:40.534Z] [LOG] [ERROR] - blog not found. Slug: qwFVe
 [2025-07-21T18:26:40.534Z] [LOG] [ERROR] - blog not found. Slug: qwFVe
 [2025-07-21T18:26:40.534Z] [LOG] [ERROR] - blog not found. Slug: qwFVe
+[2025-07-21T18:44:20.381Z] [LOG] [ERROR] - Error fetching user information: JsonWebTokenError: invalid signature
+[2025-07-21T18:44:20.381Z] [LOG] [ERROR] - Error fetching user information: JsonWebTokenError: invalid signature
+[2025-07-21T18:44:20.381Z] [LOG] [ERROR] - Error fetching user information: JsonWebTokenError: invalid signature
+[2025-07-21T18:44:20.453Z] [LOG] [ERROR] - Error fetching user information: JsonWebTokenError: invalid signature
+[2025-07-21T18:44:20.453Z] [LOG] [ERROR] - Error fetching user information: JsonWebTokenError: invalid signature
+[2025-07-21T18:44:20.453Z] [LOG] [ERROR] - Error fetching user information: JsonWebTokenError: invalid signature
+[2025-07-21T18:56:11.255Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-21T18:56:11.295Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-21T18:56:14.138Z] [LOG] [DEBUG] - Topic is available: W
+[2025-07-21T18:56:14.352Z] [LOG] [DEBUG] - Topic is available: Wh
+[2025-07-21T18:56:14.483Z] [LOG] [DEBUG] - Topic is available: Wha
+[2025-07-21T18:56:14.611Z] [LOG] [DEBUG] - Topic is available: What
+[2025-07-21T18:56:14.891Z] [LOG] [DEBUG] - Topic is available: What 
+[2025-07-21T18:56:15.180Z] [LOG] [DEBUG] - Topic is available: What i
+[2025-07-21T18:56:15.292Z] [LOG] [DEBUG] - Topic is available: What is
+[2025-07-21T18:56:15.531Z] [LOG] [DEBUG] - Topic is available: What is 
+[2025-07-21T18:56:18.558Z] [LOG] [DEBUG] - Topic is available: What is H
+[2025-07-21T18:56:18.857Z] [LOG] [DEBUG] - Topic is available: What is HT
+[2025-07-21T18:56:19.282Z] [LOG] [DEBUG] - Topic is available: What is HTM
+[2025-07-21T18:56:19.506Z] [LOG] [DEBUG] - Topic is available: What is HTML
+[2025-07-21T18:56:26.194Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2025-07-21T18:56:26.194Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2025-07-21T18:56:47.502Z] [LOG] [DEBUG] - Topic is available: What is HTML
+[2025-07-21T18:56:48.264Z] [LOG] [DEBUG] - Topic is available: What is HTML
+[2025-07-21T18:57:28.234Z] [LOG] [DEBUG] - Topic is available: What is HTML
+[2025-07-21T19:03:11.242Z] [LOG] [DEBUG] - Topic is available: What is HTML
+[2025-07-21T19:03:33.939Z] [LOG] [DEBUG] - Topic is available: What is HTML
+[2025-07-21T19:04:47.248Z] [LOG] [DEBUG] - Topic is available: What is HTML
+[2025-07-21T19:06:12.820Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-21T19:06:13.107Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-21T19:06:13.135Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-21T19:06:13.285Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-21T19:10:09.276Z] [LOG] [DEBUG] - Topic is available: what is css
+[2025-07-21T19:10:32.228Z] [LOG] [DEBUG] - Topic is available: what is css
+[2025-07-21T19:11:12.246Z] [LOG] [DEBUG] - Topic is available: what is css
+[2025-07-21T19:15:02.242Z] [LOG] [DEBUG] - Topic is available: what is css
+[2025-07-21T19:15:30.292Z] [LOG] [DEBUG] - Topic is available: what is css
+[2025-07-21T19:15:49.568Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-21T19:15:49.572Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-21T19:15:58.303Z] [LOG] [DEBUG] - Topic is available: W
+[2025-07-21T19:15:58.493Z] [LOG] [DEBUG] - Topic is available: Wh
+[2025-07-21T19:15:58.612Z] [LOG] [DEBUG] - Topic is available: Wha
+[2025-07-21T19:15:58.753Z] [LOG] [DEBUG] - Topic is available: What
+[2025-07-21T19:15:58.975Z] [LOG] [DEBUG] - Topic is available: What 
+[2025-07-21T19:15:59.189Z] [LOG] [DEBUG] - Topic is available: What i
+[2025-07-21T19:15:59.305Z] [LOG] [DEBUG] - Topic is available: What is
+[2025-07-21T19:15:59.454Z] [LOG] [DEBUG] - Topic is available: What is 
+[2025-07-21T19:15:59.775Z] [LOG] [DEBUG] - Topic is available: What is c
+[2025-07-21T19:15:59.876Z] [LOG] [DEBUG] - Topic is available: What is cs
+[2025-07-21T19:16:00.139Z] [LOG] [DEBUG] - Topic is available: What is css
+[2025-07-21T19:20:01.236Z] [LOG] [DEBUG] - Topic is available: What is cs
+[2025-07-21T19:20:01.422Z] [LOG] [DEBUG] - Topic is available: What is c
+[2025-07-21T19:20:01.553Z] [LOG] [DEBUG] - Topic is available: What is 
+[2025-07-21T19:20:02.221Z] [LOG] [DEBUG] - Topic is available: What is t
+[2025-07-21T19:20:02.408Z] [LOG] [DEBUG] - Topic is available: What is th
+[2025-07-21T19:20:02.766Z] [LOG] [DEBUG] - Topic is available: What is thr
+[2025-07-21T19:20:03.227Z] [LOG] [DEBUG] - Topic is available: What is thro
+[2025-07-21T19:20:04.124Z] [LOG] [DEBUG] - Topic is available: What is throt
+[2025-07-21T19:20:05.373Z] [LOG] [DEBUG] - Topic is available: What is thrott
+[2025-07-21T19:20:05.840Z] [LOG] [DEBUG] - Topic is available: What is throttl
+[2025-07-21T19:20:06.101Z] [LOG] [DEBUG] - Topic is available: What is throttli
+[2025-07-21T19:20:06.306Z] [LOG] [DEBUG] - Topic is available: What is throttlin
+[2025-07-21T19:20:06.525Z] [LOG] [DEBUG] - Topic is available: What is throttlin 
+[2025-07-21T19:20:06.753Z] [LOG] [DEBUG] - Topic is available: What is throttlin i
+[2025-07-21T19:20:06.961Z] [LOG] [DEBUG] - Topic is available: What is throttlin in
+[2025-07-21T19:20:07.029Z] [LOG] [DEBUG] - Topic is available: What is throttlin in 
+[2025-07-21T19:20:07.530Z] [LOG] [DEBUG] - Topic is available: What is throttlin in r
+[2025-07-21T19:20:07.673Z] [LOG] [DEBUG] - Topic is available: What is throttlin in re
+[2025-07-21T19:20:07.899Z] [LOG] [DEBUG] - Topic is available: What is throttlin in rea
+[2025-07-21T19:20:08.347Z] [LOG] [DEBUG] - Topic is available: What is throttlin in reac
+[2025-07-21T19:20:08.595Z] [LOG] [DEBUG] - Topic is available: What is throttlin in react
+[2025-07-21T19:20:34.008Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-21T19:20:34.627Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-21T19:20:34.640Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-21T19:20:34.746Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:09:11.540Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:09:11.935Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:09:18.311Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:09:18.351Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:12:54.217Z] [LOG] [DEBUG] - Topic is available: w
+[2025-07-23T11:12:54.652Z] [LOG] [DEBUG] - Topic is available: wh
+[2025-07-23T11:12:55.054Z] [LOG] [DEBUG] - Topic is available: wha
+[2025-07-23T11:12:55.600Z] [LOG] [DEBUG] - Topic is available: what
+[2025-07-23T11:12:55.860Z] [LOG] [DEBUG] - Topic is available: what 
+[2025-07-23T11:12:56.362Z] [LOG] [DEBUG] - Topic is available: what i
+[2025-07-23T11:12:57.593Z] [LOG] [DEBUG] - Topic is available: what is
+[2025-07-23T11:12:58.186Z] [LOG] [DEBUG] - Topic is available: what is 
+[2025-07-23T11:13:00.874Z] [LOG] [DEBUG] - Topic is available: what is j
+[2025-07-23T11:13:01.328Z] [LOG] [DEBUG] - Topic is available: what is ja
+[2025-07-23T11:13:01.847Z] [LOG] [DEBUG] - Topic is available: what is jav
+[2025-07-23T11:13:02.226Z] [LOG] [DEBUG] - Topic is available: what is java
+[2025-07-23T11:13:03.184Z] [LOG] [DEBUG] - Topic is available: what is javas
+[2025-07-23T11:13:03.466Z] [LOG] [DEBUG] - Topic is available: what is javasc
+[2025-07-23T11:13:04.291Z] [LOG] [DEBUG] - Topic is available: what is javascr
+[2025-07-23T11:13:05.230Z] [LOG] [DEBUG] - Topic is available: what is javascri
+[2025-07-23T11:13:05.554Z] [LOG] [DEBUG] - Topic is available: what is javascrip
+[2025-07-23T11:13:06.079Z] [LOG] [DEBUG] - Topic is available: what is javascript
+[2025-07-23T11:15:00.839Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:15:01.157Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:15:01.160Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:15:01.513Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:15:17.265Z] [LOG] [DEBUG] - Topic is available: what is javascript
+[2025-07-23T11:18:32.839Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:18:32.845Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:18:40.799Z] [LOG] [DEBUG] - Topic is available: what is javascript
+[2025-07-23T11:19:28.334Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:19:28.679Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:19:28.746Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:19:28.814Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:19:36.730Z] [LOG] [DEBUG] - Topic is available: what is javascript
+[2025-07-23T11:20:50.376Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:20:50.390Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T11:22:53.843Z] [LOG] [DEBUG] - Topic is available: what is javascript
+[2025-07-23T11:23:22.119Z] [LOG] [DEBUG] - New Blog saved as draft. Title: what is javascript
+[2025-07-23T11:23:29.651Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascript
+[2025-07-23T11:23:30.087Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascript
+[2025-07-23T11:23:39.152Z] [LOG] [DEBUG] - Blog saved as draft. Title: what is javascript
+[2025-07-23T11:24:04.972Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascript
+[2025-07-23T11:24:05.073Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascript
+[2025-07-23T11:51:38.064Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:51:38.237Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:52:25.334Z] [LOG] [DEBUG] - Searching for blog: qwFVe
+[2025-07-23T11:52:25.404Z] [LOG] [INFO] - Blog: qwe fetched. Content size is: 0.03125 KB
+[2025-07-23T11:52:25.404Z] [LOG] [INFO] - Blog: qwe fetched. Content size is: 0.03125 KB
+[2025-07-23T11:52:25.405Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-07-23T11:52:25.728Z] [LOG] [DEBUG] - Searching for blog: qwFVe
+[2025-07-23T11:52:25.804Z] [LOG] [INFO] - Blog: qwe fetched. Content size is: 0.03125 KB
+[2025-07-23T11:52:25.804Z] [LOG] [INFO] - Blog: qwe fetched. Content size is: 0.03125 KB
+[2025-07-23T11:52:25.805Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-07-23T11:52:29.957Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T11:52:30.081Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:00:02.218Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:00:02.349Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:00:10.561Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:00:10.719Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:01:10.058Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:01:10.190Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:01:27.603Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:01:27.707Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:01:37.982Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:01:38.095Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:04:00.329Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:04:00.459Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:08:38.628Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:08:38.709Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:10:28.021Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:10:28.028Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:11:24.904Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:11:27.015Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:11:27.430Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:11:27.467Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:11:27.505Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:11:55.154Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:12:00.112Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:12:03.126Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:12:04.854Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:12:13.374Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:12:52.490Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:13:22.755Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:15:00.121Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:15:10.109Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:15:24.157Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:15:24.165Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:15:24.582Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:15:24.932Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:16:08.232Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:16:08.564Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:16:08.570Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:16:08.618Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:16:11.995Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:16:12.328Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:16:12.339Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:16:12.391Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:16:15.019Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:16:15.066Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:16:47.598Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:16:47.882Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:16:49.511Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:16:49.847Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:16:49.848Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:16:49.887Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:17:13.998Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:17:14.335Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:17:14.344Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:17:14.692Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:18:27.128Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:18:27.253Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:18:27.450Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:18:27.806Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:18:42.245Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:19:02.097Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:19:06.104Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:19:44.080Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:19:49.764Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:19:49.764Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:19:49.764Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:19:51.751Z] [LOG] [DEBUG] - Topic is available: what is javascripte
+[2025-07-23T12:19:51.766Z] [LOG] [DEBUG] - Topic is available: what is javascriptew
+[2025-07-23T12:20:54.993Z] [LOG] [DEBUG] - New Blog saved as draft. Title: what is javascriptew
+[2025-07-23T12:21:03.367Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascriptew
+[2025-07-23T12:21:03.623Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascriptew
+[2025-07-23T12:26:13.190Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascriptew
+[2025-07-23T12:26:14.334Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascriptew
+[2025-07-23T12:26:14.398Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascriptew
+[2025-07-23T12:26:17.585Z] [LOG] [DEBUG] - Topic is available: what is javascripte
+[2025-07-23T12:26:18.022Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:26:18.022Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:26:18.022Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:26:19.061Z] [LOG] [DEBUG] - Topic is available: what is javascript 
+[2025-07-23T12:26:19.162Z] [LOG] [DEBUG] - Topic is available: what is javascript a
+[2025-07-23T12:26:19.369Z] [LOG] [DEBUG] - Topic is available: what is javascript an
+[2025-07-23T12:26:19.433Z] [LOG] [DEBUG] - Topic is available: what is javascript and
+[2025-07-23T12:26:19.566Z] [LOG] [DEBUG] - Topic is available: what is javascript and 
+[2025-07-23T12:26:19.874Z] [LOG] [DEBUG] - Topic is available: what is javascript and h
+[2025-07-23T12:26:20.085Z] [LOG] [DEBUG] - Topic is available: what is javascript and ho
+[2025-07-23T12:26:20.237Z] [LOG] [DEBUG] - Topic is available: what is javascript and how
+[2025-07-23T12:26:20.402Z] [LOG] [DEBUG] - Topic is available: what is javascript and how 
+[2025-07-23T12:26:21.106Z] [LOG] [DEBUG] - Topic is available: what is javascript and how i
+[2025-07-23T12:26:21.446Z] [LOG] [DEBUG] - Topic is available: what is javascript and how it
+[2025-07-23T12:26:21.450Z] [LOG] [DEBUG] - Topic is available: what is javascript and how it 
+[2025-07-23T12:26:21.755Z] [LOG] [DEBUG] - Topic is available: what is javascript and how it i
+[2025-07-23T12:26:21.822Z] [LOG] [DEBUG] - Topic is available: what is javascript and how it is 
+[2025-07-23T12:26:21.824Z] [LOG] [DEBUG] - Topic is available: what is javascript and how it is
+[2025-07-23T12:28:33.248Z] [LOG] [DEBUG] - Topic is available: what is javascript and how it is 
+[2025-07-23T12:28:33.522Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascriptew
+[2025-07-23T12:28:37.811Z] [LOG] [ERROR] - Error searching published blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:37.811Z] [LOG] [ERROR] - Error searching published blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:37.811Z] [LOG] [ERROR] - Error searching published blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:37.815Z] [LOG] [ERROR] - Error searching pending review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:37.815Z] [LOG] [ERROR] - Error searching pending review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:37.815Z] [LOG] [ERROR] - Error searching pending review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.097Z] [LOG] [ERROR] - Error searching under review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.097Z] [LOG] [ERROR] - Error searching under review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.097Z] [LOG] [ERROR] - Error searching under review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.102Z] [LOG] [ERROR] - Error searching awaiting author blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.105Z] [LOG] [ERROR] - Error searching published blogs:BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.102Z] [LOG] [ERROR] - Error searching awaiting author blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.105Z] [LOG] [ERROR] - Error searching published blogs:BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.102Z] [LOG] [ERROR] - Error searching awaiting author blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.105Z] [LOG] [ERROR] - Error searching published blogs:BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.178Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:28:38.422Z] [LOG] [ERROR] - Error searching published blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.422Z] [LOG] [ERROR] - Error searching published blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.422Z] [LOG] [ERROR] - Error searching published blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.425Z] [LOG] [ERROR] - Error searching pending review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.427Z] [LOG] [ERROR] - Error searching under review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.425Z] [LOG] [ERROR] - Error searching pending review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.427Z] [LOG] [ERROR] - Error searching under review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.425Z] [LOG] [ERROR] - Error searching pending review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.427Z] [LOG] [ERROR] - Error searching under review blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.455Z] [LOG] [ERROR] - Error searching awaiting author blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.455Z] [LOG] [ERROR] - Error searching awaiting author blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.455Z] [LOG] [ERROR] - Error searching awaiting author blogs: BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.486Z] [LOG] [ERROR] - Error searching published blogs:BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.486Z] [LOG] [ERROR] - Error searching published blogs:BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.486Z] [LOG] [ERROR] - Error searching published blogs:BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+[2025-07-23T12:28:38.775Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:28:40.621Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascriptew
+[2025-07-23T12:28:41.006Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascriptew
+[2025-07-23T12:28:43.595Z] [LOG] [DEBUG] - Topic is available: what is javascripte
+[2025-07-23T12:28:43.672Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:28:43.672Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:28:43.672Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T12:28:45.035Z] [LOG] [DEBUG] - Topic is available: what is javascript?
+[2025-07-23T12:28:45.447Z] [LOG] [DEBUG] - Topic is available: what is javascript? 
+[2025-07-23T12:28:45.781Z] [LOG] [DEBUG] - Topic is available: what is javascript? w
+[2025-07-23T12:28:45.915Z] [LOG] [DEBUG] - Topic is available: what is javascript? wh
+[2025-07-23T12:28:46.074Z] [LOG] [DEBUG] - Topic is available: what is javascript? wha
+[2025-07-23T12:28:46.163Z] [LOG] [DEBUG] - Topic is available: what is javascript? what 
+[2025-07-23T12:28:46.164Z] [LOG] [DEBUG] - Topic is available: what is javascript? what
+[2025-07-23T12:28:46.940Z] [LOG] [DEBUG] - Topic is available: what is javascript? what is
+[2025-07-23T12:28:46.942Z] [LOG] [DEBUG] - Topic is available: what is javascript? what i
+[2025-07-23T12:28:46.949Z] [LOG] [DEBUG] - Topic is available: what is javascript? what is 
+[2025-07-23T12:28:47.184Z] [LOG] [DEBUG] - Topic is available: what is javascript? what is c
+[2025-07-23T12:28:47.318Z] [LOG] [DEBUG] - Topic is available: what is javascript? what is cs
+[2025-07-23T12:28:47.431Z] [LOG] [DEBUG] - Topic is available: what is javascript? what is css
+[2025-07-23T12:29:12.720Z] [LOG] [DEBUG] - Blog saved as draft. Title: what is javascript? what is css
+[2025-07-23T12:29:52.141Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascript? what is css
+[2025-07-23T12:29:52.407Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:29:52.440Z] [LOG] [DEBUG] - Blog opened in Edit mode. Blog title: what is javascript? what is css
+[2025-07-23T12:29:52.756Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T12:33:06.496Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T12:33:06.524Z] [LOG] [DEBUG] - Topic is available: 

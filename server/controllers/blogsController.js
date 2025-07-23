@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
 const pako = require("pako");
 const sendEmail = require("../services/mailer");
+const {GoogleGenAI}= require("@google/genai")
 const logger = require("./../utils/Logging/logs.js");
 
 // const Reviewer= require("../models/Reviewer.js");
@@ -546,6 +547,27 @@ exports.createNewBlog = async (req, res) => {
       .json({ error: "An error occurred while creating the post" });
   }
 };
+
+exports.createNewAIBlog = async (req, res) => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
+
+     const prompt = `Write a blog in HTML format for the title: "${req.body.title}". 
+    Use proper HTML tags like <h1>, <p>, <ul>, <li>, <strong>, etc. 
+    Do NOT include <html>, <head>, or <body> tags. Only the content inside.`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: prompt,
+  });
+  const data= response.text;
+  // console.log(data);
+  res.json(data);
+  } catch (error) {
+    console.log("Error generating AI blog:", error);
+  }
+}
+
 
 exports.editBlog = async (req, res) => {
   try {

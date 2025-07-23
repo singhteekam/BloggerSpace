@@ -1,75 +1,37 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Container,
   Card,
-  Spinner,
-  ListGroup,
   Badge,
-  Button,
   Row,
   InputGroup,
   Form,
-  FormControl,
   Col,
 } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import Select from "react-select";
-import blogCategory from "utils/blogCategory.json";
-import blogTags from "utils/blogTags.json";
-
 import { FaEye, FaHeart } from "react-icons/fa";
+import "styles/style.css"; // Assuming you have a CSS file for styles
 import PreLoader from "utils/PreLoader";
-import { toast, ToastContainer } from "react-toastify";
-
-// import { useDispatch, useSelector } from "react-redux";
-// import { fetchAllBlog } from "redux/slice/allblog";
+import { useBlogs } from "contexts/BlogContext";
 
 const blogItemVariant = {
   hover: {
-    // scale: 1.1,
     fontWeight: "bold",
-    // originX: 0,
-    // textShadow:"0px 0px 8px rgb(255,255,255)",
-    // boxShadow:"0px 0px 8px rgb(255,255,255)",
     transition: {
       type: "spring",
       stiffness: 300,
-      yoyo: Infinity, // We can give any value like 100 etc
+      yoyo: Infinity,
     },
   },
 };
 
 const AllBlogs = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [filterCategory, setFilterCategory] = useState("");
+  const { blogs, loading } = useBlogs();
+
   const [searchTerm, setSearchTerm] = useState("");
-
-  const navigate = useNavigate();
-
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const limit = 6;
-
-  // const dispatch= useDispatch();
-  // const state= useSelector((state)=>state.allblog);
-  // console.log("State",state)
-
-  const fetchBlogs = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `/api/blogs/allblogs?page=${page}&limit=${limit}`
-      );
-      setBlogs(response.data.blogs);
-      setTotal(response.data.total);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching Blogs:", error);
-    }
-  };
 
   const filteredBlogs = useMemo(() => {
     return blogs.filter((blog) =>
@@ -77,27 +39,15 @@ const AllBlogs = () => {
     );
   }, [blogs, searchTerm]);
 
-  const fetchBlogsByCategory = async (filterCategory) => {
-    console.log(filterCategory);
-    try {
-      const response = await axios.get(
-        `/api/blogs/allblogs/category/${filterCategory}?page=${page}&limit=${limit}`
-      );
-      setBlogs(response.data.blogs);
-      setTotal(response.data.total);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching Blogs:", error);
-    }
-  };
+  const totalPages = Math.ceil(filteredBlogs.length / limit);
+  const currentBlogs = useMemo(() => {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    return filteredBlogs.slice(startIndex, endIndex);
+  }, [filteredBlogs, page]);
 
-  useEffect(() => {
-    if (filterCategory) fetchBlogsByCategory();
-    else fetchBlogs();
-  }, [page]);
-
-  if (isLoading) {
-    return <PreLoader isLoading={isLoading} />;
+  if (loading) {
+    return <PreLoader isLoading={loading} />;
   }
 
   const prePage = () => {
@@ -116,7 +66,6 @@ const AllBlogs = () => {
     }
   };
 
-  const totalPages = Math.ceil(total / limit);
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
 
   return (
@@ -125,164 +74,125 @@ const AllBlogs = () => {
         <h3 className="page-title">Blogs</h3>
         <div className="heading-underline"></div>
         <i>
-          Showing total results: {total}, Page {page} of {totalPages}
+          Showing total results: {filteredBlogs.length}, Page {page} of{" "}
+          {totalPages}
         </i>
-        <div>
-          <InputGroup className="mb-3">
-            <InputGroup.Text>Search by title</InputGroup.Text>
-            <Form.Control placeholder="Search any blog..." onChange={(e) => setSearchTerm(e.target.value)} aria-label="First name" />
-          </InputGroup>
-          {/* <b>Filter by category: </b>
-          <Select
-            className="react-select-dropdown m-1"
-            defaultValue={filterCategory}
-            onChange={setFilterCategory}
-            options={blogCategory}
+
+        <InputGroup className="mb-3">
+          <InputGroup.Text>Search by title</InputGroup.Text>
+          <Form.Control
+            placeholder="Search any blog..."
+            onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="Search"
           />
+        </InputGroup>
 
-          <Button
-            variant="success"
-            size="sm"
-            onClick={() => fetchBlogsByCategory(filterCategory.value)}
-            disabled
-          >
-            Search
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            className="mx-2"
-            onClick={() => {
-              setFilterCategory(null);
-              fetchBlogs();
-            }}
-          >
-            Reset
-          </Button> */}
-        </div>
-
-        {blogs?.length === 0 ? (
+        {currentBlogs.length === 0 ? (
           <div>No blogs found</div>
         ) : (
-          <>
-            <Row className="m-3">
-              {filteredBlogs?.map((blog) => (
-                <Col md={4}>
-                  <div key={blog.slug} className="mb-2 border blogitem">
-                    <motion.div
-                      variants={blogItemVariant}
-                      whileHover="hover"
-                      className="row align-items-center"
+          <Row className="m-3">
+            {currentBlogs.map((blog) => (
+              <Col md={4} key={blog.slug}>
+                <div className="mb-2 border blogitem">
+                  <motion.div
+                    variants={blogItemVariant}
+                    whileHover="hover"
+                    className="row align-items-center"
+                  >
+                    <Link
+                      to={`/${blog.slug}`}
+                      style={{ textDecoration: "none" }}
+                      onClick={() =>
+                        window.scrollTo({ top: 0, behavior: "smooth" })
+                      }
                     >
-                      <Link
-                        to={`/${blog.slug}`}
-                        // target="_blank"
-                        style={{ textDecoration: "none" }}
-                        onClick={() =>
-                          window.scrollTo({ top: 0, behavior: "smooth" })
-                        }
-                      >
-                        <Card className="blogcard bgcolor-mint">
-                          <div class="blogcard-container">
-                            {/* <img
-                              src="carousel_img1.png"
-                              alt="Image"
-                              className="blogcard-container-img"
-                            /> */}
-                            <div className="blogcard-container-img bgcolor-teal-green"></div>
-                            <div class="blogcard-container-text">
-                              {blog.category}
-                            </div>
+                      <Card className="blogcard bgcolor-mint">
+                        <div className="blogcard-container">
+                          <div className="blogcard-container-img bgcolor-teal-green"></div>
+                          <div className="blogcard-container-text">
+                            {blog.category}
                           </div>
-                          <Card.Body>
-                            <h6>{blog.title}</h6>
-                            {/* <div className="underline"></div> */}
-                            {blog.tags &&
-                              blog.tags.map((tag) => (
-                                <Badge
-                                  key={tag}
-                                  pill
-                                  bg="secondary"
-                                  className="mx-1"
-                                >
-                                  {tag}
-                                </Badge>
-                              ))}
-                            <p>
-                              {blog.status === "ADMIN_PUBLISHED" ? (
-                                <i className="text-muted">Author: ADMIN</i>
-                              ) : (
-                                <i className="text-muted">
-                                  Author: {blog.authorDetails?.userName}
-                                </i>
-                              )}
-                              <br />
+                        </div>
+                        <Card.Body>
+                          <h6>{blog.title}</h6>
+                          {blog.tags &&
+                            blog.tags.map((tag) => (
+                              <Badge
+                                key={tag}
+                                pill
+                                bg="secondary"
+                                className="mx-1"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          <p>
+                            {blog.status === "ADMIN_PUBLISHED" ? (
+                              <i className="text-muted">Author: ADMIN</i>
+                            ) : (
                               <i className="text-muted">
-                                Last Updated: {blog.lastUpdatedAt.slice(11, 19)}
-                                , {blog.lastUpdatedAt.slice(0, 10)}
+                                Author: {blog.authorDetails?.userName}
                               </i>
-                              <br />
-                              <FaEye className="color-teal-green" />{" "}
-                              <span className="color-teal-green">
-                                {blog.blogViews}
-                                {"  "}
-                              </span>
-                              <FaHeart className="color-teal-green" />{" "}
-                              <span className="color-teal-green">
-                                {blog.blogLikes.length}
-                              </span>
-                            </p>
-                          </Card.Body>
-                        </Card>
-                      </Link>
-                    </motion.div>
-                  </div>
-                </Col>
-              ))}
-
-              <nav>
-                <ul className="pagination">
-                  <li className="page-item">
-                    <button className="page-link" onClick={prePage}>
-                      Prev
-                    </button>
-                  </li>
-                  {numbers.slice(0, 3).map((n, i) => (
-                    <li
-                      className={`page-item ${page === n ? "active" : ""}`}
-                      key={i}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() => changeCPage(n)}
-                      >
-                        {n}
-                      </button>
-                    </li>
-                  ))}
-                  <li className="page-item">
-                    <button className="page-link">...</button>
-                  </li>
-                  <li className="page-item">
-                    <button
-                      className="page-link"
-                      onClick={() => changeCPage(totalPages)}
-                    >
-                      {totalPages}
-                    </button>
-                  </li>
-                  <li className="page-item">
-                    <button className="page-link" onClick={nextPage}>
-                      Next
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-
-              {/* <Link to={"/sitemap"}>Show more</Link> */}
-            </Row>
-          </>
+                            )}
+                            <br />
+                            <i className="text-muted">
+                              Last Updated: {blog.lastUpdatedAt.slice(11, 19)},
+                              {blog.lastUpdatedAt.slice(0, 10)}
+                            </i>
+                            <br />
+                            <FaEye className="color-teal-green" />{" "}
+                            <span className="color-teal-green">
+                              {blog.blogViews}
+                            </span>
+                            <FaHeart className="color-teal-green" />{" "}
+                            <span className="color-teal-green">
+                              {blog.blogLikes.length}
+                            </span>
+                          </p>
+                        </Card.Body>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                </div>
+              </Col>
+            ))}
+          </Row>
         )}
+
+        {/* Pagination */}
+        <nav>
+          <ul className="pagination">
+            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+              <button
+                className="page-link"
+                onClick={prePage}
+                disabled={page === 1}
+              >
+                Prev
+              </button>
+            </li>
+
+            {numbers.map((n) => (
+              <li className={`page-item ${page === n ? "active" : ""}`} key={n}>
+                <button className="page-link" onClick={() => changeCPage(n)}>
+                  {n}
+                </button>
+              </li>
+            ))}
+
+            <li
+              className={`page-item ${page === totalPages ? "disabled" : ""}`}
+            >
+              <button
+                className="page-link"
+                onClick={nextPage}
+                disabled={page === totalPages}
+              >
+                Next
+              </button>
+            </li>
+          </ul>
+        </nav>
       </Container>
     </section>
   );

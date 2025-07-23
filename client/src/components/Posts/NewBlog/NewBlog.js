@@ -24,6 +24,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Select from "react-select";
 
 import { AuthContext } from "contexts/AuthContext";
+import { MdStars } from "react-icons/md";
 
 import PreLoader from "utils/PreLoader";
 import FileUpload from "./FileUpload";
@@ -36,7 +37,7 @@ const NewBlog = () => {
   const [author, setAuthor] = useState("");
   const [authorEmail, setAuthorEmail] = useState("");
   const [category, setCategory] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState("<p></p>");
   const [otherCategory, setOtherCategory] = useState(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [tags, setTags] = useState([]);
@@ -254,6 +255,30 @@ const NewBlog = () => {
     console.log("All tags: ", tags);
   };
 
+  const handleAIGenerate = async () => {
+    if (!title) {
+      toast.error("Please enter a title before generating content.");
+      return;
+    }
+    toast.info("Generating content with AI...");
+    try {
+      const response = await axios.post(
+        `/api/blogs/generateblog?userId=${authorId}`,
+        {
+          title,
+          author,
+        }
+      );
+      console.log("AI Generated Content: ", response.data);
+      setContent(response.data);
+      setSlug(slugify(title.trim()));
+      toast.success("Content generated successfully!");
+    } catch (error) {
+      console.error("Error generating content:", error);
+      toast.error("Failed to generate content. Please try again.");
+    }
+  };
+
   if (loading) {
     return <PreLoader isLoading={loading} />;
   }
@@ -307,6 +332,9 @@ const NewBlog = () => {
               )
             ) : null}
           </Form.Group>
+          <Button className="m-1 " onClick={handleAIGenerate}>
+            <MdStars /> Generate with AI
+          </Button>
 
           <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey="0">
@@ -446,8 +474,9 @@ const NewBlog = () => {
             {/* <TinymceEditor content={content} onContentChange={setContent}  /> */}
 
             <CKEditor
+              // key={content}
               editor={Editor}
-              data="<p></p>"
+              data={content}
               onChange={(event, editor) => {
                 setContent(editor.getData());
               }}

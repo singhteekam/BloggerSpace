@@ -303,6 +303,47 @@ html {
     z-index: 2;
   }
 
+  .pagination {
+  display: flex;
+  justify-content: center; /* centers the pagination */
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.page-item {
+  margin: 0 2px; /* spacing between page items */
+}
+
+.page-link {
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background-color: #fff;
+  color: var(--color-teal-green);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.page-link:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-item.active .page-link {
+  background-color: var(--color-teal-green);;
+  color: white;
+  border-color: var(--color-teal-green);;
+}
+
+.page-item.disabled .page-link {
+  color: #ccc;
+  background-color: #f9f9f9;
+  border-color: #ddd;
+}
+
+
 
   /*=============*/
 /*  ViewBlog  */

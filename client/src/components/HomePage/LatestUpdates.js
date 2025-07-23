@@ -21,6 +21,13 @@ export const LatestUpdates= [
         link: null,
     },
     {
+        title: "Generate with AI",
+        description: "Write a blog with the help of AI. Just enter the title and it will generate the content for you.",
+        image: img1,
+        linkTitle:"",
+        link: null,
+    },
+    {
         title: "Explore Reviewer Panel",
         description: "If you want to review blogs written by other authors then register yourself as Reviewer.",
         image: img1,

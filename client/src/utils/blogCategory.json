@@ -512,6 +512,10 @@
     "label": "Networking"
   },
   {
+    "value": "Next.js",
+    "label": "Next.js"
+  }, 
+  {
     "value": "Node.js",
     "label": "Node.js"
   },
@@ -546,6 +550,10 @@
   {
     "value": "Penetration Testing",
     "label": "Penetration Testing"
+  },
+  {
+    "value": "Personal Development",
+    "label": "Personal Development"
   },
   {
     "value": "Philosophy",
