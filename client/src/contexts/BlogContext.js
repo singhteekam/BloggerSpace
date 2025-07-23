@@ -12,7 +12,14 @@ export const BlogProvider = ({ children }) => {
   const fetchAllBlogs = async () => {
     try {
       const response = await axios.get("/api/blogs/fetchallblogs");
-      setBlogs(response.data.blogs);
+
+      const blogs = response.data.blogs;
+
+      blogs.sort(
+        (a, b) => new Date(b.lastUpdatedAt) - new Date(a.lastUpdatedAt)
+      );
+
+      setBlogs(blogs);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching all blogs:", error);

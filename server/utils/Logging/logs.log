@@ -1175,3 +1175,54 @@
 [2025-07-23T12:46:50.084Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
 [2025-07-23T12:46:50.100Z] [LOG] [DEBUG] - Topic is available: 
 [2025-07-23T12:46:50.483Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-07-23T13:19:33.031Z] [LOG] [DEBUG] - Searching for blog: what-is-nodejs
+[2025-07-23T13:19:33.513Z] [LOG] [INFO] - Blog: What is Node.js? fetched. Content size is: 0.80859375 KB
+[2025-07-23T13:19:33.513Z] [LOG] [INFO] - Blog: What is Node.js? fetched. Content size is: 0.80859375 KB
+[2025-07-23T13:19:33.514Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-07-23T13:19:33.840Z] [LOG] [DEBUG] - Searching for blog: what-is-nodejs
+[2025-07-23T13:19:33.950Z] [LOG] [INFO] - Blog: What is Node.js? fetched. Content size is: 0.80859375 KB
+[2025-07-23T13:19:33.950Z] [LOG] [INFO] - Blog: What is Node.js? fetched. Content size is: 0.80859375 KB
+[2025-07-23T13:19:33.951Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-07-23T13:28:23.917Z] [LOG] [DEBUG] - Searching for blog: what-is-nodejs
+[2025-07-23T13:28:23.984Z] [LOG] [INFO] - Blog: What is Node.js? fetched. Content size is: 0.80859375 KB
+[2025-07-23T13:28:23.984Z] [LOG] [INFO] - Blog: What is Node.js? fetched. Content size is: 0.80859375 KB
+[2025-07-23T13:28:23.985Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-07-23T13:28:24.301Z] [LOG] [DEBUG] - Searching for blog: what-is-nodejs
+[2025-07-23T13:28:24.386Z] [LOG] [INFO] - Blog: What is Node.js? fetched. Content size is: 0.80859375 KB
+[2025-07-23T13:28:24.386Z] [LOG] [INFO] - Blog: What is Node.js? fetched. Content size is: 0.80859375 KB
+[2025-07-23T13:28:24.386Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-07-23T23:22:40.063Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T23:22:40.077Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T23:23:41.794Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T23:24:02.901Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T23:24:02.908Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T23:24:13.322Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T23:24:13.322Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T23:24:13.322Z] [LOG] [ERROR] - Topic is not avaialable: what is javascript
+[2025-07-23T23:24:16.793Z] [LOG] [DEBUG] - Topic is available: what is javascrip
+[2025-07-23T23:24:17.334Z] [LOG] [DEBUG] - Topic is available: what is javascri
+[2025-07-23T23:24:17.356Z] [LOG] [DEBUG] - Topic is available: what is javascr
+[2025-07-23T23:24:17.702Z] [LOG] [DEBUG] - Topic is available: what is javasc
+[2025-07-23T23:24:17.709Z] [LOG] [DEBUG] - Topic is available: what is javas
+[2025-07-23T23:24:17.730Z] [LOG] [DEBUG] - Topic is available: what is java
+[2025-07-23T23:24:18.080Z] [LOG] [DEBUG] - Topic is available: what is jav
+[2025-07-23T23:24:18.102Z] [LOG] [DEBUG] - Topic is available: what is ja
+[2025-07-23T23:24:18.447Z] [LOG] [DEBUG] - Topic is available: what is j
+[2025-07-23T23:24:18.454Z] [LOG] [DEBUG] - Topic is available: what is 
+[2025-07-23T23:24:18.477Z] [LOG] [DEBUG] - Topic is available: what is
+[2025-07-23T23:24:19.059Z] [LOG] [DEBUG] - Topic is available: what ish
+[2025-07-23T23:24:19.349Z] [LOG] [DEBUG] - Topic is available: what isht
+[2025-07-23T23:24:19.692Z] [LOG] [DEBUG] - Topic is available: what ishtm
+[2025-07-23T23:24:19.962Z] [LOG] [DEBUG] - Topic is available: what ishtml
+[2025-07-23T23:24:43.082Z] [LOG] [DEBUG] - Topic is available: what ishtml 
+[2025-07-23T23:24:44.486Z] [LOG] [DEBUG] - Topic is available: what is html 
+[2025-07-23T23:26:21.192Z] [LOG] [DEBUG] - Topic is available: what is html 
+[2025-07-23T23:26:22.238Z] [LOG] [DEBUG] - Topic is available: what is html 
+[2025-07-23T23:26:32.387Z] [LOG] [DEBUG] - Topic is available: what is html 
+[2025-07-23T23:26:47.135Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T23:26:47.563Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T23:30:04.223Z] [LOG] [DEBUG] - Topic is available: w
+[2025-07-23T23:30:09.966Z] [LOG] [DEBUG] - Topic is available: ww
+[2025-07-23T23:30:59.256Z] [LOG] [DEBUG] - Topic is available: www
+[2025-07-23T23:40:29.214Z] [LOG] [DEBUG] - Topic is available: 
+[2025-07-23T23:40:29.250Z] [LOG] [DEBUG] - Topic is available: 

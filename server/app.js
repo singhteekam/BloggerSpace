@@ -10,8 +10,8 @@ const path = require("path");
 
 const functions = require("firebase-functions");
 
-require("dotenv").config(); // Load environment variables from .env file - Production mode
-// require("dotenv").config({ path: ".env.local" }); // development mode
+// require("dotenv").config(); // Load environment variables from .env file - Production mode
+require("dotenv").config({ path: ".env.local" }); // development mode
 
 const PORT = process.env.PORT || 5000; // For development
 // const PORT = 8183;  // For production
