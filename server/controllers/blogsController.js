@@ -557,7 +557,7 @@ exports.createNewAIBlog = async (req, res) => {
     Do NOT include <html>, <head>, or <body> tags. Only the content inside.`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     contents: prompt,
   });
   const data= response.text;

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect,useMemo, useState } from "react";
 import {
   Container,
   Card,
@@ -31,19 +31,49 @@ const AllBlogs = () => {
   const { blogs, loading } = useBlogs();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [filterValue, setFilterValue] = useState("");
+
   const [page, setPage] = useState(1);
   const limit = 6;
 
+  // let filteredBlogs = useMemo(() => {
+  //   setPage(1); // Reset to first page on search
+  //   if (!searchTerm) return blogs;
+  //   return blogs.filter((blog) =>
+  //     blog.title.toLowerCase().includes(searchTerm.toLowerCase())
+  //   );
+  // }, [blogs, searchTerm]);
+
+  useEffect(() => {
+  setPage(1);
+}, [searchTerm, filterType, filterValue]);
+
+
   let filteredBlogs = useMemo(() => {
-    setPage(1); // Reset to first page on search
-    if (!searchTerm) return blogs;
-    return blogs.filter((blog) =>
-      blog.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [blogs, searchTerm]);
+    //setPage(1); // reset pagination
+
+    return blogs.filter((blog) => {
+      const matchesSearch = blog.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+      const matchesCategory =
+        filterType === "category" && filterValue
+          ? blog.category === filterValue
+          : true;
+
+      const matchesTag =
+        filterType === "tag" && filterValue
+          ? blog.tags?.includes(filterValue)
+          : true;
+
+      return matchesSearch && matchesCategory && matchesTag;
+    });
+  }, [blogs, searchTerm, filterType, filterValue]);
 
   const totalPages = Math.ceil(filteredBlogs.length / limit);
-   filteredBlogs = useMemo(() => {
+  filteredBlogs = useMemo(() => {
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     return filteredBlogs.slice(startIndex, endIndex);
@@ -113,6 +143,52 @@ const AllBlogs = () => {
           />
         </InputGroup>
 
+        <Row className="mb-3 align-items-center">
+          <Col md={6}>
+            <InputGroup>
+              <InputGroup.Text>Filter Type</InputGroup.Text>
+              <Form.Select
+                value={filterType}
+                onChange={(e) => {
+                  setFilterType(e.target.value);
+                  setFilterValue("");
+                }}
+              >
+                <option value="">Select Filter</option>
+                <option value="category">Filter by Category</option>
+                <option value="tag">Filter by Tag</option>
+              </Form.Select>
+            </InputGroup>
+          </Col>
+
+          {filterType && (
+            <Col md={6}>
+              <InputGroup>
+                <InputGroup.Text>
+                  {filterType === "category" ? "Category" : "Tag"}
+                </InputGroup.Text>
+                <Form.Select
+                  value={filterValue}
+                  onChange={(e) => setFilterValue(e.target.value)}
+                >
+                  <option value="">All</option>
+                  {[
+                    ...new Set(
+                      blogs.flatMap((b) =>
+                        filterType === "category" ? [b.category] : b.tags || []
+                      )
+                    ),
+                  ].map((val) => (
+                    <option key={val} value={val}>
+                      {val}
+                    </option>
+                  ))}
+                </Form.Select>
+              </InputGroup>
+            </Col>
+          )}
+        </Row>
+
         {filteredBlogs.length === 0 ? (
           <div>No blogs found</div>
         ) : (
@@ -142,16 +218,18 @@ const AllBlogs = () => {
                         <Card.Body>
                           <h6>{blog.title}</h6>
                           {blog.tags &&
-                            blog.tags.map((tag) => (
-                              <Badge
-                                key={tag}
-                                pill
-                                bg="secondary"
-                                className="mx-1"
-                              >
-                                {tag}
-                              </Badge>
-                            )).slice(0,2)}
+                            blog.tags
+                              .map((tag) => (
+                                <Badge
+                                  key={tag}
+                                  pill
+                                  bg="secondary"
+                                  className="mx-1"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))
+                              .slice(0, 2)}
                           <p>
                             {blog.status === "ADMIN_PUBLISHED" ? (
                               <i className="text-muted">Author: ADMIN</i>
