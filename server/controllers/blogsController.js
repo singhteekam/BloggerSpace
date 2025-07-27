@@ -136,7 +136,6 @@ exports.fetchAllBlogsFromDB = async (req, res) => {
       blogs,
     });
   } catch (error) {
-    logger.error("Error fetching blogs..:" + error);
     console.error("Error fetching blogs..:", error);
     res.status(500).json({ error: "Server error.." });
   }

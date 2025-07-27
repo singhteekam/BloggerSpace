@@ -42,11 +42,11 @@ import { useBlogs } from "contexts/BlogContext";
 import decompressBase64Content from "utils/decompressBase64Content";
 
 const ViewBlog = () => {
-  const { blogs } = useBlogs();
+  const { blogs, loading } = useBlogs();
   const { user, logout } = useContext(AuthContext);
   const { blogSlug } = useParams();
   const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [commentContent, setCommentContent] = useState("");
   const [replyCommentContent, setReplyCommentContent] = useState("");
   const [comments, setComments] = useState([]);
@@ -175,17 +175,17 @@ const ViewBlog = () => {
           ...prevBlog,
           content: decompressBase64Content(blog.content),
         }));
-        setLoading(false);
+        // setLoading(false);
       }
       const response = await axios.get(`/api/blogs/${blogSlug}`);
       // setBlog(response.data.blog);
       console.log("Blog fetched at: " + new Date());
       if (response.data.alreadyLiked === true) setThumbColor("solid");
 
-      setLoading(false);
+      // setLoading(false);
     } catch (error) {
       console.error("Error fetching Blog:", error);
-      setLoading(false);
+      // setLoading(false);
       // setNotFound(true);
     }
   };
@@ -406,7 +406,7 @@ const ViewBlog = () => {
       });
   };
 
-  if (blogs.length === 0 || loading || disableLikeButton) {
+  if ( loading) {
     return <PreLoader isLoading={loading} />;
   }
 
@@ -488,7 +488,7 @@ const ViewBlog = () => {
                     }
                   ></i>{" "}
                   {/* {blog?.likes.length} */}
-                  {blog?.blogLikes.length}
+                  {blog?.blogLikes?.length}
                   {isBlogSaved ? (
                     <IoBookmark
                       size="25px"
@@ -736,7 +736,7 @@ const ViewBlog = () => {
                         )}
                         <p className="mx-2">{comment?.content}</p>
                         <small
-                          style={{ cursor: "pointer" }}
+                          style={{ cursor: "pointer", }}
                           onClick={() => {
                             setShowReplyInput(comment?._id);
                             setReplyCommentContent(
@@ -754,7 +754,7 @@ const ViewBlog = () => {
                                 <li
                                   key={index}
                                   style={{ listStyleType: "none" }}
-                                  className="mt-2"
+                                  className="mt-3"
                                 >
                                   {nestedReply.replyCommentUser
                                     ?.profilePicture ? (
@@ -851,8 +851,7 @@ const ViewBlog = () => {
                                 <Button
                                   type="submit"
                                   size="sm"
-                                  variant="mt-2"
-                                  className="bs-button"
+                                  className="bs-button mt-2 mb-3"
                                 >
                                   Submit
                                 </Button>
