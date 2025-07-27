@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
 const pako = require("pako");
 const sendEmail = require("../services/mailer");
-const {GoogleGenAI}= require("@google/genai")
+const { GoogleGenAI } = require("@google/genai");
 const logger = require("./../utils/Logging/logs.js");
 
 // const Reviewer= require("../models/Reviewer.js");
@@ -125,7 +125,12 @@ exports.fetchAllBlogsFromDB = async (req, res) => {
   try {
     const blogs = await Blog.find({
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
-    }).populate("authorDetails").exec();
+    })
+      .populate("authorDetails")
+      .populate("blogLikes")
+      .populate("comments.user", "email userName profilePicture")
+      .populate("comments.commentReplies.replyCommentUser",  "email userName profilePicture")
+      .exec();
 
     res.json({
       blogs,
@@ -290,7 +295,8 @@ exports.viewBlogRoute = async (req, res) => {
     const blog = await Blog.findOne({
       slug: req.params.blogSlug,
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
-    }).populate("authorDetails")
+    })
+      .populate("authorDetails")
       // .populate("likes")
       .populate("blogLikes")
       // .populate("comments")
@@ -552,22 +558,21 @@ exports.createNewAIBlog = async (req, res) => {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
 
-     const prompt = `Write a blog in HTML format for the title: "${req.body.title}". 
+    const prompt = `Write a blog in HTML format for the title: "${req.body.title}". 
     Use proper HTML tags like <h1>, <p>, <ul>, <li>, <strong>, etc. 
     Do NOT include <html>, <head>, or <body> tags. Only the content inside.`;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-  });
-  const data= response.text;
-  // console.log(data);
-  res.json(data);
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+    const data = response.text;
+    // console.log(data);
+    res.json(data);
   } catch (error) {
     console.log("Error generating AI blog:", error);
   }
-}
-
+};
 
 exports.editBlog = async (req, res) => {
   try {
@@ -716,7 +721,7 @@ exports.postNewBlogComment = async (req, res) => {
 
     // Populate the user field with email and fullName
     // await blog.populate({ path: "comments.user", select: "email fullName" }).execPopulate();
-    await blog.populate("comments.user", "email userName");
+    await blog.populate("comments.user", "email userName profilePicture");
 
     // Get the newly added comment with user details
     const addedComment = blog.comments.findLast((comment) =>
@@ -727,16 +732,15 @@ exports.postNewBlogComment = async (req, res) => {
       return res.status(500).json({ message: "Failed to add comment" });
     }
 
-    const responseComment = {
-      _id: addedComment._id,
-      content: addedComment.content,
-      userEmail: addedComment.user.email,
-      userName: addedComment.user.userName,
-      userProfilePic: addedComment.user.profilePicture,
-    };
-
-    logger.debug("New comment added in blog: " + blogSlug);
-    res.json(responseComment);
+    const comments = blog.comments.map((comment) => ({
+      _id: comment._id,
+      content: comment.content,
+      userEmail: comment.user.email,
+      likes: comment.likes,
+      createdAt: addedComment.createdAt,
+    }));
+    console.log("Comments: ", comments);
+    res.json(comments);
   } catch (error) {
     console.error("Error adding comment:", error);
     logger.error("Error adding comment: " + error);
@@ -749,7 +753,7 @@ exports.postNewBlogReplyComment = async (req, res) => {
     const { blogSlug } = req.params;
     const { repliedToCommentId, replyCommentContent } = req.body;
 
-    const blog = await Blog.findOne({ slug: blogSlug });
+    const blog = await Blog.findOne({ slug: blogSlug })
 
     if (!blog) {
       logger.error("Blog not found  with blog: " + blogSlug);
@@ -772,8 +776,15 @@ exports.postNewBlogReplyComment = async (req, res) => {
     blog.comments[repliedToComment].commentReplies.push(newReplyComment);
     // console.log("Index2: "+ blog.comments[repliedToComment]);
     await blog.save();
+    await blog.populate("comments.commentReplies.replyCommentUser",  "email userName profilePicture")
 
-    res.json({ message: "Added reply to comment" });
+    const comments = blog.comments.map((comment) => ({
+      _id: comment._id,
+      content: comment.content,
+      userEmail: comment.user.email,
+      likes: comment.likes,
+    }));
+    res.json(comments);
   } catch (error) {
     console.error("Error adding comment:", error);
     logger.error("Error adding comment: " + error);
@@ -784,7 +795,7 @@ exports.postNewBlogReplyComment = async (req, res) => {
 exports.viewBlogComments = async (req, res) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.blogSlug })
-      .populate("comments.user", "email userName")
+      .populate("comments.user", "email userName profilePicture")
       .exec();
 
     if (!blog) {
@@ -800,6 +811,8 @@ exports.viewBlogComments = async (req, res) => {
       userEmail: comment.user.email,
       userName: comment.user.userName,
       likes: comment.likes,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
     }));
 
     res.json(comments);

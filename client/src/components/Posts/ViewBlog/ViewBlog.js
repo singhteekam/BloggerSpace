@@ -38,8 +38,11 @@ import { AuthContext } from "contexts/AuthContext";
 import MostViewedBlogs from "./MostViewedBlogs";
 import RelatedBlogs from "./RelatedBlogs";
 import { MdDownload } from "react-icons/md";
+import { useBlogs } from "contexts/BlogContext";
+import decompressBase64Content from "utils/decompressBase64Content";
 
 const ViewBlog = () => {
+  const { blogs } = useBlogs();
   const { user, logout } = useContext(AuthContext);
   const { blogSlug } = useParams();
   const [blog, setBlog] = useState(null);
@@ -60,7 +63,7 @@ const ViewBlog = () => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const token = localStorage.getItem("token");
-  const [userId, setUserId]= useState(user?._id);
+  const [userId, setUserId] = useState(user?._id);
 
   const navigate = useNavigate();
 
@@ -161,12 +164,21 @@ const ViewBlog = () => {
     fetchBlog();
     // fetchComments();
     fetchBlogViews();
-  }, [blogSlug]);
+  }, [blogSlug, blogs]);
 
   const fetchBlog = async () => {
     try {
+      const blog = blogs?.find((b) => b.slug === blogSlug);
+      if (blog) {
+        setBlog(blog);
+        setBlog((prevBlog) => ({
+          ...prevBlog,
+          content: decompressBase64Content(blog.content),
+        }));
+        setLoading(false);
+      }
       const response = await axios.get(`/api/blogs/${blogSlug}`);
-      setBlog(response.data.blog);
+      // setBlog(response.data.blog);
       console.log("Blog fetched at: " + new Date());
       if (response.data.alreadyLiked === true) setThumbColor("solid");
 
@@ -186,10 +198,19 @@ const ViewBlog = () => {
     }
 
     try {
-      const response = await axios.post(`/api/blogs/${blogSlug}/comments?userId=${userId}`, {
-        content: commentContent,
-      });
-      fetchBlog();
+      const response = await axios.post(
+        `/api/blogs/${blogSlug}/comments?userId=${userId}`,
+        {
+          content: commentContent,
+          userId: userId,
+        }
+      );
+      // fetchBlog();
+      console.log("Comment submitted at: ", response.data.content);
+      setBlog((prevBlog) => ({
+        ...prevBlog,
+        comments: response.data,
+      }));
       setCommentContent("");
       toast.success("Comment submitted!!");
     } catch (error) {
@@ -213,9 +234,16 @@ const ViewBlog = () => {
           replyCommentContent: replyCommentContent,
         }
       );
-      fetchBlog();
-      setReplyCommentContent("");
-      toast.success("Replied to comment!");
+      // fetchBlog();
+      // setBlog((prevBlog) => ({
+        //   ...prevBlog,
+        //   comments: response.data,
+        // }));
+        setReplyCommentContent("");
+        toast.success("Replied to comment!");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
     } catch (error) {
       toast.error("Error submitting comment!");
       console.error("Error submitting comment:", error);
@@ -230,9 +258,12 @@ const ViewBlog = () => {
     }
     try {
       setDisableLikeButton(true);
-      const response = await axios.post(`/api/blogs/bloglikes/${blog._id}?userId=${userId}`, {
-        thumbColor,
-      });
+      const response = await axios.post(
+        `/api/blogs/bloglikes/${blog._id}?userId=${userId}`,
+        {
+          thumbColor,
+        }
+      );
       setThumbColor(response.data.newThumbColor);
       setBlog((prevBlog) => ({
         ...prevBlog,
@@ -251,7 +282,7 @@ const ViewBlog = () => {
   };
 
   const handleCommentLike = async (commentId) => {
-    if (!userInfo) {
+    if (!user) {
       console.log("Inside if");
       navigate("/login");
       // return <LoginPageModal show={true} handleClose={null} />;
@@ -308,9 +339,11 @@ const ViewBlog = () => {
 
   const handleFollowUser = async (idToFollow) => {
     try {
-      console.log("Userid: ",userId);
+      console.log("Userid: ", userId);
       setDisableFollowButton(true);
-      const response = await axios.patch(`/api/users/follow/${idToFollow}?userId=${userId}`);
+      const response = await axios.patch(
+        `/api/users/follow/${idToFollow}?userId=${userId}`
+      );
       toast.success("Following.");
       console.log("Following....");
       setIsFollowing(true);
@@ -327,7 +360,9 @@ const ViewBlog = () => {
   const handleUnfollowUser = async (idToUnfollow) => {
     try {
       setDisableFollowButton(true);
-      const response = await axios.patch(`/api/users/unfollow/${idToUnfollow}?userId=${userId}`);
+      const response = await axios.patch(
+        `/api/users/unfollow/${idToUnfollow}?userId=${userId}`
+      );
       toast.success("Unfollowed.");
       console.log("Unfollowed....");
       setIsFollowing(false);
@@ -341,36 +376,37 @@ const ViewBlog = () => {
     }
   };
 
-  const handleDownloadBlog= async()=>{
-    const pdfData={
+  const handleDownloadBlog = async () => {
+    const pdfData = {
       title: blog.title,
       category: blog.category,
       lastUpdated: blog.lastUpdatedAt,
       tags: blog.tags,
-      content:stripHtmlTags(blog.content),
-      author: blog.authorDetails.fullName
-    }
+      content: stripHtmlTags(blog.content),
+      author: blog.authorDetails.fullName,
+    };
     console.log(pdfData);
-    axios.post('/api/blogs/downloadblog', pdfData, {
-      responseType: 'blob', // important to handle binary data (PDF file)
-    })
-    .then(response => {
-      // Create a Blob from the PDF data
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      
-      // Create a temporary link element to trigger the file download
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${blog.slug}.pdf`); // Specify file name
-      document.body.appendChild(link);
-      link.click(); // Trigger the download
-    })
-    .catch(error => {
-      console.error('Error generating PDF report', error);
-    });
-  }
+    axios
+      .post("/api/blogs/downloadblog", pdfData, {
+        responseType: "blob", // important to handle binary data (PDF file)
+      })
+      .then((response) => {
+        // Create a Blob from the PDF data
+        const url = window.URL.createObjectURL(new Blob([response.data]));
 
-  if (loading || disableLikeButton) {
+        // Create a temporary link element to trigger the file download
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `${blog.slug}.pdf`); // Specify file name
+        document.body.appendChild(link);
+        link.click(); // Trigger the download
+      })
+      .catch((error) => {
+        console.error("Error generating PDF report", error);
+      });
+  };
+
+  if (blogs.length === 0 || loading || disableLikeButton) {
     return <PreLoader isLoading={loading} />;
   }
 
@@ -426,8 +462,6 @@ const ViewBlog = () => {
         {blog && (
           <div className="viewblog-flex">
             <div className="viewblog-flex1">
-              {/* <h4>{window.location.href}</h4> */}
-              {/* <h2 className="view-blog-heading">View Blog</h2> */}
 
               <Card className="view-blog-card">
                 <Card.Body>
@@ -507,10 +541,12 @@ const ViewBlog = () => {
                         <b className="mx-3">{blog?.authorDetails.userName}</b>
                       </Link>
                       <br />
-                      
-                      {blog.authorDetails._id=== userId?"": blog.authorDetails.followers.find(
-                        (element) => element === userId
-                      ) ? (
+
+                      {blog.authorDetails._id === userId ? (
+                        ""
+                      ) : blog.authorDetails.followers.find(
+                          (element) => element === userId
+                        ) ? (
                         <Button
                           variant="secondary"
                           size="sm"
@@ -550,7 +586,12 @@ const ViewBlog = () => {
               <br />
 
               <div>
-                <Button className="bs-button-outline" size="sm" onClick={handleDownloadBlog}>
+                <Button
+                  className="bs-button-outline"
+                  size="sm"
+                  onClick={handleDownloadBlog}
+                  disabled
+                >
                   <MdDownload title="Download" />
                   Download blog
                 </Button>
@@ -646,30 +687,30 @@ const ViewBlog = () => {
                 <h5>
                   <b>Comments:</b>
                 </h5>
-                {blog?.comments.length === 0 ? (
+                {blog?.comments?.length === 0 ? (
                   <p>No comments yet.</p>
                 ) : (
                   <ul>
-                    {blog?.comments.map((comment, index) => (
+                    {blog?.comments?.map((comment, index) => (
                       <li key={index} style={{ listStyleType: "none" }}>
-                        {comment.user?.profilePicture ? (
+                        {comment?.user?.profilePicture ? (
                           <div>
                             <Image
-                              src={`data:image/jpeg;base64,${comment.user.profilePicture}`}
+                              src={`data:image/jpeg;base64,${comment?.user?.profilePicture}`}
                               roundedCircle
                               className="avatar-icon"
                               style={{ width: "30px", height: "30px" }}
                             />
                             <Link
-                              to={`/profile/${comment.user.userName}`}
+                              to={`/profile/${comment?.user?.userName}`}
                               target="_blank"
                               style={{ textDecoration: "none" }}
                             >
-                              <b className="mx-3">{comment.user.userName}</b>
+                              <b className="mx-3">{comment?.user?.userName}</b>
                             </Link>
                             <small className="mx-3">
-                              {comment.createdAt.slice(0, 10)}{" "}
-                              {comment.createdAt.slice(11, 16)}
+                              {comment?.createdAt?.slice(0, 10)}{" "}
+                              {comment?.createdAt?.slice(11, 16)}
                             </small>
                           </div>
                         ) : (
@@ -681,32 +722,32 @@ const ViewBlog = () => {
                               style={{ width: "30px", height: "30px" }}
                             />
                             <Link
-                              to={`/profile/${comment.user.userName}`}
+                              to={`/profile/${comment?.user?.userName}`}
                               target="_blank"
                               style={{ textDecoration: "none" }}
                             >
-                              <b className="mx-3">{comment.user.userName}</b>
+                              <b className="mx-3">{comment?.user?.userName}</b>
                             </Link>
                             <small className="mx-3">
-                              {comment.createdAt.slice(0, 10)}{" "}
-                              {comment.createdAt.slice(11, 16)}
+                              {comment?.createdAt?.slice(0, 10)}{" "}
+                              {comment?.createdAt?.slice(11, 16)}
                             </small>
                           </div>
                         )}
-                        <p className="mx-2">{comment.content}</p>
+                        <p className="mx-2">{comment?.content}</p>
                         <small
                           style={{ cursor: "pointer" }}
                           onClick={() => {
-                            setShowReplyInput(comment._id);
+                            setShowReplyInput(comment?._id);
                             setReplyCommentContent(
-                              "@" + comment.user.userName + " "
+                              "@" + comment?.user?.userName + " "
                             );
                           }}
                         >
                           <FaReply /> Reply
                         </small>
 
-                        {comment.commentReplies ? (
+                        {comment?.commentReplies ? (
                           <ul>
                             {comment.commentReplies.map(
                               (nestedReply, index) => (
@@ -781,16 +822,16 @@ const ViewBlog = () => {
                           </ul>
                         ) : null}
 
-                        {userInfo &&
-                          userInfo?.isVerified &&
-                          showReplyInput === comment._id && (
+                        {user &&
+                          user?.isVerified &&
+                          showReplyInput === comment?._id && (
                             <div>
                               <small>
-                                <i>Replying to: {comment.user.userName}</i>
+                                <i>Replying to: {comment?.user?.userName}</i>
                               </small>
                               <form
                                 onSubmit={(e) =>
-                                  handleReplyCommentSubmit(e, comment._id)
+                                  handleReplyCommentSubmit(e, comment?._id)
                                 }
                               >
                                 <div className="form-group">
@@ -836,7 +877,7 @@ const ViewBlog = () => {
                   </ul>
                 )}
 
-                {userInfo && userInfo?.isVerified ? (
+                {user && user?.isVerified ? (
                   <form onSubmit={handleCommentSubmit}>
                     <div className="form-group">
                       <label htmlFor="commentContent">

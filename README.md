@@ -4,11 +4,10 @@ Tech Stack: MERN stack
  - There are two panels: Writing and Reviewing panel. In
  writing panel, anyone can signup and start writing blogs.
  - The reviewer requests would be sent to admin for approval and then user can start reviewing the assigned blogs. The admin can delete any user, revoke/grant reviewer access.
-
  - Used nodemailer API to send emails. Ex: Email will be sent when the blog is under review, discarded, published.
  - Review stages: Pending for Review-Under review-In Review-Awaiting author (if need modification)-Publish
 Please try and give me the feedback. Your valuable feedback will help me to improve this website.
-- 80+ blogs are already ranked on Google search.
+- 150+ blogs are already ranked on Google search.
 
 ### Link: [https://bloggerspace.singhteekam.in](https://bloggerspace.singhteekam.in/)
 
@@ -19,6 +18,7 @@ Please try and give me the feedback. Your valuable feedback will help me to impr
 ## Features
 - View all published blogs
 - Create new blog
+- Write a blog with AI
 - save as draft the blog
 - Real time blog views count
 - Comments and Reply on the comments
@@ -61,6 +61,9 @@ Please try and give me the feedback. Your valuable feedback will help me to impr
 │   ├── public
 │   ├── src
 │   │   ├── components
+│   │   ├── assets
+│   │   ├── contexts
+│   │   ├── styles
 │   │   ├── utils
 │   ├── App.css
 │   ├── App.js
@@ -95,6 +98,9 @@ Please try and give me the feedback. Your valuable feedback will help me to impr
 
 #### BloggerSpace Homepage
 ![alt text](image.png)
+
+### My Personal Portfolio
+- Link: [https://www.singhteekam.in](https://www.singhteekam.in/)
 
 ## Contributing
 
