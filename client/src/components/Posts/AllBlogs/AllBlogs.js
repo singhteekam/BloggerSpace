@@ -1,4 +1,4 @@
-import React, { useEffect,useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Container,
   Card,
@@ -8,7 +8,7 @@ import {
   Form,
   Col,
 } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaEye, FaHeart } from "react-icons/fa";
 import "styles/style.css"; // Assuming you have a CSS file for styles
@@ -30,12 +30,27 @@ const blogItemVariant = {
 const AllBlogs = () => {
   const { blogs, loading } = useBlogs();
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("");
-  const [filterValue, setFilterValue] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialPage = parseInt(searchParams.get("page") || "1", 10);
+  const initialSearchTerm = searchParams.get("search") || "";
+  const initialFilterType = searchParams.get("filterType") || "";
+  const initialFilterValue = searchParams.get("filterValue") || "";
 
-  const [page, setPage] = useState(1);
-  const limit = 6;
+  const [page, setPage] = useState(initialPage);
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  const [filterType, setFilterType] = useState(initialFilterType);
+  const [filterValue, setFilterValue] = useState(initialFilterValue);
+
+  // Whenever page changes, update URL
+  useEffect(() => {
+    setSearchParams({
+      page,
+      search: searchTerm,
+      filterType,
+      filterValue,
+    });
+  }, [page, searchTerm, filterType, filterValue, setSearchParams]);
+  const limit = 9;
 
   // let filteredBlogs = useMemo(() => {
   //   setPage(1); // Reset to first page on search
@@ -46,9 +61,8 @@ const AllBlogs = () => {
   // }, [blogs, searchTerm]);
 
   useEffect(() => {
-  setPage(1);
-}, [searchTerm, filterType, filterValue]);
-
+      setPage(1);
+  }, [searchTerm, filterType, filterValue]);
 
   let filteredBlogs = useMemo(() => {
     //setPage(1); // reset pagination
@@ -247,7 +261,7 @@ const AllBlogs = () => {
                             <FaEye className="color-teal-green" />{" "}
                             <span className="color-teal-green">
                               {blog.blogViews}
-                            </span>
+                            </span> {"    "}
                             <FaHeart className="color-teal-green" />{" "}
                             <span className="color-teal-green">
                               {blog.blogLikes.length}
