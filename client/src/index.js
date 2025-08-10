@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 min fresh
-      cacheTime: 30 * 60 * 1000, // keep in memory 30 min
+      cacheTime: 4 * 60 * 60 * 1000, // keep in memory 4*60 mins= 4 hours
       refetchOnWindowFocus: false, // avoid refetching on every tab focus
     },
   },
