@@ -28,9 +28,6 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { IoBookmarkOutline, IoBookmark } from "react-icons/io5";
 import { FaEye, FaReply } from "react-icons/fa";
-import LoginPageModal from "../../../utils/LoginPageModal";
-import PageNotFound from "../../PageNotFound/PageNotFound";
-import { motion, useScroll, useSpring } from "framer-motion";
 import TableOfContent from "./TOC/TableOfContent";
 import PreLoader from "utils/PreLoader";
 
@@ -40,12 +37,19 @@ import RelatedBlogs from "./RelatedBlogs";
 import { MdDownload } from "react-icons/md";
 import { useBlogs } from "contexts/BlogContext";
 import decompressBase64Content from "utils/decompressBase64Content";
+import { useBlog } from "utils/hooks/useBlog";
+
+import { useQueryClient } from "@tanstack/react-query";
 
 const ViewBlog = () => {
   const { blogs, loading } = useBlogs();
   const { user, logout } = useContext(AuthContext);
   const { blogSlug } = useParams();
-  const [blog, setBlog] = useState(null);
+
+  const queryClient = useQueryClient();
+  const { data: blog, isLoading } = useBlog(blogSlug);
+
+  // const [blog, setBlog] = useState(null);
   // const [loading, setLoading] = useState(true);
   const [commentContent, setCommentContent] = useState("");
   const [replyCommentContent, setReplyCommentContent] = useState("");
@@ -99,70 +103,19 @@ const ViewBlog = () => {
         const response = await axios.patch(`/api/blogs/updateblogviews`, {
           blogSlug,
         });
-        setBlog((prevBlog) => ({
-          ...prevBlog,
+        // setBlog((prevBlog) => ({
+        //   ...prevBlog,
+        //   blogViews: response.data.totalViews,
+        // }));
+        queryClient.setQueryData(["blog", blogSlug], (old) => ({
+          ...old,
           blogViews: response.data.totalViews,
         }));
       }
     };
 
-    // const fetchLoggedInUser = async () => {
-    //   await axios
-    //     .get("/api/users/userinfo", {
-    //       headers: { Authorization: `Bearer ${token}` },
-    //     })
-    //     .then((response) => {
-    //       const user = response.data;
-    //       // console.log(user);
-    //       setUserInfo(user);
-    //       setDisableFollowButton(false);
-    //       for (let index = 0; index < user.savedBlogs.length; index++) {
-    //         if (
-    //           user.savedBlogs[index].slug ===
-    //           window.location.href.slice(
-    //             window.location.href.lastIndexOf("/") + 1
-    //           )
-    //         ) {
-    //           setIsBlogSaved(true);
-    //           break;
-    //         }
-    //       }
-    //       // setLoading(false);
-    //     })
-    //     .catch((error) => {
-    //       console.error("Error fetching user information:", error);
-    //       // setLoading(false);
-    //     });
-    // };
-
-    // const fetchBlog = async () => {
-    //   try {
-    //     const response = await axios.get(`/api/blogs/${blogSlug}`);
-    //     setBlog(response.data.blog);
-    //     console.log("Blog fetched at: " + new Date());
-    //     if (response.data.alreadyLiked === true) setThumbColor("solid");
-
-    //     setLoading(false);
-
-    //   } catch (error) {
-    //     console.error("Error fetching Blog:", error);
-    //     setLoading(false);
-    //     // setNotFound(true);
-    //   }
-    // };
-
-    // const fetchComments = async () => {
-    //   try {
-    //     const response = await axios.get(`/api/blogs/${blogSlug}/comments`);
-    //     setComments(response.data);
-    //   } catch (error) {
-    //     console.error("Error fetching comments:", error);
-    //   }
-    // };
-
-    // fetchLoggedInUser();
+  
     fetchBlog();
-    // fetchComments();
     fetchBlogViews();
   }, [blogSlug, blogs]);
 
@@ -170,11 +123,15 @@ const ViewBlog = () => {
     try {
       const blog = blogs?.find((b) => b.slug === blogSlug);
       if (blog) {
-        setBlog(blog);
-        setBlog((prevBlog) => ({
-          ...prevBlog,
-          content: decompressBase64Content(blog.content),
-        }));
+        // setBlog(blog);
+        // setBlog((prevBlog) => ({
+        //   ...prevBlog,
+        //   content: decompressBase64Content(blog.content),
+        // }));
+        queryClient.setQueryData(["blog", blogSlug], {
+        ...blog,
+        content: decompressBase64Content(blog.content),
+      });
         // setLoading(false);
       }
       const response = await axios.get(`/api/blogs/${blogSlug}`);
@@ -207,10 +164,14 @@ const ViewBlog = () => {
       );
       // fetchBlog();
       console.log("Comment submitted at: ", response.data.content);
-      setBlog((prevBlog) => ({
-        ...prevBlog,
-        comments: response.data,
-      }));
+      // setBlog((prevBlog) => ({
+      //   ...prevBlog,
+      //   comments: response.data,
+      // }));
+      queryClient.setQueryData(["blog", blogSlug], (old) => ({
+      ...old,
+      comments: response.data,
+    }));
       setCommentContent("");
       toast.success("Comment submitted!!");
     } catch (error) {
@@ -236,14 +197,14 @@ const ViewBlog = () => {
       );
       // fetchBlog();
       // setBlog((prevBlog) => ({
-        //   ...prevBlog,
-        //   comments: response.data,
-        // }));
-        setReplyCommentContent("");
-        toast.success("Replied to comment!");
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+      //   ...prevBlog,
+      //   comments: response.data,
+      // }));
+      setReplyCommentContent("");
+      toast.success("Replied to comment!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       toast.error("Error submitting comment!");
       console.error("Error submitting comment:", error);
@@ -265,11 +226,16 @@ const ViewBlog = () => {
         }
       );
       setThumbColor(response.data.newThumbColor);
-      setBlog((prevBlog) => ({
-        ...prevBlog,
-        // likes: response.data.newLikes,
-        blogLikes: response.data.newLikes,
-      }));
+      // setBlog((prevBlog) => ({
+      //   ...prevBlog,
+      //   // likes: response.data.newLikes,
+      //   blogLikes: response.data.newLikes,
+      // }));
+      queryClient.setQueryData(["blog", blogSlug], (old) => ({
+      ...old,
+      blogLikes: response.data.newLikes,
+    }));
+
       setDisableLikeButton(false);
       if (response.data.newThumbColor === "regular")
         toast.info("You disliked this blog");
@@ -406,7 +372,7 @@ const ViewBlog = () => {
       });
   };
 
-  if ( loading) {
+  if (loading) {
     return <PreLoader isLoading={loading} />;
   }
 
@@ -462,7 +428,6 @@ const ViewBlog = () => {
         {blog && (
           <div className="viewblog-flex">
             <div className="viewblog-flex1">
-
               <Card className="view-blog-card">
                 <Card.Body>
                   <Card.Title>{blog?.title}</Card.Title>
@@ -736,7 +701,7 @@ const ViewBlog = () => {
                         )}
                         <p className="mx-2">{comment?.content}</p>
                         <small
-                          style={{ cursor: "pointer", }}
+                          style={{ cursor: "pointer" }}
                           onClick={() => {
                             setShowReplyInput(comment?._id);
                             setReplyCommentContent(

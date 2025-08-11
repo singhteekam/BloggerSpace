@@ -20,7 +20,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { AuthContext } from "contexts/AuthContext";
 
 function Header() {
-  const { user, setUser, logout } = useContext(AuthContext);
+  const { user, loading, setUser, logout } = useContext(AuthContext);
   const [showCanvas, setShowCanvas] = useState(false);
 
   const handleCloseCanvas = () => setShowCanvas(false);
@@ -59,7 +59,13 @@ function Header() {
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
-                <small className="color-teal-green">Last Login: <em>{localStorage.getItem('lastLogin')?.slice(11,19)} {localStorage.getItem('lastLogin')?.slice(0,10)}</em> </small>
+                <small className="color-teal-green">
+                  Last Login:{" "}
+                  <em>
+                    {localStorage.getItem("lastLogin")?.slice(11, 19)}{" "}
+                    {localStorage.getItem("lastLogin")?.slice(0, 10)}
+                  </em>{" "}
+                </small>
                 <div className="d-grid gap-2">
                   {authheaderLinks.map((link) => (
                     <>
@@ -94,27 +100,29 @@ function Header() {
                   Hi, User
                 </Offcanvas.Title>
               </Offcanvas.Header>
-              <Offcanvas.Body>
-                <div className="d-grid gap-2">
-                  {headerLinks.map((link) => (
-                    <>
-                      <Link
-                        className={`btn bs-button`}
-                        to={link.to}
-                        target={link.target}
-                        onClick={
-                          link.onclick === "closeCanvas"
-                            ? handleCloseCanvas
-                            : logout
-                        }
-                      >
-                        {link.icon} {link.name}
-                      </Link>
-                      {link.name === "Sign Up" ? <hr /> : null}
-                    </>
-                  ))}
-                </div>
-              </Offcanvas.Body>
+              {!loading && (
+                <Offcanvas.Body>
+                  <div className="d-grid gap-2">
+                    {headerLinks.map((link) => (
+                      <>
+                        <Link
+                          className={`btn bs-button`}
+                          to={link.to}
+                          target={link.target}
+                          onClick={
+                            link.onclick === "closeCanvas"
+                              ? handleCloseCanvas
+                              : logout
+                          }
+                        >
+                          {link.icon} {link.name}
+                        </Link>
+                        {link.name === "Sign Up" ? <hr /> : null}
+                      </>
+                    ))}
+                  </div>
+                </Offcanvas.Body>
+              )}
             </Offcanvas>
           )}
 
