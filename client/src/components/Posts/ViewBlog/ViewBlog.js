@@ -134,7 +134,7 @@ const ViewBlog = () => {
       });
         // setLoading(false);
       }
-      const response = await axios.get(`/api/blogs/${blogSlug}`);
+      const response = await axios.get(`/api/blogs/${blogSlug}?userId=${userId}`);
       // setBlog(response.data.blog);
       console.log("Blog fetched at: " + new Date());
       if (response.data.alreadyLiked === true) setThumbColor("solid");

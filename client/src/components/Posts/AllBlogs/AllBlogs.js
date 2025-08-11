@@ -51,7 +51,7 @@ const AllBlogs = () => {
       filterValue,
     });
   }, [page, searchTerm, filterType, filterValue, setSearchParams]);
-  const limit = 9;
+  const limit = 6;
 
   // let filteredBlogs = useMemo(() => {
   //   setPage(1); // Reset to first page on search
