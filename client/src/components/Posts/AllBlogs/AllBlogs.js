@@ -40,6 +40,7 @@ const AllBlogs = () => {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [filterType, setFilterType] = useState(initialFilterType);
   const [filterValue, setFilterValue] = useState(initialFilterValue);
+  const [filtersChangedByUser, setFiltersChangedByUser] = useState(false);
 
   // Whenever page changes, update URL
   useEffect(() => {
@@ -61,7 +62,10 @@ const AllBlogs = () => {
   // }, [blogs, searchTerm]);
 
   useEffect(() => {
-      setPage(1);
+    if (filtersChangedByUser && (searchTerm || filterType || filterValue)) {
+    setPage(1);
+    setFiltersChangedByUser(false);
+  }
   }, [searchTerm, filterType, filterValue]);
 
   let filteredBlogs = useMemo(() => {
@@ -152,7 +156,10 @@ const AllBlogs = () => {
           <InputGroup.Text>Search by title</InputGroup.Text>
           <Form.Control
             placeholder="Search any blog..."
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setFiltersChangedByUser(true);
+            }}
             aria-label="Search"
           />
         </InputGroup>
@@ -166,6 +173,7 @@ const AllBlogs = () => {
                 onChange={(e) => {
                   setFilterType(e.target.value);
                   setFilterValue("");
+                  setFiltersChangedByUser(true);
                 }}
               >
                 <option value="">Select Filter</option>
@@ -183,7 +191,10 @@ const AllBlogs = () => {
                 </InputGroup.Text>
                 <Form.Select
                   value={filterValue}
-                  onChange={(e) => setFilterValue(e.target.value)}
+                  onChange={(e) =>{
+                    setFilterValue(e.target.value)
+                    setFiltersChangedByUser(true);
+                  } }
                 >
                   <option value="">All</option>
                   {[
@@ -261,7 +272,8 @@ const AllBlogs = () => {
                             <FaEye className="color-teal-green" />{" "}
                             <span className="color-teal-green">
                               {blog.blogViews}
-                            </span> {"    "}
+                            </span>{" "}
+                            {"    "}
                             <FaHeart className="color-teal-green" />{" "}
                             <span className="color-teal-green">
                               {blog.blogLikes.length}
