@@ -42,8 +42,10 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test": "jest --watchAll",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --runInBand"
   },
   "eslintConfig": {
     "extends": [
@@ -62,5 +64,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-react": "^7.27.1",
+    "babel-jest": "^30.0.5"
   }
 }

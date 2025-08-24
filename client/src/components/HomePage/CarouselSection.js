@@ -11,12 +11,12 @@ const CarouselSection = () => {
         <Carousel>
           {LatestUpdates.map((item)=>(
             <Carousel.Item>
-            <div className="carousel-image">
-              <img
+            <div className="carousel-image bgcolor-mint">
+              {/* <img
                 className=""
                 src={item.image}
                 alt={item.title}
-                />
+                /> */}
             </div>
             <Carousel.Caption className="color-teal-green">
               <motion.h3

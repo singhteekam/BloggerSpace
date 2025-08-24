@@ -10,7 +10,7 @@ export const useBlogs = () => useContext(BlogContext);
 async function fetchAllBlogs() {
   const { data } = await axios.get("/api/blogs/fetchallblogs");
   return data.blogs.sort(
-    (a, b) => new Date(b.lastUpdatedAt) - new Date(a.lastUpdatedAt)
+    (a, b) => new Date(a.lastUpdatedAt) - new Date(b.lastUpdatedAt)
   );
 }
 
