@@ -4893,3 +4893,18 @@
 [2025-09-17T15:46:10.747Z] [LOG] [DEBUG] - Topic is available: 
 [2025-09-17T15:46:14.474Z] [LOG] [DEBUG] - Topic is available: 
 [2025-09-17T15:46:14.475Z] [LOG] [DEBUG] - Topic is available: 
+[2025-09-17T16:02:59.331Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T16:02:59.392Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T16:08:02.741Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T16:08:03.110Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T16:08:04.701Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T16:08:05.036Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T22:20:37.822Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T22:20:38.046Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T22:20:46.615Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T22:20:46.664Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
+[2025-09-17T22:21:24.682Z] [LOG] [ERROR] - User not found with given email.
+[2025-09-17T22:21:24.682Z] [LOG] [ERROR] - User not found with given email.
+[2025-09-17T22:21:24.682Z] [LOG] [ERROR] - User not found with given email.
+[2025-09-17T22:21:43.019Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2025-09-17T22:21:43.450Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh

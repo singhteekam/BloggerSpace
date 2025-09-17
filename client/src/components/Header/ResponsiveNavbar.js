@@ -21,7 +21,7 @@ import SearchBlogs from "components/Posts/SearchBlogs/SearchBlogs";
 import { IoIosLogOut } from "react-icons/io";
 
 function ResponsiveNavbar() {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, loading } = useContext(AuthContext);
   const [showOffcanvas, setShowOffcanvas] = useState(false);
 
   const handleClose = () => setShowOffcanvas(false);
@@ -55,11 +55,13 @@ function ResponsiveNavbar() {
         <Navbar.Brand
           as={Link}
           to="/"
-          className="d-flex align-items-center text-white mx-auto mx-lg-0"
+          className="text-white mx-auto mx-lg-0"
           style={{ justifyContent: "center" }}
         >
+          <div className="responsive-brand">
           <img src={logoImg} height={30} className="me-2" alt="Logo" />
           <b>BloggerSpace</b>
+          </div>
         </Navbar.Brand>
 
         {/* Desktop: Links + Dropdown */}
@@ -75,7 +77,7 @@ function ResponsiveNavbar() {
                   {item.name}
                 </Nav.Link>
               ))
-            : navbarLinks.slice(0, 5).map((item, i) => (
+            : !loading && navbarLinks.slice(0, 5).map((item, i) => (
                 <Nav.Link
                   as={Link}
                   to={item.to}
@@ -89,12 +91,22 @@ function ResponsiveNavbar() {
           <NavDropdown title="More" className="text-white">
             {user &&
               navbarLinks.slice(2, 5).map((link, idx) => (
-                <NavDropdown.Item as={Link} to={link.to} key={idx} target={link.target}>
+                <NavDropdown.Item
+                  as={Link}
+                  to={link.to}
+                  key={idx}
+                  target={link.target}
+                >
                   {link.name}
                 </NavDropdown.Item>
               ))}
             {navbarLinks.slice(5).map((link, idx) => (
-              <NavDropdown.Item as={Link} to={link.to} key={idx} target={link.target}>
+              <NavDropdown.Item
+                as={Link}
+                to={link.to}
+                key={idx}
+                target={link.target}
+              >
                 {link.name}
               </NavDropdown.Item>
             ))}
@@ -110,18 +122,22 @@ function ResponsiveNavbar() {
 
         {/* Right Section (Always Visible) */}
         <div className="d-flex align-items-center">
-            <Button
-                variant="outline-light"
-                className="mx-2"
-                onClick={handleSearchClick}
-              >
-                <FaSearch />
-              </Button>
+          <Button
+            variant="outline-light"
+            className="mx-2"
+            onClick={handleSearchClick}
+          >
+            <FaSearch />
+          </Button>
           {user ? (
             <NavDropdown
               title={
                 <Image
-                  src={user?.profilePicture || logoImg}
+                  src={
+                    user
+                      ? `data:image/jpeg;base64,${user?.profilePicture}`
+                      : logoImg
+                  }
                   roundedCircle
                   height={40}
                   width={40}
@@ -146,10 +162,11 @@ function ResponsiveNavbar() {
             </NavDropdown>
           ) : (
             <>
-              
-              <Button as={Link} to="/login" variant="outline-light">
-                Login
-              </Button>
+              {!loading && (
+                <Button as={Link} to="/login" variant="outline-light">
+                  Login
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -206,6 +223,7 @@ function ResponsiveNavbar() {
                   ))}
                 </>
               ) : (
+                !loading &&
                 navbarLinks.map((item, idx) => (
                   <Nav.Link
                     as={Link}

@@ -46,7 +46,7 @@ const SearchBlogs = ({ show, onHide }) => {
         <div className="search-bar">
           <FormControl
             type="text"
-            placeholder="Enter at least 2 characters"
+            placeholder="Type at least 2 characters"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
