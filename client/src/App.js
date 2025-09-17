@@ -37,13 +37,15 @@ import ScrollToTop from "utils/ScrollToTop";
 import { AuthProvider } from "contexts/AuthContext";
 import ProtectedRoute from "components/ProtectedRoute";
 import { BlogProvider } from "contexts/BlogContext";
+import ResponsiveNavbar from "components/Header/ResponsiveNavbar";
 
 const App = () => {
   return (
     <AuthProvider>
       <BlogProvider>
       <BrowserRouter>
-        <Header />
+        {/* <Header /> */}
+        <ResponsiveNavbar />
 
         <Helmet>
           <meta
