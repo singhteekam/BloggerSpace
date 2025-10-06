@@ -172,7 +172,7 @@ const Footer = () => {
         </Row>
         <hr />
         <Row>
-        <p>Copyright © {year} BloggerSpace</p>
+        <p> © {year} BloggerSpace. All rights reserved.</p>
         </Row>
       </Container>
 

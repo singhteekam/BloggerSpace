@@ -27,13 +27,13 @@ const UsersReviewData = [
     review:
       "❝ BloggerSpace has exceeded my expectations with its exceptional writing features and user-friendly interface. ❞",
   },
-  {
-    name: "Swaranjali",
-    image: swaraImg,
-    publicURL: "https://bloggerspace.singhteekam.in/profile/drswaranjalii",
-    review:
-      "❝ The platform's focus on enhancing the writing process through innovative features sets it apart in the blogging landscape. ❞",
-  },
+  // {
+  //   name: "Swaranjali",
+  //   image: swaraImg,
+  //   publicURL: "https://bloggerspace.singhteekam.in/profile/drswaranjalii",
+  //   review:
+  //     "❝ The platform's focus on enhancing the writing process through innovative features sets it apart in the blogging landscape. ❞",
+  // },
   {
     name: "Abhay Chaudhary",
     image: abhayImg,
