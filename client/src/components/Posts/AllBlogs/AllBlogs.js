@@ -15,6 +15,7 @@ import "styles/style.css"; // Assuming you have a CSS file for styles
 import PreLoader from "utils/PreLoader";
 import { useBlogs } from "contexts/BlogContext";
 import Pagination from "react-bootstrap/Pagination";
+import { Helmet } from "react-helmet";
 
 const blogItemVariant = {
   hover: {
@@ -63,9 +64,9 @@ const AllBlogs = () => {
 
   useEffect(() => {
     if (filtersChangedByUser && (searchTerm || filterType || filterValue)) {
-    setPage(1);
-    setFiltersChangedByUser(false);
-  }
+      setPage(1);
+      setFiltersChangedByUser(false);
+    }
   }, [searchTerm, filterType, filterValue]);
 
   let filteredBlogs = useMemo(() => {
@@ -144,6 +145,36 @@ const AllBlogs = () => {
 
   return (
     <section className="newpage-section">
+      <Helmet>
+        <meta
+          name="description"
+          content="Here is a list of all the published blogs. Read these blogs."
+        />
+        <title>All Published Blogs</title>
+
+        <meta name="apple-mobile-web-app-title" content="All Published Blogs" />
+
+        <meta property="og:title" content="All Published Blogs" />
+        <meta
+          property="og:description"
+          content="Here is a list of all the published blogs. Read these blogs."
+        />
+        <meta property="og:image" content="%PUBLIC_URL%/BLOGGERSPACE.png" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:type" content="website" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="All Published Blogs" />
+        <meta
+          name="twitter:description"
+          content="Here is a list of all the published blogs. Read these blogs."
+        />
+        <meta name="twitter:image" content="%PUBLIC_URL%/BLOGGERSPACE.png" />
+        <meta name="twitter:site" content="@singh__teekam" />
+
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+
       <Container>
         <h3 className="page-title">Blogs</h3>
         <div className="heading-underline"></div>
@@ -191,10 +222,10 @@ const AllBlogs = () => {
                 </InputGroup.Text>
                 <Form.Select
                   value={filterValue}
-                  onChange={(e) =>{
-                    setFilterValue(e.target.value)
+                  onChange={(e) => {
+                    setFilterValue(e.target.value);
                     setFiltersChangedByUser(true);
-                  } }
+                  }}
                 >
                   <option value="">All</option>
                   {[

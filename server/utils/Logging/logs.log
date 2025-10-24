@@ -4908,3 +4908,21 @@
 [2025-09-17T22:21:24.682Z] [LOG] [ERROR] - User not found with given email.
 [2025-09-17T22:21:43.019Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2025-09-17T22:21:43.450Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2025-10-06T22:57:10.759Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2025-10-06T22:57:10.759Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2025-10-06T22:57:10.759Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2025-10-06T22:57:10.800Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2025-10-06T22:57:10.800Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2025-10-06T22:57:10.800Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
+[2025-10-06T22:57:14.077Z] [LOG] [DEBUG] - Searching for blog: dwfre
+[2025-10-06T22:57:14.084Z] [LOG] [DEBUG] - Searching for blog: dwfre
+[2025-10-06T22:57:14.195Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2025-10-06T22:57:14.195Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2025-10-06T22:57:14.199Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-10-06T22:57:14.208Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2025-10-06T22:57:14.208Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2025-10-06T22:57:14.209Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-10-06T22:57:14.629Z] [LOG] [DEBUG] - Searching for blog: dwfre
+[2025-10-06T22:57:14.751Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2025-10-06T22:57:14.751Z] [LOG] [INFO] - Blog: dwfre fetched. Content size is: 0.671875 KB
+[2025-10-06T22:57:14.751Z] [LOG] [DEBUG] - Inside viewBlogRoute function.

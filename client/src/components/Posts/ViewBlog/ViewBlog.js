@@ -403,6 +403,8 @@ const ViewBlog = () => {
     return textContent;
   }
 
+  const canonicalUrl = `${window.location.origin}/${blogSlug}`;
+
   return (
     <section className="newpage-section">
       <ToastContainer />
@@ -422,6 +424,7 @@ const ViewBlog = () => {
           name="twitter:description"
           content={stripHtmlTags(blog?.content)}
         />
+        <link rel="canonical" href={canonicalUrl} />
       </Helmet>
 
       <Container>
