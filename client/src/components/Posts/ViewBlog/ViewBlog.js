@@ -651,7 +651,7 @@ const ViewBlog = () => {
                 </FacebookMessengerShareButton>
               </div>
 
-              <div className="mt-4 p-2 bgcolor-mint">
+              {/* <div className="mt-4 p-2 bgcolor-mint">
                 <h5>
                   <b>Comments:</b>
                 </h5>
@@ -827,18 +827,7 @@ const ViewBlog = () => {
                             </div>
                           )}
 
-                        {/* <div>
-                  <i
-                    className={`fa-${commentThumbColor} fa-thumbs-up fa-xl`}
-                    onClick={
-                      disableCommentLikeButton === false ? ()=>handleCommentLike(comment._id) : null
-                    }
-                  ></i>{" "}
-                  {comment?.likes.length}
-                </div> */}
-                        {/* <p className="comment-user">
-                  <strong>Commented by:</strong> {comment.userName}
-                </p> */}
+                     
                       </li>
                     ))}
                   </ul>
@@ -869,13 +858,13 @@ const ViewBlog = () => {
                     <Link to="/signup">Sign up</Link> now.
                   </p>
                 )}
-              </div>
+              </div> */}
             </div>
-            <div className="viewblog-flex2 bgcolor-mint">
+            {/* <div className="viewblog-flex2 bgcolor-mint">
               <TableOfContent />
               <RelatedBlogs blogId={blog?._id} />
               <MostViewedBlogs />
-            </div>
+            </div> */}
           </div>
         )}
       </Container>

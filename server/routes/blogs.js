@@ -42,10 +42,10 @@ router.get("/fetchallblogs", fetchAllBlogsFromDB);
 router.get("/allblogs/category/:filterCategory", fetchBlogsByCategory);
 
 // Most Viewed blogs
-router.get("/mostviewedblogs", fetchMostViewedBlogs);
+// router.get("/mostviewedblogs", fetchMostViewedBlogs);
 
 // Related Blogs
-router.get("/relatedblogs/:blogId", fetchRelatedBlogs);
+// router.get("/relatedblogs/:blogId", fetchRelatedBlogs);
 
 router.get("/:blogSlug", viewBlogRoute);
 
