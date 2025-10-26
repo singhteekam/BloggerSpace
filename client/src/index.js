@@ -22,8 +22,8 @@ const asyncLocalStorage = {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 2 min fresh
-      cacheTime: 4 * 60 * 60 * 1000, // keep in memory 4*60 mins= 4 hours
+      staleTime: 50 * 60 * 1000, // 50 min fresh
+      cacheTime: 8 * 60 * 60 * 1000, // keep in memory 8*60 mins= 8 hours
       refetchOnWindowFocus: false, // avoid refetching on every tab focus
     },
   },
