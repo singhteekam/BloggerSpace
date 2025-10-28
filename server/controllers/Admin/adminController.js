@@ -95,6 +95,33 @@ exports.adminLogin=async (req, res) => {
 }
 
 
+// Fetch admin blogs (paginated)
+exports.fetchAdminBlogs = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const blogs = await Blog.find({ status: "ADMIN_PUBLISHED" })
+      // .sort({ lastUpdatedAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalBlogs = await Blog.countDocuments({ status: "ADMIN_PUBLISHED" });
+
+    res.json({
+      blogs,
+      currentPage: page,
+      totalPages: Math.ceil(totalBlogs / limit),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch admin blogs" });
+  }
+};
+
+
+
 exports.inReviewBlogs = async (req, res) => {
   try {
     // if (req.session.currentemail) {

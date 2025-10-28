@@ -8,14 +8,14 @@
     "deploy": "firebase deploy --only functions:bloggerspacebackend"
   },
   "engines": {
-    "node": "18"
+    "node": "22"
   },
   "author": "Teekam Singh",
   "license": "ISC",
   "dependencies": {
     "@google/genai": "^1.10.0",
     "axios": "^1.6.2",
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "connect-mongo": "^3.2.0",
     "cookie-parser": "^1.4.6",

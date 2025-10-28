@@ -25,10 +25,10 @@ const {
   fetchAllBlogs,
   fetchBlogsByCategory,
   fetchBlogByBlogId,
-  fetchMostViewedBlogs,
   fetchRelatedBlogs,
   fetchAllBlogsFromDB,
   createNewAIBlog,
+  fetchTopViewedBlogs,
 } = require("../controllers/blogsController");
 const { downloadBlog } = require("../controllers/userscontroller");
 
@@ -41,8 +41,11 @@ router.get("/fetchallblogs", fetchAllBlogsFromDB);
 // fetch Blogs by category filter 
 router.get("/allblogs/category/:filterCategory", fetchBlogsByCategory);
 
-// Most Viewed blogs
-// router.get("/mostviewedblogs", fetchMostViewedBlogs);
+// Top Viewed blogs
+router.get("/topviewedblogs", fetchTopViewedBlogs);
+
+// Related Blogs
+router.get("/:blogId/related", fetchRelatedBlogs);
 
 // Related Blogs
 // router.get("/relatedblogs/:blogId", fetchRelatedBlogs);

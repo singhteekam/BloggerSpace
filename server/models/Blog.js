@@ -11,7 +11,10 @@ const blogSchema = new mongoose.Schema({
   },
   slug: {
     type: String,
-    required: false,
+    // required: false,
+    // unique: true, 
+    index: true,
+    required: true,
   },
   title: {
     type: String,
@@ -72,5 +75,7 @@ const blogSchema = new mongoose.Schema({
 });
 
 const Blog = mongoose.model("Blog", blogSchema);
+
+Blog.syncIndexes();
 
 module.exports = Blog;

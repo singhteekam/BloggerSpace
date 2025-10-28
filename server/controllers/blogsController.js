@@ -121,88 +121,161 @@ exports.fetchAllBlogs = async (req, res) => {
   }
 };
 
+
 exports.fetchAllBlogsFromDB = async (req, res) => {
   try {
-    const blogs = await Blog.find({
+    const page = Math.max(parseInt(req.query.page || "1", 10), 1);
+    const limit = Math.max(parseInt(req.query.limit || "6", 10), 1);
+
+    const search = (req.query.search || "").trim();
+    const filterType = req.query.filterType || "";
+    const filterValue = req.query.filterValue || "";
+
+    // Build match object
+    const match = {
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
-      tags: "Interview Questions",  // TEMP
-    })
-      .populate("authorDetails")
-      // .populate("blogLikes")  //TEMP
-      // .populate("comments.user", "email userName profilePicture")    //TEMP
-      // .populate("comments.commentReplies.replyCommentUser",  "email userName profilePicture")   //TEMP
-      .exec();
+    };
+
+    if (search) {
+      match.title = { $regex: search, $options: "i" };
+    }
+
+    if (filterType === "category" && filterValue) {
+      match.category = filterValue;
+    }
+
+    if (filterType === "tag" && filterValue) {
+      // adjust depending on your schema (string array or object)
+      match.tags = filterValue; // or: match.tags = { $in: [filterValue] }
+    }
+
+    const skip = (page - 1) * limit;
+
+    // run find and count in parallel
+    const [blogs, totalCount] = await Promise.all([
+      Blog.find(match)
+        // .sort({ lastUpdatedAt: -1 }) // newest first
+        .skip(skip)
+        .limit(limit)
+        .populate("authorDetails", "userName profilePicture") // minimal fields
+        // do NOT populate comments/likes here (heavy)
+        .lean()
+        .exec(),
+      Blog.countDocuments(match),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
 
     res.json({
       blogs,
+      currentPage: page,
+      totalPages,
+      totalCount,
     });
   } catch (error) {
-    console.error("Error fetching blogs..:", error);
-    res.status(500).json({ error: "Server error.." });
+    console.error("Error fetching blogs:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
-exports.fetchMostViewedBlogs = async (req, res) => {
+// controllers/blogs.js (same file)
+exports.fetchSingleBlog = async (req, res) => {
   try {
-    const blogs = await Blog.find({
+    const { id } = req.params;
+
+    const blog = await Blog.findOne({
+      _id: id,
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
     })
-      .limit(15)
-      .sort({ blogViews: -1 });
-    // .populate("authorDetails")
-    // .exec();
+      .populate("authorDetails", "userName profilePicture email")
+      .populate("blogLikes", "user") // minimal fields
+      .populate("comments.user", "email userName profilePicture")
+      .populate(
+        "comments.commentReplies.replyCommentUser",
+        "email userName profilePicture"
+      )
+      .lean()
+      .exec();
 
-    res.json(blogs);
-  } catch (error) {
-    logger.error("Error fetching most viewed blogs..:" + error);
-    console.error("Error fetching most viewed blogs..:", error);
-    res.status(500).json({ error: "Server error.." });
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+
+    res.json({ blog });
+  } catch (err) {
+    console.error("Error fetching blog detail:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+// exports.fetchAllBlogsFromDB = async (req, res) => {
+//   try {
+//     const blogs = await Blog.find({
+//       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] }
+//     }).lean()
+//       .populate("authorDetails")
+//       .populate("blogLikes")  //TEMP
+//       .populate("comments.user", "email userName profilePicture")    //TEMP
+//       .populate("comments.commentReplies.replyCommentUser",  "email userName profilePicture")   //TEMP
+//       .exec();
+
+//     res.json({
+//       blogs,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching blogs..:", error);
+//     res.status(500).json({ error: "Server error.." });
+//   }
+// };
+
+exports.fetchTopViewedBlogs = async (req, res) => {
+  try {
+    const blogs = await Blog.find({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
+      .sort({ blogViews: -1 })
+      .limit(10)
+      .select("title slug blogViews"); // Select only needed fields
+
+    res.json({ blogs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch top viewed blogs" });
   }
 };
 
 exports.fetchRelatedBlogs = async (req, res) => {
   try {
-    const blogId = req.params.blogId;
-    if (!blogId) {
-      return res.status(404).send({ message: "Blog id is required" });
-    }
+    const { blogId } = req.params;
 
     const currentBlog = await Blog.findById(blogId);
     if (!currentBlog) {
-      return res.status(404).send({ message: "Blog not found" });
+      return res.status(404).json({ message: "Blog not found" });
     }
 
-    const stopwords = [
-      "a",
-      "the",
-      "in",
-      "as",
-      "of",
-      "on",
-      "for",
-      "and",
-      "to",
-      "by",
-      "with",
-    ];
-    const words = currentBlog.title
-      .split(" ")
-      .filter((word) => !stopwords.includes(word.toLowerCase()));
-    const titleRegex = new RegExp("\\b(" + words.join("|") + ")\\b", "i");
+    // Extract keywords from the title
+    const keywords = currentBlog.title
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(
+        (word) =>
+          !["the", "a", "an", "and", "or", "in", "on", "of", "to", "for", "with"].includes(word) &&
+          word.length > 2
+      );
 
+    // Fetch blogs that share category or matching title words
     const relatedBlogs = await Blog.find({
-      _id: { $ne: blogId }, //Exclude current blog
-      title: { $regex: titleRegex },
+      _id: { $ne: blogId },
+      $or: [
+        { category: currentBlog.category },
+        { title: { $regex: keywords.join("|"), $options: "i" } },
+      ],
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
     })
-      .limit(15)
-      .sort({ lastUpdatedAt: -1 });
+      .select("title slug blogViews category")
+      .limit(5);
 
-    res.json(relatedBlogs);
-  } catch (error) {
-    logger.error("Error fetching related blogs..:" + error);
-    console.error("Error fetching related blogs..:", error);
-    res.status(500).json({ error: "Server error.." });
+    res.json({ blogs: relatedBlogs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch related blogs" });
   }
 };
 
@@ -297,7 +370,6 @@ exports.viewBlogRoute = async (req, res) => {
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
     })
       .populate("authorDetails")
-      // .populate("likes")
       .populate("blogLikes")
       // .populate("comments")
       .populate("comments.user", "email userName profilePicture")
@@ -305,6 +377,7 @@ exports.viewBlogRoute = async (req, res) => {
         "comments.commentReplies.replyCommentUser",
         "email userName profilePicture"
       )
+      .lean()
       .exec();
 
     if (!blog) {

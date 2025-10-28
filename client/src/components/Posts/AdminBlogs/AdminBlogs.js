@@ -1,16 +1,23 @@
 import React from "react";
-import { Button, Container, ListGroup } from "react-bootstrap";
+import { Button, Container, ListGroup, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useBlogs } from "contexts/BlogContext"; // Adjust path as needed
+import { useAdminBlogs } from "utils/hooks/useAdminBlogs"; // adjust path
 import PreLoader from "utils/PreLoader";
 
 const AdminBlogs = () => {
-  const { blogs, loading } = useBlogs();
-  const adminBlogs = blogs.filter((blog) => blog.status === "ADMIN_PUBLISHED");
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    error,
+  } = useAdminBlogs();
 
-  if (loading) {
-    return <PreLoader isLoading="true" />;
-  }
+  if (isLoading) return <PreLoader isLoading={true} />;
+  if (error) return <p className="text-center mt-4">Failed to load blogs.</p>;
+
+  const adminBlogs = data?.pages.flatMap((page) => page.blogs) || [];
 
   if (adminBlogs.length === 0) {
     return <p className="text-center mt-4">No published blogs available.</p>;
@@ -42,6 +49,24 @@ const AdminBlogs = () => {
             </ListGroup.Item>
           ))}
         </ListGroup>
+
+        {hasNextPage && (
+          <div className="text-center mt-4">
+            <Button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="bs-button"
+            >
+              {isFetchingNextPage ? (
+                <>
+                  <Spinner animation="border" size="sm" /> Loading...
+                </>
+              ) : (
+                "Load More"
+              )}
+            </Button>
+          </div>
+        )}
       </Container>
     </section>
   );

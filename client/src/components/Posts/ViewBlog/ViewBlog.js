@@ -32,7 +32,6 @@ import TableOfContent from "./TOC/TableOfContent";
 import PreLoader from "utils/PreLoader";
 
 import { AuthContext } from "contexts/AuthContext";
-import MostViewedBlogs from "./MostViewedBlogs";
 import RelatedBlogs from "./RelatedBlogs";
 import { MdDownload } from "react-icons/md";
 import { useBlogs } from "contexts/BlogContext";
@@ -40,6 +39,7 @@ import decompressBase64Content from "utils/decompressBase64Content";
 import { useBlog } from "utils/hooks/useBlog";
 
 import { useQueryClient } from "@tanstack/react-query";
+import TopViewedBlogs from "./TopViewedBlogs";
 
 const ViewBlog = () => {
   const { blogs, loading } = useBlogs();
@@ -512,7 +512,7 @@ const ViewBlog = () => {
 
                       {blog.authorDetails._id === userId ? (
                         ""
-                      ) : blog.authorDetails.followers.find(
+                      ) : blog.authorDetails.followers?.find(
                           (element) => element === userId
                         ) ? (
                         <Button
@@ -651,7 +651,7 @@ const ViewBlog = () => {
                 </FacebookMessengerShareButton>
               </div>
 
-              {/* <div className="mt-4 p-2 bgcolor-mint">
+              <div className="mt-4 p-2 bgcolor-mint">
                 <h5>
                   <b>Comments:</b>
                 </h5>
@@ -858,13 +858,13 @@ const ViewBlog = () => {
                     <Link to="/signup">Sign up</Link> now.
                   </p>
                 )}
-              </div> */}
+              </div>
             </div>
-            {/* <div className="viewblog-flex2 bgcolor-mint">
+            <div className="viewblog-flex2 bgcolor-mint">
               <TableOfContent />
               <RelatedBlogs blogId={blog?._id} />
-              <MostViewedBlogs />
-            </div> */}
+              <TopViewedBlogs />
+            </div>
           </div>
         )}
       </Container>

@@ -9,7 +9,8 @@ export function useBlog(blogSlug) {
       const res = await axios.get(`/api/blogs/${blogSlug}`);
       return res.data.blog;
     },
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 24 * 60 * 60 * 1000, 
+    refetchOnWindowFocus: false, // Avoid unnecessary re-fetch
   });
 }

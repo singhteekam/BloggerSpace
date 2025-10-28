@@ -33,7 +33,8 @@ const {
   sendNewsletter,
   updateSitemapXML,
   downloadExcelReport,
-  downloadPDFReport
+  downloadPDFReport,
+  fetchAdminBlogs
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -41,6 +42,8 @@ const { discardBlogFromDB } = require("../../utils/discardBlog");
 router.post("/signup", adminSignup);
 
 router.post("/login", adminLogin);
+
+router.get("/adminblogs", fetchAdminBlogs);
 
 router.get("/inreviewblogs", adminMiddleware, inReviewBlogs);
 

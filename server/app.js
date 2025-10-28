@@ -8,7 +8,9 @@ const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo")(session);
 const path = require("path");
 
-const functions = require("firebase-functions");
+// const functions = require("firebase-functions");
+
+const { onRequest } = require('firebase-functions/v2/https');
 
 require("dotenv").config(); // Load environment variables from .env file - Production mode
 // require("dotenv").config({ path: ".env.local" }); // development mode
@@ -162,4 +164,5 @@ app.get("/api/viewlogs", async (req, res) => {
 app.listen(PORT, console.log("Server started at " + PORT+ " and pid: "+ process.pid));
 
 
-exports.bloggerspacebackend = functions.https.onRequest(app);
+exports.bloggerspacebackend = onRequest(app);
+// exports.bloggerspacebackend = functions.https.onRequest(app);

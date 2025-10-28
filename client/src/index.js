@@ -1,3 +1,64 @@
+// import React from "react";
+// import ReactDOM from "react-dom/client";
+// import "./index.css";
+// import App from "./App";
+// import reportWebVitals from "./reportWebVitals";
+// import "bootstrap/dist/css/bootstrap.min.css";
+// import "react-toastify/dist/ReactToastify.css";
+
+// import { Provider } from "react-redux";
+// import { store } from "./redux/store";
+
+// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// import { persistQueryClient } from "@tanstack/react-query-persist-client";
+// import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
+
+// const asyncLocalStorage = {
+//   getItem: (key) => Promise.resolve(localStorage.getItem(key)),
+//   setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
+//   removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
+// };
+
+// const queryClient = new QueryClient({
+//   defaultOptions: {
+//     queries: {
+//       staleTime: 5 * 60 * 1000, // 5 min fresh
+//       cacheTime: 4 * 60 * 60 * 1000, // keep in memory 4*60 mins= 4 hours
+//       refetchOnWindowFocus: false, // avoid refetching on every tab focus
+//     },
+//   },
+// });
+
+// // Create localStorage persister
+// const persister = createAsyncStoragePersister({
+//   storage: asyncLocalStorage,
+// });
+
+// // Enable React Query cache persistence
+// persistQueryClient({
+//   queryClient,
+//   persister,
+// });
+
+// const root = ReactDOM.createRoot(document.getElementById("root"));
+// root.render(
+//   <React.StrictMode>
+//     <Provider store={store}>
+//       <QueryClientProvider client={queryClient}>
+//         <App />
+//       </QueryClientProvider>
+//     </Provider>
+//   </React.StrictMode>
+// );
+
+// // If you want to start measuring performance in your app, pass a function
+// // to log results (for example: reportWebVitals(console.log))
+// // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// reportWebVitals();
+
+
+
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -9,49 +70,48 @@ import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { QueryClient } from "@tanstack/react-query";
+import {
+  PersistQueryClientProvider,
+} from "@tanstack/react-query-persist-client";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 
+// ✅ Async wrapper around localStorage
 const asyncLocalStorage = {
   getItem: (key) => Promise.resolve(localStorage.getItem(key)),
   setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
   removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
 };
 
+// ✅ React Query client configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 50 * 60 * 1000, // 50 min fresh
-      cacheTime: 8 * 60 * 60 * 1000, // keep in memory 8*60 mins= 8 hours
-      refetchOnWindowFocus: false, // avoid refetching on every tab focus
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 4 * 60 * 60 * 1000, // 4 hours
+      refetchOnWindowFocus: false,
     },
   },
 });
 
-// Create localStorage persister
+// ✅ Create persister using localStorage
 const persister = createAsyncStoragePersister({
   storage: asyncLocalStorage,
 });
 
-// Enable React Query cache persistence
-persistQueryClient({
-  queryClient,
-  persister,
-});
-
+// ✅ Wrap app with persistence-enabled provider
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister }}
+      >
         <App />
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </Provider>
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
