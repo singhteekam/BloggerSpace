@@ -222,7 +222,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
 
     // Save the updated blog
     await blog.save();
-    await generateSitemap();
+    // await generateSitemap();
 
     // Sending mail to author
     const receiver = blog.authorDetails.email;
@@ -633,7 +633,7 @@ exports.adminNewBlog = async (req, res) => {
       status: "ADMIN_PUBLISHED"
     });
     const savedBlog = await newPost.save();
-    await generateSitemap();
+    // await generateSitemap();
 
     res.json(savedBlog);
   } catch (error) {
@@ -833,7 +833,7 @@ exports.adminSaveEditedBlog = async (req, res) => {
 
     // Save the updated blog
     await blog.save();
-    await generateSitemap();
+    // await generateSitemap();
     console.debug("Blog updated successfully. Title: "+ blog.title);
 
     res.json({ message: "blog updated successfully" });

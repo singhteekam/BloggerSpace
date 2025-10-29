@@ -53,12 +53,12 @@ const UserProfile = () => {
         <Card className="bgcolor-mint">
           <Card.Body>
             <Card.Title>{fullName}</Card.Title>
-            <Card.Text>
+            {/* <Card.Text>
               <p>
                 Email:{" "}
                 {email.slice(0, 4) + "*****" + email.slice(email.indexOf("@"))}
               </p>
-            </Card.Text>
+            </Card.Text> */}
             <div>
               <b>Followers: {userProfile.followers.length}</b>
               <ul>
@@ -128,7 +128,7 @@ const UserProfile = () => {
           <ListGroup>
             {blogs.map((blog) => (
               <ListGroup.Item key={blog.slug}>
-                {++i}. <Link to={`/${blog.slug}`}>{blog.title}</Link>
+                {++i}. <Link to={`/${blog.slug}`} className="text-decoration-none">{blog.title}</Link>
               </ListGroup.Item>
             ))}
           </ListGroup>

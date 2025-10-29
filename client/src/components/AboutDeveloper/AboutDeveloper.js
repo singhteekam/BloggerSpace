@@ -26,8 +26,8 @@ function AboutDeveloper() {
               </div>
               <div>
                 <p>
-                  Hello, I’m Teekam Singh currently working in Tata Consultancy
-                  Services(TCS) having 2+ years of Experience and completed my
+                  Hello, I’m Teekam Singh currently working at Tata Consultancy
+                  Services(TCS) having 3+ years of Experience and completed my
                   B.Tech from ABES Engineering College, Ghaziabad.
                 </p>
                 <Stack direction="horizontal" gap={2}>

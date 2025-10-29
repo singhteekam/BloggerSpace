@@ -332,32 +332,9 @@ const NewBlog = () => {
               )
             ) : null}
           </Form.Group>
-          <Button className="m-1 " onClick={handleAIGenerate}>
-            <MdStars /> Generate with AI
+          <Button className="generate-ai-btn" onClick={handleAIGenerate}>
+            <img width="24" height="24" src="https://img.icons8.com/color/48/bard--v1.png" alt="bard--v1"/> Generate with AI
           </Button>
-
-          <Accordion defaultActiveKey="0">
-            <Accordion.Item eventKey="0">
-              <Accordion.Header>
-                Published Blogs with Similar title:
-              </Accordion.Header>
-              <Accordion.Body>
-                <ListGroup>
-                  {searchTitleResults.map((blog) => (
-                    <ListGroup.Item key={blog._id} className="">
-                      <Link
-                        to={`/${blog.slug}`}
-                        target="_blank"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <h6>{blog.title}</h6>
-                      </Link>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              </Accordion.Body>
-            </Accordion.Item>
-          </Accordion>
 
           <Form.Group controlId="blogAuthor" className="newblogfields">
             <Form.Label>Author:</Form.Label>
@@ -381,24 +358,6 @@ const NewBlog = () => {
             options={blogCategory}
             required
           />
-
-          {/* <Form.Group controlId="blogCategory" className="newblogfields">
-            <Form.Label>Category:</Form.Label>
-            <Form.Control
-              as="select"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              placeholder="Select category"
-              required
-            >
-              <option value="">Select Category</option>
-              {blogCategory.map((category) => (
-                <option key={category.value} value={category.value}>
-                  {category.label}
-                </option>
-              ))}
-            </Form.Control>
-          </Form.Group> */}
 
           {category === "Other" ? (
             <Form.Group controlId="otherCategory" className="newblogfields">
@@ -424,50 +383,7 @@ const NewBlog = () => {
             required
             isMulti
           />
-          {/* <Button
-              variant="success"
-              size="sm"
-              onClick={handleTagAdd}
-              className="my-2"
-            >
-              Add Tag
-            </Button> */}
-
-          {/* <Form.Group controlId="blogCategory" className="newblogfields">
-            <Form.Label>Tags:</Form.Label>
-            <Form.Control
-              as="select"
-              value={selectedTag}
-              // onChange={handleSelectedTag}
-              placeholder="Select tag"
-            >
-              <option value="">Select Tag</option>
-              {blogTags.map((tag) => (
-                <option key={tag} value={tag}>
-                  {tag}
-                </option>
-              ))}
-            </Form.Control>
-            <Button
-              variant="success"
-              size="sm"
-              onClick={handleTagAdd}
-              className="my-2"
-            >
-              Add Tag
-            </Button>
-            <br />
-            {tags.map((tag) => (
-              <Badge key={tag} pill bg="secondary">
-                {tag}
-                <CloseButton
-                  variant="white"
-                  onClick={() => handleTagDismiss(tag)}
-                ></CloseButton>
-              </Badge>
-            ))}
-          </Form.Group> */}
-
+        
           <Form.Group controlId="blogContent" className="newblogfields">
             <Form.Label>Content:</Form.Label>
             {/* <QuillEditor content={content} onContentChange={setContent} /> */}
@@ -494,7 +410,7 @@ const NewBlog = () => {
               VIDEO_ID: cfbepul-yHY?si=Xt6YWbm1M2AgWfjx
             </small>
             <br />
-            <button
+            <button className="bs-button-outline"
               onClick={() => {
                 navigator.clipboard.writeText(`
           <div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;">

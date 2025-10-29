@@ -112,7 +112,6 @@ const App = () => {
                 <Route path="/blogs" element={<AllBlogs />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
-                {/* <Route path="/mynotes" element={<SignupPage />} /> */}
                 <Route
                   path="/newblog"
                   element={

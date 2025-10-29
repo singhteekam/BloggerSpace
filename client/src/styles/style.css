@@ -647,6 +647,18 @@ html {
 /*  NewBlog  */
 /* =========== */
 
+.generate-ai-btn{
+  margin-top: 5px;
+  background: linear-gradient(90deg, #bcb5e3, #0d9caf) !important;
+  color: var(--color-mint) !important;
+}
+.generate-ai-btn:hover{
+  background: linear-gradient(90deg, #9f95d4, #65d6e5) !important;
+  color: var(--color-teal-green) !important;
+  font-weight: bold !important;
+}
+
+
 .editor-wrapper {
   border: 1px solid #ced4da;
   border-radius: 5px;

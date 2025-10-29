@@ -986,11 +986,11 @@ exports.fileUpload = async (req, res) => {
     fileName = `${timestamp}_${name}${ext}`; // Append timestamp to filename
 
     // Construct the file URL
-    const fileUrl = `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/${process.env.GITHUBBRANCH}/uploads/${fileName}`;
+    const fileUrl = `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO_FILEUPLOAD}/${process.env.GITHUBBRANCH}/uploads/${fileName}`;
 
     // Upload the file to GitHub repository
     const uploadResponse = await axios.put(
-      `https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/contents/uploads/${fileName}`,
+      `https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO_FILEUPLOAD}/contents/uploads/${fileName}`,
       {
         message: `Upload ${new Date().toISOString()}`, // Commit message
         content: fileBuffer.toString("base64"), // Encode file content to Base64
@@ -1015,7 +1015,7 @@ exports.fetchUploadedFiles = async (req, res) => {
   try {
     // Fetch the contents of the uploads folder in the GitHub repo
     const response = await axios.get(
-      `https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/contents/uploads`,
+      `https://api.github.com/repos/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO_FILEUPLOAD}/contents/uploads`,
       {
         headers: {
           Authorization: `Bearer ${process.env.GITHUBACCESSTOKEN}`,
@@ -1037,7 +1037,7 @@ exports.fetchUploadedFiles = async (req, res) => {
       .map((item) => ({
         fileName: item.name,
         fileUrl: item.download_url, // Raw file URL from GitHub
-        filePreview: `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO}/${process.env.GITHUBBRANCH}/uploads/${item.name}`, // Preview URL
+        filePreview: `https://raw.githubusercontent.com/${process.env.GITHUBOWNER}/${process.env.GITHUBREPO_FILEUPLOAD}/${process.env.GITHUBBRANCH}/uploads/${item.name}`, // Preview URL
       }));
 
       const sortedImages = images.sort((a, b) => {
