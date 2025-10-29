@@ -1,6 +1,9 @@
 import React from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "components/ErrorFallback/ErrorFallback";
+
 import LoginPage from "components/LoginPage/LoginPage.js";
 import SignupPage from "components/SignUpPage/SignupPage.js";
 import Header from "components/Header/Header.js";
@@ -100,108 +103,116 @@ const App = () => {
 
           <main>
             <ScrollToTop />
-            <Routes>
-              <Route path="/" element={<HomePage />} exact />
-              <Route path="/blogs" element={<AllBlogs />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              {/* <Route path="/mynotes" element={<SignupPage />} /> */}
-              <Route
-                path="/newblog"
-                element={
-                  <ProtectedRoute>
-                    <NewBlog />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/editblog/:id"
-                element={
-                  <ProtectedRoute>
-                    <EditBlog />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/verify-account" element={<VerifyAccountPage />} />
-              <Route
-                path="/myprofile"
-                element={
-                  <ProtectedRoute>
-                    <MyProfilePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-              <Route path="/profile/:username" element={<UserProfile />} />
-              <Route
-                path="/resetpassword/:resetToken"
-                element={<ResetPasswordPage />}
-              />
-              <Route
-                path="/changepassword"
-                element={
-                  <ProtectedRoute>
-                    <ChangePasswordPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/myblogs"
-                element={
-                  <ProtectedRoute>
-                    <MyBlogs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
-              <Route path="/guidelines" element={<WritingGuidelines />} />
-              <Route
-                path="/savedblogs"
-                element={
-                  <ProtectedRoute>
-                    <SavedBlogs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/improveblog/:blogId"
-                element={
-                  <ProtectedRoute>
-                    <ImproveBlog />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/sitemap" element={<Sitemap />} />
-              <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-              <Route
-                path="/termsandconditions"
-                element={<TermsAndConditions />}
-              />
-              <Route path="/about" element={<AboutBloggerSpace />} />
+            <ErrorBoundary
+              FallbackComponent={ErrorFallback}
+              onReset={() => window.location.reload()}
+            >
+              <Routes>
+                <Route path="/" element={<HomePage />} exact />
+                <Route path="/blogs" element={<AllBlogs />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                {/* <Route path="/mynotes" element={<SignupPage />} /> */}
+                <Route
+                  path="/newblog"
+                  element={
+                    <ProtectedRoute>
+                      <NewBlog />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/editblog/:id"
+                  element={
+                    <ProtectedRoute>
+                      <EditBlog />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/verify-account" element={<VerifyAccountPage />} />
+                <Route
+                  path="/myprofile"
+                  element={
+                    <ProtectedRoute>
+                      <MyProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/forgotpassword"
+                  element={<ForgotPasswordPage />}
+                />
+                <Route path="/profile/:username" element={<UserProfile />} />
+                <Route
+                  path="/resetpassword/:resetToken"
+                  element={<ResetPasswordPage />}
+                />
+                <Route
+                  path="/changepassword"
+                  element={
+                    <ProtectedRoute>
+                      <ChangePasswordPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/myblogs"
+                  element={
+                    <ProtectedRoute>
+                      <MyBlogs />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/aboutdeveloper" element={<AboutDeveloper />} />
+                <Route path="/guidelines" element={<WritingGuidelines />} />
+                <Route
+                  path="/savedblogs"
+                  element={
+                    <ProtectedRoute>
+                      <SavedBlogs />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/improveblog/:blogId"
+                  element={
+                    <ProtectedRoute>
+                      <ImproveBlog />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/sitemap" element={<Sitemap />} />
+                <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                <Route
+                  path="/termsandconditions"
+                  element={<TermsAndConditions />}
+                />
+                <Route path="/about" element={<AboutBloggerSpace />} />
 
-              <Route path="/community" element={<CommunityPage />} />
-              <Route
-                path="/community/post/:communityPostId/:communityPostSlug"
-                element={<ViewCommunityPost />}
-              />
+                <Route path="/community" element={<CommunityPage />} />
+                <Route
+                  path="/community/post/:communityPostId/:communityPostSlug"
+                  element={<ViewCommunityPost />}
+                />
 
-              <Route path="/adminblogs" element={<AdminBlogs />} />
+                <Route path="/adminblogs" element={<AdminBlogs />} />
 
-              <Route path="/auth-success" element={<AuthSuccess />} />
-              
-              <Route path="/:blogSlug" element={<ViewBlog />} />
-              <Route path="*" element={<PageNotFound />} />
-              {/* <Route path="*" element={<Navigate to="/" />} /> */}
-              {/* <Route element={<PageNotFound />} /> */}
-            </Routes>
+                <Route path="/auth-success" element={<AuthSuccess />} />
+
+                <Route path="/:blogSlug" element={<ViewBlog />} />
+                <Route path="*" element={<PageNotFound />} />
+                {/* <Route path="*" element={<Navigate to="/" />} /> */}
+                {/* <Route element={<PageNotFound />} /> */}
+              </Routes>
+            </ErrorBoundary>
           </main>
           <Footer />
         </BrowserRouter>

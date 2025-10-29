@@ -15,8 +15,8 @@ const { onRequest } = require('firebase-functions/v2/https');
 require("dotenv").config(); // Load environment variables from .env file - Production mode
 // require("dotenv").config({ path: ".env.local" }); // development mode
 
-// const PORT = process.env.PORT || 5000; // For development
-const PORT = 8183;  // For production
+const PORT = process.env.PORT || 5000; // For development
+// const PORT = 8183;  // For production
 
 const connectDB = require("./db/db");
 const blogs = require("./routes/blogs");
@@ -164,5 +164,5 @@ app.get("/api/viewlogs", async (req, res) => {
 app.listen(PORT, console.log("Server started at " + PORT+ " and pid: "+ process.pid));
 
 
-exports.bloggerspacebackend = onRequest(app);
+exports.bloggerspacebackend2 = onRequest(app);
 // exports.bloggerspacebackend = functions.https.onRequest(app);

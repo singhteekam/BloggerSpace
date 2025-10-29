@@ -28,6 +28,7 @@
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.2.0",
     "react-draft-wysiwyg": "^1.15.0",
+    "react-error-boundary": "^6.0.0",
     "react-helmet": "^6.1.0",
     "react-icons": "^4.8.0",
     "react-quill": "^2.0.0",

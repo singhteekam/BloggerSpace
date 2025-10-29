@@ -799,3 +799,12 @@ html {
 .card-footer-button:hover {
   background-color: var(--color-spearmint) !important;
 }
+
+
+/* Fallback UI Component */
+
+.fallback-ui-container{
+  padding-top: 100px;
+  text-align: center;
+  color: #167d7f;
+}

@@ -272,6 +272,8 @@ exports.fetchRelatedBlogs = async (req, res) => {
       .select("title slug blogViews category")
       .limit(5);
 
+      // console.log(relatedBlogs)
+
     res.json({ blogs: relatedBlogs });
   } catch (err) {
     console.error(err);
