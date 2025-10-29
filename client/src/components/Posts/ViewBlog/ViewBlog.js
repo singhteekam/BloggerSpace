@@ -42,12 +42,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import TopViewedBlogs from "./TopViewedBlogs";
 
 const ViewBlog = () => {
-  const { blogs, loading } = useBlogs();
+  const { blogs, loading: blogsLoading } = useBlogs();
   const { user, logout } = useContext(AuthContext);
   const { blogSlug } = useParams();
 
   const queryClient = useQueryClient();
-  const { data: blog, isLoading } = useBlog(blogSlug);
+  const { data: blog, isLoading: blogLoading,isError  } = useBlog(blogSlug);
 
   // const [blog, setBlog] = useState(null);
   // const [loading, setLoading] = useState(true);
@@ -372,17 +372,25 @@ const ViewBlog = () => {
       });
   };
 
-  if (loading) {
-    return <PreLoader isLoading={loading} />;
-  }
-
-  if (!blog) {
+    if (blogsLoading || blogLoading) return <PreLoader isLoading={true} />;
+  if (isError || !blog)
     return (
       <Container className="d-flex justify-content-center align-items-center vh-100">
-        <div>Blog not found.</div>
+        <div>Blog not found or failed to load.</div>
       </Container>
     );
-  }
+
+  // if (loading) {
+  //   return <PreLoader isLoading={loading} />;
+  // }
+
+  // if (!blog) {
+  //   return (
+  //     <Container className="d-flex justify-content-center align-items-center vh-100">
+  //       <div>Blog not found.</div>
+  //     </Container>
+  //   );
+  // }
 
   // if (notFound) {
   //   // Render the PageNotFound component when an error occurs
@@ -511,7 +519,7 @@ const ViewBlog = () => {
                       </Link>
                       <br />
 
-                      {blog.authorDetails._id === userId ? (
+                      {/* {blog.authorDetails._id === userId ? (
                         ""
                       ) : blog.authorDetails.followers?.find(
                           (element) => element === userId
@@ -539,7 +547,7 @@ const ViewBlog = () => {
                         >
                           Follow +
                         </Button>
-                      )}
+                      )} */}
                     </div>
                   ) : (
                     <div className="mx-2 my-2">
@@ -863,7 +871,7 @@ const ViewBlog = () => {
             </div>
             <div className="viewblog-flex2 bgcolor-mint">
               <TableOfContent />
-              <RelatedBlogs blogId={blog?._id} />
+              {blog._id && <RelatedBlogs blogId={blog._id} />}
               <TopViewedBlogs />
             </div>
           </div>
