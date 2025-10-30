@@ -647,16 +647,35 @@ html {
 /*  NewBlog  */
 /* =========== */
 
-.generate-ai-btn{
+.generate-ai-btn {
   margin-top: 5px;
-  background: linear-gradient(90deg, #bcb5e3, #0d9caf) !important;
+  background: linear-gradient(270deg, #bcb5e3, #0d9caf, #bcb5e3);
+  background-size: 400% 400%;
   color: var(--color-mint) !important;
+  border: none;
+  animation: gradientMove 6s ease infinite;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.generate-ai-btn:hover{
-  background: linear-gradient(90deg, #9f95d4, #65d6e5) !important;
+
+.generate-ai-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 156, 175, 0.3);
   color: var(--color-teal-green) !important;
   font-weight: bold !important;
 }
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 
 
 .editor-wrapper {

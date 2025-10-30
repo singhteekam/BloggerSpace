@@ -265,3 +265,11 @@
 [2025-10-30T00:00:31.646Z] [LOG] [INFO] - Blog: Difference between HTML and HTML5 fetched. Content size is: 1.5078125 KB
 [2025-10-30T00:00:31.646Z] [LOG] [INFO] - Blog: Difference between HTML and HTML5 fetched. Content size is: 1.5078125 KB
 [2025-10-30T00:00:31.646Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2025-10-30T20:59:20.743Z] [LOG] [DEBUG] - Topic is available: 
+[2025-10-30T20:59:20.783Z] [LOG] [DEBUG] - Topic is available: 
+[2025-10-30T20:59:59.998Z] [LOG] [DEBUG] - Topic is available: 
+[2025-10-30T21:00:07.005Z] [LOG] [DEBUG] - Topic is available: 
+[2025-10-30T21:00:13.017Z] [LOG] [DEBUG] - Topic is available: 
+[2025-10-30T21:01:44.016Z] [LOG] [DEBUG] - Topic is available: 
+[2025-10-30T21:08:02.886Z] [LOG] [DEBUG] - Topic is available: 
+[2025-10-30T21:08:03.215Z] [LOG] [DEBUG] - Topic is available: 

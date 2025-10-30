@@ -279,21 +279,51 @@ exports.saveEditedInReviewBlog = async (req, res) => {
 
 exports.publishedBlogs = async (req, res) => {
   try {
-    if (req.query.userId) {
-      // Query the Blog model for pending blogs assigned to the reviewer
-      const pendingBlogs = await Blog.find({
-        status: "PUBLISHED",
-      });
+    const { userId, page = 1, limit = 40 } = req.query;
 
-      res.json(pendingBlogs);
-    } else {
-      res.status(500).json({ error: "Failed to fetch PUBLISHED blogs" });
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
     }
+
+    const skip = (page - 1) * limit;
+
+    const blogs = await Blog.find({ status: "PUBLISHED" })
+      .sort({ lastUpdatedAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalCount = await Blog.countDocuments({ status: "PUBLISHED" });
+
+    res.json({
+      blogs,
+      totalCount,
+      currentPage: Number(page),
+      totalPages: Math.ceil(totalCount / limit),
+    });
   } catch (error) {
     console.error("Error fetching PUBLISHED blogs:", error);
     res.status(500).json({ error: "Failed to fetch PUBLISHED blogs" });
   }
-}; 
+};
+
+
+// exports.publishedBlogs = async (req, res) => {
+//   try {
+//     if (req.query.userId) {
+//       // Query the Blog model for pending blogs assigned to the reviewer
+//       const pendingBlogs = await Blog.find({
+//         status: "PUBLISHED",
+//       });
+
+//       res.json(pendingBlogs);
+//     } else {
+//       res.status(500).json({ error: "Failed to fetch PUBLISHED blogs" });
+//     }
+//   } catch (error) {
+//     console.error("Error fetching PUBLISHED blogs:", error);
+//     res.status(500).json({ error: "Failed to fetch PUBLISHED blogs" });
+//   }
+// }; 
 
 
 exports.allReviewersFromDB = async (req, res) => {
