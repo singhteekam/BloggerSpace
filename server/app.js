@@ -10,13 +10,13 @@ const path = require("path");
 
 // const functions = require("firebase-functions");
 
-const { onRequest } = require('firebase-functions/v2/https');
+const { onRequest } = require("firebase-functions/v2/https");
 
 require("dotenv").config(); // Load environment variables from .env file - Production mode
 // require("dotenv").config({ path: ".env.local" }); // development mode
 
 // const PORT = process.env.PORT || 5000; // For development
-const PORT = 8185;  // For production
+const PORT = 8186;  // For production
 
 const connectDB = require("./db/db");
 const blogs = require("./routes/blogs");
@@ -25,6 +25,7 @@ const authRoutes = require("./routes/users");
 const reviewerRouted = require("./routes/Reviewer/reviewerRoute");
 const adminRoutes = require("./routes/Admin/adminRoute");
 const communityRoutes = require("./routes/community");
+const autoWriteBlogs = require("./routes/autoWriteBlogs");
 
 const sitemapRouter = require("./routes/sitemap");
 
@@ -36,16 +37,18 @@ const { fileParser } = require("express-multipart-file-parser");
 // app.use(require('prerender-node').set('prerenderToken', process.env.PRERENDER_TOKEN).set('host', 'https://bloggerspace.singhteekam.in'));
 
 // Use the fileParser middleware
-app.use(fileParser({
-  rawBodyOptions: {
-      limit: '10mb', // Adjust the size limit as needed
-  },
-  busboyOptions: {
+app.use(
+  fileParser({
+    rawBodyOptions: {
+      limit: "10mb", // Adjust the size limit as needed
+    },
+    busboyOptions: {
       limits: {
-          fileSize: 5 * 1024 * 1024, // 5MB file size limit
+        fileSize: 5 * 1024 * 1024, // 5MB file size limit
       },
-  },
-}));
+    },
+  })
+);
 
 ////////////////////////////////////////////////////////////////////
 
@@ -62,8 +65,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin:
-     [
+    origin: [
       process.env.FRONTEND_URL,
       process.env.BLOGGERSPACE1,
       process.env.BLOGGERSPACE2,
@@ -113,6 +115,9 @@ app.use("/api/admin/", adminRoutes);
 // Community
 app.use("/api/community", communityRoutes);
 
+//Auto Writing Blogs
+app.use("/api/autowrite", autoWriteBlogs);
+
 //For capturing logs
 const { uploadLogsToGitHub, fetchLogsFile } = require("./utils/uploadToGitHub");
 app.get("/api/logs", (req, res) => {
@@ -161,8 +166,10 @@ app.get("/api/viewlogs", async (req, res) => {
 // }
 // else{
 // }
-app.listen(PORT, console.log("Server started at " + PORT+ " and pid: "+ process.pid));
-
+app.listen(
+  PORT,
+  console.log("Server started at " + PORT + " and pid: " + process.pid)
+);
 
 exports.bloggerspacebackend2 = onRequest(app);
 // exports.bloggerspacebackend = functions.https.onRequest(app);
