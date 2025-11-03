@@ -26,7 +26,7 @@ const fetchNextRowFromSheet = async () => {
       range: "Sheet1!2:2",
     });
     // console.log("D Sheet: ", dataGsheet)
-        return dataGsheet.data.values[0];
+    return dataGsheet.data.values[0];
   } catch (error) {
     console.log("Error occured: ", error);
     return {};
@@ -34,7 +34,8 @@ const fetchNextRowFromSheet = async () => {
 };
 
 const slugify = (title) => {
-  return title.trim()
+  return title
+    .trim()
     .toLowerCase()
     .replace(/[^a-zA-Z0-9 ]/g, "")
     .replace(/\s+/g, "-");
@@ -65,9 +66,9 @@ const createNewAIContent = async (title) => {
   }
 };
 
-const deleteRowFromSheet= async()=>{
-    try {
-        const spreadsheetId = process.env.SHEET_ID;
+const deleteRowFromSheet = async () => {
+  try {
+    const spreadsheetId = process.env.SHEET_ID;
     const sheetName = "Sheet1";
     const rowNumber = 2; // delete row 2
 
@@ -79,44 +80,51 @@ const deleteRowFromSheet= async()=>{
     const sheetId = sheet.properties.sheetId;
 
     sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        resource: {
-            requests: [
-                {
-                    deleteDimension: {
-                        range: {
-                            sheetId,
-                            dimension: "ROWS",
-                            startIndex: rowNumber - 1, // 0-based index
-                            endIndex: rowNumber, // exclusive
-                        },
-                    },
-                },
-            ],
-        },
+      spreadsheetId,
+      resource: {
+        requests: [
+          {
+            deleteDimension: {
+              range: {
+                sheetId,
+                dimension: "ROWS",
+                startIndex: rowNumber - 1, // 0-based index
+                endIndex: rowNumber, // exclusive
+              },
+            },
+          },
+        ],
+      },
     });
-      console.log("1 Row deleted");
-    } catch (error) {
-        console.log("Error....", error);
-    }
-}
+    console.log("1 Row deleted");
+  } catch (error) {
+    console.log("Error....", error);
+  }
+};
 
 router.get("/nextblog", async (req, res) => {
   try {
     const fetchedRow = await fetchNextRowFromSheet();
-    if(!fetchedRow || Object.keys(fetchedRow).length === 0){
-        console.log("No data found!!")
-        return res.status(404).json({ message: "No record found in sheet!!"});
+    if (!fetchedRow || Object.keys(fetchedRow).length === 0) {
+      console.log("No data found!!");
+      return res.status(404).json({ message: "No record found in sheet!!" });
     }
     console.log(fetchedRow);
-    const tags= fetchedRow[2] ? fetchedRow[2].split(",").map(tag => tag.trim()).filter(tag => tag) : []
+    const tags = fetchedRow[2]
+      ? fetchedRow[2]
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag)
+      : [];
     const blogPayload = new Blog({
       slug: slugify(fetchedRow[0]),
       title: fetchedRow[0],
       content: await createNewAIContent(fetchedRow[0]),
       category: fetchedRow[1],
       tags: tags,
-      authorDetails: new mongoose.Types.ObjectId(process.env.AUTO_WRITTEN_BLOG_USERID),
+      authorDetails: new mongoose.Types.ObjectId(
+        process.env.AUTO_WRITTEN_BLOG_USERID
+      ),
       lastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
     });
     const savedBlog = await blogPayload.save();
@@ -124,18 +132,16 @@ router.get("/nextblog", async (req, res) => {
     await deleteRowFromSheet();
 
     // Sending mail to author
-    const receiver = process.env.AUTO_WRITTEN_BLOG_USEREMAIL;
-    const subject = "Blog submitted for review";
+    const receiver = process.env.EMAIL;
+    const subject = "Admin- New Blog submitted for review";
     const html = `
   <div class="content">
     <h2>Hello, ${receiver}!</h2>
-    <p>Your blog is submitted for review.</p>
+    <p>New Auto AI blog is submitted for review.</p>
     <p>Topic: <span style="color:#167d7f; font-weight:bold">${fetchedRow[0]}</span></p>
     <p>Category: <span style="color:#167d7f; font-weight:bold">${fetchedRow[1]}</span></p>
     <p>Tags: <span style="color:#167d7f; font-weight:bold">${fetchedRow[2]}</span></p>
     <br />
-    <p>Your blog will be reviewed shortly.</p>
-    <p><a href="${process.env.FRONTEND_URL}/myblogs" class="button">Track status</a></p>
   </div>
     `;
 
@@ -147,15 +153,95 @@ router.get("/nextblog", async (req, res) => {
         console.error("Error sending email:", error);
       });
 
-    res.status(201).json({message:"New blog from sheet: "+fetchedRow[0]});
-} catch (error) {
-    console.log("Error--", error)
+    res.status(201).json({ message: "New blog from sheet: " + fetchedRow[0] });
+  } catch (error) {
+    console.log("Error--", error);
     await deleteRowFromSheet();
     res.status(500).json({ message: "Something went wrong", error: error });
   }
 });
 
+router.get("/autopublish", async (req, res) => {
+  try {
+    const blogs = await Blog.find({
+      status: "PENDING_REVIEW",
+      authorDetails: new mongoose.Types.ObjectId(
+        process.env.AUTO_WRITTEN_BLOG_USERID
+      ),
+    })
+      .populate("authorDetails")
+      .exec();
 
+    if (!blogs) {
+      return res.status(404).json({ error: "blogs not found" });
+    }
+
+    blogs.map(async (blog) => {
+      blog.status = "PUBLISHED";
+      blog.reviewedBy.push({
+        ReviewedBy: {
+          Id: new mongoose.Types.ObjectId(process.env.AUTOWRITE_ADMIN_USERID),
+          Email: process.env.EMAIL,
+          Role: "Admin",
+        },
+        Revision: "NA",
+        Rating: 5,
+        Remarks: "Auto-Ok",
+        statusTransition: "PENDING_REVIEW-PUBLISHED",
+        LastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
+      });
+      blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
+
+      await blog.save();
+
+      console.log(blog.authorDetails.email);
+
+      const receiver = blog.authorDetails.email;
+      const subject = "Published!!";
+      const html = `
+  <div class="content">
+    <h2>Hi ${blog.authorDetails.fullName},</h2>
+    <p>Congratulations!! Your blog is published.</p>
+    <p>Topic: <span style="color:#167d7f; font-weight:bold">${blog.title}</span></p>
+    <p>Published Link: <a href="${process.env.FRONTEND_URL}/${blog.slug}">${process.env.FRONTEND_URL}/${blog.slug}</a></p>
+  </div>
+    `;
+
+      sendEmail(receiver, subject, html)
+        .then((response) => {
+          console.log(`Email sent to ${receiver}:`, response);
+        })
+        .catch((error) => {
+          console.error("Error sending email:", error);
+        });
+
+      // Sending mail to admin
+      const receiver2 = process.env.EMAIL;
+      const subject2 = "Auto-Blog Published!!";
+      const html2 = `
+    <div class="content">
+    <h2>Hi Admin,</h2>
+    <p>Congratulations!! New auto-blog is published.</p>
+    <p>Topic: <span style="color:#167d7f; font-weight:bold">${blog.title}</span></p>
+    <p>Published Link: <a href="${process.env.FRONTEND_URL}/${blog.slug}">${process.env.FRONTEND_URL}/${blog.slug}</a></p>
+  </div>
+    `;
+
+      sendEmail(receiver2, subject2, html2)
+        .then((response) => {
+          console.log(`Email sent to ${receiver}:`, response);
+        })
+        .catch((error) => {
+          console.error("Error sending email:", error);
+        });
+    });
+
+    res.status(200).json({ message: "auto-blogs published successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error: error });
+  }
+});
 
 // const fs= require('fs');
 // const { google } = require("googleapis");
@@ -167,7 +253,7 @@ router.get("/nextblog", async (req, res) => {
 // });
 
 // async function saveToGoogleSheet(data) {
-//   const sheets = google.sheets({ version: "v4", auth }); 
+//   const sheets = google.sheets({ version: "v4", auth });
 
 //   const values = data.map((item) => [
 //     item.firstName,
@@ -208,7 +294,6 @@ router.get("/nextblog", async (req, res) => {
 // ];
 
 // saveToGoogleSheet(exampleData).catch(console.error);
-
 
 // router.get("/fetch-next", async (req, res) => {
 //   try {
