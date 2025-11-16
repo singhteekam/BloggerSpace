@@ -45,9 +45,22 @@ const createNewAIContent = async (title) => {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
 
-    const prompt = `Write a blog in HTML format for the title: "${title}". 
-      Use proper HTML tags like <h1>, <p>, <ul>, <li>, <strong>, etc. 
-      Do NOT include <html>, <head>, or <body> tags. Only the content inside.`;
+    // const prompt = `Write a blog in HTML format for the title: "${title}".
+    //   Use proper HTML tags like <h1>, <p>, <ul>, <li>, <strong>, etc.
+    //   Do NOT include <html>, <head>, or <body> tags. Only the content inside.`;
+
+    const prompt = `
+Write a detailed, well-structured blog post in clean HTML format for the title: "${title}". 
+
+Guidelines:
+- Use proper semantic HTML tags like <h1>, <h2>, <p>, <ul>, <li>, <code>, <pre>, <strong>, <em>, etc.
+- Do NOT include <html>, <head>, or <body> tags — only the inner HTML content.
+- Ensure the content is SEO-friendly, informative, and easy to read.
+- If the topic is technical, include clear explanations with accurate and formatted code examples inside <pre><code> blocks.
+- Avoid restating the title at the beginning of the content.
+- Do NOT end with phrases like "Would you like me to create visuals or examples for this?" or similar meta text.
+- Maintain a professional and engaging tone throughout.
+`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -110,6 +123,7 @@ router.get("/nextblog", async (req, res) => {
       return res.status(404).json({ message: "No record found in sheet!!" });
     }
     console.log(fetchedRow);
+    const aiContent= await createNewAIContent(fetchedRow[0]);
     const tags = fetchedRow[2]
       ? fetchedRow[2]
           .split(",")
@@ -119,7 +133,7 @@ router.get("/nextblog", async (req, res) => {
     const blogPayload = new Blog({
       slug: slugify(fetchedRow[0]),
       title: fetchedRow[0],
-      content: await createNewAIContent(fetchedRow[0]),
+      content: aiContent,
       category: fetchedRow[1],
       tags: tags,
       authorDetails: new mongoose.Types.ObjectId(
@@ -141,6 +155,7 @@ router.get("/nextblog", async (req, res) => {
     <p>Topic: <span style="color:#167d7f; font-weight:bold">${fetchedRow[0]}</span></p>
     <p>Category: <span style="color:#167d7f; font-weight:bold">${fetchedRow[1]}</span></p>
     <p>Tags: <span style="color:#167d7f; font-weight:bold">${fetchedRow[2]}</span></p>
+    <p>Content:</p> <div class="blog-content">${aiContent}</div>
     <br />
   </div>
     `;
@@ -181,7 +196,7 @@ router.get("/autopublish", async (req, res) => {
       blog.reviewedBy.push({
         ReviewedBy: {
           Id: new mongoose.Types.ObjectId(process.env.AUTOWRITE_ADMIN_USERID),
-          Email: process.env.EMAIL,
+          Email: process.env.AUTOWRITE_ADMIN_EMAIL,
           Role: "Admin",
         },
         Revision: "NA",
@@ -190,7 +205,7 @@ router.get("/autopublish", async (req, res) => {
         statusTransition: "PENDING_REVIEW-PUBLISHED",
         LastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
       });
-      blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
+      // blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
 
       await blog.save();
 
@@ -237,7 +252,6 @@ router.get("/autopublish", async (req, res) => {
     });
 
     res.status(200).json({ message: "auto-blogs published successfully" });
-
   } catch (error) {
     res.status(500).json({ message: "Something went wrong", error: error });
   }

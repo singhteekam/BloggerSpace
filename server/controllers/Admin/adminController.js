@@ -217,7 +217,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
       LastUpdatedAt: new Date(new Date().getTime() + 330 * 60000),
     });
     // blog.lastUpdatedAt= Date.now();
-    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
+    // blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);   // TEMP
     blog.tags=tags;
 
     // Save the updated blog

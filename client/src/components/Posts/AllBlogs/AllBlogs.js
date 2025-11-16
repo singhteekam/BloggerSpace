@@ -154,8 +154,11 @@ const AllBlogs = () => {
           Showing page {page} of {totalPages}, Results: {filteredBlogs.length}
         </i>
 
-        {/* 🔍 Search */}
-        <InputGroup className="mb-3">
+
+
+        {/* TODO */}
+
+        {/* <InputGroup className="mb-3">
           <InputGroup.Text>Search by title</InputGroup.Text>
           <Form.Control
             placeholder="Search any blog..."
@@ -167,7 +170,6 @@ const AllBlogs = () => {
           />
         </InputGroup>
 
-        {/* 🧩 Filter Section */}
         <Row className="mb-3 align-items-center">
           <Col md={6}>
             <InputGroup>
@@ -216,7 +218,7 @@ const AllBlogs = () => {
               </InputGroup>
             </Col>
           )}
-        </Row>
+        </Row> */}
 
         {/* 📰 Blog Cards */}
         {filteredBlogs.length === 0 ? (

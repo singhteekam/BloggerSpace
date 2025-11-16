@@ -372,7 +372,8 @@ const ViewBlog = () => {
       });
   };
 
-    if (blogsLoading || blogLoading) return <PreLoader isLoading={true} />;
+    if (blogLoading) 
+      return <PreLoader isLoading={true} />;
   if (isError || !blog)
     return (
       <Container className="d-flex justify-content-center align-items-center vh-100">
@@ -411,7 +412,8 @@ const ViewBlog = () => {
     return textContent;
   }
 
-  const canonicalUrl = `${window.location.origin}/${blogSlug}`;
+  const canonicalUrl = `${process.env.REACT_APP_FRONTEND_URL}/${blogSlug}`;
+
 
   return (
     <section className="newpage-section">
