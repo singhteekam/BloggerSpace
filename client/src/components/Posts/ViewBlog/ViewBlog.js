@@ -421,7 +421,7 @@ const ViewBlog = () => {
 
       <Helmet>
         <meta name="description" content={stripHtmlTags(blog?.content)} />
-        <title>{blog?.title ? `${blog.title} - BloggerSpace` : "BloggerSpace"}</title>
+        <title>{blog?.title ? `${blog.title} - BloggerSpace` : {blogSlug}}</title>
 
 
         <meta property="og:title" content={blog?.title} />
