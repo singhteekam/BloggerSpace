@@ -87,7 +87,7 @@ const App = () => {
             />
             <meta name="twitter:site" content="@singh__teekam" />
 
-            <link rel="canonical" href={window.location.href} />
+            {/* <link rel="canonical" href={window.location.href} /> */}
 
             <script
               async
