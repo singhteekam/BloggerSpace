@@ -460,12 +460,12 @@ const ViewBlog = () => {
                   <i className="mx-3">
                     Last Updated: {blog?.lastUpdatedAt?.slice(0, 10)}
                   </i>
-                  <i
+                  {/* <i
                     className={`fa-${thumbColor} fa-thumbs-up fa-xl`}
                     onClick={
                       disableLikeButton === false ? handleBlogLikes : null
                     }
-                  ></i>{" "}
+                  ></i>{" "} */}
                   {/* {blog?.likes.length} */}
                   {blog?.blogLikes?.length}
                   {isBlogSaved ? (
