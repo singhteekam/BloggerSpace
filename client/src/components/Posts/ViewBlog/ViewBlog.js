@@ -467,7 +467,7 @@ const ViewBlog = () => {
                     }
                   ></i>{" "} */}
                   {/* {blog?.likes.length} */}
-                  {blog?.blogLikes?.length}
+                  {/* {blog?.blogLikes?.length} */}
                   {isBlogSaved ? (
                     <IoBookmark
                       size="25px"
