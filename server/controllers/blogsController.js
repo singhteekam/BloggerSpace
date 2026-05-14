@@ -232,7 +232,7 @@ exports.fetchTopViewedBlogs = async (req, res) => {
     const blogs = await Blog.find({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
       .sort({ blogViews: -1 })
       .limit(10)
-      .select("title slug blogViews"); // Select only needed fields
+      .select("title slug blogViews blogLikes"); // Select only needed fields
 
     res.json({ blogs });
   } catch (err) {
@@ -245,7 +245,9 @@ exports.fetchRelatedBlogs = async (req, res) => {
   try {
     const { blogId } = req.params;
 
-    const currentBlog = await Blog.findById(blogId);
+    // NEW- Fixed: blogId is a custom numeric field, not the MongoDB ObjectId (_id).
+    // Blog.findById() queries _id and throws a CastError on numeric strings.
+    const currentBlog = await Blog.findOne({ blogId: blogId });
     if (!currentBlog) {
       return res.status(404).json({ message: "Blog not found" });
     }
@@ -260,17 +262,17 @@ exports.fetchRelatedBlogs = async (req, res) => {
           word.length > 2
       );
 
-    // Fetch blogs that share category or matching title words
+    // NEW- Fixed exclusion field: use blogId (custom numeric) not _id (ObjectId)
     const relatedBlogs = await Blog.find({
-      _id: { $ne: blogId },
+      blogId: { $ne: blogId },
       $or: [
         { category: currentBlog.category },
         { title: { $regex: keywords.join("|"), $options: "i" } },
       ],
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
     })
-      .select("title slug blogViews category")
-      .limit(5);
+      .select("title slug blogViews blogLikes category tags")
+      .limit(6);
 
       // console.log(relatedBlogs)
 
@@ -513,21 +515,21 @@ exports.saveAsDraftBlog = async (req, res) => {
 
 exports.isUniqueTitle = async (req, res) => {
   try {
-    const { title } = req.body;
-    const blog = await Blog.findOne({ title: title });
+    const { title, excludeId } = req.body;
+    const query = excludeId
+      ? { title, _id: { $ne: excludeId } }
+      : { title };
+    const blog = await Blog.findOne(query).select("_id").lean();
     if (!blog) {
       logger.debug("Topic is available: " + title);
-      return res.json("Available");
+      return res.json({ message: "Available" });
     } else {
-      logger.error("Topic is not avaialable: " + title);
-      return res.json("Already exists");
+      logger.debug("Topic is not available: " + title);
+      return res.json({ message: "Already exists" });
     }
   } catch (error) {
     logger.error("Error checking isuniquetitle: " + error);
-    console.error("Error checking isuniquetitle: ", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while checking isuniquetitle" });
+    res.status(500).json({ error: "An error occurred while checking isuniquetitle" });
   }
 };
 
@@ -631,21 +633,34 @@ exports.createNewBlog = async (req, res) => {
 
 exports.createNewAIBlog = async (req, res) => {
   try {
+    const { title } = req.body;
+    if (!title?.trim()) return res.status(400).json({ error: "Title is required" });
+
     const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
 
-    const prompt = `Write a blog in HTML format for the title: "${req.body.title}". 
-    Use proper HTML tags like <h1>, <p>, <ul>, <li>, <strong>, etc. 
-    Do NOT include <html>, <head>, or <body> tags. Only the content inside.`;
+    const prompt = `
+Write a detailed, well-structured blog post in clean HTML format for the title: "${title}".
+
+Guidelines:
+- Use proper semantic HTML tags like <h2>, <h3>, <p>, <ul>, <li>, <code>, <pre>, <strong>, <em>, <blockquote>, etc.
+- Do NOT include <html>, <head>, <body>, or <h1> tags — only the inner HTML content.
+- Ensure the content is SEO-friendly, informative, and easy to read.
+- If the topic is technical, include clear explanations with formatted code examples inside <pre><code> blocks.
+- Do NOT restate the title at the beginning.
+- Do NOT end with meta phrases like "Would you like me to…" or similar.
+- Maintain a professional and engaging tone throughout.
+`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
     });
-    const data = response.text;
-    // console.log(data);
-    res.json(data);
+
+    // Return raw HTML — frontend sets it directly in the editor
+    res.json({ html: response.text });
   } catch (error) {
     console.log("Error generating AI blog:", error);
+    res.status(500).json({ error: "AI generation failed" });
   }
 };
 
@@ -798,22 +813,20 @@ exports.postNewBlogComment = async (req, res) => {
     // await blog.populate({ path: "comments.user", select: "email fullName" }).execPopulate();
     await blog.populate("comments.user", "email userName profilePicture");
 
-    // Get the newly added comment with user details
-    const addedComment = blog.comments.findLast((comment) =>
-      comment.user._id.equals(req.body.userId)
-    );
-
-    if (!addedComment) {
-      return res.status(500).json({ message: "Failed to add comment" });
-    }
-
-    const comments = blog.comments.map((comment) => ({
-      _id: comment._id,
-      content: comment.content,
-      userEmail: comment.user.email,
-      likes: comment.likes,
-      createdAt: addedComment.createdAt,
-    }));
+    // NEW- Removed findLast — it crashed when any older comment's user was deleted (null after
+    // populate). We don't need it: just map all comments and filter out null-user entries.
+    // NEW- Added userName to match what viewBlogComments returns and what the frontend expects.
+    // NEW- Fixed createdAt to use each comment's own timestamp (was using addedComment.createdAt for all).
+    const comments = blog.comments
+      .filter((comment) => comment.user != null)
+      .map((comment) => ({
+        _id: comment._id,
+        content: comment.content,
+        userEmail: comment.user.email,
+        userName: comment.user.userName,
+        likes: comment.likes,
+        createdAt: comment.createdAt,
+      }));
     console.log("Comments: ", comments);
     res.json(comments);
   } catch (error) {
@@ -871,6 +884,7 @@ exports.viewBlogComments = async (req, res) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.blogSlug })
       .populate("comments.user", "email userName profilePicture")
+      .populate("comments.commentReplies.replyCommentUser", "email userName profilePicture")
       .exec();
 
     if (!blog) {
@@ -880,15 +894,30 @@ exports.viewBlogComments = async (req, res) => {
       return res.status(404).json({ message: "blog not found" });
     }
 
-    const comments = blog.comments.map((comment) => ({
-      _id: comment._id,
-      content: comment.content,
-      userEmail: comment.user.email,
-      userName: comment.user.userName,
-      likes: comment.likes,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-    }));
+    const comments = blog.comments
+      .filter((comment) => comment.user != null)
+      .map((comment) => ({
+        _id: comment._id,
+        content: comment.content,
+        userEmail: comment.user.email,
+        userName: comment.user.userName,
+        profilePicture: comment.user.profilePicture,
+        commentLikes: comment.commentLikes,
+        createdAt: comment.createdAt,
+        commentReplies: (comment.commentReplies || [])
+          .filter((r) => r.replyCommentUser != null)
+          .map((r) => ({
+            _id: r._id,
+            replyCommentContent: r.replyCommentContent,
+            replyCommentUser: {
+              email: r.replyCommentUser.email,
+              userName: r.replyCommentUser.userName,
+              profilePicture: r.replyCommentUser.profilePicture,
+            },
+            commentLikes: r.commentLikes,
+            createdAt: r.createdAt,
+          })),
+      }));
 
     res.json(comments);
   } catch (error) {
@@ -1047,13 +1076,10 @@ exports.blogLikes = async (req, res) => {
       });
       newThumbColor = "solid";
     } else if (thumbColor === "solid") {
-      // blog.likes.splice(blog.likes.indexOf(req.session.userId),1);
-      blog.blogLikes.splice(
-        blog.blogLikes
-          .map((e) => e.userId)
-          .indexOf(new mongoose.Types.ObjectId(req.query.userId)),
-        1
+      const idx = blog.blogLikes.findIndex(
+        (e) => e.userId.toString() === req.query.userId
       );
+      if (idx !== -1) blog.blogLikes.splice(idx, 1);
       newThumbColor = "regular";
     }
     // blog.likes=[];
@@ -1170,5 +1196,107 @@ exports.blogCommentLikes = async (req, res) => {
   } catch (error) {
     logger.error("Error occured when fetching comment likes of the blog.");
     res.status(500).json({ error: "An error occurred..." });
+  }
+};
+
+
+exports.fetchAdminPublishedBlogs = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 9;
+  const skip = (page - 1) * limit;
+  try {
+    const [blogs, total] = await Promise.all([
+      Blog.find({ status: "ADMIN_PUBLISHED" })
+        .skip(skip)
+        .limit(limit)
+        .sort({ lastUpdatedAt: -1 })
+        .populate("authorDetails", "userName fullName profilePicture")
+        .lean()
+        .exec(),
+      Blog.countDocuments({ status: "ADMIN_PUBLISHED" }),
+    ]);
+    res.json({ blogs, total, page, pages: Math.ceil(total / limit) });
+  } catch (error) {
+    console.error("Error fetching admin published blogs:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.getDistinctCategories = async (req, res) => {
+  try {
+    const categories = await Blog.distinct("category", {
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+      category: { $ne: null, $ne: "" },
+    });
+    res.json({ categories: categories.sort() });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.getDistinctTags = async (req, res) => {
+  try {
+    const tags = await Blog.distinct("tags", {
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    });
+    res.json({ tags: tags.filter(Boolean).sort() });
+  } catch (error) {
+    console.error("Error fetching tags:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.toggleBlogLike = async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) return res.status(400).json({ error: "userId required" });
+
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    // Deduplicate existing likes (keep last entry per userId)
+    const seen = new Set();
+    blog.blogLikes = blog.blogLikes.filter((l) => {
+      const key = l.userId.toString();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const idx = blog.blogLikes.findIndex((l) => l.userId.toString() === userId);
+    let liked;
+    if (idx !== -1) {
+      blog.blogLikes.splice(idx, 1);
+      liked = false;
+    } else {
+      blog.blogLikes.push({
+        userId: new mongoose.Types.ObjectId(userId),
+        likedTime: new Date(),
+      });
+      liked = true;
+    }
+
+    await blog.save();
+    res.json({ liked, likeCount: blog.blogLikes.length });
+  } catch (error) {
+    console.error("Error toggling blog like:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.getBlogLikeStatus = async (req, res) => {
+  const userId = req.query.userId;
+  try {
+    const blog = await Blog.findById(req.params.id).select("blogLikes").lean();
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    const liked = userId
+      ? blog.blogLikes.some((l) => l.userId.toString() === userId)
+      : false;
+    res.json({ liked, likeCount: blog.blogLikes.length });
+  } catch (error) {
+    console.error("Error fetching like status:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };

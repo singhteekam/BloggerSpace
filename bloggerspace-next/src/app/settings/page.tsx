@@ -1,0 +1,210 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import {
+  User as UserIcon,
+  Lock,
+  Shield,
+  AlertTriangle,
+  Loader2,
+  ChevronRight,
+  BadgeCheck,
+} from "lucide-react";
+import { isAxiosError } from "axios";
+import { toast } from "sonner";
+import { useRequireAuth } from "@/hooks/use-require-auth";
+import { useAuth } from "@/contexts/auth-context";
+import { userApi } from "@/lib/api/user";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+export default function SettingsPage() {
+  const { user, isLoading: authLoading } = useRequireAuth();
+  const { logout } = useAuth();
+  const router = useRouter();
+  const [deactivating, setDeactivating] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ["userinfo"],
+    queryFn: () => userApi.getInfo().then((r) => r.data),
+    enabled: !!user,
+  });
+
+  const handleDeactivate = async () => {
+    if (!user) return;
+    setDeactivating(true);
+    try {
+      await userApi.deactivateAccount(user._id);
+      toast.success("Account deactivated. You have been signed out.");
+      logout();
+      router.push("/");
+    } catch (err) {
+      toast.error(
+        isAxiosError(err)
+          ? (err.response?.data?.message ?? "Failed to deactivate account.")
+          : "Something went wrong.",
+      );
+    } finally {
+      setDeactivating(false);
+      setDialogOpen(false);
+    }
+  };
+
+  if (authLoading || profileLoading) return <SettingsSkeleton />;
+  if (!user) return null;
+
+  return (
+    <main className="mx-auto max-w-2xl px-6 py-12">
+      <h1 className="mb-8 font-serif text-3xl font-semibold tracking-tight">Settings</h1>
+
+      {/* Account overview */}
+      <section className="mb-8 rounded-2xl border border-border bg-card p-6">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          Account
+        </h2>
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="flex items-center gap-2 font-medium">
+                {profile?.fullName}
+                {profile?.isVerified && (
+                  <BadgeCheck className="size-4 fill-primary text-primary-foreground" />
+                )}
+              </p>
+              <p className="text-sm text-muted-foreground">{profile?.email ?? user.email}</p>
+              <p className="text-sm text-muted-foreground">@{profile?.userName ?? "—"}</p>
+            </div>
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              {profile?.isVerified ? "Verified" : "Unverified"}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick links */}
+      <section className="mb-8">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          Manage
+        </h2>
+        <div className="overflow-hidden rounded-xl border border-border">
+          <SettingsRow
+            icon={<UserIcon className="size-4" />}
+            label="Edit profile"
+            description="Update your name, username, and photo"
+            href="/myprofile"
+          />
+          <Separator />
+          <SettingsRow
+            icon={<Lock className="size-4" />}
+            label="Change password"
+            description="Update your account password"
+            href="/changepassword"
+          />
+          <Separator />
+          <SettingsRow
+            icon={<Shield className="size-4" />}
+            label="My blogs"
+            description="Manage your published and draft blogs"
+            href="/myblogs"
+          />
+        </div>
+      </section>
+
+      {/* Danger zone */}
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-destructive">
+          Danger zone
+        </h2>
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="flex items-center gap-2 font-medium text-foreground">
+                <AlertTriangle className="size-4 text-destructive" />
+                Deactivate account
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your account will be set to inactive. You will be signed out immediately. Contact
+                support to reactivate.
+              </p>
+            </div>
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="shrink-0">
+                  Deactivate
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Deactivate your account?</DialogTitle>
+                  <DialogDescription>
+                    Your account will be set to inactive. You will be signed out immediately.
+                    Your blogs and data will be preserved. Contact us to reactivate your account.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={deactivating}>
+                    Cancel
+                  </Button>
+                  <Button variant="destructive" onClick={handleDeactivate} disabled={deactivating}>
+                    {deactivating && <Loader2 className="size-4 animate-spin" />}
+                    Yes, deactivate
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function SettingsRow({
+  icon,
+  label,
+  description,
+  href,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <Link href={href} className="flex items-center gap-4 bg-card px-5 py-4 transition-colors hover:bg-muted/50">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        {icon}
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+    </Link>
+  );
+}
+
+function SettingsSkeleton() {
+  return (
+    <div className="mx-auto max-w-2xl px-6 py-12 space-y-8">
+      <Skeleton className="h-9 w-32" />
+      <Skeleton className="h-28 w-full rounded-2xl" />
+      <Skeleton className="h-40 w-full rounded-xl" />
+    </div>
+  );
+}

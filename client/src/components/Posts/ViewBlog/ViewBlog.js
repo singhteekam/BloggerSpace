@@ -147,6 +147,21 @@ const ViewBlog = () => {
     }
   };
 
+  useEffect(()=>{
+    const blogLikesFn= async ()=>{
+      try {
+      const response = await axios.get(`/api/blogs/${blogSlug}?userId=${userId}`);
+      // setBlog(response.data.blog);
+      console.log("Blog fetched at: " + new Date());
+      if (response.data.alreadyLiked === true) setThumbColor("solid");
+    } catch (error) {
+      toast.info("Error getting likes..");
+    }
+    }
+    blogLikesFn();
+  }, [disableLikeButton])
+
+
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
     if (commentContent.trim().length === 0) {
@@ -460,14 +475,14 @@ const ViewBlog = () => {
                   <i className="mx-3">
                     Last Updated: {blog?.lastUpdatedAt?.slice(0, 10)}
                   </i>
-                  {/* <i
+                  <i
                     className={`fa-${thumbColor} fa-thumbs-up fa-xl`}
                     onClick={
                       disableLikeButton === false ? handleBlogLikes : null
                     }
-                  ></i>{" "} */}
+                  ></i>{" "}
                   {/* {blog?.likes.length} */}
-                  {/* {blog?.blogLikes?.length} */}
+                  {blog?.blogLikes?.length}
                   {isBlogSaved ? (
                     <IoBookmark
                       size="25px"

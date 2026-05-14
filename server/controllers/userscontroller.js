@@ -188,12 +188,17 @@ exports.login = async (req, res) => {
     user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
     await user.save();
 
-    // You can generate a JWT token here if you want to implement authentication
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "3d", // Token expiration time
-    });
-    // console.log(token);
+    // Block reviewer applicants that are not yet approved
+    if (user.role === "reviewer" && user.reviewerStatus !== "approved") {
+      return res.status(403).json({ message: "Your reviewer application is still pending admin approval." });
+    }
+
+    // Unified JWT using CURRENT_JWT_SECRET (same secret as reviewer/admin)
+    const token = jwt.sign(
+      { userId: user._id, currentuserId: user._id, role: user.role || "user" },
+      process.env.CURRENT_JWT_SECRET,
+      { expiresIn: "3d" }
+    );
     const userDetails = {
       _id: user._id,
       fullName: user.fullName,
@@ -202,6 +207,8 @@ exports.login = async (req, res) => {
       isVerified: user.isVerified,
       profilePicture: user.profilePicture,
       savedBlogs: user.savedBlogs,
+      role: user.role || "user",
+      createdAt: user.createdAt,
     };
 
     // req.session.user = user; // Will remove in future
@@ -231,6 +238,21 @@ exports.logout = (req, res) => {
     res.clearCookie("sid"); // Clear the session cookie
     res.status(200).json({ message: "Logout successful" });
   });
+};
+
+exports.deactivateAccount = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    user.status = "INACTIVE";
+    await user.save();
+    res.json({ message: "Account deactivated successfully." });
+  } catch (error) {
+    console.error("Account deactivation failed:", error);
+    logger.error("Account deactivation failed: " + error.message);
+    res.status(500).json({ error: "Failed to deactivate the account" });
+  }
 };
 
 exports.deleteAccount = async (req, res) => {
@@ -509,8 +531,8 @@ exports.loggedInUserInfo = async (req, res) => {
     }
 
     // Verify and decode the JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.userId;
+    const decoded = jwt.verify(token, process.env.CURRENT_JWT_SECRET);
+    const userId = decoded.userId || decoded.currentuserId;
 
     // Fetch the user information from the database
     const user = await User.findById(userId);
@@ -552,6 +574,8 @@ exports.loggedInUserInfo = async (req, res) => {
       isVerified: user.isVerified,
       profilePicture: user.profilePicture,
       savedBlogs: user.savedBlogs,
+      role: user.role ?? "user",
+      createdAt: user.createdAt,
     };
     // console.log("LoggedIn user details fetched");
     logger.debug("LoggedIn user details fetched. Name: " + user.fullName);
@@ -566,9 +590,11 @@ exports.loggedInUserInfo = async (req, res) => {
 exports.userProfile = async (req, res) => {
   try {
     const userName = req.params.username;
+    const viewerId = req.query.viewerId || null;
+
     const user = await User.findOne({ userName })
-      .populate("following")
-      .populate("followers")
+      .select("fullName userName email profilePicture isVerified followers following createdAt")
+      .lean()
       .exec();
 
     if (!user) {
@@ -576,36 +602,56 @@ exports.userProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch posts by the author's username
+    // Mask email: first char + stars + @domain
+    const [local, domain] = user.email.split("@");
+    const maskedEmail = `${local[0]}${"*".repeat(Math.min(local.length - 1, 5))}@${domain}`;
+
+    // Fetch published blogs with stats
     const blogs = await Blogs.find({
       authorDetails: user._id,
-      status: "PUBLISHED",
-    });
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    })
+      .select("title slug blogViews blogLikes category tags createdAt lastUpdatedAt")
+      .sort({ lastUpdatedAt: -1 })
+      .lean();
 
-    // Here, you can customize the post data you want to send in the response
-    const userBlogs = blogs.map((blog) => {
-      return {
-        title: blog.title,
-        slug: blog.slug,
-        // Add more fields as needed
-      };
-    });
-
-    // Create the user profile object
-    const userProfile = {
-      id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      blogs: userBlogs,
-      followers: user.followers,
-      following: user.following,
-    };
+    const isFollowing = viewerId
+      ? user.followers.some((id) => id.toString() === viewerId)
+      : false;
 
     logger.info("Returning from user profile route with data.");
-    res.json(userProfile);
+    res.json({
+      _id: user._id,
+      fullName: user.fullName,
+      userName: user.userName,
+      email: maskedEmail,
+      profilePicture: user.profilePicture,
+      isVerified: user.isVerified,
+      followersCount: user.followers.length,
+      followingCount: user.following.length,
+      isFollowing,
+      blogs,
+      createdAt: user.createdAt,
+    });
   } catch (error) {
     logger.error("Error fetching user profile: " + error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getFollowStatus = async (req, res) => {
+  try {
+    const { targetId } = req.params;
+    const viewerId = req.query.viewerId;
+    if (!viewerId) return res.json({ isFollowing: false });
+
+    const target = await User.findById(targetId).select("followers").lean();
+    if (!target) return res.status(404).json({ message: "User not found" });
+
+    const isFollowing = target.followers.some((id) => id.toString() === viewerId);
+    res.json({ isFollowing });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -704,55 +750,33 @@ exports.getSavedBlogsOfUser = async (req, res) => {
 // Follow and Unfollow users
 exports.followUser = async (req, res) => {
   try {
-    if (!req.query.userId) {
-      console.log("You are not logged in..");
-      return res.status(404).json("You are not logged in..");
-    }
-    const response = await User.findByIdAndUpdate(
-      { _id: new mongoose.Types.ObjectId(req.params.idToFollow) },
-      {
-        $push: { followers: req.query.userId },
-      },
-      { new: true }
-    );
-    const response2 = await User.findByIdAndUpdate(
-      { _id: new mongoose.Types.ObjectId(req.query.userId) },
-      {
-        $push: { following: req.params.idToFollow },
-      },
-      { new: true }
-    );
+    if (!req.query.userId) return res.status(401).json({ error: "Not logged in" });
+    const targetId = req.params.idToFollow;
+    const userId = req.query.userId;
+    if (targetId === userId) return res.status(400).json({ error: "Cannot follow yourself" });
 
-    if (!response || !response2) return res.status(404).json({ error: error });
-    return res.json("Done");
+    await Promise.all([
+      User.findByIdAndUpdate(targetId, { $addToSet: { followers: userId } }),
+      User.findByIdAndUpdate(userId,   { $addToSet: { following: targetId } }),
+    ]);
+    return res.json({ message: "Followed" });
   } catch (error) {
     console.log(error);
-    return res.status(404).json({ error: "Error occured" + error });
+    return res.status(500).json({ error: "Error occurred" });
   }
 };
 
 exports.unfollowUser = async (req, res) => {
   try {
-    if (!req.query.userId) {
-      console.log("You are not logged in..");
-      return res.status(404).json("You are not logged in..");
-    }
-    const response = await User.findByIdAndUpdate(
-      { _id: new mongoose.Types.ObjectId(req.params.idToUnfollow) },
-      {
-        $pull: { followers: req.query.userId },
-      },
-      { new: true }
-    );
-    const response2 = await User.findByIdAndUpdate(
-      { _id: new mongoose.Types.ObjectId(req.query.userId) },
-      {
-        $pull: { following: req.params.idToUnfollow },
-      },
-      { new: true }
-    );
-    if (!response || !response2) return res.status(404).json({ error: error });
-    return res.json("Done");
+    if (!req.query.userId) return res.status(401).json({ error: "Not logged in" });
+    const targetId = req.params.idToUnfollow;
+    const userId = req.query.userId;
+
+    await Promise.all([
+      User.findByIdAndUpdate(targetId, { $pull: { followers: userId } }),
+      User.findByIdAndUpdate(userId,   { $pull: { following: targetId } }),
+    ]);
+    return res.json({ message: "Unfollowed" });
 
     // User.findByIdAndUpdate(
     //   req.params.idToUnfollow,

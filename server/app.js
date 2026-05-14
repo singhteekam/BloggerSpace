@@ -1,12 +1,15 @@
 const express = require("express");
-const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const helmet= require("helmet");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo")(session);
 const path = require("path");
+
+const app = express();
+app.use(helmet());
 
 // const functions = require("firebase-functions");
 
@@ -71,8 +74,10 @@ app.use(
       process.env.BLOGGERSPACE2,
       process.env.PANEL2BLOGGERSPACE1,
     ],
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    allowedHeaders: ["Content-Type", "Access-Control-Allow-Credentials"],
+    // NEW- Added PATCH method and Authorization header so the Next.js client
+    // can send Bearer JWT tokens and use PATCH for saved-blogs endpoint
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+    allowedHeaders: ["Content-Type", "Access-Control-Allow-Credentials", "Authorization"],
     credentials: true, // mandoatory for google auths
   })
 );

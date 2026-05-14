@@ -34,7 +34,14 @@ const {
   updateSitemapXML,
   downloadExcelReport,
   downloadPDFReport,
-  fetchAdminBlogs
+  fetchAdminBlogs,
+  migrateReviewersToUsers,
+  discardAnyBlog,
+  adminEditAnyBlog,
+  deleteBlogPermanently,
+  adminGetInfo,
+  adminUpdateProfile,
+  adminUploadProfilePicture,
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -102,5 +109,15 @@ router.get("/updatesitemapxml", adminMiddleware, updateSitemapXML);
 
 router.get("/dashboard/downloadexcel",adminMiddleware, downloadExcelReport)
 router.get("/dashboard/downloadpdf", adminMiddleware, downloadPDFReport)
+
+router.post("/dashboard/migrate-reviewers", adminMiddleware, migrateReviewersToUsers);
+
+router.post("/blogs/discard/:id", adminMiddleware, discardAnyBlog);
+router.put("/blogs/edit/:id", adminMiddleware, adminEditAnyBlog);
+router.delete("/blogs/delete/:id", adminMiddleware, deleteBlogPermanently);
+
+router.get("/profile", adminMiddleware, adminGetInfo);
+router.patch("/profile/update", adminMiddleware, adminUpdateProfile);
+router.post("/profile/uploadpicture", adminMiddleware, adminUploadProfilePicture);
 
 module.exports = router;

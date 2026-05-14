@@ -8,6 +8,7 @@ const {
   verifyAccountget,
   logout,
   deleteAccount,
+  deactivateAccount,
   forgetPassword,
   resetPassword,
   changePassword,
@@ -22,6 +23,7 @@ const {
   getSavedBlogsOfUser,
   followUser,
   unfollowUser,
+  getFollowStatus,
   contactUs,
   oauthGoogleCallback,
   authGithubCallback,
@@ -145,6 +147,8 @@ router.post("/logout", logout);
 // Delete user account route
 router.delete("/delete", deleteAccount);
 
+router.patch("/deactivate", authenticate, deactivateAccount);
+
 // Password reset POST route for sending the password reset email
 router.post("/forgotpassword", forgetPassword);
 
@@ -184,6 +188,7 @@ router.get("/savedblogs", authenticate, getSavedBlogsOfUser);
 // Follow and Unfollow
 router.patch("/follow/:idToFollow", authenticate, followUser);
 router.patch("/unfollow/:idToUnfollow", authenticate, unfollowUser);
+router.get("/followstatus/:targetId", getFollowStatus);
 
 // Contact us
 router.post("/contactus",contactUs);

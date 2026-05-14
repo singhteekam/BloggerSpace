@@ -1,0 +1,255 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * BloggerSpace — Palette A "Editorial Indigo"
+ * All semantic tokens are CSS variables so the entire palette can be swapped
+ * by editing this file. Component code only references token names.
+ */
+
+:root {
+  /* Surfaces */
+  --background: #faf9f7;
+  --foreground: #0b0f19;
+  --card: #ffffff;
+  --card-foreground: #0b0f19;
+  --popover: #ffffff;
+  --popover-foreground: #0b0f19;
+
+  /* Borders & inputs */
+  --border: #e7e5e4;
+  --input: #e7e5e4;
+  --ring: #4f46e5;
+
+  /* Muted */
+  --muted: #f5f4f1;
+  --muted-foreground: #6b7280;
+
+  /* Brand */
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --accent: #f59e0b;
+  --accent-foreground: #0b0f19;
+
+  /* Semantic */
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --success: #059669;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+  --info: #2563eb;
+  --info-foreground: #ffffff;
+
+  /* Misc */
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: #0a0a0f;
+  --foreground: #e4e4e7;
+  --card: #131318;
+  --card-foreground: #e4e4e7;
+  --popover: #131318;
+  --popover-foreground: #e4e4e7;
+
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #818cf8;
+
+  --muted: #1c1c22;
+  --muted-foreground: #a1a1aa;
+
+  --primary: #818cf8;
+  --primary-foreground: #0a0a0f;
+  --accent: #fbbf24;
+  --accent-foreground: #0a0a0f;
+
+  --destructive: #f87171;
+  --destructive-foreground: #0a0a0f;
+  --success: #34d399;
+  --success-foreground: #0a0a0f;
+  --warning: #fbbf24;
+  --warning-foreground: #0a0a0f;
+  --info: #60a5fa;
+  --info-foreground: #0a0a0f;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-crimson-pro), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+@layer utilities {
+  /* Soft brand gradient used in hero/marketing surfaces. */
+  .bg-brand-gradient {
+    background-image:
+      radial-gradient(at 20% 0%, color-mix(in oklab, var(--primary) 22%, transparent) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, color-mix(in oklab, var(--accent) 18%, transparent) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, color-mix(in oklab, var(--primary) 14%, transparent) 0px, transparent 60%);
+    background-size: 200% 200%;
+    animation: gradient-drift 18s ease-in-out infinite;
+  }
+
+  @keyframes gradient-drift {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+  }
+}
+
+/* ─── Blog prose ─────────────────────────────────────────────────────────── */
+@layer components {
+  .blog-prose {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--foreground);
+
+    p { margin: 1.25em 0; }
+    h1, h2, h3, h4 {
+      font-family: var(--font-serif), ui-serif, Georgia, serif;
+      font-weight: 600;
+      line-height: 1.25;
+      margin: 1.75em 0 0.6em;
+      color: var(--foreground);
+    }
+    h1 { font-size: 2em; }
+    h2 { font-size: 1.5em; }
+    h3 { font-size: 1.25em; }
+    h4 { font-size: 1.1em; }
+
+    ul, ol { margin: 1em 0; padding-left: 1.6em; }
+    li { margin: 0.4em 0; }
+    ul > li { list-style-type: disc; }
+    ol > li { list-style-type: decimal; }
+
+    blockquote {
+      margin: 1.5em 0;
+      padding: 0.75em 1.25em;
+      border-left: 3px solid var(--primary);
+      background: color-mix(in oklab, var(--primary) 6%, transparent);
+      border-radius: 0 0.5rem 0.5rem 0;
+      font-style: italic;
+      color: var(--muted-foreground);
+    }
+
+    code {
+      font-family: var(--font-mono), monospace;
+      font-size: 0.875em;
+      background: var(--muted);
+      padding: 0.15em 0.4em;
+      border-radius: 0.25rem;
+    }
+
+    pre {
+      margin: 1.5em 0;
+      padding: 1em 1.25em;
+      border-radius: 0.75rem;
+      background: var(--muted);
+      overflow-x: auto;
+      code { background: none; padding: 0; font-size: 0.875em; }
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    a:hover { opacity: 0.8; }
+
+    img {
+      max-width: 100%;
+      border-radius: 0.75rem;
+      margin: 1.5em auto;
+      display: block;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2em 0;
+    }
+
+    strong { font-weight: 600; }
+    em { font-style: italic; }
+  }
+}
+
+/* ─── TipTap editor placeholder ─────────────────────────────────────────── */
+@layer components {
+  .tiptap p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--muted-foreground);
+    pointer-events: none;
+    height: 0;
+  }
+}
+
+@layer utilities {
+  /* Subtle grid overlay for hero backgrounds */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+}

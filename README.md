@@ -1,107 +1,206 @@
 # BloggerSpace
-Tech Stack: MERN stack
- - A blogging website where users can write a blog on any topic. 
- - There are two panels: Writing and Reviewing panel. In
- writing panel, anyone can signup and start writing blogs.
- - The reviewer requests would be sent to admin for approval and then user can start reviewing the assigned blogs. The admin can delete any user, revoke/grant reviewer access.
- - Used nodemailer API to send emails. Ex: Email will be sent when the blog is under review, discarded, published.
- - Review stages: Pending for Review-Under review-In Review-Awaiting author (if need modification)-Publish
-Please try and give me the feedback. Your valuable feedback will help me to improve this website.
-- 150+ blogs are already ranked on Google search.
 
-### Link: [https://bloggerspace.singhteekam.in](https://bloggerspace.singhteekam.in/)
+A full-stack blogging platform where every post is reviewed by a real human before it goes live. Writers submit drafts, reviewers give structured feedback, and admins publish — no bots, no AI scoring.
 
-### BloggerSpace Reviewer Panel: [https://reviewbloggerspace.singhteekam.in](https://reviewbloggerspace.singhteekam.in/)
+**Live site:** [bloggerspace.singhteekam.in](https://bloggerspace.singhteekam.in/)  
+**Community:** [bloggerspace.singhteekam.in/community](https://bloggerspace.singhteekam.in/community)
 
-### BloggerSpace community: [https://bloggerspace.singhteekam.in/community](https://bloggerspace.singhteekam.in/community)
+> 150+ blogs already ranked on Google Search.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16 (App Router), React 19, TypeScript |
+| Styling | Tailwind CSS v4, Radix UI primitives, shadcn/ui |
+| Editor | TipTap (ProseMirror) with AI generation |
+| State / Data | TanStack React Query, React Context |
+| Backend | Node.js, Express.js |
+| Database | MongoDB + Mongoose |
+| Auth | JWT (access + refresh tokens), Firebase Auth (Google OAuth) |
+| Email | Nodemailer |
+| Storage | GitHub raw CDN for user-uploaded images |
+| Deployment | Vercel (frontend), self-hosted VPS (backend) |
+| Analytics | Vercel Analytics + Speed Insights |
+
+---
 
 ## Features
-- View all published blogs
-- Create new blog
-- Write a blog with AI
-- save as draft the blog
-- Real time blog views count
-- Comments and Reply on the comments
-- Share blog on most famous social media platforms
-- Count number of visitor who visited the website.
-- Login/Sign up with Email and password
-- Sign in with Google
-- Forgot password page
-- Change password
-- Delete Account
-- Change username
-- View public profile of any user
-- Email verification for new users(except Sign in with Google)
-- Review stages:
-    - Pending for Review
-    - Under review
-    - In Review
-    - Awaiting author (if need modification)
-    - Publish
-- Mail sent when:
-    - blog is submitted for review
-    - blog status is moved to awaiting author
-    - blog is published
-- Like any blog (user should be loggged in and verified account)
-- Save any blog for read later
-- Search any published blog
-- Writing Guidelines for writing the blog
-- Preview the blog before submitting for review
-- Sitemap
-- Responsive
-- SEO friendly
-- Follow and Unfollow users
-- Community for bloggers to interactive with each other
-- No review process for community posts. Instantly published after submitting the post.
 
+### For Readers
+- Browse all published blogs with category and tag filtering (dropdowns)
+- Full-text blog reading — rich formatting, code blocks, images
+- Save blogs to a personal reading list
+- Real-time blog view count
+- Like any blog (verified accounts only)
+- Search published blogs
+- View any user's public profile
+- Community discussion board with threaded replies
 
-#### Folder structure:
+### For Writers
+- Rich TipTap editor — markdown, headings, code blocks, images, links
+- AI-assisted content generation (enter a title, get a first draft)
+- Auto-save drafts every 30 seconds
+- Preview before submitting
+- Submit for human review; receive structured feedback via email
+- Track every blog through its full review lifecycle:
+  `Draft → Pending Review → Under Review → Awaiting Revision → Published`
+- Email notifications at each key stage
+- Edit and resubmit after reviewer feedback
+
+### For Reviewers
+- Dedicated dashboard with assigned blogs
+- Inline content editing (title, category, tags, body)
+- Star rating + written remarks before forwarding to admin
+- Send revision requests directly back to the author
+- Save review drafts; pick up later
+
+### For Admins
+- Publish or discard any user-submitted blog
+- Write and publish admin-authored blogs directly (with draft support)
+- Approve or remove reviewer accounts
+- Manage all registered users (soft-delete)
+- Full visibility into every blog at every status stage
+- Edit any blog before publishing
+
+### Platform
+- Sign up with email/password or Google (Firebase OAuth)
+- Email verification for new accounts
+- Forgot password / reset password flow
+- Change password and username from profile settings
+- Delete account
+- Follow and unfollow users
+- Writing guidelines page
+- Sitemap (`/sitemap.xml`)
+- Fully responsive and mobile-friendly
+- SEO-optimised (per-page metadata, Open Graph, JSON-LD structured data)
+- Community posts — no review required, instantly published
+
+---
+
+## Folder Structure
+
 ```
-├── client
-│   ├── public
-│   ├── src
-│   │   ├── components
-│   │   ├── assets
-│   │   ├── contexts
-│   │   ├── styles
-│   │   ├── utils
-│   ├── App.css
-│   ├── App.js
-│   ├── index.css
-│   ├── index.js
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── .gitignore
-├── server
-│   ├── controllers
-│   │   ├── Admin
-│   │   ├── Reviewer
-│   │   ├── blogController.js
+MyBlogWebsite/
+│
+├── bloggerspace-next/       # ✅ Active frontend — Next.js 16 (App Router)
+│   ├── public/              # Static assets (logo, user photos, OG images)
+│   └── src/
+│       ├── app/             # Pages, layouts, API routes (App Router)
+│       ├── components/      # UI — brand, layout, editor, blog, animated, ui/
+│       ├── contexts/        # Auth context
+│       ├── data/            # Static JSON (categories, tags)
+│       ├── hooks/           # Custom hooks (useAutoSave, useRequireAuth, …)
+│       ├── lib/             # API clients, utilities, constants, JSON-LD
+│       └── types/           # TypeScript types
+│
+├── server/                  # Express.js + MongoDB backend (API)
+│   ├── controllers/
+│   │   ├── Admin/
+│   │   ├── Reviewer/
+│   │   ├── blogsController.js
 │   │   ├── communityController.js
 │   │   └── userscontroller.js
-│   ├── db
-│   │   └── db.js
-│   ├── middlewares
-│   ├── models
-│   ├── routes
-│   ├── services
-│   ├── utils
-│   ├── .env
-│   ├── node_modules
-│   ├── package.json
-│   └── package-lock.json
+│   ├── db/
+│   ├── middlewares/         # Auth, role guards, logging
+│   ├── models/              # Mongoose schemas
+│   ├── routes/
+│   ├── services/
+│   └── utils/
+│
+├── client/                  # Legacy React frontend (replaced by bloggerspace-next)
+│
 ├── package.json
-├── package-lock.json  
-├── .gitignore  
-└── README.md
+└── README.md                # ← you are here
 ```
 
-#### BloggerSpace Homepage
-![alt text](image.png)
+---
 
-### My Personal Portfolio
-- Link: [https://www.singhteekam.in](https://www.singhteekam.in/)
+## Getting Started (Local Development)
+
+### Prerequisites
+- Node.js ≥ 20
+- MongoDB (local or Atlas)
+
+### 1 — Clone
+
+```bash
+git clone https://github.com/singhteekam/BloggerSpace.git
+cd BloggerSpace
+```
+
+### 2 — Start the backend
+
+```bash
+cd server
+npm install
+npm run dev        # starts on http://localhost:5000
+```
+
+Create `server/.env`:
+
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/bloggerspace
+
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+
+# Firebase Admin SDK (Google OAuth)
+FIREBASE_PROJECT_ID=...
+FIREBASE_CLIENT_EMAIL=...
+FIREBASE_PRIVATE_KEY=...
+```
+
+### 3 — Start the frontend
+
+```bash
+cd bloggerspace-next
+npm install
+npm run dev        # starts on http://localhost:3000
+```
+
+Create `bloggerspace-next/.env.local`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
+```
+
+---
+
+## Deployment
+
+### Frontend → Vercel
+1. Push to GitHub.
+2. Import `bloggerspace-next/` as the root directory in [vercel.com/new](https://vercel.com/new).
+3. Set `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_FRONTEND_URL` in Vercel environment variables.
+4. Deploy — auto-deploys on every push to `main`.
+
+### Backend → VPS / Railway / Render
+Deploy the `server/` directory to any Node.js host with the `.env` variables above.
+
+---
+
+## Screenshots
+
+![BloggerSpace Homepage](image.png)
+
+---
+
+## Developer
+
+**Teekam Singh**  
+[singhteekam.in](https://www.singhteekam.in/) · [GitHub](https://github.com/singhteekam) · [LinkedIn](https://in.linkedin.com/in/singhteekam)
+
+---
 
 ## Contributing
 
-Contributions are always welcome!
+Contributions, issues, and feature requests are welcome. Please try the site and share your feedback — it genuinely helps improve the platform.
+

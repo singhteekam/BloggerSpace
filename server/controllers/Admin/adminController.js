@@ -3,6 +3,7 @@ const Admin= require("../../models/Admin");
 const Reviewer= require("../../models/Reviewer");
 const User= require("../../models/User");
 const Community= require("../../models/Community");
+const migrateReviewersToUsers = require("../../utils/migrateReviewers");
 const jwt = require("jsonwebtoken");
 const Blog = require("../../models/Blog");
 const mongoose = require("mongoose");
@@ -66,8 +67,10 @@ exports.adminLogin=async (req, res) => {
 
     // You can generate a JWT token here if you want to implement authentication
     // Generate JWT token
+    // NEW- Added userId and role to JWT payload; kept currentuserId for backward compat
     const token = jwt.sign(
-      { currentuserId: admin._id },
+      { userId: admin._id, currentuserId: admin._id, role: "Admin" },
+      // OLD: { currentuserId: admin._id },
       process.env.CURRENT_JWT_SECRET,
       {
         expiresIn: "3d", // Token expiration time
@@ -78,8 +81,11 @@ exports.adminLogin=async (req, res) => {
       _id: admin._id,
       email: admin.email,
       fullName: admin.fullName,
+      userName: admin.userName,
+      profilePicture: admin.profilePicture,
       isVerified: admin.isVerified,
-      role: admin.role
+      role: admin.role,
+      createdAt: admin.createdAt,
     };
 
     // req.session.currentuserId = admin._id;
@@ -222,7 +228,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
 
     // Save the updated blog
     await blog.save();
-    // await generateSitemap();
+    generateSitemap().catch((err) => console.error("Sitemap update failed:", err));
 
     // Sending mail to author
     const receiver = blog.authorDetails.email;
@@ -328,14 +334,14 @@ exports.publishedBlogs = async (req, res) => {
 
 exports.allReviewersFromDB = async (req, res) => {
   try {
-    if (req.query.userId) {
-      // Query the Blog model for pending blogs assigned to the reviewer
-      const allReviewers = await Reviewer.find({isVerified:true});
-
-      res.json(allReviewers);
-    } else {
-      res.status(500).json({ error: "Failed to fetch Reviewers" });
-    }
+    if (!req.query.userId) return res.status(400).json({ error: "Missing userId" });
+    // New system: Users with reviewer role
+    const userReviewers = await User.find({ role: "reviewer", isVerified: true });
+    // Legacy: old Reviewer collection (only those not yet migrated)
+    const migratedEmails = new Set(userReviewers.map((u) => u.email));
+    const legacyReviewers = await Reviewer.find({ isVerified: true });
+    const unmigrated = legacyReviewers.filter((r) => !migratedEmails.has(r.email));
+    res.json([...userReviewers, ...unmigrated]);
   } catch (error) {
     console.error("Error fetching Reviewers:", error);
     res.status(500).json({ error: "Failed to fetch Reviewers" });
@@ -467,20 +473,30 @@ exports.fetchAwaitingAuthorFromDB = async (req, res) => {
 
 exports.fetchAllVerifiedReviewers= async(req, res)=>{
   try {
-    const allVerifiedReviewers = await Reviewer.find({ isVerified : true});
-    res.json(allVerifiedReviewers);
+    // New system: Users with reviewer role approved
+    const userReviewers = await User.find({ role: "reviewer", reviewerStatus: "approved" });
+    // Legacy: old Reviewer collection not yet migrated
+    const migratedEmails = new Set(userReviewers.map((u) => u.email));
+    const legacyReviewers = await Reviewer.find({ isVerified: true });
+    const unmigrated = legacyReviewers.filter((r) => !migratedEmails.has(r.email));
+    res.json([...userReviewers, ...unmigrated]);
   } catch (error) {
-    console.log("Error fetching verified reviewers")
+    console.log("Error fetching verified reviewers");
     res.status(500).json({ error: "Failed to fetch All verified reviewers" });
   }
 }
 
 exports.fetchAllPendingRequestReviewers= async(req, res)=>{
   try {
-    const allPendingRequestReviewers = await Reviewer.find({ isVerified : false});
-    res.json(allPendingRequestReviewers);
+    // New system: Users with pending reviewer application
+    const pendingUsers = await User.find({ reviewerStatus: "pending" });
+    // Legacy: old Reviewer collection not yet migrated
+    const pendingEmails = new Set(pendingUsers.map((u) => u.email));
+    const legacyPending = await Reviewer.find({ isVerified: false });
+    const unmigrated = legacyPending.filter((r) => !pendingEmails.has(r.email));
+    res.json([...pendingUsers, ...unmigrated]);
   } catch (error) {
-    console.log("Error fetching pending request reviewers")
+    console.log("Error fetching pending request reviewers");
     res.status(500).json({ error: "Failed to fetch pending request reviewers" });
   }
 }
@@ -488,53 +504,145 @@ exports.fetchAllPendingRequestReviewers= async(req, res)=>{
 exports.approveReviewerRequest= async(req, res)=>{
   const {id}= req.params;
   try {
-    const reviewer= await Reviewer.findById(id);
-    reviewer.isVerified=true;
-    reviewer.status="ACTIVE";
-    await reviewer.save();
+    // Try User collection first (new system)
+    let target = await User.findById(id);
+    if (target) {
+      target.role = "reviewer";
+      target.reviewerStatus = "approved";
+      target.isVerified = true;
+      target.status = "ACTIVE";
+      await target.save();
+    } else {
+      // Fallback: old Reviewer collection
+      target = await Reviewer.findById(id);
+      if (!target) return res.status(404).json({ error: "Reviewer not found" });
+      target.isVerified = true;
+      target.status = "ACTIVE";
+      await target.save();
+    }
 
-    const receiver = reviewer.email;
-    const subject = "Congratulations! Your request is approved";
+    const receiver = target.email;
+    const subject = "Congratulations! Your reviewer request is approved";
     const html = `
-            <div class="content">
-            <h2>Hi ${reviewer.fullName},</h2>
-            <p>Congratulations!! Your Reviewer request is approved and you are now a Reviewer.</p>
-            <p>Kindly review the assigned blogs before deadline. If failed to review then that blog will be assigned to some other Reviewer. Repeating the same practice multiple times could revoke your Reviewer access.</p>
-            <p>BloggerSpace Reviewer panel: <span>${process.env.REVIEWER_PANEL_URL}</span></p> 
-          </div>
-          `;
+      <div class="content">
+        <h2>Hi ${target.fullName},</h2>
+        <p>Congratulations!! Your Reviewer request is approved and you are now a Reviewer.</p>
+        <p>Kindly review the assigned blogs before deadline. If failed to review then that blog will be assigned to some other Reviewer. Repeating the same practice multiple times could revoke your Reviewer access.</p>
+        <p>Sign in at: <a href="${process.env.REVIEWER_PANEL_URL}">${process.env.REVIEWER_PANEL_URL}</a></p>
+      </div>`;
 
     res.json({ message: "Reviewer verified successfully" });
     await sendEmail(receiver, subject, html);
   } catch (error) {
-    console.log("Error when approving request of the reviewer");
+    console.log("Error when approving request of the reviewer", error);
+    res.status(500).json({ error: "Failed to approve reviewer" });
   }
 }
 
 exports.removeFromReviewerRole= async(req, res)=>{
   const {id}= req.params;
   try {
-    const reviewer= await Reviewer.findById(id);
-    reviewer.isVerified=false;
-    reviewer.status="INACTIVE";
-    await reviewer.save();
+    // Try User collection first (new system)
+    let target = await User.findById(id);
+    if (target) {
+      target.role = "user";
+      target.reviewerStatus = "rejected";
+      target.isVerified = false;
+      target.status = "INACTIVE";
+      await target.save();
+    } else {
+      // Fallback: old Reviewer collection
+      target = await Reviewer.findById(id);
+      if (!target) return res.status(404).json({ error: "Reviewer not found" });
+      target.isVerified = false;
+      target.status = "INACTIVE";
+      await target.save();
+    }
 
-    const receiver = reviewer.email;
+    const receiver = target.email;
     const subject = "Sorry to say Goodbye!";
     const html = `
-          <div class="content">
-            <h2>Hi ${reviewer.fullName},</h2>
-            <p>You are no longer a reviewer now. If you wish to re-apply for reviewer then send reminder again to verify your account. </p>
-            <p>BloggerSpace Reviewer panel: <span>${process.env.REVIEWER_PANEL_URL}</span></p> 
-          </div>
-                `;
+      <div class="content">
+        <h2>Hi ${target.fullName},</h2>
+        <p>You are no longer a reviewer now. If you wish to re-apply, please submit a new application.</p>
+        <p>BloggerSpace Reviewer panel: <span>${process.env.REVIEWER_PANEL_URL}</span></p>
+      </div>`;
 
     res.json({ message: "Reviewer removed successfully" });
     await sendEmail(receiver, subject, html);
   } catch (error) {
-    console.log("Error when removing the reviewer");
+    console.log("Error when removing the reviewer", error);
+    res.status(500).json({ error: "Failed to remove reviewer" });
   }
 }
+
+exports.discardAnyBlog = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const blog = await Blog.findById(id);
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    blog.status = blog.status.startsWith("ADMIN_") ? "ADMIN_DISCARDED" : "DISCARD_QUEUE";
+    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
+    await blog.save();
+    res.json({ message: "Blog discarded successfully" });
+  } catch (error) {
+    console.error("Error discarding blog:", error);
+    res.status(500).json({ error: "Failed to discard blog" });
+  }
+};
+
+exports.deleteBlogPermanently = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const blog = await Blog.findById(id);
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    const allowedStatuses = ["DISCARD_QUEUE", "ADMIN_DISCARDED"];
+    if (!allowedStatuses.includes(blog.status)) {
+      return res.status(400).json({ error: "Only discarded blogs can be permanently deleted." });
+    }
+    await Blog.findByIdAndDelete(id);
+    res.json({ message: "Blog permanently deleted." });
+  } catch (error) {
+    console.error("Error deleting blog:", error);
+    res.status(500).json({ error: "Failed to delete blog" });
+  }
+};
+
+exports.adminEditAnyBlog = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { title, slug, content, category, tags } = req.body;
+    const blog = await Blog.findById(id);
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    if (title) blog.title = title;
+    if (slug) blog.slug = slug;
+    if (content) {
+      const compressedContent = Buffer.from(pako.deflate(content, { to: "string" })).toString("base64");
+      blog.content = compressedContent;
+    }
+    if (category) blog.category = category;
+    if (tags) blog.tags = tags;
+    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
+    await blog.save();
+    res.json({ message: "Blog updated successfully" });
+  } catch (error) {
+    console.error("Error editing blog:", error);
+    res.status(500).json({ error: "Failed to update blog" });
+  }
+};
+
+exports.migrateReviewersToUsers = async (req, res) => {
+  try {
+    const result = await migrateReviewersToUsers();
+    res.json({
+      message: `Migration complete. ${result.migrated} created, ${result.merged} merged, ${result.skipped} already migrated.`,
+      ...result,
+    });
+  } catch (error) {
+    console.error("Migration failed:", error);
+    res.status(500).json({ error: "Migration failed: " + error.message });
+  }
+};
 
 exports.fetchAllUsers= async(req, res)=>{
 
@@ -663,7 +771,7 @@ exports.adminNewBlog = async (req, res) => {
       status: "ADMIN_PUBLISHED"
     });
     const savedBlog = await newPost.save();
-    // await generateSitemap();
+    generateSitemap().catch((err) => console.error("Sitemap update failed:", err));
 
     res.json(savedBlog);
   } catch (error) {
@@ -836,7 +944,7 @@ exports.adminBlogEdit = async (req, res) => {
 exports.adminSaveEditedBlog = async (req, res) => {
   try {
     // const { id } = req.params;
-    const { slug, title, content, category } = req.body;
+    const { slug, title, content, category, tags } = req.body;
 
     // Find the blog by ID
     const blog = await Blog.findById({
@@ -859,11 +967,13 @@ exports.adminSaveEditedBlog = async (req, res) => {
     blog.title = title;
     blog.content = compressedContent;
     blog.category = category;
+    if (tags) blog.tags = tags;
     blog.status = "ADMIN_PUBLISHED";
+    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
 
     // Save the updated blog
     await blog.save();
-    // await generateSitemap();
+    generateSitemap().catch((err) => console.error("Sitemap update failed:", err));
     console.debug("Blog updated successfully. Title: "+ blog.title);
 
     res.json({ message: "blog updated successfully" });
@@ -1019,3 +1129,72 @@ exports.downloadPDFReport= async (req, res)=>{
   // Finalize the PDF and end the response
   doc.end();
 }
+
+exports.adminGetInfo = async (req, res) => {
+  try {
+    const adminId = req.query.userId;
+    const admin = await Admin.findById(adminId).select("-password");
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
+    res.json({
+      _id: admin._id,
+      fullName: admin.fullName,
+      userName: admin.userName,
+      email: admin.email,
+      profilePicture: admin.profilePicture,
+      isVerified: admin.isVerified,
+      role: admin.role,
+      createdAt: admin.createdAt,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch admin info" });
+  }
+};
+
+exports.adminUpdateProfile = async (req, res) => {
+  try {
+    const adminId = req.query.userId;
+    const { fullName, userName } = req.body;
+    const admin = await Admin.findById(adminId);
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
+
+    if (userName && userName !== admin.userName) {
+      const taken = await Admin.findOne({ userName, _id: { $ne: adminId } });
+      if (taken) return res.status(400).json({ message: "Username already taken." });
+    }
+
+    if (fullName) admin.fullName = fullName;
+    if (userName) admin.userName = userName;
+    await admin.save();
+
+    const adminDetails = {
+      _id: admin._id,
+      fullName: admin.fullName,
+      userName: admin.userName,
+      email: admin.email,
+      profilePicture: admin.profilePicture,
+      isVerified: admin.isVerified,
+      role: admin.role,
+      createdAt: admin.createdAt,
+    };
+    res.json({ message: "Profile updated.", adminDetails });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update profile" });
+  }
+};
+
+exports.adminUploadProfilePicture = async (req, res) => {
+  try {
+    const adminId = req.query.userId;
+    const profilePicture = req.files && req.files.find((f) => f.fieldname === "profilePicture");
+    if (!profilePicture) return res.status(400).json({ error: "No profile picture uploaded" });
+
+    const admin = await Admin.findById(adminId);
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
+
+    admin.profilePicture = profilePicture.buffer.toString("base64");
+    await admin.save();
+    res.json({ message: "Profile picture updated." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to upload profile picture" });
+  }
+};

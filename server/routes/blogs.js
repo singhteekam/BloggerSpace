@@ -29,12 +29,23 @@ const {
   fetchAllBlogsFromDB,
   createNewAIBlog,
   fetchTopViewedBlogs,
+  fetchAdminPublishedBlogs,
+  getDistinctCategories,
+  getDistinctTags,
+  toggleBlogLike,
+  getBlogLikeStatus,
 } = require("../controllers/blogsController");
 const { downloadBlog } = require("../controllers/userscontroller");
 
 router.get("/", blogsHomepage);
 
 router.get("/allblogs", fetchAllBlogs);
+
+router.get("/adminpublished", fetchAdminPublishedBlogs);
+
+router.get("/categories", getDistinctCategories);
+
+router.get("/tags", getDistinctTags);
 
 router.get("/fetchallblogs", fetchAllBlogsFromDB);
 
@@ -86,6 +97,10 @@ router.get("/myblogs/awaitingauthorblogs", authenticate, awaitingAuthorBlogs);
 router.get("/myblogs/authorpublishedblogs",authenticate,authorPublishedBlogs);
 
 router.post("/bloglikes/:id",authenticate, blogLikes);
+
+router.post("/:id/like", authenticate, toggleBlogLike);
+
+router.get("/:id/likecheck", getBlogLikeStatus);
 
 router.post("/blogcommentlike/:id", authenticate, blogCommentLikes);
 

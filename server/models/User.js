@@ -53,8 +53,22 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "users",
   }],
-  resetToken: String, // Field for storing the reset token
-  resetTokenExpiration: Date, // Field for storing the token expiration date
+  role: {
+    type: String,
+    enum: ["user", "reviewer"],
+    default: "user",
+  },
+  reviewerStatus: {
+    type: String,
+    enum: ["none", "pending", "approved", "rejected"],
+    default: "none",
+  },
+  reviewedBlogs: {
+    type: Array,
+    default: [],
+  },
+  resetToken: String,
+  resetTokenExpiration: Date,
   createdAt: {
     type: Date,
     // default: Date.now,

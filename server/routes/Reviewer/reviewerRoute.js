@@ -5,9 +5,11 @@ const {
   reviewerLogin,
   userDetails,
   uploadUserProfilePicture,
+  awaitingAuthorBlogs,
   pendingReviewBlogs,
   editPendingBlog,
   saveEditedPendingBlog,
+  saveReviewerDraft,
   deleteReviewerAccount,
   feedbackToAuthor,
   changeUsername,
@@ -29,11 +31,16 @@ router.get("/userdetails", userDetails);
 router.post("/uploaduserprofilepicture", uploadUserProfilePicture);
 
 // Pending for Review
-router.get("/pendingreviewblogs",reviewerMiddleware, pendingReviewBlogs);
+router.get("/pendingreviewblogs", reviewerMiddleware, pendingReviewBlogs);
+
+// Blogs where reviewer sent feedback and awaiting author response
+router.get("/awaitingauthorblogs", reviewerMiddleware, awaitingAuthorBlogs);
 
 router.get("/blog/editblog/:id",reviewerMiddleware, editPendingBlog);
 
 router.put("/blog/editblog/save/:id",reviewerMiddleware, saveEditedPendingBlog);
+
+router.put("/blog/savedraft/:id", reviewerMiddleware, saveReviewerDraft);
 
 // Delete Account
 router.put("/account/delete",reviewerMiddleware, deleteReviewerAccount);

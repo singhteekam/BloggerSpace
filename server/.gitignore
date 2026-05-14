@@ -70,3 +70,5 @@ node_modules/
 firebase.json
 
 /config/
+
+tasks.txt
