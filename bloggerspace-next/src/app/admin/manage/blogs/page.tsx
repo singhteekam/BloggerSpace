@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
@@ -9,10 +9,12 @@ import {
   FileText, BookOpen, Globe, AlertCircle, EyeOff, MessageCircleWarning,
   Loader2, CheckCheck, Star, ChevronDown, RefreshCw,
   Pencil, FileMinus, Trash2, Clock, Tag, User,
+  ChevronLeft, ChevronRight, Search, X,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Popover from "@radix-ui/react-popover";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
+import { useDebounce } from "@/hooks/use-debounce";
 import { adminApi, type AdminBlog, type ReviewerItem } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +31,12 @@ export default function AdminBlogsPage() {
 
 function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: string }) {
   const qc = useQueryClient();
+  const [publishedPage, setPublishedPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
+
+  // Reset to page 1 whenever the search term changes
+  useEffect(() => { setPublishedPage(1); }, [debouncedSearch]);
 
   const { data: pending = [], isLoading: pendingLoading } = useQuery({
     queryKey: ["admin-pending", adminId],
@@ -47,8 +55,8 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
     queryFn: () => adminApi.getInReviewBlogs(adminId).then((r) => r.data),
   });
   const { data: publishedData, isLoading: publishedLoading } = useQuery({
-    queryKey: ["admin-published", adminId],
-    queryFn: () => adminApi.getPublishedBlogs(adminId).then((r) => r.data),
+    queryKey: ["admin-published", adminId, publishedPage, debouncedSearch],
+    queryFn: () => adminApi.getPublishedBlogs(adminId, publishedPage, debouncedSearch).then((r) => r.data),
   });
   const { data: discardQueue = [], isLoading: discardLoading } = useQuery({
     queryKey: ["admin-discard", adminId],
@@ -61,10 +69,29 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
 
   const published = publishedData?.blogs ?? [];
 
+  // Client-side filtering for non-paginated tabs
+  const q = search.toLowerCase().trim();
+  const filterBlogs = useMemo(() => (blogs: AdminBlog[]) => {
+    if (!q) return blogs;
+    return blogs.filter((b) =>
+      b.title?.toLowerCase().includes(q) ||
+      b.authorDetails?.fullName?.toLowerCase().includes(q) ||
+      b.category?.toLowerCase().includes(q) ||
+      b.currentReviewer?.toLowerCase().includes(q),
+    );
+  }, [q]);
+
+  const fPending      = useMemo(() => filterBlogs(pending),      [filterBlogs, pending]);
+  const fUnderReview  = useMemo(() => filterBlogs(underReview),  [filterBlogs, underReview]);
+  const fAwaiting     = useMemo(() => filterBlogs(awaitingAuthor),[filterBlogs, awaitingAuthor]);
+  const fInReview     = useMemo(() => filterBlogs(inReview),     [filterBlogs, inReview]);
+  const fDiscard      = useMemo(() => filterBlogs(discardQueue),  [filterBlogs, discardQueue]);
+
   const invalidateAll = () => {
-    ["admin-pending", "admin-underreview", "admin-awaiting", "admin-inreview", "admin-published", "admin-discard"].forEach((k) =>
+    ["admin-pending", "admin-underreview", "admin-awaiting", "admin-inreview", "admin-discard"].forEach((k) =>
       qc.invalidateQueries({ queryKey: [k, adminId] }),
     );
+    qc.invalidateQueries({ queryKey: ["admin-published", adminId] });
   };
 
   const assignMutation = useMutation({
@@ -80,10 +107,7 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
 
   const discardMutation = useMutation({
     mutationFn: (blogId: string) => adminApi.discardBlog(blogId, adminId),
-    onSuccess: () => {
-      toast.success("Blog discarded.");
-      invalidateAll();
-    },
+    onSuccess: () => { toast.success("Blog discarded."); invalidateAll(); },
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
   });
 
@@ -96,107 +120,151 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
   });
 
+  const publishedTotal = publishedData?.totalCount ?? published.length;
+
   return (
     <main className="px-6 py-8 max-w-5xl mx-auto">
-      <h1 className="font-serif text-2xl font-semibold mb-6">Blog Management</h1>
+      <h1 className="font-serif text-2xl font-semibold mb-4">Blog Management</h1>
 
-        <Tabs defaultValue="pending">
-      <div className="overflow-x-auto mb-6 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+      {/* Global search */}
+      <SearchInput
+        value={search}
+        onChange={setSearch}
+        placeholder="Search by title, author, category…"
+        className="mb-5"
+      />
+
+      <Tabs defaultValue="pending">
+        <div className="overflow-x-auto mb-6 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
           <TabsList className="flex w-max gap-1">
-            <TabsTrigger value="pending"><FileText className="size-3.5 mr-1.5" />Pending ({pending.length})</TabsTrigger>
-            <TabsTrigger value="underreview"><EyeOff className="size-3.5 mr-1.5" />Under Review ({underReview.length})</TabsTrigger>
-            <TabsTrigger value="awaiting"><MessageCircleWarning className="size-3.5 mr-1.5" />Awaiting Author ({awaitingAuthor.length})</TabsTrigger>
-            <TabsTrigger value="inreview"><BookOpen className="size-3.5 mr-1.5" />In Review ({inReview.length})</TabsTrigger>
-            <TabsTrigger value="published"><Globe className="size-3.5 mr-1.5" />Published ({published.length})</TabsTrigger>
-            <TabsTrigger value="discard"><AlertCircle className="size-3.5 mr-1.5" />Discard Queue ({discardQueue.length})</TabsTrigger>
+            <TabsTrigger value="pending">
+              <FileText className="size-3.5 mr-1.5" />
+              Pending ({pendingLoading ? "…" : fPending.length})
+            </TabsTrigger>
+            <TabsTrigger value="underreview">
+              <EyeOff className="size-3.5 mr-1.5" />
+              Under Review ({underReviewLoading ? "…" : fUnderReview.length})
+            </TabsTrigger>
+            <TabsTrigger value="awaiting">
+              <MessageCircleWarning className="size-3.5 mr-1.5" />
+              Awaiting Author ({awaitingLoading ? "…" : fAwaiting.length})
+            </TabsTrigger>
+            <TabsTrigger value="inreview">
+              <BookOpen className="size-3.5 mr-1.5" />
+              In Review ({inReviewLoading ? "…" : fInReview.length})
+            </TabsTrigger>
+            <TabsTrigger value="published">
+              <Globe className="size-3.5 mr-1.5" />
+              Published ({publishedLoading ? "…" : publishedTotal})
+            </TabsTrigger>
+            <TabsTrigger value="discard">
+              <AlertCircle className="size-3.5 mr-1.5" />
+              Discard Queue ({discardLoading ? "…" : fDiscard.length})
+            </TabsTrigger>
           </TabsList>
-          </div>
+        </div>
 
-          {/* ── Pending Review ───────────────────────────────── */}
-          <TabsContent value="pending">
-            <SectionHeader title="Pending Review" desc="Blogs submitted by authors — assign a reviewer or review directly." />
-            {pendingLoading ? <TabSkeleton /> : pending.length === 0 ? <EmptyState icon={<FileText />} msg="No blogs awaiting assignment." /> : (
-              <div className="space-y-3">
-                {pending.map((blog) => (
-                  <BlogCard key={blog._id} blog={blog}>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Button asChild size="sm" className="gap-1.5">
-                        <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Review</Link>
-                      </Button>
-                      <AssignPopover reviewers={allReviewers} onAssign={(email) => assignMutation.mutate({ blogId: blog._id, email })} loading={assignMutation.isPending} />
-                      <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
-                    </div>
-                  </BlogCard>
-                ))}
-              </div>
-            )}
-          </TabsContent>
+        {/* ── Pending Review ───────────────────────────────── */}
+        <TabsContent value="pending">
+          <SectionHeader title="Pending Review" desc="Blogs submitted by authors — assign a reviewer or review directly." />
+          {pendingLoading ? <TabSkeleton /> : fPending.length === 0 ? (
+            <EmptyState icon={<FileText />} msg={q ? `No results for "${search}".` : "No blogs awaiting assignment."} />
+          ) : (
+            <div className="space-y-3">
+              {fPending.map((blog) => (
+                <BlogCard key={blog._id} blog={blog}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button asChild size="sm" className="gap-1.5">
+                      <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Review</Link>
+                    </Button>
+                    <AssignPopover reviewers={allReviewers} onAssign={(email) => assignMutation.mutate({ blogId: blog._id, email })} loading={assignMutation.isPending} />
+                    <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
+                  </div>
+                </BlogCard>
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
-          {/* ── Under Review ─────────────────────────────────── */}
-          <TabsContent value="underreview">
-            <SectionHeader title="Under Review" desc="Blogs currently being reviewed by an assigned reviewer." />
-            {underReviewLoading ? <TabSkeleton /> : underReview.length === 0 ? <EmptyState icon={<EyeOff />} msg="No blogs under review." /> : (
-              <div className="space-y-3">
-                {underReview.map((blog) => (
-                  <BlogCard key={blog._id} blog={blog}>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Button asChild size="sm" className="gap-1.5">
-                        <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Review</Link>
-                      </Button>
-                      <AssignPopover reviewers={allReviewers} onAssign={(email) => assignMutation.mutate({ blogId: blog._id, email })} loading={assignMutation.isPending} label="Re-assign" />
-                      <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
-                    </div>
-                  </BlogCard>
-                ))}
-              </div>
-            )}
-          </TabsContent>
+        {/* ── Under Review ─────────────────────────────────── */}
+        <TabsContent value="underreview">
+          <SectionHeader title="Under Review" desc="Blogs currently being reviewed by an assigned reviewer." />
+          {underReviewLoading ? <TabSkeleton /> : fUnderReview.length === 0 ? (
+            <EmptyState icon={<EyeOff />} msg={q ? `No results for "${search}".` : "No blogs under review."} />
+          ) : (
+            <div className="space-y-3">
+              {fUnderReview.map((blog) => (
+                <BlogCard key={blog._id} blog={blog}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button asChild size="sm" className="gap-1.5">
+                      <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Review</Link>
+                    </Button>
+                    <AssignPopover reviewers={allReviewers} onAssign={(email) => assignMutation.mutate({ blogId: blog._id, email })} loading={assignMutation.isPending} label="Re-assign" />
+                    <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
+                  </div>
+                </BlogCard>
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
-          {/* ── Awaiting Author ──────────────────────────────── */}
-          <TabsContent value="awaiting">
-            <SectionHeader title="Awaiting Author" desc="Reviewer sent feedback — waiting for the author to respond." />
-            {awaitingLoading ? <TabSkeleton /> : awaitingAuthor.length === 0 ? <EmptyState icon={<MessageCircleWarning />} msg="No blogs awaiting author." /> : (
-              <div className="space-y-3">
-                {awaitingAuthor.map((blog) => (
-                  <BlogCard key={blog._id} blog={blog}>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Button asChild size="sm" className="gap-1.5">
-                        <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Review</Link>
-                      </Button>
-                      <AssignPopover reviewers={allReviewers} onAssign={(email) => assignMutation.mutate({ blogId: blog._id, email })} loading={assignMutation.isPending} label="Re-assign" />
-                      <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
-                    </div>
-                  </BlogCard>
-                ))}
-              </div>
-            )}
-          </TabsContent>
+        {/* ── Awaiting Author ──────────────────────────────── */}
+        <TabsContent value="awaiting">
+          <SectionHeader title="Awaiting Author" desc="Reviewer sent feedback — waiting for the author to respond." />
+          {awaitingLoading ? <TabSkeleton /> : fAwaiting.length === 0 ? (
+            <EmptyState icon={<MessageCircleWarning />} msg={q ? `No results for "${search}".` : "No blogs awaiting author."} />
+          ) : (
+            <div className="space-y-3">
+              {fAwaiting.map((blog) => (
+                <BlogCard key={blog._id} blog={blog}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button asChild size="sm" className="gap-1.5">
+                      <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Review</Link>
+                    </Button>
+                    <AssignPopover reviewers={allReviewers} onAssign={(email) => assignMutation.mutate({ blogId: blog._id, email })} loading={assignMutation.isPending} label="Re-assign" />
+                    <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
+                  </div>
+                </BlogCard>
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
-          {/* ── In Review (ready to publish) ─────────────────── */}
-          <TabsContent value="inreview">
-            <SectionHeader title="In Review" desc="Reviewer has submitted — do a final check and publish." />
-            {inReviewLoading ? <TabSkeleton /> : inReview.length === 0 ? <EmptyState icon={<BookOpen />} msg="No blogs ready for publishing." /> : (
-              <div className="space-y-3">
-                {inReview.map((blog) => (
-                  <BlogCard key={blog._id} blog={blog}>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <PublishDialog blog={blog} adminId={adminId} adminEmail={adminEmail} onPublished={invalidateAll} />
-                      <Button asChild variant="outline" size="sm" className="gap-1.5">
-                        <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Review</Link>
-                      </Button>
-                      <AssignPopover reviewers={allReviewers} onAssign={(email) => assignMutation.mutate({ blogId: blog._id, email })} loading={assignMutation.isPending} label="Re-review" />
-                      <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
-                    </div>
-                  </BlogCard>
-                ))}
-              </div>
-            )}
-          </TabsContent>
+        {/* ── In Review (ready to publish) ─────────────────── */}
+        <TabsContent value="inreview">
+          <SectionHeader title="In Review" desc="Reviewer has submitted — do a final check and publish." />
+          {inReviewLoading ? <TabSkeleton /> : fInReview.length === 0 ? (
+            <EmptyState icon={<BookOpen />} msg={q ? `No results for "${search}".` : "No blogs ready for publishing."} />
+          ) : (
+            <div className="space-y-3">
+              {fInReview.map((blog) => (
+                <BlogCard key={blog._id} blog={blog}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <PublishDialog blog={blog} adminId={adminId} adminEmail={adminEmail} onPublished={invalidateAll} />
+                    <Button asChild variant="outline" size="sm" className="gap-1.5">
+                      <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Review</Link>
+                    </Button>
+                    <AssignPopover reviewers={allReviewers} onAssign={(email) => assignMutation.mutate({ blogId: blog._id, email })} loading={assignMutation.isPending} label="Re-review" />
+                    <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
+                  </div>
+                </BlogCard>
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
-          {/* ── Published ────────────────────────────────────── */}
-          <TabsContent value="published">
-            <SectionHeader title="Published" desc="All live blogs on BloggerSpace." />
-            {publishedLoading ? <TabSkeleton /> : published.length === 0 ? <EmptyState icon={<Globe />} msg="No published blogs yet." /> : (
+        {/* ── Published ────────────────────────────────────── */}
+        <TabsContent value="published">
+          <SectionHeader
+            title="Published"
+            desc={publishedData
+              ? `${publishedData.totalCount} published blog${publishedData.totalCount !== 1 ? "s" : ""}${debouncedSearch ? ` matching "${debouncedSearch}"` : ""}.`
+              : "All live blogs on BloggerSpace."}
+          />
+          {publishedLoading ? <TabSkeleton /> : published.length === 0 ? (
+            <EmptyState icon={<Globe />} msg={debouncedSearch ? `No results for "${debouncedSearch}".` : "No published blogs yet."} />
+          ) : (
+            <>
               <div className="space-y-3">
                 {published.map((blog) => (
                   <BlogCard key={blog._id} blog={blog}>
@@ -212,28 +280,66 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
                   </BlogCard>
                 ))}
               </div>
-            )}
-          </TabsContent>
+              {(publishedData?.totalPages ?? 1) > 1 && (
+                <div className="flex items-center justify-center gap-3 mt-6">
+                  <Button variant="outline" size="sm" className="gap-1" disabled={publishedPage <= 1} onClick={() => setPublishedPage((p) => p - 1)}>
+                    <ChevronLeft className="size-3.5" />Prev
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {publishedData?.currentPage} of {publishedData?.totalPages}
+                  </span>
+                  <Button variant="outline" size="sm" className="gap-1" disabled={publishedPage >= (publishedData?.totalPages ?? 1)} onClick={() => setPublishedPage((p) => p + 1)}>
+                    Next<ChevronRight className="size-3.5" />
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </TabsContent>
 
-          {/* ── Discard Queue ────────────────────────────────── */}
-          <TabsContent value="discard">
-            <SectionHeader title="Discard Queue" desc="Blogs rejected by reviewers or admin. Delete permanently to remove from DB." />
-            {discardLoading ? <TabSkeleton /> : discardQueue.length === 0 ? <EmptyState icon={<AlertCircle />} msg="Discard queue is empty." /> : (
-              <div className="space-y-3">
-                {discardQueue.map((blog) => (
-                  <BlogCard key={blog._id} blog={blog}>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs text-destructive border-destructive/40">Discarded</Badge>
-                      <DeletePermanentlyButton title={blog.title} isPending={deleteMutation.isPending} onConfirm={() => deleteMutation.mutate(blog._id)} />
-                    </div>
-                  </BlogCard>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      {/* </div> */}
+        {/* ── Discard Queue ────────────────────────────────── */}
+        <TabsContent value="discard">
+          <SectionHeader title="Discard Queue" desc="Blogs rejected by reviewers or admin. Delete permanently to remove from DB." />
+          {discardLoading ? <TabSkeleton /> : fDiscard.length === 0 ? (
+            <EmptyState icon={<AlertCircle />} msg={q ? `No results for "${search}".` : "Discard queue is empty."} />
+          ) : (
+            <div className="space-y-3">
+              {fDiscard.map((blog) => (
+                <BlogCard key={blog._id} blog={blog}>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs text-destructive border-destructive/40">Discarded</Badge>
+                    <DeletePermanentlyButton title={blog.title} isPending={deleteMutation.isPending} onConfirm={() => deleteMutation.mutate(blog._id)} />
+                  </div>
+                </BlogCard>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </main>
+  );
+}
+
+/* ─── Search input ────────────────────────────────────────────────── */
+function SearchInput({ value, onChange, placeholder, className = "" }: {
+  value: string; onChange: (v: string) => void; placeholder?: string; className?: string;
+}) {
+  return (
+    <div className={`relative ${className}`}>
+      <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder ?? "Search…"}
+        className="w-full rounded-lg border border-input bg-background py-2 pl-9 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
+      />
+      {value && (
+        <button type="button" onClick={() => onChange("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+          <X className="size-3.5" />
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -288,7 +394,6 @@ function PageSkeleton() {
   );
 }
 
-/* ─── Delete permanently button ──────────────────────────────────── */
 function DeletePermanentlyButton({ title, isPending, onConfirm }: { title: string; isPending: boolean; onConfirm: () => void }) {
   const [open, setOpen] = useState(false);
   return (
@@ -317,23 +422,16 @@ function DeletePermanentlyButton({ title, isPending, onConfirm }: { title: strin
   );
 }
 
-/* ─── Assign reviewer popover ─────────────────────────────────────── */
 function AssignPopover({
   reviewers, onAssign, loading, label = "Assign reviewer",
-}: {
-  reviewers: ReviewerItem[];
-  onAssign: (email: string) => void;
-  loading: boolean;
-  label?: string;
-}) {
+}: { reviewers: ReviewerItem[]; onAssign: (email: string) => void; loading: boolean; label?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
         <Button size="sm" variant="outline" className="gap-1.5" disabled={loading}>
           {loading ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
-          {label}
-          <ChevronDown className="size-3 ml-0.5" />
+          {label}<ChevronDown className="size-3 ml-0.5" />
         </Button>
       </Popover.Trigger>
       <Popover.Portal>
@@ -343,12 +441,8 @@ function AssignPopover({
             {reviewers.length === 0 ? (
               <p className="px-2 py-4 text-center text-xs text-muted-foreground">No active reviewers.</p>
             ) : reviewers.map((r) => (
-              <button
-                key={r._id}
-                type="button"
-                onClick={() => { onAssign(r.email); setOpen(false); }}
-                className="flex w-full flex-col rounded-md px-2 py-2 text-left text-sm hover:bg-accent"
-              >
+              <button key={r._id} type="button" onClick={() => { onAssign(r.email); setOpen(false); }}
+                className="flex w-full flex-col rounded-md px-2 py-2 text-left text-sm hover:bg-accent">
                 <span className="font-medium">{r.fullName}</span>
                 <span className="text-xs text-muted-foreground">{r.email}</span>
               </button>
@@ -360,7 +454,6 @@ function AssignPopover({
   );
 }
 
-/* ─── Discard confirm button ──────────────────────────────────────── */
 function DiscardButton({ title, isPending, onConfirm }: { title: string; isPending: boolean; onConfirm: () => void }) {
   const [open, setOpen] = useState(false);
   return (
@@ -389,12 +482,9 @@ function DiscardButton({ title, isPending, onConfirm }: { title: string; isPendi
   );
 }
 
-/* ─── Publish dialog ──────────────────────────────────────────────── */
 function PublishDialog({
   blog, adminId, adminEmail, onPublished,
-}: {
-  blog: AdminBlog; adminId: string; adminEmail: string; onPublished: () => void;
-}) {
+}: { blog: AdminBlog; adminId: string; adminEmail: string; onPublished: () => void }) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -426,9 +516,7 @@ function PublishDialog({
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <Button size="sm" className="gap-1.5">
-          <CheckCheck className="size-3.5" />Publish
-        </Button>
+        <Button size="sm" className="gap-1.5"><CheckCheck className="size-3.5" />Publish</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
@@ -448,7 +536,8 @@ function PublishDialog({
             </div>
             <div>
               <p className="mb-1.5 text-sm font-medium">Remarks (optional)</p>
-              <textarea rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Final review notes…" className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground" />
+              <textarea rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Final review notes…"
+                className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground" />
             </div>
           </div>
           <div className="mt-5 flex justify-end gap-2">

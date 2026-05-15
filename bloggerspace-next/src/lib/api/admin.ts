@@ -34,6 +34,9 @@ export type ReviewerItem = {
   email: string;
   isVerified: boolean;
   status: string;
+  reviewerStatus?: string;
+  role?: string;
+  profilePicture?: string;
   createdAt: string;
   reviewedBlogs: unknown[];
 };
@@ -44,6 +47,8 @@ export type UserItem = {
   userName: string;
   email: string;
   status: string;
+  isVerified?: boolean;
+  role?: string;
   createdAt: string;
 };
 
@@ -91,10 +96,10 @@ export const adminApi = {
   getInReviewBlogs: (userId: string) =>
     api.get<AdminBlog[]>("/api/admin/inreviewblogs", { params: p(userId) }),
 
-  getPublishedBlogs: (userId: string, page = 1) =>
+  getPublishedBlogs: (userId: string, page = 1, search = "") =>
     api.get<{ blogs: AdminBlog[]; totalCount: number; currentPage: number; totalPages: number }>(
       "/api/admin/published",
-      { params: { ...p(userId), page, limit: 30 } },
+      { params: { ...p(userId), page, limit: 30, ...(search ? { search } : {}) } },
     ),
 
   getBlogForReview: (blogId: string, userId: string) =>
@@ -122,6 +127,9 @@ export const adminApi = {
   approveReviewer: (reviewerId: string, userId: string) =>
     api.patch<{ message: string }>(`/api/admin/dashboard/approvereviewer/${reviewerId}`, {}, { params: p(userId) }),
 
+  rejectReviewer: (reviewerId: string, userId: string) =>
+    api.patch<{ message: string }>(`/api/admin/dashboard/rejectreviewer/${reviewerId}`, {}, { params: p(userId) }),
+
   removeReviewer: (reviewerId: string, userId: string) =>
     api.patch<{ message: string }>(`/api/admin/dashboard/removefromreviewer/${reviewerId}`, {}, { params: p(userId) }),
 
@@ -135,10 +143,10 @@ export const adminApi = {
     }),
 
   // ── Community ─────────────────────────────────────────────────────
-  getCommunityPosts: (userId: string, page = 1) =>
+  getCommunityPosts: (userId: string, page = 1, search = "") =>
     api.get<{ posts: CommunityPost[]; total: number; page: number; pages: number }>(
       "/api/admin/community",
-      { params: { ...p(userId), page, limit: 20 } },
+      { params: { ...p(userId), page, limit: 20, ...(search ? { search } : {}) } },
     ),
 
   deleteCommunityPost: (postId: string, userId: string) =>

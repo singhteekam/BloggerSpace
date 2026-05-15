@@ -26,11 +26,19 @@ exports.forgotPassword = async (req, res) => {
     // const resetUrl = `http://localhost:4000/resetpassword/${resetToken}`;
     const resetUrl = `${req.protocol}://${req.get("host")}/resetpassword/${resetToken}`;
 
-    const receiver= email;
-    const subject = "Password Reset Request";
+    const receiver = email;
+    const subject = "Password reset request — BloggerSpace";
     const html = `
-    You are receiving this email because you (or someone else) has requested to reset the password for your account.\n\nPlease click on the following link to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n
-    `; 
+      <div class="content">
+        <h2>Reset your password</h2>
+        <p>We received a request to reset the password for your BloggerSpace account. Click the button below to choose a new password.</p>
+        <p><a class="btn" href="${resetUrl}">Reset Password</a></p>
+        <div class="warn-box">
+          This link expires in <strong>1 minute</strong>. If you didn't request a password reset, you can safely ignore this email — your password will remain unchanged.
+        </div>
+        <p class="text-muted">If the button above doesn't work, copy and paste this URL into your browser:<br>${resetUrl}</p>
+      </div>
+    `;
 
     // Send the password reset email
     await sendEmail(receiver, subject, html);

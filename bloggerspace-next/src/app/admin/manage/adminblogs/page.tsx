@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { PenLine, Globe, FileText, Trash2, Loader2, Plus, Clock, Tag, FileMinus } from "lucide-react";
+import { PenLine, Globe, FileText, Trash2, Loader2, Plus, Clock, Tag, FileMinus, Search, X } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi, type AdminBlog } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ export default function AdminBlogsWritePage() {
 
 function AdminBlogsList({ adminId }: { adminId: string }) {
   const qc = useQueryClient();
+  const [search, setSearch] = useState("");
+  const q = search.trim().toLowerCase();
 
   const { data: drafts = [], isLoading: draftsLoading } = useQuery({
     queryKey: ["admin-own-drafts", adminId],
@@ -37,6 +39,19 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
     queryKey: ["admin-own-discarded", adminId],
     queryFn: () => adminApi.getAdminDiscardedBlogs(adminId).then((r) => r.data),
   });
+
+  const filterBlogs = (blogs: AdminBlog[]) =>
+    q
+      ? blogs.filter(
+          (b) =>
+            b.title.toLowerCase().includes(q) ||
+            (b.category?.toLowerCase() ?? "").includes(q),
+        )
+      : blogs;
+
+  const fDrafts = useMemo(() => filterBlogs(drafts), [drafts, q]);
+  const fPublished = useMemo(() => filterBlogs(published), [published, q]);
+  const fDiscarded = useMemo(() => filterBlogs(discarded), [discarded, q]);
 
   const invalidateAll = () => {
     ["admin-own-drafts", "admin-own-published", "admin-own-discarded"].forEach((k) =>
@@ -68,20 +83,30 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
         </Button>
       </div>
 
+      <SearchInput search={search} setSearch={setSearch} placeholder="Search by title or category…" />
+
       <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
         <Tabs defaultValue="drafts">
           <TabsList className="flex w-max gap-1 mb-6">
-            <TabsTrigger value="drafts"><FileText className="size-3.5 mr-1.5" />Drafts ({drafts.length})</TabsTrigger>
-            <TabsTrigger value="published"><Globe className="size-3.5 mr-1.5" />Published ({published.length})</TabsTrigger>
-            <TabsTrigger value="discarded"><Trash2 className="size-3.5 mr-1.5" />Discarded ({discarded.length})</TabsTrigger>
+            <TabsTrigger value="drafts">
+              <FileText className="size-3.5 mr-1.5" />Drafts ({fDrafts.length}{q && drafts.length !== fDrafts.length ? `/${drafts.length}` : ""})
+            </TabsTrigger>
+            <TabsTrigger value="published">
+              <Globe className="size-3.5 mr-1.5" />Published ({fPublished.length}{q && published.length !== fPublished.length ? `/${published.length}` : ""})
+            </TabsTrigger>
+            <TabsTrigger value="discarded">
+              <Trash2 className="size-3.5 mr-1.5" />Discarded ({fDiscarded.length}{q && discarded.length !== fDiscarded.length ? `/${discarded.length}` : ""})
+            </TabsTrigger>
           </TabsList>
 
           {/* Drafts */}
           <TabsContent value="drafts">
             <SectionHeader title="Drafts" desc="Admin-written blogs saved as draft — not yet published." />
-            {draftsLoading ? <TabSkeleton /> : drafts.length === 0 ? <EmptyState icon={<FileText />} msg="No drafts yet." /> : (
+            {draftsLoading ? <TabSkeleton /> : fDrafts.length === 0 ? (
+              <EmptyState icon={<FileText />} msg={q ? `No results for "${search}".` : "No drafts yet."} />
+            ) : (
               <div className="space-y-3">
-                {drafts.map((blog) => (
+                {fDrafts.map((blog) => (
                   <BlogCard key={blog._id} blog={blog}>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Button asChild size="sm" className="gap-1.5">
@@ -98,9 +123,11 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
           {/* Published */}
           <TabsContent value="published">
             <SectionHeader title="Published" desc="Admin-written blogs live on the site." />
-            {publishedLoading ? <TabSkeleton /> : published.length === 0 ? <EmptyState icon={<Globe />} msg="No published admin blogs." /> : (
+            {publishedLoading ? <TabSkeleton /> : fPublished.length === 0 ? (
+              <EmptyState icon={<Globe />} msg={q ? `No results for "${search}".` : "No published admin blogs."} />
+            ) : (
               <div className="space-y-3">
-                {published.map((blog) => (
+                {fPublished.map((blog) => (
                   <BlogCard key={blog._id} blog={blog}>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Button asChild variant="outline" size="sm">
@@ -120,9 +147,11 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
           {/* Discarded */}
           <TabsContent value="discarded">
             <SectionHeader title="Discarded" desc="Admin blogs removed from publication. Delete permanently to remove from DB." />
-            {discardedLoading ? <TabSkeleton /> : discarded.length === 0 ? <EmptyState icon={<Trash2 />} msg="No discarded blogs." /> : (
+            {discardedLoading ? <TabSkeleton /> : fDiscarded.length === 0 ? (
+              <EmptyState icon={<Trash2 />} msg={q ? `No results for "${search}".` : "No discarded blogs."} />
+            ) : (
               <div className="space-y-3">
-                {discarded.map((blog) => (
+                {fDiscarded.map((blog) => (
                   <BlogCard key={blog._id} blog={blog}>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs text-destructive border-destructive/40">Discarded</Badge>
@@ -136,6 +165,25 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
         </Tabs>
       </div>
     </main>
+  );
+}
+
+function SearchInput({ search, setSearch, placeholder }: { search: string; setSearch: (v: string) => void; placeholder?: string }) {
+  return (
+    <div className="relative mb-5">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder={placeholder ?? "Search…"}
+        className="w-full rounded-lg border border-border bg-card pl-9 pr-9 py-2 text-sm outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground"
+      />
+      {search && (
+        <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+          <X className="size-3.5" />
+        </button>
+      )}
+    </div>
   );
 }
 

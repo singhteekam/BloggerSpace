@@ -34,12 +34,32 @@ export type ReviewerAuthResponse = {
 export type LoginPayload = { email: string; password: string };
 export type SignupPayload = { fullName: string; email: string; password: string };
 
+/** Returned by POST /api/users/signup and POST /api/users/login when email is unverified */
+export type OtpRequiredResponse = {
+  message: "otp_required";
+  email: string;
+  info: string;
+};
+
+/** Returned by POST /api/users/verify-otp on success — logs the user in */
+export type VerifyOtpResponse = {
+  message: string;
+  token: string;
+  userDetails: AuthUser;
+};
+
 export const authApi = {
   login: (data: LoginPayload) =>
     api.post<AuthResponse>("/api/users/login", data),
 
   signup: (data: SignupPayload) =>
-    api.post<SignupResponse>("/api/users/signup", data),
+    api.post<OtpRequiredResponse>("/api/users/signup", data),
+
+  verifyOtp: (email: string, otp: string) =>
+    api.post<VerifyOtpResponse>("/api/users/verify-otp", { email, otp }),
+
+  resendOtp: (email: string) =>
+    api.post<{ message: string }>("/api/users/resend-otp", { email }),
 
   forgotPassword: (email: string) =>
     api.post("/api/users/forgotpassword", { email }),

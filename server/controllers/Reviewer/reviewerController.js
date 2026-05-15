@@ -40,15 +40,24 @@ exports.reviewerSignup = async (req, res) => {
       const motivationHtml = motivation?.trim()
         ? `<p><strong>Motivation:</strong> ${motivation.trim()}</p>`
         : "";
-      const adminHtml = `<div><h2>New Reviewer Application</h2>
-        <p>An existing user has applied to join the BloggerSpace Reviewer Panel.</p>
-        <p><strong>Name:</strong> ${existingUser.fullName}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        ${motivationHtml}
-        <p>Please log in to the Admin Panel to approve their application.</p></div>`;
-      const applicantHtml = `<div><h2>Hi ${existingUser.fullName},</h2>
-        <p>Your application to the <strong>BloggerSpace Reviewer Panel</strong> has been received.</p>
-        <p>Our admin team will review it and notify you once approved.</p></div>`;
+      const adminHtml = `
+        <div class="content">
+          <h2>New Reviewer Application</h2>
+          <p>An existing user has applied to join the BloggerSpace Reviewer Panel.</p>
+          <div class="info-box">
+            <strong>Name:</strong> ${existingUser.fullName}<br>
+            <strong>Email:</strong> ${email}
+            ${motivationHtml ? `<br><strong>Motivation:</strong> ${motivation.trim()}` : ""}
+          </div>
+          <p><a class="btn" href="${process.env.FRONTEND_URL}/admin">Open Admin Panel</a></p>
+        </div>`;
+      const applicantHtml = `
+        <div class="content">
+          <h2>Hi ${existingUser.fullName},</h2>
+          <p>Your application to the <strong>BloggerSpace Reviewer Panel</strong> has been received.</p>
+          <p>Our admin team will review it and notify you by email once approved.</p>
+          <div class="info-box">In the meantime, you can keep using BloggerSpace as a regular reader and writer.</div>
+        </div>`;
 
       res.status(201).json({ message: "Application submitted successfully." });
       await sendEmail(process.env.EMAIL, "New Reviewer Application — BloggerSpace", adminHtml);
@@ -79,17 +88,24 @@ exports.reviewerSignup = async (req, res) => {
     const motivationHtml = motivation?.trim()
       ? `<p><strong>Motivation:</strong> ${motivation.trim()}</p>`
       : "";
-    const adminHtml = `<div><h2>New Reviewer Application</h2>
-      <p>A new user has applied to join the BloggerSpace Reviewer Panel.</p>
-      <p><strong>Name:</strong> ${fullName}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      ${motivationHtml}
-      <p>Please log in to the Admin Panel to verify and activate their account.</p></div>`;
-    const applicantHtml = `<div><h2>Hi ${fullName},</h2>
-      <p>Thank you for applying to the <strong>BloggerSpace Reviewer Panel</strong>!</p>
-      <p>Your application has been received and is currently under review by our admin team.
-         We will notify you by email once your account is approved.</p>
-      <p>Once approved, you can sign in at the Reviewer Portal with your email and password.</p></div>`;
+    const adminHtml = `
+      <div class="content">
+        <h2>New Reviewer Application</h2>
+        <p>A new user has applied to join the BloggerSpace Reviewer Panel.</p>
+        <div class="info-box">
+          <strong>Name:</strong> ${fullName}<br>
+          <strong>Email:</strong> ${email}
+          ${motivationHtml ? `<br><strong>Motivation:</strong> ${motivation.trim()}` : ""}
+        </div>
+        <p><a class="btn" href="${process.env.FRONTEND_URL}/admin">Open Admin Panel</a></p>
+      </div>`;
+    const applicantHtml = `
+      <div class="content">
+        <h2>Hi ${fullName},</h2>
+        <p>Thank you for applying to the <strong>BloggerSpace Reviewer Panel</strong>!</p>
+        <p>Your application has been received and is under review by our admin team. We'll notify you by email once it's approved.</p>
+        <div class="info-box">Once approved, you can sign in at the Reviewer Portal with your email and password.</div>
+      </div>`;
 
     res.status(201).json({ message: "Application submitted successfully." });
     await sendEmail(process.env.EMAIL, "New Reviewer Application — BloggerSpace", adminHtml);
@@ -300,8 +316,14 @@ exports.saveEditedPendingBlog = async (req, res) => {
       await found.doc.save();
 
       const receiver = found.doc.email;
-      const subject = "Blog status updated — IN_REVIEW";
-      const html = `<p>Blog status updated: IN_REVIEW</p><p>Blog Title: ${blog.title}</p>`;
+      const subject = "Your blog is now under review — BloggerSpace";
+      const html = `
+        <div class="content">
+          <h2>Blog under review</h2>
+          <p>You've successfully submitted your review. The blog has been moved to <strong>IN_REVIEW</strong> status.</p>
+          <div class="info-box"><strong>Blog:</strong> ${blog.title}</div>
+          <p><a class="btn" href="${process.env.FRONTEND_URL}/reviewer">Go to Reviewer Dashboard</a></p>
+        </div>`;
       res.json({ message: "blog updated successfully" });
       await sendEmail(receiver, subject, html);
     } else {
@@ -409,12 +431,29 @@ exports.feedbackToAuthor = async (req, res) => {
 
     const receiver1 = blog.authorDetails.email;
     const receiver2 = req.query.email;
-    const subject = "Blog status updated — AWAITING_AUTHOR";
-    const html = `<p>Blog status updated: AWAITING_AUTHOR</p><p>Blog: ${blog.slug}</p><p>Feedback: ${feedback}</p>`;
+    const subject = "Reviewer feedback on your blog — BloggerSpace";
+    const authorHtml = `
+      <div class="content">
+        <h2>You have reviewer feedback</h2>
+        <p>Your blog has been reviewed and requires some revisions before it can be published.</p>
+        <div class="info-box">
+          <strong>Blog:</strong> ${blog.slug}<br>
+          <strong>Status:</strong> Awaiting your revision
+        </div>
+        <h3>Reviewer feedback</h3>
+        <p>${feedback}</p>
+        <p><a class="btn" href="${process.env.FRONTEND_URL}/myblogs">View your blogs</a></p>
+      </div>`;
+    const reviewerHtml = `
+      <div class="content">
+        <h2>Feedback sent</h2>
+        <p>Your feedback has been sent to the author. The blog status has been updated to <strong>AWAITING_AUTHOR</strong>.</p>
+        <div class="info-box"><strong>Blog:</strong> ${blog.slug}</div>
+      </div>`;
 
     res.json({ message: "Feedback sent successfully" });
-    await sendEmail(receiver1, subject, html);
-    await sendEmail(receiver2, subject, html);
+    await sendEmail(receiver1, subject, authorHtml);
+    await sendEmail(receiver2, subject, reviewerHtml);
   } catch (error) {
     console.error("Failed to send feedback:", error);
     res.status(500).json({ error: "Failed to send feedback" });

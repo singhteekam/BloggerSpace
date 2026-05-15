@@ -573,19 +573,19 @@ exports.createNewBlog = async (req, res) => {
 
     // Sending mail to author
     const receiver = authorEmail;
-    const subject = "Blog submitted for review";
+    const subject = "Blog submitted for review — BloggerSpace";
     const html = `
-  <div class="content">
-    <h2>Hello, ${authorEmail}!</h2>
-    <p>Your blog is submitted for review.</p>
-    <p>Topic: <span style="color:#167d7f; font-weight:bold">${title}</span></p>
-    <p>Category: <span style="color:#167d7f; font-weight:bold">${category}</span></p>
-    <p>Tags: <span style="color:#167d7f; font-weight:bold">${tags}</span></p>
-    <p>Content:</p> <div class="blog-content">${content}</div>
-    <br />
-    <p>Your blog will be reviewed shortly.</p>
-    <p><a href="${process.env.FRONTEND_URL}/myblogs" class="button">Track status</a></p>
-  </div>
+      <div class="content">
+        <h2>Blog submitted!</h2>
+        <p>Your blog has been submitted and is now pending review by one of our human reviewers.</p>
+        <div class="info-box">
+          <strong>Title:</strong> ${title}<br>
+          <strong>Category:</strong> ${category}<br>
+          <strong>Tags:</strong> ${tags}
+        </div>
+        <p>We'll notify you by email when your blog moves through each review stage.</p>
+        <p><a class="btn" href="${process.env.FRONTEND_URL}/myblogs">Track status</a></p>
+      </div>
     `;
 
     sendEmail(receiver, subject, html)
@@ -601,24 +601,24 @@ exports.createNewBlog = async (req, res) => {
       });
 
     // Sending mail to admin
-    // const blogLink = `http://localhost:3000/api/blogs/${slug}`;
     const blogLink = `${process.env.REVIEWER_PANEL_URL}/${slug}`;
     const receiver2 = process.env.EMAIL;
-    const subject2 = "New Blog available for review";
+    const subject2 = "New blog pending review — BloggerSpace";
     const html2 = `
-    <p>New blog available for review</p>
-    <p>Title: ${title}</p>
-    <a href="${blogLink}">${blogLink}</a>
+      <div class="content">
+        <h2>New blog submitted</h2>
+        <p>A new blog has been submitted and is waiting to be assigned to a reviewer.</p>
+        <div class="info-box"><strong>Title:</strong> ${title}</div>
+        <p><a class="btn" href="${blogLink}">View in Admin Panel</a></p>
+      </div>
     `;
 
     sendEmail(receiver2, subject2, html2)
       .then((response) => {
-        console.log(`Email sent to ${receiver}:`, response);
-        // Handle success
+        console.log(`Email sent to ${receiver2}:`, response);
       })
       .catch((error) => {
         console.error("Error sending email:", error);
-        // Handle error
       });
 
     res.json(savedBlog);
@@ -734,41 +734,41 @@ exports.saveEditedBlog = async (req, res) => {
 
     // Sending mail to author
     const receiver = blog.authorDetails.email;
-    const subject = "Blog submitted for review";
+    const subject = "Blog resubmitted for review — BloggerSpace";
     const html = `
-  <div class="content">
-    <h2>Hello, ${blog.authorDetails.fullName}!</h2>
-    <p>Your blog is submitted for review.</p>
-    <p>Topic: <span style="color:#167d7f; font-weight:bold">${title}</span></p>
-    <p>Category: <span style="color:#167d7f; font-weight:bold">${category}</span></p>
-    <p>Content:</p> <div class="blog-content">${content}</div>
-    <br />
-    <p>Your blog will be reviewed shortly.</p>
-    <p><a href="${process.env.FRONTEND_URL}/myblogs" class="button">Track status</a></p>
-  </div>
+      <div class="content">
+        <h2>Blog resubmitted!</h2>
+        <p>Hi ${blog.authorDetails.fullName}, your updated blog has been resubmitted and is now pending review.</p>
+        <div class="info-box">
+          <strong>Title:</strong> ${title}<br>
+          <strong>Category:</strong> ${category}
+        </div>
+        <p>We'll notify you when the reviewer responds.</p>
+        <p><a class="btn" href="${process.env.FRONTEND_URL}/myblogs">Track status</a></p>
+      </div>
     `;
 
     sendEmail(receiver, subject, html)
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);
         logger.debug("Email sent to writer:" + response);
-        // Handle success
       })
       .catch((error) => {
         console.error("Error sending email:", error);
         logger.error("Error sending email:" + error);
-        // Handle error
       });
 
     // Sending mail to admin
-    // const blogLink = `http://localhost:3000/api/blogs/${slug}`;
     const blogLink = `${process.env.REVIEWER_PANEL_URL}/${slug}`;
     const receiver2 = process.env.EMAIL;
-    const subject2 = "New Blog available for review";
+    const subject2 = "Blog resubmitted — BloggerSpace";
     const html2 = `
-    <p>New blog available for review</p>
-    <p>Title: ${title}</p>
-    <a href="${blogLink}">${blogLink}</a>
+      <div class="content">
+        <h2>Blog resubmitted</h2>
+        <p>An author has resubmitted their revised blog for review.</p>
+        <div class="info-box"><strong>Title:</strong> ${title}</div>
+        <p><a class="btn" href="${blogLink}">View in Admin Panel</a></p>
+      </div>
     `;
 
     sendEmail(receiver2, subject2, html2)

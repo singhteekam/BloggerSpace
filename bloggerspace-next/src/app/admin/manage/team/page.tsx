@@ -4,17 +4,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
-  Users, UserCheck, UserX, Loader2, Trash2, Clock,
+  Users, UserCheck, UserX, Loader2, Trash2, Clock, Ban, ShieldCheck, Search, X,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi, type ReviewerItem, type UserItem } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/utils/html";
+
 
 export default function AdminTeamPage() {
   const { user, isLoading: authLoading } = useRequireAdmin();
@@ -25,6 +26,8 @@ export default function AdminTeamPage() {
 
 function TeamManagement({ adminId }: { adminId: string }) {
   const qc = useQueryClient();
+  const [search, setSearch] = useState("");
+  const q = search.trim().toLowerCase();
 
   const { data: verifiedReviewers = [], isLoading: verifiedLoading } = useQuery({
     queryKey: ["admin-verified-reviewers", adminId],
@@ -39,11 +42,35 @@ function TeamManagement({ adminId }: { adminId: string }) {
     queryFn: () => adminApi.getUsers(adminId).then((r) => r.data),
   });
 
+  const matchReviewer = (r: ReviewerItem) =>
+    r.fullName.toLowerCase().includes(q) ||
+    r.userName.toLowerCase().includes(q) ||
+    r.email.toLowerCase().includes(q);
+
+  const matchUser = (u: UserItem) =>
+    u.fullName.toLowerCase().includes(q) ||
+    u.userName.toLowerCase().includes(q) ||
+    u.email.toLowerCase().includes(q);
+
+  const fPending = useMemo(() => (q ? pendingReviewers.filter(matchReviewer) : pendingReviewers), [pendingReviewers, q]);
+  const fVerified = useMemo(() => (q ? verifiedReviewers.filter(matchReviewer) : verifiedReviewers), [verifiedReviewers, q]);
+  const fUsers = useMemo(() => (q ? users.filter(matchUser) : users), [users, q]);
+
   const approveMutation = useMutation({
     mutationFn: (reviewerId: string) => adminApi.approveReviewer(reviewerId, adminId),
     onSuccess: () => {
       toast.success("Reviewer approved.");
-      qc.invalidateQueries({ queryKey: ["admin-pending-reviewers", "admin-verified-reviewers"] });
+      qc.invalidateQueries({ queryKey: ["admin-pending-reviewers"] });
+      qc.invalidateQueries({ queryKey: ["admin-verified-reviewers"] });
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (reviewerId: string) => adminApi.rejectReviewer(reviewerId, adminId),
+    onSuccess: () => {
+      toast.success("Request rejected.");
+      qc.invalidateQueries({ queryKey: ["admin-pending-reviewers"] });
     },
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
   });
@@ -71,38 +98,54 @@ function TeamManagement({ adminId }: { adminId: string }) {
     <main className="px-6 py-8 max-w-5xl mx-auto">
       <h1 className="font-serif text-2xl font-semibold mb-6">Team Management</h1>
 
+      <SearchInput search={search} setSearch={setSearch} placeholder="Search by name, username, or email…" />
+
       <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
         <Tabs defaultValue="pending">
           <TabsList className="flex w-max gap-1 mb-6">
             <TabsTrigger value="pending">
-              <UserCheck className="size-3.5 mr-1.5" />Pending ({pendingReviewers.length})
+              <UserCheck className="size-3.5 mr-1.5" />Pending ({fPending.length}{q && pendingReviewers.length !== fPending.length ? `/${pendingReviewers.length}` : ""})
             </TabsTrigger>
             <TabsTrigger value="reviewers">
-              <Users className="size-3.5 mr-1.5" />Active Reviewers ({verifiedReviewers.length})
+              <Users className="size-3.5 mr-1.5" />Active Reviewers ({fVerified.length}{q && verifiedReviewers.length !== fVerified.length ? `/${verifiedReviewers.length}` : ""})
             </TabsTrigger>
             <TabsTrigger value="users">
-              <Users className="size-3.5 mr-1.5" />Users ({users.length})
+              <Users className="size-3.5 mr-1.5" />Users ({fUsers.length}{q && users.length !== fUsers.length ? `/${users.length}` : ""})
             </TabsTrigger>
           </TabsList>
 
           {/* ── Pending Reviewer Requests ─── */}
           <TabsContent value="pending">
             <SectionHeader title="Pending Reviewer Requests" desc="New reviewer sign-up requests awaiting your approval." />
-            {pendingLoading ? <TabSkeleton /> : pendingReviewers.length === 0 ? (
-              <EmptyState icon={<UserCheck />} msg="No pending reviewer requests." />
+            {pendingLoading ? <TabSkeleton /> : fPending.length === 0 ? (
+              <EmptyState icon={<UserCheck />} msg={q ? `No results for "${search}".` : "No pending reviewer requests."} />
             ) : (
               <div className="space-y-3">
-                {pendingReviewers.map((r) => (
+                {fPending.map((r) => (
                   <ReviewerCard key={r._id} reviewer={r}>
-                    <Button
-                      size="sm"
-                      className="gap-1.5"
-                      disabled={approveMutation.isPending}
-                      onClick={() => approveMutation.mutate(r._id)}
-                    >
-                      {approveMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <UserCheck className="size-3.5" />}
-                      Approve
-                    </Button>
+                    <ConfirmActionButton
+                      label="Approve"
+                      icon={<UserCheck className="size-3.5" />}
+                      dialogTitle="Approve reviewer?"
+                      dialogDesc={`Grant reviewer access to ${r.fullName} (${r.email}). They will receive an email and can start reviewing blogs.`}
+                      confirmLabel="Approve"
+                      isPending={approveMutation.isPending}
+                      onConfirm={() => approveMutation.mutate(r._id)}
+                      triggerVariant="default"
+                      confirmVariant="default"
+                    />
+                    <ConfirmActionButton
+                      label="Reject"
+                      icon={<Ban className="size-3.5" />}
+                      dialogTitle="Reject request?"
+                      dialogDesc={`Reject the reviewer application from ${r.fullName} (${r.email}). They will be notified via email.`}
+                      confirmLabel="Reject"
+                      isPending={rejectMutation.isPending}
+                      onConfirm={() => rejectMutation.mutate(r._id)}
+                      triggerVariant="outline"
+                      triggerClassName="text-destructive hover:text-destructive border-destructive/40"
+                      confirmVariant="destructive"
+                    />
                   </ReviewerCard>
                 ))}
               </div>
@@ -112,22 +155,24 @@ function TeamManagement({ adminId }: { adminId: string }) {
           {/* ── Active Reviewers ─────────── */}
           <TabsContent value="reviewers">
             <SectionHeader title="Active Reviewers" desc="Currently verified reviewers who can be assigned blogs." />
-            {verifiedLoading ? <TabSkeleton /> : verifiedReviewers.length === 0 ? (
-              <EmptyState icon={<Users />} msg="No active reviewers." />
+            {verifiedLoading ? <TabSkeleton /> : fVerified.length === 0 ? (
+              <EmptyState icon={<Users />} msg={q ? `No results for "${search}".` : "No active reviewers."} />
             ) : (
               <div className="space-y-3">
-                {verifiedReviewers.map((r) => (
+                {fVerified.map((r) => (
                   <ReviewerCard key={r._id} reviewer={r}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1.5 text-destructive hover:text-destructive"
-                      disabled={removeMutation.isPending}
-                      onClick={() => removeMutation.mutate(r._id)}
-                    >
-                      {removeMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <UserX className="size-3.5" />}
-                      Remove
-                    </Button>
+                    <ConfirmActionButton
+                      label="Remove"
+                      icon={<UserX className="size-3.5" />}
+                      dialogTitle="Remove reviewer?"
+                      dialogDesc={`Revoke reviewer access for ${r.fullName} (${r.email}). Their role will revert to regular user.`}
+                      confirmLabel="Remove"
+                      isPending={removeMutation.isPending}
+                      onConfirm={() => removeMutation.mutate(r._id)}
+                      triggerVariant="ghost"
+                      triggerClassName="text-destructive hover:text-destructive"
+                      confirmVariant="destructive"
+                    />
                   </ReviewerCard>
                 ))}
               </div>
@@ -137,11 +182,11 @@ function TeamManagement({ adminId }: { adminId: string }) {
           {/* ── Users ────────────────────── */}
           <TabsContent value="users">
             <SectionHeader title="Registered Users" desc="All active user accounts on BloggerSpace." />
-            {usersLoading ? <TabSkeleton /> : users.length === 0 ? (
-              <EmptyState icon={<Users />} msg="No users found." />
+            {usersLoading ? <TabSkeleton /> : fUsers.length === 0 ? (
+              <EmptyState icon={<Users />} msg={q ? `No results for "${search}".` : "No users found."} />
             ) : (
               <div className="space-y-3">
-                {users.map((u) => (
+                {fUsers.map((u) => (
                   <UserCard key={u._id} user={u}>
                     <DeleteConfirmButton
                       label="Remove user"
@@ -162,6 +207,25 @@ function TeamManagement({ adminId }: { adminId: string }) {
 
 /* ─── sub-components ──────────────────────────────────────────────── */
 
+function SearchInput({ search, setSearch, placeholder }: { search: string; setSearch: (v: string) => void; placeholder?: string }) {
+  return (
+    <div className="relative mb-5">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder={placeholder ?? "Search…"}
+        className="w-full rounded-lg border border-border bg-card pl-9 pr-9 py-2 text-sm outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground"
+      />
+      {search && (
+        <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+          <X className="size-3.5" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 function SectionHeader({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="mb-4">
@@ -172,28 +236,58 @@ function SectionHeader({ title, desc }: { title: string; desc: string }) {
 }
 
 function ReviewerCard({ reviewer, children }: { reviewer: ReviewerItem; children: React.ReactNode }) {
+  const statusColor =
+    reviewer.reviewerStatus === "approved"
+      ? "text-green-600 border-green-300 dark:text-green-400 dark:border-green-700"
+      : reviewer.reviewerStatus === "pending"
+      ? "text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700"
+      : "text-destructive border-destructive/40";
+
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-border bg-card p-4">
       <div className="min-w-0 flex-1">
-        <p className="font-medium text-foreground">{reviewer.fullName}</p>
+        <div className="flex flex-wrap items-center gap-2 mb-0.5">
+          <p className="font-medium text-foreground">{reviewer.fullName}</p>
+          {reviewer.isVerified && (
+            <Badge variant="secondary" className="text-xs h-5 px-1.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
+              <ShieldCheck className="size-3 mr-1" />Verified
+            </Badge>
+          )}
+          {reviewer.reviewerStatus && reviewer.reviewerStatus !== "none" && (
+            <Badge variant="outline" className={`text-xs h-5 px-1.5 capitalize ${statusColor}`}>
+              {reviewer.reviewerStatus}
+            </Badge>
+          )}
+        </div>
         <p className="text-xs text-muted-foreground">@{reviewer.userName} · {reviewer.email}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
           {reviewer.reviewedBlogs?.length ?? 0} blogs reviewed · Joined {formatDate(reviewer.createdAt)}
         </p>
       </div>
-      <div className="shrink-0">{children}</div>
+      <div className="shrink-0 flex items-center gap-2">{children}</div>
     </div>
   );
 }
 
 function UserCard({ user, children }: { user: UserItem; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-border bg-card p-4">
       <div className="min-w-0 flex-1">
-        <p className="font-medium text-foreground">{user.fullName}</p>
+        <div className="flex flex-wrap items-center gap-2 mb-0.5">
+          <p className="font-medium text-foreground">{user.fullName}</p>
+          {user.isVerified && (
+            <Badge variant="secondary" className="text-xs h-5 px-1.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
+              <ShieldCheck className="size-3 mr-1" />Verified
+            </Badge>
+          )}
+          {user.role && user.role !== "user" && (
+            <Badge variant="secondary" className="text-xs h-5 px-1.5 capitalize">{user.role}</Badge>
+          )}
+        </div>
         <p className="text-xs text-muted-foreground">@{user.userName} · {user.email}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
-          <Clock className="size-3 inline mr-1" />{formatDate(user.createdAt)}
+          <Clock className="size-3 inline mr-1" />Joined {formatDate(user.createdAt)}
+          {user.status && <span className="ml-2">&middot; {user.status}</span>}
         </p>
       </div>
       <div className="shrink-0">{children}</div>
@@ -224,6 +318,59 @@ function PageSkeleton() {
   );
 }
 
+/* ─── Generic confirm action button ──────────────────────────────── */
+function ConfirmActionButton({
+  label, icon, dialogTitle, dialogDesc, confirmLabel,
+  isPending, onConfirm,
+  triggerVariant = "default",
+  triggerClassName = "",
+  confirmVariant = "destructive",
+}: {
+  label: string;
+  icon?: React.ReactNode;
+  dialogTitle: string;
+  dialogDesc: string;
+  confirmLabel: string;
+  isPending: boolean;
+  onConfirm: () => void;
+  triggerVariant?: "default" | "destructive" | "outline" | "ghost";
+  triggerClassName?: string;
+  confirmVariant?: "default" | "destructive";
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger asChild>
+        <Button variant={triggerVariant} size="sm" className={`gap-1.5 ${triggerClassName}`} disabled={isPending}>
+          {isPending ? <Loader2 className="size-3.5 animate-spin" /> : icon}
+          {label}
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-6 shadow-xl">
+          <Dialog.Title className="font-serif text-lg font-semibold">{dialogTitle}</Dialog.Title>
+          <Dialog.Description className="mt-2 text-sm text-muted-foreground">{dialogDesc}</Dialog.Description>
+          <div className="mt-5 flex justify-end gap-2">
+            <Dialog.Close asChild><Button variant="outline" size="sm">Cancel</Button></Dialog.Close>
+            <Button
+              variant={confirmVariant}
+              size="sm"
+              disabled={isPending}
+              onClick={() => { onConfirm(); setOpen(false); }}
+              className="gap-1.5"
+            >
+              {isPending ? <Loader2 className="size-3.5 animate-spin" /> : icon}
+              {confirmLabel}
+            </Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+/* ─── Delete confirm button (user deletion) ──────────────────────── */
 function DeleteConfirmButton({
   label, desc, isPending, onConfirm,
 }: {

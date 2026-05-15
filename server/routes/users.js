@@ -6,6 +6,8 @@ const {
   login,
   verifyAccount,
   verifyAccountget,
+  verifyOtp,
+  resendOtp,
   logout,
   deleteAccount,
   deactivateAccount,
@@ -61,6 +63,10 @@ router.post("/signup", signup);
 
 // Login route
 router.post("/login", login);
+
+// OTP verification routes (used after signup and for unverified accounts on login)
+router.post("/verify-otp", verifyOtp);
+router.post("/resend-otp", resendOtp);
 
 // Login with Google
 router.get('/auth/google',

@@ -15,6 +15,9 @@ const logger = require("./../utils/Logging/logs");
 const passport = require("../services/passportAuth.js");
 const PDFDocument = require('pdfkit');
 
+// Returns a random 6-digit numeric OTP string
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+
 // verifyAccount controller
 exports.verifyAccount = async (req, res) => {
   const { email } = req.body;
@@ -108,55 +111,76 @@ exports.signup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
-    // Check if the user already exists
     const existingUser = await User.findOne({ email });
-    console.log(existingUser);
+
     if (existingUser) {
-      logger.error("User already exists with given email.");
-      return res.status(400).json({ message: "User already exists" });
+      if (existingUser.isVerified) {
+        // Fully registered account — reject re-registration
+        logger.error("Signup attempt for already-verified email: " + email);
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Account was created before but never verified — issue a fresh OTP so they
+      // can complete verification without creating a duplicate account.
+      const otp = generateOtp();
+      existingUser.otpCode = otp;
+      existingUser.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      await existingUser.save();
+
+      sendEmail(email, "Your BloggerSpace verification code", `
+        <div class="content">
+          <h2>Hi ${existingUser.fullName},</h2>
+          <p>You tried to sign up again. Your account already exists but hasn't been verified yet.</p>
+          <p>Enter the code below to complete verification:</p>
+          <div class="otp-code">${otp}</div>
+          <div class="info-box">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</div>
+          <p class="text-muted">Didn't request this? You can safely ignore this email.</p>
+        </div>
+      `).catch((err) => logger.error("Failed to send re-signup OTP email: " + err));
+
+      logger.debug("Re-signup attempt for unverified account, new OTP sent: " + email);
+      return res.status(200).json({
+        message: "otp_required",
+        email,
+        info: "Account exists but is not verified. A new code has been sent to your email.",
+      });
     }
 
-    // Hash the password
+    // New user — create account in INACTIVE/unverified state until OTP is confirmed
     const hashedPassword = await bcrypt.hash(password, 10);
+    const otp = generateOtp();
 
-    // Create a new user
     const newUser = new User({
       fullName,
-      userName: email
-        .substring(0, email.indexOf("@"))
-        .replace(/[^a-zA-Z0-9 ]/g, ""),
+      userName: email.substring(0, email.indexOf("@")).replace(/[^a-zA-Z0-9]/g, ""),
       email,
       password: hashedPassword,
-      status: "ACTIVE",
+      status: "INACTIVE",  // Activated on OTP verification
+      isVerified: false,
+      otpCode: otp,
+      otpExpiry: new Date(Date.now() + 10 * 60 * 1000),
     });
-
-    console.log(newUser);
 
     await newUser.save();
 
-    const receiver = email;
-    const receiver2= process.env.EMAIL;
-    const subject = "Signup Success!!";
-    const html = `
-              <div class="content">
-                <h2>Hi ${email},</h2>
-                <p>Your account has been created successfully.</p>
-                <p>You will be asked to verify your account in next step. If not, login with your email and password to get verification link on your registered email id. </p>
-              </div>
-                `;
+    // Fire-and-forget — a failed email must not block account creation
+    sendEmail(email, "Your BloggerSpace verification code", `
+      <div class="content">
+        <h2>Hi ${fullName},</h2>
+        <p>Welcome to BloggerSpace! Enter the code below to verify your account and get started.</p>
+        <div class="otp-code">${otp}</div>
+        <div class="info-box">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</div>
+        <p class="text-muted">Didn't sign up for BloggerSpace? You can safely ignore this email.</p>
+      </div>
+    `).catch((err) => logger.error("Failed to send signup OTP email: " + err));
 
-    sendEmail(receiver, subject, html)
-      .then((response) => {
-        console.log(`Email sent to ${receiver}:`, response);
-        logger.debug("Sign up successful.");
-      })
-      .catch((error) => {
-        console.error("Error sending email:", error);
-        logger.error("Error Sign up. Error: " + error);
-      });
+    logger.debug("New user created (pending OTP verification): " + email);
+    return res.status(201).json({
+      message: "otp_required",
+      email,
+      info: "Account created. Enter the code sent to your email to complete sign-up.",
+    });
 
-    logger.debug("New user added. Signup successful.");
-    res.status(201).json({ message: "Signup successful" });
   } catch (error) {
     logger.error("Signup failed. Error: " + error.message);
     res.status(500).json({ message: "Signup failed", error: error.message });
@@ -181,6 +205,31 @@ exports.login = async (req, res) => {
     if (!isPasswordValid) {
       logger.error("The password is invalid.");
       return res.status(401).json({ message: "Invalid password" });
+    }
+
+    // OTP gate — unverified accounts must verify before a session token is issued
+    if (!user.isVerified) {
+      const otp = generateOtp();
+      user.otpCode = otp;
+      user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      await user.save();
+
+      sendEmail(user.email, "Your BloggerSpace verification code", `
+        <div class="content">
+          <h2>Hi ${user.fullName},</h2>
+          <p>Your account isn't verified yet. Enter the code below to complete verification and sign in.</p>
+          <div class="otp-code">${otp}</div>
+          <div class="info-box">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</div>
+          <p class="text-muted">Didn't request this? You can safely ignore this email.</p>
+        </div>
+      `).catch((err) => logger.error("Failed to send login OTP email: " + err));
+
+      logger.info("Login blocked — account not verified, OTP sent: " + user.email);
+      return res.status(403).json({
+        message: "otp_required",
+        email: user.email,
+        info: "Your email is not verified. An OTP has been sent to your email.",
+      });
     }
 
     // Updating user's last login
@@ -224,6 +273,138 @@ exports.login = async (req, res) => {
   } catch (error) {
     logger.error("Login failed: " + error.message);
     res.status(500).json({ message: "Login failed", error: error.message });
+  }
+};
+
+// Verify OTP submitted by the user after signup or login
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required." });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Guard against calling this endpoint on an already-verified account
+    if (user.isVerified) {
+      return res.status(400).json({ message: "Account is already verified." });
+    }
+
+    if (!user.otpCode || !user.otpExpiry) {
+      return res.status(400).json({ message: "No OTP found. Please request a new one." });
+    }
+
+    if (new Date() > user.otpExpiry) {
+      // Clean up the stale OTP
+      user.otpCode = null;
+      user.otpExpiry = null;
+      await user.save();
+      return res.status(400).json({ message: "OTP has expired. Please request a new one." });
+    }
+
+    if (user.otpCode !== otp.toString().trim()) {
+      return res.status(400).json({ message: "Incorrect OTP. Please try again." });
+    }
+
+    // OTP is valid — activate and verify the account
+    user.isVerified = true;
+    user.status = "ACTIVE";
+    user.otpCode = null;
+    user.otpExpiry = null;
+    user.lastLogin = new Date(new Date().getTime() + 330 * 60000); // IST
+    await user.save();
+
+    // Issue a JWT so the user is logged in immediately after verification
+    const token = jwt.sign(
+      { userId: user._id, currentuserId: user._id, role: user.role || "user" },
+      process.env.CURRENT_JWT_SECRET,
+      { expiresIn: "3d" }
+    );
+
+    const userDetails = {
+      _id: user._id,
+      fullName: user.fullName,
+      userName: user.userName,
+      email: user.email,
+      isVerified: user.isVerified,
+      profilePicture: user.profilePicture,
+      savedBlogs: user.savedBlogs,
+      role: user.role || "user",
+      createdAt: user.createdAt,
+    };
+
+    // Welcome email — fire and forget
+    sendEmail(email, "Your BloggerSpace account is verified!", `
+      <div class="content">
+        <h2>You're verified, ${user.fullName}!</h2>
+        <p>Your email has been confirmed and your account is now active. Welcome to BloggerSpace — a space where every story is reviewed by a real human before it goes live.</p>
+        <p>
+          <a class="btn" href="${process.env.FRONTEND_URL}/blogs">Explore Blogs</a>
+          &nbsp;
+          <a class="btn-outline" href="${process.env.FRONTEND_URL}/newblog">Start Writing</a>
+        </p>
+      </div>
+    `).catch((err) => logger.error("Failed to send verification success email: " + err));
+
+    logger.debug("Account verified via OTP: " + email);
+    return res.status(200).json({
+      message: "Account verified successfully",
+      token,
+      userDetails,
+    });
+
+  } catch (error) {
+    logger.error("OTP verification failed: " + error.message);
+    res.status(500).json({ message: "Verification failed", error: error.message });
+  }
+};
+
+// Resend OTP to an unverified account
+exports.resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+
+    const user = await User.findOne({ email });
+
+    // Don't reveal whether the email is registered (prevents account enumeration)
+    if (!user) {
+      return res.status(200).json({ message: "If that email is registered, a new code has been sent." });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "This account is already verified." });
+    }
+
+    const otp = generateOtp();
+    user.otpCode = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    await sendEmail(email, "Your new BloggerSpace verification code", `
+      <div class="content">
+        <h2>Hi ${user.fullName},</h2>
+        <p>Here is your new verification code:</p>
+        <div class="otp-code">${otp}</div>
+        <div class="info-box">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</div>
+        <p class="text-muted">Didn't request this? You can safely ignore this email.</p>
+      </div>
+    `);
+
+    logger.debug("OTP resent to: " + email);
+    return res.status(200).json({ message: "A new code has been sent to your email." });
+
+  } catch (error) {
+    logger.error("Resend OTP failed: " + error.message);
+    res.status(500).json({ message: "Failed to send OTP", error: error.message });
   }
 };
 
@@ -934,11 +1115,13 @@ exports.authPassportCallback = async (req, res) => {
         user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
         await user.save();
 
+        // Use CURRENT_JWT_SECRET so /api/users/userinfo (which verifies with CURRENT_JWT_SECRET) can decode it.
+        // Previously used JWT_SECRET, which caused a mismatch with the userinfo endpoint.
         const token = jwt.sign(
-          { userId: user._id, email: user.email },
-          process.env.JWT_SECRET,
+          { userId: user._id, currentuserId: user._id, email: user.email, role: user.role || "user" },
+          process.env.CURRENT_JWT_SECRET,
           {
-            expiresIn: "3d", // Token expiration time
+            expiresIn: "3d",
           }
         );
 

@@ -17,6 +17,7 @@ const {
   fetchAllVerifiedReviewers,
   fetchAllPendingRequestReviewers,
   approveReviewerRequest,
+  rejectReviewerRequest,
   removeFromReviewerRole,
   fetchAllUsers,
   deleteUserAccount,
@@ -79,6 +80,8 @@ router.get("/dashboard/verifiedreviewers", adminMiddleware, fetchAllVerifiedRevi
 router.get("/dashboard/pendingrequests", adminMiddleware, fetchAllPendingRequestReviewers);
 
 router.patch("/dashboard/approvereviewer/:id", adminMiddleware, approveReviewerRequest);
+
+router.patch("/dashboard/rejectreviewer/:id", adminMiddleware, rejectReviewerRequest);
 
 router.patch("/dashboard/removefromreviewer/:id", adminMiddleware, removeFromReviewerRole);
 

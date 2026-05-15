@@ -25,3 +25,38 @@
 [2026-05-14T16:48:24.320Z] [LOG] [INFO] - Blog: Best chrome extensions that feels like magic  fetched. Content size is: 2.30078125 KB
 [2026-05-14T16:48:24.320Z] [LOG] [INFO] - Blog: Best chrome extensions that feels like magic  fetched. Content size is: 2.30078125 KB
 [2026-05-14T16:48:24.321Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2026-05-15T01:01:56.318Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-15T01:02:17.910Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-15T01:03:17.802Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-15T01:03:22.890Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-15T01:03:34.113Z] [LOG] [DEBUG] - Devs Team: Profile picture uploaded successfully.
+[2026-05-15T01:03:34.129Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-15T01:03:42.590Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-15T01:07:15.753Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-15T01:07:15.753Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-15T01:07:15.753Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-15T01:07:16.783Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-15T01:07:16.783Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-15T01:07:16.783Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-15T01:08:02.967Z] [LOG] [DEBUG] - New user added. Signup successful.
+[2026-05-15T01:08:05.585Z] [LOG] [DEBUG] - Sign up successful.
+[2026-05-15T01:23:28.075Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T01:23:28.075Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T01:24:22.034Z] [LOG] [DEBUG] - OTP resent to: dynamicdevs.ima@gmail.com
+[2026-05-15T01:24:40.958Z] [LOG] [DEBUG] - Account verified via OTP: dynamicdevs.ima@gmail.com
+[2026-05-15T01:24:47.856Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: test
+[2026-05-15T01:25:06.424Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-15T01:25:06.424Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-15T01:25:06.424Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-15T01:25:23.207Z] [LOG] [DEBUG] - New user created (pending OTP verification): dynamicdevs.ima@gmail.com
+[2026-05-15T01:26:24.555Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T01:26:24.555Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T01:26:48.878Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T01:26:48.878Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T01:27:18.338Z] [LOG] [DEBUG] - Account verified via OTP: dynamicdevs.ima@gmail.com
+[2026-05-15T01:34:52.020Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: test
+[2026-05-15T01:35:59.981Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: test
+[2026-05-15T01:42:16.342Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T01:42:16.342Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T11:49:25.662Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T11:49:25.662Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com

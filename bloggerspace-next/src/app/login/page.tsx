@@ -9,6 +9,7 @@ import { z } from "zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/auth-context";
 import { authApi } from "@/lib/api/auth";
+import { env } from "@/lib/env";
 
 // Note: metadata export is ignored in client components — SEO handled in a
 // separate generateMetadata or a server wrapper if needed.
@@ -31,6 +33,10 @@ export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
   const [showPass, setShowPass] = useState(false);
+
+  const handleOAuth = (provider: "google" | "github") => {
+    window.location.href = `${env.NEXT_PUBLIC_BACKEND_URL}/api/users/auth/${provider}`;
+  };
 
   const {
     register,
@@ -52,6 +58,16 @@ export default function LoginPage() {
       toast.success("Welcome back!");
       router.push("/");
     } catch (err) {
+      if (
+        isAxiosError(err) &&
+        err.response?.status === 403 &&
+        err.response.data?.message === "otp_required"
+      ) {
+        // Account exists but email is not yet verified — redirect to OTP page
+        toast.info("Your email isn't verified. We've sent a code to your email.");
+        router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`);
+        return;
+      }
       const message = isAxiosError(err)
         ? (err.response?.data?.message ?? "Login failed. Check your credentials.")
         : "Something went wrong.";
@@ -124,6 +140,33 @@ export default function LoginPage() {
               Sign in
             </Button>
           </form>
+
+          <div className="relative my-5 flex items-center">
+            <div className="flex-1 border-t border-border" />
+            <span className="mx-3 text-xs text-muted-foreground">or</span>
+            <div className="flex-1 border-t border-border" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              onClick={() => handleOAuth("google")}
+            >
+              <FaGoogle className="size-4" />
+              Google
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              onClick={() => handleOAuth("github")}
+            >
+              <FaGithub className="size-4" />
+              GitHub
+            </Button>
+          </div>
         </div>
 
         <p className="mt-5 text-center text-sm text-muted-foreground">

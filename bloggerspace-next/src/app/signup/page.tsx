@@ -9,11 +9,13 @@ import { z } from "zod";
 import { Eye, EyeOff, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authApi } from "@/lib/api/auth";
+import { env } from "@/lib/env";
 
 const passwordRules = [
   { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -48,6 +50,10 @@ export default function SignupPage() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const handleOAuth = (provider: "google" | "github") => {
+    window.location.href = `${env.NEXT_PUBLIC_BACKEND_URL}/api/users/auth/${provider}`;
+  };
+
   const {
     register,
     handleSubmit,
@@ -64,8 +70,18 @@ export default function SignupPage() {
         email: data.email.toLowerCase(),
         password: data.password,
       });
-      toast.success(res.data.message + " Please verify your email, then sign in.");
-      router.push("/login");
+
+      const email = encodeURIComponent(data.email.toLowerCase());
+
+      if (res.status === 200) {
+        // Existing unverified account — inform the user their email is already registered
+        toast.info("An account with this email already exists but wasn't verified. We've sent a new code to your email.");
+      } else {
+        // 201 — brand new account
+        toast.success("Account created! Check your email for the verification code.");
+      }
+
+      router.push(`/verify-otp?email=${email}`);
     } catch (err) {
       const message = isAxiosError(err)
         ? (err.response?.data?.message ?? "Signup failed. Please try again.")
@@ -197,6 +213,33 @@ export default function SignupPage() {
               Create account
             </Button>
           </form>
+
+          <div className="relative my-5 flex items-center">
+            <div className="flex-1 border-t border-border" />
+            <span className="mx-3 text-xs text-muted-foreground">or</span>
+            <div className="flex-1 border-t border-border" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              onClick={() => handleOAuth("google")}
+            >
+              <FaGoogle className="size-4" />
+              Google
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              onClick={() => handleOAuth("github")}
+            >
+              <FaGithub className="size-4" />
+              GitHub
+            </Button>
+          </div>
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
             By signing up you agree to our{" "}

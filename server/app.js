@@ -61,6 +61,10 @@ app.use("/api", sitemapRouter);
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
+// Serve server-side static assets (e.g. logo used in email templates)
+// Logo accessible at: <BACKEND_URL>/assets/logo128x128.png
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
 connectDB();
 
 app.use(express.json());

@@ -232,46 +232,49 @@ exports.saveEditedInReviewBlog = async (req, res) => {
 
     // Sending mail to author
     const receiver = blog.authorDetails.email;
-    const subject = "Published!!";
+    const subject = "Your blog is live on BloggerSpace!";
     const html = `
-  <div class="content">
-    <h2>Hi ${blog.authorDetails.fullName},</h2>
-    <p>Congratulations!! Your blog is published.</p>
-    <p>Topic: <span style="color:#167d7f; font-weight:bold">${title}</span></p>
-    <p>Published Link: <a href="${process.env.FRONTEND_URL}/${slug}">${process.env.FRONTEND_URL}/${slug}</a></p>
-  </div>
+      <div class="content">
+        <h2>Congratulations, ${blog.authorDetails.fullName}!</h2>
+        <p>Your blog has passed review and is now <strong>live</strong> on BloggerSpace. 🎉</p>
+        <div class="info-box"><strong>Title:</strong> ${title}</div>
+        <p>
+          <a class="btn" href="${process.env.FRONTEND_URL}/blogs/${slug}">Read your blog</a>
+          &nbsp;
+          <a class="btn-outline" href="${process.env.FRONTEND_URL}/newblog">Write another</a>
+        </p>
+      </div>
     `;
 
     sendEmail(receiver, subject, html)
       .then((response) => {
         console.log(`Email sent to ${receiver}:`, response);
-        // Handle success
       })
       .catch((error) => {
         console.error("Error sending email:", error);
-        // Handle error
       });
 
     // Sending mail to admin
     const receiver2 = process.env.EMAIL;
-    const subject2 = "Blog Published!!";
+    const subject2 = "Blog published — BloggerSpace";
     const html2 = `
-    <div class="content">
-    <h2>Hi Admin,</h2>
-    <p>Congratulations!! New blog is published.</p>
-    <p>Topic: <span style="color:#167d7f; font-weight:bold">${title}</span></p>
-    <p>Published Link: <a href="${process.env.FRONTEND_URL}/${slug}">${process.env.FRONTEND_URL}/${slug}</a></p>
-  </div>
+      <div class="content">
+        <h2>Blog published</h2>
+        <p>A blog has been published successfully.</p>
+        <div class="info-box">
+          <strong>Title:</strong> ${title}<br>
+          <strong>Author:</strong> ${blog.authorDetails.fullName}
+        </div>
+        <p><a class="btn" href="${process.env.FRONTEND_URL}/blogs/${slug}">View live blog</a></p>
+      </div>
     `;
 
     sendEmail(receiver2, subject2, html2)
       .then((response) => {
-        console.log(`Email sent to ${receiver}:`, response);
-        // Handle success
+        console.log(`Email sent to admin:`, response);
       })
       .catch((error) => {
         console.error("Error sending email:", error);
-        // Handle error
       });
 
 
@@ -285,20 +288,30 @@ exports.saveEditedInReviewBlog = async (req, res) => {
 
 exports.publishedBlogs = async (req, res) => {
   try {
-    const { userId, page = 1, limit = 40 } = req.query;
+    const { userId, page = 1, limit = 30, search = "" } = req.query;
 
     if (!userId) {
       return res.status(400).json({ error: "Missing userId" });
     }
 
     const skip = (page - 1) * limit;
+    const q = search.trim();
+    const searchFilter = q
+      ? { $or: [
+          { title: { $regex: q, $options: "i" } },
+          { category: { $regex: q, $options: "i" } },
+        ] }
+      : {};
 
-    const blogs = await Blog.find({ status: "PUBLISHED" })
+    const publishedQuery = { status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] }, ...searchFilter };
+
+    const blogs = await Blog.find(publishedQuery)
       .sort({ lastUpdatedAt: -1 })
       .skip(skip)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
 
-    const totalCount = await Blog.countDocuments({ status: "PUBLISHED" });
+    const totalCount = await Blog.countDocuments(publishedQuery);
 
     res.json({
       blogs,
@@ -388,15 +401,15 @@ exports.updateReviewerAssignment = async (req, res) => {
     await blog.save();
 
     const receiver = assignedUser;
-    const subject = "New blog assigned to you for review";
+    const subject = "New blog assigned to you — BloggerSpace";
     const html = `
-          <div class="content">
-            <h2>Hi ${assignedUser}</h2>
-            <p>New blog is assigned to you for review. Please review it within 3 days.</p>
-            <p>Title: ${blog.title}</p>
-            <p>BloggerSpace Reviewer panel: <span>${process.env.REVIEWER_PANEL_URL}</span></p> 
-          </div>
-          `;
+      <div class="content">
+        <h2>New blog assigned</h2>
+        <p>A blog has been assigned to you for review. Please complete the review within <strong>3 days</strong>.</p>
+        <div class="info-box"><strong>Blog title:</strong> ${blog.title}</div>
+        <p><a class="btn" href="${process.env.REVIEWER_PANEL_URL}">Open Reviewer Panel</a></p>
+      </div>
+    `;
 
     
     sendEmail(receiver, subject, html)
@@ -501,6 +514,40 @@ exports.fetchAllPendingRequestReviewers= async(req, res)=>{
   }
 }
 
+exports.rejectReviewerRequest = async (req, res) => {
+  const { id } = req.params;
+  try {
+    let target = await User.findById(id);
+    if (target) {
+      target.reviewerStatus = "rejected";
+      await target.save();
+    } else {
+      target = await Reviewer.findById(id);
+      if (!target) return res.status(404).json({ error: "Reviewer not found" });
+      target.isVerified = false;
+      target.status = "INACTIVE";
+      await target.save();
+    }
+
+    const receiver = target.email;
+    const subject = "Update on your BloggerSpace Reviewer application";
+    const html = `
+      <div class="content">
+        <h2>Hi ${target.fullName},</h2>
+        <p>Thank you for your interest in joining the BloggerSpace Reviewer Panel.</p>
+        <p>After reviewing your application, we're unable to approve it at this time.</p>
+        <div class="info-box">You're welcome to continue writing and re-apply in the future. We appreciate your enthusiasm for the platform!</div>
+        <p>If you have any questions, please reach out at <a href="mailto:${process.env.EMAIL}">${process.env.EMAIL}</a>.</p>
+      </div>`;
+
+    res.json({ message: "Reviewer request rejected." });
+    await sendEmail(receiver, subject, html);
+  } catch (error) {
+    console.log("Error when rejecting reviewer request", error);
+    res.status(500).json({ error: "Failed to reject reviewer request" });
+  }
+};
+
 exports.approveReviewerRequest= async(req, res)=>{
   const {id}= req.params;
   try {
@@ -522,13 +569,15 @@ exports.approveReviewerRequest= async(req, res)=>{
     }
 
     const receiver = target.email;
-    const subject = "Congratulations! Your reviewer request is approved";
+    const subject = "You're approved as a BloggerSpace Reviewer!";
     const html = `
       <div class="content">
-        <h2>Hi ${target.fullName},</h2>
-        <p>Congratulations!! Your Reviewer request is approved and you are now a Reviewer.</p>
-        <p>Kindly review the assigned blogs before deadline. If failed to review then that blog will be assigned to some other Reviewer. Repeating the same practice multiple times could revoke your Reviewer access.</p>
-        <p>Sign in at: <a href="${process.env.REVIEWER_PANEL_URL}">${process.env.REVIEWER_PANEL_URL}</a></p>
+        <h2>Welcome to the Reviewer team, ${target.fullName}!</h2>
+        <p>Your application to join the BloggerSpace Reviewer Panel has been approved. You now have access to the Reviewer dashboard.</p>
+        <div class="info-box">
+          Please review assigned blogs before their deadline. Consistently missing deadlines may result in your reviewer access being revoked.
+        </div>
+        <p><a class="btn" href="${process.env.REVIEWER_PANEL_URL}">Sign in to Reviewer Panel</a></p>
       </div>`;
 
     res.json({ message: "Reviewer verified successfully" });
@@ -560,12 +609,13 @@ exports.removeFromReviewerRole= async(req, res)=>{
     }
 
     const receiver = target.email;
-    const subject = "Sorry to say Goodbye!";
+    const subject = "Your BloggerSpace Reviewer access has been removed";
     const html = `
       <div class="content">
         <h2>Hi ${target.fullName},</h2>
-        <p>You are no longer a reviewer now. If you wish to re-apply, please submit a new application.</p>
-        <p>BloggerSpace Reviewer panel: <span>${process.env.REVIEWER_PANEL_URL}</span></p>
+        <p>Your reviewer access on BloggerSpace has been removed by an admin.</p>
+        <p>If you'd like to re-apply in the future, you can submit a new application from your account settings.</p>
+        <div class="warn-box">If you believe this was done in error, please contact us at <a href="mailto:${process.env.EMAIL}">${process.env.EMAIL}</a>.</div>
       </div>`;
 
     res.json({ message: "Reviewer removed successfully" });
@@ -664,13 +714,14 @@ exports.deleteUserAccount = async (req, res) => {
     // await User.findByIdAndDelete(id);
 
     const receiver = req.query.useremail;
-    const subject = "Sorry to say Goodbye!";
+    const subject = "Your BloggerSpace account has been removed";
     const html = `
-          <div class="content">
-            <h2>Hi ${req.query.useremail},</h2>
-            <p>Your account is deleted by admin. If you have any query then please drop a mail to below email id.\nEmail:${process.env.EMAIL}</p>
-          </div>
-          `;
+      <div class="content">
+        <h2>Account removed</h2>
+        <p>Your BloggerSpace account has been removed by an admin.</p>
+        <div class="warn-box">If you believe this was done in error or have any questions, please contact us at <a href="mailto:${process.env.EMAIL}">${process.env.EMAIL}</a>.</div>
+      </div>
+    `;
 
     res.json({ message: "User Account deleted by admin successfully" });
     await sendEmail(receiver, subject, html);
@@ -681,13 +732,20 @@ exports.deleteUserAccount = async (req, res) => {
 
 // Community
 exports.getCommunityPosts = async (req, res) => {
-  const page= parseInt(req.query.page) || 1;
-  const limit= parseInt(req.query.limit) || 6;
-  const skip= (page-1)*limit;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+  const q = (req.query.search || "").trim();
+  const searchFilter = q
+    ? { $or: [
+        { communityPostTopic: { $regex: q, $options: "i" } },
+        { communityPostCategory: { $regex: q, $options: "i" } },
+      ] }
+    : {};
   try {
-    const posts = await Community.find({}).skip(skip).limit(limit)
+    const posts = await Community.find(searchFilter).skip(skip).limit(limit)
       .sort({ createdAt: -1 })
-      .populate("communityPostAuthor") // Populate the author field with the User document
+      .populate("communityPostAuthor")
       .exec();
 
     // console.log(typeof posts[1].communityPostContent);
@@ -700,7 +758,7 @@ exports.getCommunityPosts = async (req, res) => {
       posts[i].communityPostContent= decompressedContent
     }
  
-    const total= await Community.countDocuments({});
+    const total = await Community.countDocuments(searchFilter);
     
     res.json({
       posts, total, page, pages: Math.ceil(total/limit)

@@ -63,7 +63,7 @@ const uploadLogsToGitHub=async ()=> {
     console.log("File content removed locally.");
   } catch (error) {
     // If the file doesn't exist, create a new file
-    if (error.response.status === 404) {
+    if (error.response?.status === 404) {
       await axios.put(
         apiUrl,
         {
@@ -106,12 +106,13 @@ const fetchLogsFile= async ()=>{
 
 // uploadToGitHub();
 
-// Create or update the sitemap file on GitHub
-const uploadSitemapToGitHub=async ()=> {
+// Create or update the sitemap file on GitHub.
+// Pass sitemapXML as a string directly — no disk read needed.
+const uploadSitemapToGitHub=async (sitemapXML)=> {
 
-  // const sitemapFilepath= "./../sitemap.xml";
-  const sitemapFilepath= path.join('/tmp', 'sitemap.xml'); // Firebase production
-  const sitemapFileContent = fs.readFileSync(sitemapFilepath, "utf8");
+  const sitemapFileContent = sitemapXML != null
+    ? String(sitemapXML)
+    : fs.readFileSync(path.join('/tmp', 'sitemap.xml'), "utf8"); // fallback for legacy callers
 
   const apiUrl2 = `https://api.github.com/repos/${owner}/${repo}/contents/sitemap.xml`;
 
@@ -149,6 +150,7 @@ const uploadSitemapToGitHub=async ()=> {
       console.log("sitemap File created on GitHub.");
     } else {
       console.error("Error uploading sitemap file to GitHub:", error.message);
+      throw error;
     }
   }
 }
