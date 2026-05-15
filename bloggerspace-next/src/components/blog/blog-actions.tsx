@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils/cn";
 import { useAuth } from "@/contexts/auth-context";
 import { interactionsApi } from "@/lib/api/interactions";
+import { adminApi } from "@/lib/api/admin";
 
 type Props = {
   blogId: string;
@@ -39,13 +40,18 @@ export function BlogActions({ blogId, blogSlug, blogTitle, blogCategory, blogTag
       });
   }, [blogId, user?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const isAdmin = user?.role === "Admin";
+
   // Fetch saved state
   useEffect(() => {
     if (!user) return;
-    interactionsApi.getSavedSlugs(user._id)
+    const fetch = isAdmin
+      ? adminApi.getAdminSavedBlogs(user._id)
+      : interactionsApi.getSavedSlugs(user._id);
+    fetch
       .then((r) => setSaved(r.data.some((s) => s.slug === blogSlug)))
       .catch(() => {/* silent */});
-  }, [user, blogSlug]);
+  }, [user, blogSlug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLike = async () => {
     if (!user) { toast.error("Sign in to like posts."); return; }
@@ -75,10 +81,12 @@ export function BlogActions({ blogId, blogSlug, blogTitle, blogCategory, blogTag
     setSaved(!wasSaved);
     try {
       if (wasSaved) {
-        await interactionsApi.unsaveBlog(user._id, blogSlug);
+        if (isAdmin) await adminApi.removeAdminSavedBlog(user._id, blogSlug);
+        else await interactionsApi.unsaveBlog(user._id, blogSlug);
         toast.success("Removed from saved.");
       } else {
-        await interactionsApi.saveBlog(user._id, { title: blogTitle, slug: blogSlug, category: blogCategory, tags: blogTags });
+        if (isAdmin) await adminApi.addAdminSavedBlog(user._id, { title: blogTitle, slug: blogSlug, category: blogCategory, tags: blogTags });
+        else await interactionsApi.saveBlog(user._id, { title: blogTitle, slug: blogSlug, category: blogCategory, tags: blogTags });
         toast.success("Saved!");
       }
     } catch (err) {

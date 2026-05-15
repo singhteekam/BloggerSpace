@@ -1256,3 +1256,46 @@ exports.adminUploadProfilePicture = async (req, res) => {
     res.status(500).json({ error: "Failed to upload profile picture" });
   }
 };
+
+exports.addBlogToAdminSaved = async (req, res) => {
+  try {
+    const adminId = req.query.userId;
+    const admin = await Admin.findById(adminId);
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
+
+    const { title, slug, category, tags } = req.body;
+    if (admin.savedBlogs.some((b) => b.slug === slug)) {
+      return res.status(400).json({ message: "Already saved this blog" });
+    }
+    admin.savedBlogs.push({ title, slug, category, tags });
+    await admin.save();
+    res.json({ message: "Added to saved blogs successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add to saved blogs" });
+  }
+};
+
+exports.removeBlogFromAdminSaved = async (req, res) => {
+  try {
+    const adminId = req.query.userId;
+    const admin = await Admin.findById(adminId);
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
+
+    admin.savedBlogs = admin.savedBlogs.filter((b) => b.slug !== req.params.blogSlug);
+    await admin.save();
+    res.json({ message: "Removed from saved blogs successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to remove from saved blogs" });
+  }
+};
+
+exports.getAdminSavedBlogs = async (req, res) => {
+  try {
+    const adminId = req.query.userId;
+    const admin = await Admin.findById(adminId).select("savedBlogs");
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
+    res.json(admin.savedBlogs);
+  } catch (error) {
+    res.status(500).json({ error: "Error getting saved blogs" });
+  }
+};

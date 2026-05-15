@@ -50,6 +50,7 @@ export const reviewerMenuNav: NavItem[] = [
 export const adminMenuNav: NavItem[] = [
   { title: "Admin Panel", href: "/admin/dashboard", icon: ShieldCheck },
   { title: "Newsletter", href: "/admin/newsletter", icon: Mail },
+  { title: "Saved Blogs", href: "/admin/savedblogs", icon: Bookmark },
   { title: "My Profile", href: "/admin/profile", icon: UserIcon },
   { title: "Settings", href: "/admin/settings", icon: Settings },
   { title: "Change Password", href: "/admin/changepassword", icon: Lock },

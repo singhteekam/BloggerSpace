@@ -85,19 +85,20 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
 
       <SearchInput search={search} setSearch={setSearch} placeholder="Search by title or category…" />
 
-      <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
         <Tabs defaultValue="drafts">
-          <TabsList className="flex w-max gap-1 mb-6">
-            <TabsTrigger value="drafts">
-              <FileText className="size-3.5 mr-1.5" />Drafts ({fDrafts.length}{q && drafts.length !== fDrafts.length ? `/${drafts.length}` : ""})
-            </TabsTrigger>
-            <TabsTrigger value="published">
-              <Globe className="size-3.5 mr-1.5" />Published ({fPublished.length}{q && published.length !== fPublished.length ? `/${published.length}` : ""})
-            </TabsTrigger>
-            <TabsTrigger value="discarded">
-              <Trash2 className="size-3.5 mr-1.5" />Discarded ({fDiscarded.length}{q && discarded.length !== fDiscarded.length ? `/${discarded.length}` : ""})
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+            <TabsList className="flex w-max gap-1 mb-6">
+              <TabsTrigger value="drafts">
+                <FileText className="size-3.5 mr-1.5" />Drafts ({fDrafts.length}{q && drafts.length !== fDrafts.length ? `/${drafts.length}` : ""})
+              </TabsTrigger>
+              <TabsTrigger value="published">
+                <Globe className="size-3.5 mr-1.5" />Published ({fPublished.length}{q && published.length !== fPublished.length ? `/${published.length}` : ""})
+              </TabsTrigger>
+              <TabsTrigger value="discarded">
+                <Trash2 className="size-3.5 mr-1.5" />Discarded ({fDiscarded.length}{q && discarded.length !== fDiscarded.length ? `/${discarded.length}` : ""})
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Drafts */}
           <TabsContent value="drafts">
@@ -163,7 +164,7 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
             )}
           </TabsContent>
         </Tabs>
-      </div>
+      
     </main>
   );
 }

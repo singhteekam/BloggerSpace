@@ -35,6 +35,8 @@ const {
   toggleBlogLike,
   getBlogLikeStatus,
   fetchBlogsForSitemap,
+  toggleCommentLike,
+  toggleReplyLike,
 } = require("../controllers/blogsController");
 const { downloadBlog } = require("../controllers/userscontroller");
 
@@ -86,6 +88,10 @@ router.post("/:blogSlug/comments/reply", authenticate, postNewBlogReplyComment);
 
 // Get comments of a blog
 router.get("/:blogSlug/comments", viewBlogComments);
+
+// Like/unlike a comment or reply
+router.post("/:blogSlug/comments/:commentId/like", authenticate, toggleCommentLike);
+router.post("/:blogSlug/comments/:commentId/replies/:replyId/like", authenticate, toggleReplyLike);
 
 router.get("/searchblogs/:query", searchBlogsFromDB);
 

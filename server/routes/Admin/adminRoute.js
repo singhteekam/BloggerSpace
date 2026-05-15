@@ -43,6 +43,9 @@ const {
   adminGetInfo,
   adminUpdateProfile,
   adminUploadProfilePicture,
+  addBlogToAdminSaved,
+  removeBlogFromAdminSaved,
+  getAdminSavedBlogs,
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -122,5 +125,9 @@ router.delete("/blogs/delete/:id", adminMiddleware, deleteBlogPermanently);
 router.get("/profile", adminMiddleware, adminGetInfo);
 router.patch("/profile/update", adminMiddleware, adminUpdateProfile);
 router.post("/profile/uploadpicture", adminMiddleware, adminUploadProfilePicture);
+
+router.get("/savedblogs", adminMiddleware, getAdminSavedBlogs);
+router.patch("/savedblogs/add", adminMiddleware, addBlogToAdminSaved);
+router.delete("/savedblogs/remove/:blogSlug", adminMiddleware, removeBlogFromAdminSaved);
 
 module.exports = router;

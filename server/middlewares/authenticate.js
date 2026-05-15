@@ -11,12 +11,14 @@ const authenticate = (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.CURRENT_JWT_SECRET);
       if (!req.query.userId) req.query.userId = decoded.userId?.toString();
+      if (decoded.role) req.userRole = decoded.role;
       return next();
     } catch (_) {}
     // Fallback: legacy JWT_SECRET (old user sessions still in the wild)
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       if (!req.query.userId) req.query.userId = decoded.userId?.toString();
+      if (decoded.role) req.userRole = decoded.role;
       return next();
     } catch (_) {}
   }

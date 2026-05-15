@@ -15,11 +15,11 @@ app.use(helmet());
 
 const { onRequest } = require("firebase-functions/v2/https");
 
-require("dotenv").config(); // Load environment variables from .env file - Production mode
-// require("dotenv").config({ path: ".env.local" }); // development mode
+// require("dotenv").config(); // Load environment variables from .env file - Production mode
+require("dotenv").config({ path: ".env.local" }); // development mode
 
-// const PORT = process.env.PORT || 5000; // For development
-const PORT = 8190;  // For production
+const PORT = process.env.PORT || 5000; // For development
+// const PORT = 8190;  // For production
 
 const connectDB = require("./db/db");
 const blogs = require("./routes/blogs");
@@ -52,10 +52,6 @@ app.use(
     },
   })
 );
-
-////////////////////////////////////////////////////////////////////
-
-app.use("/api", sitemapRouter);
 
 // Increase the payload limit to 10MB
 app.use(bodyParser.json({ limit: "10mb" }));
@@ -104,6 +100,9 @@ app.use(
     // cookie: { secure: true }, // Adjust this based on your deployment configuration (e.g., true for HTTPS)
   })
 );
+
+// Sitemap (must be after CORS so cross-origin admin requests work)
+app.use("/api", sitemapRouter);
 
 // Passport Login/Signup
 app.use(passport.initialize());

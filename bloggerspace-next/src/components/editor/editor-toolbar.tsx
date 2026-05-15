@@ -29,7 +29,9 @@ import {
   Upload,
   Table as TableIcon,
   RemoveFormatting,
+  FileCode,
 } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
 
 interface ToolbarProps {
@@ -38,6 +40,8 @@ interface ToolbarProps {
 
 export function EditorToolbar({ editor }: ToolbarProps) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [htmlDialogOpen, setHtmlDialogOpen] = useState(false);
+  const [rawHtml, setRawHtml] = useState("");
   if (!editor) return null;
 
   const setLink = () => {
@@ -221,6 +225,53 @@ export function EditorToolbar({ editor }: ToolbarProps) {
           />
         </label>
       </div>
+
+      {/* Insert raw HTML */}
+      <Sep />
+      <ToolbarGroup>
+        <Btn onClick={() => { setRawHtml(""); setHtmlDialogOpen(true); }} title="Insert HTML">
+          <FileCode className="size-4" />
+        </Btn>
+      </ToolbarGroup>
+
+      {/* HTML insert dialog */}
+      {htmlDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-xl mx-4">
+            <p className="font-serif text-lg font-semibold mb-1">Insert HTML</p>
+            <p className="text-xs text-muted-foreground mb-3">Paste raw HTML to insert at the cursor position.</p>
+            <textarea
+              value={rawHtml}
+              onChange={(e) => setRawHtml(e.target.value)}
+              rows={8}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 font-mono text-sm outline-none focus:ring-2 focus:ring-ring resize-y"
+              placeholder="<p>Your HTML here…</p>"
+              autoFocus
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setHtmlDialogOpen(false)}
+                className="rounded-lg border border-border px-4 py-2 text-sm hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (rawHtml.trim()) {
+                    editor.chain().focus().insertContent(rawHtml, { parseOptions: { preserveWhitespace: false } }).run();
+                  }
+                  setHtmlDialogOpen(false);
+                }}
+                className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                Insert
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -99,8 +99,7 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
       adminApi.assignReviewer(blogId, adminId, email),
     onSuccess: () => {
       toast.success("Reviewer assigned.");
-      qc.invalidateQueries({ queryKey: ["admin-pending", adminId] });
-      qc.invalidateQueries({ queryKey: ["admin-underreview", adminId] });
+      invalidateAll();
     },
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
   });
@@ -115,7 +114,7 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
     mutationFn: (blogId: string) => adminApi.deleteBlogPermanently(blogId, adminId),
     onSuccess: () => {
       toast.success("Blog permanently deleted.");
-      qc.invalidateQueries({ queryKey: ["admin-discard", adminId] });
+      invalidateAll();
     },
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
   });

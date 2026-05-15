@@ -61,3 +61,37 @@
 [2026-05-15T11:49:25.662Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
 [2026-05-15T11:49:25.662Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
 [2026-05-15T23:05:19.649Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-16T01:14:51.306Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-16T01:38:39.935Z] [LOG] [DEBUG] - Searching for blog: top-300-interview-questions-html-css-js-react-node-mongodb
+[2026-05-16T01:38:40.010Z] [LOG] [INFO] - Blog: Top 300+ Interview Questions- HTML, CSS, JS, React, Node, MongoDB fetched. Content size is: 23.171875 KB
+[2026-05-16T01:38:40.010Z] [LOG] [INFO] - Blog: Top 300+ Interview Questions- HTML, CSS, JS, React, Node, MongoDB fetched. Content size is: 23.171875 KB
+[2026-05-16T01:38:40.011Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2026-05-16T01:38:40.406Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:38:40.406Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:38:40.406Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:38:40.421Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:38:40.421Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:38:40.421Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:06.247Z] [LOG] [DEBUG] - Searching for blog: 2-c-programming-practice-questions-operators-ifelse-loops-switchcase
+[2026-05-16T01:39:06.266Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
+[2026-05-16T01:39:06.266Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
+[2026-05-16T01:39:06.266Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2026-05-16T01:39:06.848Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:06.848Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:06.848Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:06.869Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:06.869Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:06.869Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:17.374Z] [LOG] [ERROR] - Added to saved blogs failed: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:17.374Z] [LOG] [ERROR] - Added to saved blogs failed: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:17.374Z] [LOG] [ERROR] - Added to saved blogs failed: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:25.484Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:25.484Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:25.484Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:28.232Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:28.232Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:39:28.232Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
+[2026-05-16T01:54:20.080Z] [LOG] [DEBUG] - Searching for blog: 2-c-programming-practice-questions-operators-ifelse-loops-switchcase
+[2026-05-16T01:54:20.148Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
+[2026-05-16T01:54:20.148Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
+[2026-05-16T01:54:20.149Z] [LOG] [DEBUG] - Inside viewBlogRoute function.

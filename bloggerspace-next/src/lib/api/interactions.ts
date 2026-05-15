@@ -15,9 +15,10 @@ export type CommentReply = {
 export type CommentItem = {
   _id: string;
   content: string;
-  userEmail: string;
-  userName: string;
+  userEmail: string | null;
+  userName: string | null;
   profilePicture?: string;
+  isAdmin?: boolean;
   commentLikes: string[];
   createdAt: string;
   commentReplies: CommentReply[];
@@ -54,5 +55,11 @@ export const interactionsApi = {
     api.post<CommentItem[]>(`/api/blogs/${slug}/comments`, { content, userId }, { params: { userId } }),
 
   postReply: (slug: string, userId: string, repliedToCommentId: string, replyCommentContent: string) =>
-    api.post(`/api/blogs/${slug}/comments/reply`, { repliedToCommentId, replyCommentContent }, { params: { userId } }),
+    api.post<CommentItem[]>(`/api/blogs/${slug}/comments/reply`, { repliedToCommentId, replyCommentContent }, { params: { userId } }),
+
+  toggleCommentLike: (slug: string, commentId: string, userId: string) =>
+    api.post<{ liked: boolean; likeCount: number }>(`/api/blogs/${slug}/comments/${commentId}/like`, {}, { params: { userId } }),
+
+  toggleReplyLike: (slug: string, commentId: string, replyId: string, userId: string) =>
+    api.post<{ liked: boolean; likeCount: number }>(`/api/blogs/${slug}/comments/${commentId}/replies/${replyId}/like`, {}, { params: { userId } }),
 };

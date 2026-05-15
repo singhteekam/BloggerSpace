@@ -12,7 +12,9 @@ type BlogCardProps = {
 export function BlogCard({ blog }: BlogCardProps) {
   const excerpt = htmlToText(blog.content, 140);
   const date = formatDate(blog.createdAt || blog.lastUpdatedAt);
-  const authorName = blog.authorDetails?.fullName ?? blog.authorDetails?.userName ?? "Anonymous";
+  const authorName = blog.status === "ADMIN_PUBLISHED"
+    ? "Admin"
+    : (blog.authorDetails?.fullName ?? blog.authorDetails?.userName ?? "Anonymous");
 
   return (
     <Link href={`/blogs/${blog.slug}`} className="group block h-full">

@@ -9,11 +9,11 @@ import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi, type UserItem } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TipTapEditor } from "@/components/editor/tiptap-editor";
 
 export default function AdminNewsletterPage() {
   const { user, isLoading: authLoading } = useRequireAdmin();
@@ -193,17 +193,15 @@ function NewsletterComposer({ adminId }: { adminId: string }) {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="message">Message *</Label>
-            <Textarea
-              id="message"
+            <Label>Message *</Label>
+            <TipTapEditor
+              content={message}
+              onChange={setMessage}
               placeholder="Write your newsletter content here…"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={12}
-              className="resize-y font-mono text-sm"
+              minHeight="280px"
             />
             <p className="text-xs text-muted-foreground">
-              Supports plain text. HTML tags are allowed.
+              Rich text — formatted as HTML in the email.
             </p>
           </div>
 

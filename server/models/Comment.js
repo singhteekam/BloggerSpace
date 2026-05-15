@@ -36,6 +36,10 @@ const commentSchema = new mongoose.Schema(
       ref: User,
       required: true,
     },
+    isAdminComment: {
+      type: Boolean,
+      default: false,
+    },
     commentLikes: {
       type: Array,
       default: [],

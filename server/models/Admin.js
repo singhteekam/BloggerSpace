@@ -33,8 +33,12 @@ const adminSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  resetToken: String, // Field for storing the reset token
-  resetTokenExpiration: Date, // Field for storing the token expiration date
+  savedBlogs: {
+    type: Array,
+    default: [],
+  },
+  resetToken: String,
+  resetTokenExpiration: Date,
   createdAt: {
     type: Date,
     // default: Date.now,

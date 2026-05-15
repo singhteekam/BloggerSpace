@@ -166,7 +166,7 @@ exports.fetchAllBlogsFromDB = async (req, res) => {
     // run find and count in parallel
     const [blogs, totalCount] = await Promise.all([
       Blog.find(match)
-        // .sort({ lastUpdatedAt: -1 }) // newest first
+        .sort({ lastUpdatedAt: -1 })
         .skip(skip)
         .limit(limit)
         .populate("authorDetails", "userName profilePicture") // minimal fields
@@ -334,16 +334,16 @@ exports.fetchBlogsByCategory = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-    const blogs = await Blog.find({ category: category, status: "PUBLISHED" })
+    const blogs = await Blog.find({ category, status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
       .skip(skip)
       .limit(limit)
-      .sort({ blogViews: -1 })
-      .populate("authorDetails") // Populate the author field with the User document
+      .sort({ lastUpdatedAt: -1 })
+      .populate("authorDetails")
       .exec();
 
     const total = await Blog.countDocuments({
-      category: category,
-      status: "PUBLISHED",
+      category,
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
     });
 
     res.json({
@@ -805,6 +805,7 @@ exports.postNewBlogComment = async (req, res) => {
   try {
     const { blogSlug } = req.params;
     const { content } = req.body;
+    const isAdmin = req.userRole === "Admin";
 
     const blog = await Blog.findOne({ slug: blogSlug });
 
@@ -816,30 +817,27 @@ exports.postNewBlogComment = async (req, res) => {
     const newComment = {
       content,
       user: req.body.userId,
+      isAdminComment: isAdmin,
     };
 
     blog.comments.push(newComment);
     await blog.save();
 
-    // Populate the user field with email and fullName
-    // await blog.populate({ path: "comments.user", select: "email fullName" }).execPopulate();
     await blog.populate("comments.user", "email userName profilePicture");
 
-    // NEW- Removed findLast — it crashed when any older comment's user was deleted (null after
-    // populate). We don't need it: just map all comments and filter out null-user entries.
-    // NEW- Added userName to match what viewBlogComments returns and what the frontend expects.
-    // NEW- Fixed createdAt to use each comment's own timestamp (was using addedComment.createdAt for all).
     const comments = blog.comments
-      .filter((comment) => comment.user != null)
+      .filter((comment) => comment.isAdminComment || comment.user != null)
       .map((comment) => ({
         _id: comment._id,
         content: comment.content,
-        userEmail: comment.user.email,
-        userName: comment.user.userName,
-        likes: comment.likes,
+        userEmail: comment.isAdminComment ? null : comment.user.email,
+        userName: comment.isAdminComment ? null : comment.user.userName,
+        profilePicture: comment.isAdminComment ? undefined : comment.user.profilePicture,
+        isAdmin: comment.isAdminComment || false,
+        commentLikes: comment.commentLikes,
         createdAt: comment.createdAt,
+        commentReplies: [],
       }));
-    console.log("Comments: ", comments);
     res.json(comments);
   } catch (error) {
     console.error("Error adding comment:", error);
@@ -853,42 +851,118 @@ exports.postNewBlogReplyComment = async (req, res) => {
     const { blogSlug } = req.params;
     const { repliedToCommentId, replyCommentContent } = req.body;
 
-    const blog = await Blog.findOne({ slug: blogSlug })
+    const blog = await Blog.findOne({ slug: blogSlug });
 
     if (!blog) {
       logger.error("Blog not found  with blog: " + blogSlug);
       return res.status(404).json({ message: "blog not found" });
     }
 
-    const newReplyComment = {
-      replyCommentContent: replyCommentContent,
+    const commentIdx = blog.comments.findIndex((c) => c._id.toString() === repliedToCommentId);
+    if (commentIdx === -1) return res.status(404).json({ message: "Comment not found" });
+
+    blog.comments[commentIdx].commentReplies.push({
+      replyCommentContent,
       replyCommentUser: req.query.userId,
-    };
-    console.log(newReplyComment);
+    });
 
-    const repliedToComment = blog.comments
-      .map((e) => e._id.toString())
-      .indexOf(repliedToCommentId);
-
-    // console.log("Index: "+ typeof(repliedToComment[0].toString()));
-    console.log("Index2: " + typeof repliedToCommentId);
-    console.log("Index3: " + repliedToComment);
-    blog.comments[repliedToComment].commentReplies.push(newReplyComment);
-    // console.log("Index2: "+ blog.comments[repliedToComment]);
     await blog.save();
-    await blog.populate("comments.commentReplies.replyCommentUser",  "email userName profilePicture")
+    await blog.populate("comments.user", "email userName profilePicture");
+    await blog.populate("comments.commentReplies.replyCommentUser", "email userName profilePicture");
 
-    const comments = blog.comments.map((comment) => ({
-      _id: comment._id,
-      content: comment.content,
-      userEmail: comment.user.email,
-      likes: comment.likes,
-    }));
+    const comments = blog.comments
+      .filter((comment) => comment.isAdminComment || comment.user != null)
+      .map((comment) => ({
+        _id: comment._id,
+        content: comment.content,
+        userEmail: comment.isAdminComment ? null : comment.user.email,
+        userName: comment.isAdminComment ? null : comment.user.userName,
+        profilePicture: comment.isAdminComment ? undefined : comment.user.profilePicture,
+        isAdmin: comment.isAdminComment || false,
+        commentLikes: comment.commentLikes,
+        createdAt: comment.createdAt,
+        commentReplies: (comment.commentReplies || [])
+          .filter((r) => r.replyCommentUser != null)
+          .map((r) => ({
+            _id: r._id,
+            replyCommentContent: r.replyCommentContent,
+            replyCommentUser: {
+              email: r.replyCommentUser.email,
+              userName: r.replyCommentUser.userName,
+              profilePicture: r.replyCommentUser.profilePicture,
+            },
+            commentLikes: r.commentLikes,
+            createdAt: r.createdAt,
+          })),
+      }));
     res.json(comments);
   } catch (error) {
-    console.error("Error adding comment:", error);
-    logger.error("Error adding comment: " + error);
+    console.error("Error adding reply:", error);
+    logger.error("Error adding reply: " + error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.toggleCommentLike = async (req, res) => {
+  const { blogSlug, commentId } = req.params;
+  const userId = req.query.userId;
+  if (!userId) return res.status(400).json({ error: "userId required" });
+
+  try {
+    const blog = await Blog.findOne({ slug: blogSlug });
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    const comment = blog.comments.id(commentId);
+    if (!comment) return res.status(404).json({ error: "Comment not found" });
+
+    const idx = comment.commentLikes.indexOf(userId);
+    let liked;
+    if (idx !== -1) {
+      comment.commentLikes.splice(idx, 1);
+      liked = false;
+    } else {
+      comment.commentLikes.push(userId);
+      liked = true;
+    }
+
+    await blog.save();
+    res.json({ liked, likeCount: comment.commentLikes.length });
+  } catch (error) {
+    console.error("Error toggling comment like:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+exports.toggleReplyLike = async (req, res) => {
+  const { blogSlug, commentId, replyId } = req.params;
+  const userId = req.query.userId;
+  if (!userId) return res.status(400).json({ error: "userId required" });
+
+  try {
+    const blog = await Blog.findOne({ slug: blogSlug });
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    const comment = blog.comments.id(commentId);
+    if (!comment) return res.status(404).json({ error: "Comment not found" });
+
+    const reply = comment.commentReplies.id(replyId);
+    if (!reply) return res.status(404).json({ error: "Reply not found" });
+
+    const idx = reply.commentLikes.indexOf(userId);
+    let liked;
+    if (idx !== -1) {
+      reply.commentLikes.splice(idx, 1);
+      liked = false;
+    } else {
+      reply.commentLikes.push(userId);
+      liked = true;
+    }
+
+    await blog.save();
+    res.json({ liked, likeCount: reply.commentLikes.length });
+  } catch (error) {
+    console.error("Error toggling reply like:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -907,13 +981,14 @@ exports.viewBlogComments = async (req, res) => {
     }
 
     const comments = blog.comments
-      .filter((comment) => comment.user != null)
+      .filter((comment) => comment.isAdminComment || comment.user != null)
       .map((comment) => ({
         _id: comment._id,
         content: comment.content,
-        userEmail: comment.user.email,
-        userName: comment.user.userName,
-        profilePicture: comment.user.profilePicture,
+        userEmail: comment.isAdminComment ? null : comment.user.email,
+        userName: comment.isAdminComment ? null : comment.user.userName,
+        profilePicture: comment.isAdminComment ? undefined : comment.user.profilePicture,
+        isAdmin: comment.isAdminComment || false,
         commentLikes: comment.commentLikes,
         createdAt: comment.createdAt,
         commentReplies: (comment.commentReplies || [])

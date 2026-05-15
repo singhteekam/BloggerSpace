@@ -244,4 +244,17 @@ export const adminApi = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+
+  // ── Saved blogs ───────────────────────────────────────────────────
+  getAdminSavedBlogs: (userId: string) =>
+    api.get<{ title: string; slug: string; category: string; tags: string[] }[]>("/api/admin/savedblogs", { params: p(userId) }),
+
+  addAdminSavedBlog: (userId: string, payload: { title: string; slug: string; category: string; tags: string[] }) =>
+    api.patch<{ message: string }>("/api/admin/savedblogs/add", payload, { params: p(userId) }),
+
+  removeAdminSavedBlog: (userId: string, slug: string) =>
+    api.delete<{ message: string }>(`/api/admin/savedblogs/remove/${slug}`, { params: p(userId) }),
+
+  getAdminSavedSlugs: (userId: string) =>
+    api.get<{ slug: string }[]>("/api/admin/savedblogs", { params: p(userId) }),
 };
