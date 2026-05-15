@@ -89,6 +89,18 @@ exports.blogsHomepage = async (req, res) => {
   }
 };
 
+exports.fetchBlogsForSitemap = async (req, res) => {
+  try {
+    const blogs = await Blog.find({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
+      .select("slug lastUpdatedAt")
+      .sort({ lastUpdatedAt: -1 })
+      .lean();
+    res.json(blogs);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 exports.fetchAllBlogs = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 6;

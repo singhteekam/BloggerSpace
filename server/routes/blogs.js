@@ -34,12 +34,15 @@ const {
   getDistinctTags,
   toggleBlogLike,
   getBlogLikeStatus,
+  fetchBlogsForSitemap,
 } = require("../controllers/blogsController");
 const { downloadBlog } = require("../controllers/userscontroller");
 
 router.get("/", blogsHomepage);
 
 router.get("/allblogs", fetchAllBlogs);
+
+router.get("/sitemap", fetchBlogsForSitemap);
 
 router.get("/adminpublished", fetchAdminPublishedBlogs);
 

@@ -4,6 +4,17 @@ const sendEmail = require("../services/mailer");
 const pako = require("pako");
 
 
+exports.getCommunityPostsForSitemap = async (req, res) => {
+  try {
+    const posts = await Community.find({})
+      .select("communityPostId communityPostSlug")
+      .lean();
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 exports.getAllCommunityPosts = async (req, res) => {
   try {
     const posts = await Community.find({})

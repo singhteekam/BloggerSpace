@@ -17,13 +17,11 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
 
 async function fetchAllBlogSlugs(): Promise<{ slug: string; lastModified?: Date }[]> {
   try {
-    const res = await fetch(`${API}/api/blogs/allblogs?page=1&limit=5000`, {
+    const res = await fetch(`${API}/api/blogs/sitemap`, {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return [];
-    const data = await res.json();
-    const blogs: { slug: string; lastUpdatedAt?: string }[] =
-      Array.isArray(data) ? data : (data.blogs ?? []);
+    const blogs: { slug: string; lastUpdatedAt?: string }[] = await res.json();
     return blogs.map((b) => ({
       slug: b.slug,
       lastModified: b.lastUpdatedAt ? new Date(b.lastUpdatedAt) : undefined,
@@ -35,13 +33,11 @@ async function fetchAllBlogSlugs(): Promise<{ slug: string; lastModified?: Date 
 
 async function fetchAllCommunityPostSlugs(): Promise<{ id: string; slug: string }[]> {
   try {
-    const res = await fetch(`${API}/api/community/allposts?page=1&limit=5000`, {
+    const res = await fetch(`${API}/api/community/sitemap`, {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return [];
-    const data = await res.json();
-    const posts: { communityPostId: string; communityPostSlug: string }[] =
-      Array.isArray(data) ? data : (data.posts ?? []);
+    const posts: { communityPostId: string; communityPostSlug: string }[] = await res.json();
     return posts
       .filter((p) => p.communityPostId && p.communityPostSlug)
       .map((p) => ({ id: p.communityPostId, slug: p.communityPostSlug }));

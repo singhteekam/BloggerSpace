@@ -60,3 +60,4 @@
 [2026-05-15T01:42:16.342Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
 [2026-05-15T11:49:25.662Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
 [2026-05-15T11:49:25.662Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
+[2026-05-15T23:05:19.649Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
