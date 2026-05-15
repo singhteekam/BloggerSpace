@@ -68,10 +68,13 @@ export default async function BlogDetailPage({ params }: Props) {
   if (!data) notFound();
 
   const { blog } = data;
-  const authorName = blog.authorDetails?.fullName ?? blog.authorDetails?.userName ?? "Anonymous";
+  const isAdminBlog = blog.status === "ADMIN_PUBLISHED";
+  const authorName = isAdminBlog
+    ? "Admin"
+    : (blog.authorDetails?.fullName ?? blog.authorDetails?.userName ?? "Anonymous");
   const date = formatDate(blog.createdAt || blog.lastUpdatedAt);
 
-  const authorUserName = blog.authorDetails?.userName;
+  const authorUserName = isAdminBlog ? undefined : blog.authorDetails?.userName;
 
   const [related, topViewed, authorProfile] = await Promise.all([
     blog.blogId ? fetchRelatedBlogs(blog.blogId) : Promise.resolve([]),
