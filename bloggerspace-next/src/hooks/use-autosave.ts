@@ -28,21 +28,22 @@ export function useAutoSave(
   canSaveRef.current = canSave;
 
   useEffect(() => {
-    const id = setInterval(async () => {
-      if (!canSaveRef.current) return;
-      const current = JSON.stringify(watchRef.current);
-      if (current === lastSavedRef.current) return;
-      lastSavedRef.current = current;
-      setStatus("saving");
-      try {
-        await saveFnRef.current();
-        setStatus("saved");
-        setLastSavedAt(new Date());
-      } catch {
-        setStatus("error");
-      }
-    }, intervalMs);
-    return () => clearInterval(id);
+    // Auto-save disabled — triggers unwanted saves while editing
+    // const id = setInterval(async () => {
+    //   if (!canSaveRef.current) return;
+    //   const current = JSON.stringify(watchRef.current);
+    //   if (current === lastSavedRef.current) return;
+    //   lastSavedRef.current = current;
+    //   setStatus("saving");
+    //   try {
+    //     await saveFnRef.current();
+    //     setStatus("saved");
+    //     setLastSavedAt(new Date());
+    //   } catch {
+    //     setStatus("error");
+    //   }
+    // }, intervalMs);
+    // return () => clearInterval(id);
   }, [intervalMs]);
 
   return { autoSaveStatus: status, lastSavedAt };
