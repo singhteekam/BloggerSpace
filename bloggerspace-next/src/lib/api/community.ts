@@ -20,7 +20,7 @@ export type CommunityPost = {
   communityPostId: string;
   communityPostSlug: string;
   communityPostTopic: string;
-  communityPostContent: string;
+  communityPostContent?: string; // not included in list responses — only in detail
   communityPostCategory?: string;
   communityPostAuthor: CommunityAuthor;
   communityPostComments: CommunityReply[];
@@ -29,9 +29,16 @@ export type CommunityPost = {
   createdAt?: string;
 };
 
+export type CommunityPostsPage = {
+  posts: CommunityPost[];
+  total: number;
+  page: number;
+  pages: number;
+};
+
 export const communityApi = {
-  getPosts: () =>
-    api.get<CommunityPost[]>("/api/community/communityposts"),
+  getPosts: (page = 1, limit = 20) =>
+    api.get<CommunityPostsPage>("/api/community/communityposts", { params: { page, limit } }),
 
   // Backend route: GET /api/community/post/:communityPostSlug
   getPost: (slug: string) =>

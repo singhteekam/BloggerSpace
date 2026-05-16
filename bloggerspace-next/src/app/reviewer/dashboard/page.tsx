@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ShieldCheck, Clock, ArrowRight, BookOpen, Tag, User,
+  ShieldCheck, Clock, ArrowRight, BookOpen, Tag, User, Gem,
   CheckCheck, ListTodo, MessageCircleWarning,
   Search, X, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { useRequireReviewer } from "@/hooks/use-require-reviewer";
 import { reviewerApi } from "@/lib/api/reviewer";
+import { RefreshButton } from "@/components/ui/refresh-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,6 +21,13 @@ const PAGE_SIZE = 10;
 
 export default function ReviewerDashboardPage() {
   const { user, isLoading: authLoading } = useRequireReviewer();
+  const qc = useQueryClient();
+
+  const refreshAll = () => {
+    qc.invalidateQueries({ queryKey: ["reviewer-assigned"] });
+    qc.invalidateQueries({ queryKey: ["reviewer-awaiting"] });
+    qc.invalidateQueries({ queryKey: ["reviewer-profile"] });
+  };
 
   const { data: assigned = [], isLoading: assignedLoading } = useQuery({
     queryKey: ["reviewer-assigned", user?._id],
@@ -57,7 +65,7 @@ export default function ReviewerDashboardPage() {
             <p className="text-sm text-muted-foreground">{user.fullName} · {user.email}</p>
           </div>
         </div>
-        <div className="mt-2 flex gap-2 sm:mt-0 flex-wrap">
+        <div className="mt-2 flex gap-2 sm:mt-0 flex-wrap items-center">
           <Badge variant="secondary">{assigned.length} assigned</Badge>
           {awaiting.length > 0 && (
             <Badge variant="outline" className="text-amber-600 border-amber-400">
@@ -65,6 +73,7 @@ export default function ReviewerDashboardPage() {
             </Badge>
           )}
           <Badge variant="outline">{reviewedBlogs.length} reviewed</Badge>
+          <RefreshButton onRefresh={refreshAll} />
         </div>
       </div>
 
@@ -100,6 +109,7 @@ export default function ReviewerDashboardPage() {
                   blog={blog}
                   actionLabel="Review"
                   actionHref={`/reviewer/blog/${blog._id}`}
+                  reviewerId={user._id}
                 />
               )}
               filterFn={(b, q) =>
@@ -125,6 +135,7 @@ export default function ReviewerDashboardPage() {
                   blog={blog}
                   actionLabel="View"
                   actionHref={`/reviewer/blog/${blog._id}`}
+                  reviewerId={user._id}
                   statusBadge={
                     <Badge variant="outline" className="text-xs text-amber-600 border-amber-400 shrink-0">
                       Awaiting Author
@@ -308,16 +319,33 @@ type BlogEntry = {
   lastUpdatedAt?: string;
   createdAt?: string;
   feedbackToAuthor?: unknown[];
+  gems?: {
+    awarded: boolean;
+    authorGems: number;
+    reviewerGems?: number;
+    reviewerUserId?: string;
+    reviewerAwards?: { userId: string; gems: number }[];
+  };
 };
 
 function BlogCard({
-  blog, actionLabel, actionHref, statusBadge,
+  blog, actionLabel, actionHref, statusBadge, reviewerId,
 }: {
   blog: BlogEntry;
   actionLabel: string;
   actionHref: string;
   statusBadge?: React.ReactNode;
+  reviewerId?: string;
 }) {
+  const reviewerGems = (() => {
+    if (!blog.gems?.awarded || !reviewerId) return 0;
+    if (blog.gems.reviewerAwards?.length) {
+      return blog.gems.reviewerAwards.find((a) => a.userId === reviewerId)?.gems ?? 0;
+    }
+    if (blog.gems.reviewerUserId === reviewerId) return blog.gems.reviewerGems ?? 0;
+    return 0;
+  })();
+
   return (
     <div className="rounded-xl border border-border bg-card p-5 transition-shadow hover:shadow-sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -325,6 +353,11 @@ function BlogCard({
           <div className="flex items-start gap-2 flex-wrap">
             <h2 className="font-medium leading-snug text-foreground line-clamp-2">{blog.title}</h2>
             {statusBadge}
+            {reviewerGems > 0 && (
+              <span className="flex items-center gap-0.5 text-xs font-medium text-primary shrink-0">
+                <Gem className="size-3" />{reviewerGems} gems
+              </span>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">

@@ -208,4 +208,22 @@ router.post("/fileupload", fileUpload);
 
 router.get("/uploadedfiles/fetch", fetchUploadedFiles);
 
+// Gems transaction history for logged-in user
+const GemsTransaction = require("../models/GemsTransaction");
+router.get("/gems/history", authenticate, async (req, res) => {
+  try {
+    const page  = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    const skip  = (page - 1) * limit;
+    const userId = req.user?._id || req.query.userId;
+    const [transactions, total] = await Promise.all([
+      GemsTransaction.find({ userId }).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      GemsTransaction.countDocuments({ userId }),
+    ]);
+    res.json({ transactions, total, page, pages: Math.ceil(total / limit) });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch gems history" });
+  }
+});
+
 module.exports = router;

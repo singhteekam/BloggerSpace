@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { Shield, FileText } from "lucide-react";
-import { BlogCard } from "@/components/blog/blog-card";
-import { Pagination } from "@/components/blog/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { InfiniteBlogGrid, adminPublishedUrl } from "@/components/blog/infinite-blog-grid";
 import { fetchAdminPublishedBlogs } from "@/lib/api/blogs";
 
 export const metadata: Metadata = {
@@ -12,15 +9,8 @@ export const metadata: Metadata = {
   description: "Handpicked and directly published blogs by the BloggerSpace admin team.",
 };
 
-type Props = {
-  searchParams: Promise<{ page?: string }>;
-};
-
-export default async function AdminBlogsPage({ searchParams }: Props) {
-  const { page: pageStr } = await searchParams;
-  const page = Math.max(1, Number(pageStr ?? 1));
-
-  const { blogs, pages: totalPages } = await fetchAdminPublishedBlogs(page);
+export default async function AdminBlogsPage() {
+  const { blogs, pages: totalPages } = await fetchAdminPublishedBlogs(1);
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
@@ -41,19 +31,11 @@ export default async function AdminBlogsPage({ searchParams }: Props) {
       </div>
 
       {blogs.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {blogs.map((blog) => (
-              <BlogCard key={blog._id} blog={blog} />
-            ))}
-          </div>
-
-          <div className="mt-10">
-            <Suspense>
-              <Pagination page={page} totalPages={totalPages} />
-            </Suspense>
-          </div>
-        </>
+        <InfiniteBlogGrid
+          initialBlogs={blogs}
+          initialHasMore={totalPages > 1}
+          buildUrl={adminPublishedUrl}
+        />
       ) : (
         <div className="flex flex-col items-center gap-4 py-24 text-center">
           <div className="flex size-14 items-center justify-center rounded-full bg-muted text-muted-foreground">

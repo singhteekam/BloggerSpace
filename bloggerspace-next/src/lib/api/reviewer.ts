@@ -46,6 +46,13 @@ export type ReviewerBlogItem = {
   createdAt: string;
   authorDetails: ReviewerBlogAuthor;
   feedbackToAuthor: FeedbackEntry[];
+  gems?: {
+    awarded: boolean;
+    authorGems: number;
+    reviewerGems?: number;
+    reviewerUserId?: string;
+    reviewerAwards?: { userId: string; gems: number }[];
+  };
 };
 
 export type ReviewerBlogDetail = ReviewerBlogItem & {

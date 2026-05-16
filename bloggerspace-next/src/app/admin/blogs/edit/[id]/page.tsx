@@ -7,12 +7,13 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
   ArrowLeft, Loader2, Save, X, ChevronsUpDown, Check,
-  Cloud, CloudOff, Eye, CheckCheck, FileMinus, Star,
+  Cloud, CloudOff, Eye, CheckCheck, FileMinus, Star, Gem, User, Pencil, Plus,
 } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
-import { adminApi } from "@/lib/api/admin";
+import { adminApi, type GemsInfo } from "@/lib/api/admin";
+import { GemsDialog } from "@/components/admin/gems-dialog";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,16 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
   const [isSaving, setIsSaving] = useState(false);
   const [blogStatus, setBlogStatus] = useState("");
   const [authorEmail, setAuthorEmail] = useState("");
+  const [blogGems, setBlogGems] = useState<GemsInfo | null>(null);
+  const [reviewedBy, setReviewedBy] = useState<{ reviewerId: string; reviewerName?: string }[]>([]);
+  const [authorDetails, setAuthorDetails] = useState<{ _id: string; fullName: string; email: string } | null>(null);
+
+  // Gems dialog state
+  const [gemsOpen, setGemsOpen] = useState(false);
+  const [gemsAuthorInput, setGemsAuthorInput] = useState("10");
+  const [gemsReviewerInputs, setGemsReviewerInputs] = useState<Record<string, string>>({});
+  const [gemsLoading, setGemsLoading] = useState(false);
+  const [justPublished, setJustPublished] = useState(false);
 
   // UI dialogs
   const [showPreview, setShowPreview] = useState(false);
@@ -86,7 +97,11 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
         setContent(b.content);
         setSlug(b.slug);
         setBlogStatus(b.status ?? "");
-        setAuthorEmail((b.authorDetails as { email?: string })?.email ?? "");
+        const ad = b.authorDetails as { _id: string; fullName: string; email: string } | undefined;
+        setAuthorEmail(ad?.email ?? "");
+        if (ad) setAuthorDetails({ _id: ad._id, fullName: ad.fullName, email: ad.email });
+        if (b.gems) setBlogGems(b.gems);
+        if (b.reviewedBy) setReviewedBy(b.reviewedBy);
         setEditorKey((k) => k + 1);
       })
       .catch(() => toast.error("Failed to load blog."))
@@ -153,7 +168,11 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
       });
       toast.success("Blog published!");
       setShowPublish(false);
-      router.push("/admin/dashboard");
+      setBlogStatus("PUBLISHED");
+      setJustPublished(true);
+      setGemsAuthorInput("10");
+      setGemsReviewerInputs({});
+      setGemsOpen(true);
     } catch (err) {
       toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Publish failed.") : "Error publishing.");
     } finally {
@@ -173,6 +192,63 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
       toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Discard failed.") : "Error.");
     } finally {
       setIsDiscarding(false);
+    }
+  };
+
+  const openGemsDialog = (editing: boolean) => {
+    if (editing && blogGems) {
+      setGemsAuthorInput(String(blogGems.authorGems));
+      const prefilled: Record<string, string> = {};
+      const awards = blogGems.reviewerAwards?.length
+        ? blogGems.reviewerAwards
+        : blogGems.reviewerUserId && blogGems.reviewerGems > 0
+          ? [{ userId: blogGems.reviewerUserId!, gems: blogGems.reviewerGems }]
+          : [];
+      for (const a of awards) {
+        if (a.userId) prefilled[a.userId] = String(a.gems);
+      }
+      setGemsReviewerInputs(prefilled);
+    } else {
+      setGemsAuthorInput("10");
+      setGemsReviewerInputs({});
+    }
+    setGemsOpen(true);
+  };
+
+  const handleAwardGems = async () => {
+    if (!user) return;
+    setGemsLoading(true);
+    try {
+      const reviewerAwards = reviewedBy
+        .map((r, i) => ({
+          userId: r.reviewerId,
+          gems: parseInt(gemsReviewerInputs[r.reviewerId ?? String(i)] ?? "0") || 0,
+        }))
+        .filter((a) => a.userId && a.gems > 0);
+
+      const payload = { authorGems: parseInt(gemsAuthorInput) || 0, reviewerAwards };
+
+      if (blogGems?.awarded) {
+        await adminApi.updateGems(user._id, blogId, payload);
+        toast.success("Gems updated.");
+        setGemsOpen(false);
+        const updated = await adminApi.getAdminBlogForEdit(blogId, user._id);
+        if (updated.data.gems) setBlogGems(updated.data.gems);
+      } else {
+        await adminApi.awardGems(user._id, blogId, payload);
+        toast.success("Gems awarded!");
+        setGemsOpen(false);
+        if (justPublished) {
+          router.push("/admin/manage/blogs");
+        } else {
+          const updated = await adminApi.getAdminBlogForEdit(blogId, user._id);
+          if (updated.data.gems) setBlogGems(updated.data.gems);
+        }
+      }
+    } catch (err) {
+      toast.error(isAxiosError(err) ? (err.response?.data?.error ?? "Failed.") : "Error awarding gems.");
+    } finally {
+      setGemsLoading(false);
     }
   };
 
@@ -281,6 +357,23 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
         </Dialog.Portal>
       </Dialog.Root>
 
+      <GemsDialog
+        open={gemsOpen}
+        setOpen={setGemsOpen}
+        title={title}
+        isEditing={!!blogGems?.awarded}
+        authorDetails={authorDetails ?? undefined}
+        authorGems={gemsAuthorInput}
+        setAuthorGems={setGemsAuthorInput}
+        allReviewers={reviewedBy}
+        reviewerInputs={gemsReviewerInputs}
+        setReviewerInputs={setGemsReviewerInputs}
+        loading={gemsLoading}
+        onSubmit={handleAwardGems}
+        onSkip={justPublished ? () => router.push("/admin/manage/blogs") : undefined}
+        skipLabel={justPublished ? "Skip" : undefined}
+      />
+
       <main className="mx-auto max-w-4xl px-6 py-10">
         {/* Header */}
         <div className="mb-8 flex items-center gap-4 flex-wrap">
@@ -288,7 +381,7 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
             <Link href="/admin/dashboard"><ArrowLeft className="size-4" />Dashboard</Link>
           </Button>
           <h1 className="font-serif text-2xl font-semibold tracking-tight">Review blog</h1>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-3 flex-wrap">
             {blogStatus && (
               <Badge variant="outline" className="text-xs capitalize">{statusLabel}</Badge>
             )}
@@ -297,6 +390,64 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
             )}
           </div>
         </div>
+
+        {/* Gems section — admin only, shown for published blogs */}
+        {(blogStatus === "PUBLISHED" || blogStatus === "ADMIN_PUBLISHED") && (
+          blogGems?.awarded ? (
+            <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Gem className="size-4 text-primary" />
+                  <p className="text-sm font-semibold text-primary">Gems awarded</p>
+                </div>
+                <Button size="sm" variant="ghost" className="gap-1 h-7 text-xs text-muted-foreground hover:text-primary"
+                  onClick={() => openGemsDialog(true)}>
+                  <Pencil className="size-3" />Edit
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm">
+                  <User className="size-3.5 text-muted-foreground shrink-0" />
+                  <span className="text-muted-foreground">{authorDetails?.fullName ?? "Author"}</span>
+                  <span className="font-semibold text-primary flex items-center gap-0.5">
+                    {blogGems.authorGems} <Gem className="size-3" />
+                  </span>
+                </div>
+                {(blogGems.reviewerAwards?.length
+                  ? blogGems.reviewerAwards
+                  : blogGems.reviewerUserId && blogGems.reviewerGems > 0
+                    ? [{ userId: blogGems.reviewerUserId, gems: blogGems.reviewerGems }]
+                    : []
+                ).map((a, i) => {
+                  const name = reviewedBy.find((r) => r.reviewerId === a.userId)?.reviewerName;
+                  return (
+                    <div key={`${a.userId ?? ""}-${i}`} className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm">
+                      <User className="size-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-muted-foreground">{name ?? `Reviewer ${i + 1}`}</span>
+                      <span className="font-semibold text-primary flex items-center gap-0.5">
+                        {a.gems} <Gem className="size-3" />
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="mb-6 rounded-xl border border-border bg-muted/30 p-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Gem className="size-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">Award Gems</p>
+                  <p className="text-xs text-muted-foreground">Reward the author and reviewers for this blog.</p>
+                </div>
+              </div>
+              <Button size="sm" variant="outline" className="gap-1.5 border-primary/40 text-primary hover:bg-primary/5 shrink-0"
+                onClick={() => openGemsDialog(false)}>
+                <Plus className="size-3.5" />Award
+              </Button>
+            </div>
+          )
+        )}
 
         <div className="space-y-6">
           {/* Title */}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi } from "@/lib/api/admin";
+import { RefreshButton } from "@/components/ui/refresh-button";
 import { api } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,6 +25,10 @@ export default function AdminDashboardPage() {
 }
 
 function AdminOverview({ adminId }: { adminId: string }) {
+  const qc = useQueryClient();
+
+  const refreshAll = () => qc.invalidateQueries({ queryKey: ["admin"] });
+
   const { data: pending = [] } = useQuery({
     queryKey: ["admin-pending", adminId],
     queryFn: () => adminApi.getPendingBlogs(adminId).then((r) => r.data),
@@ -103,14 +108,17 @@ function AdminOverview({ adminId }: { adminId: string }) {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
       {/* Header */}
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <ShieldCheck className="size-5" />
+      <div className="mb-8 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <ShieldCheck className="size-5" />
+          </div>
+          <div>
+            <h1 className="font-serif text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
+            <p className="text-sm text-muted-foreground">Overview &amp; quick navigation</p>
+          </div>
         </div>
-        <div>
-          <h1 className="font-serif text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Overview &amp; quick navigation</p>
-        </div>
+        <RefreshButton onRefresh={refreshAll} />
       </div>
 
       {/* Stats strip */}

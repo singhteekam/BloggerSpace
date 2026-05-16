@@ -67,6 +67,7 @@ const userSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  gems: { type: Number, default: 0 },
   resetToken: String,
   resetTokenExpiration: Date,
   // OTP-based email verification fields

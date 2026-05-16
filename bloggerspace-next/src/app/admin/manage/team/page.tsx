@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
-  Users, UserCheck, UserX, Loader2, Trash2, Clock, Ban, ShieldCheck, Search, X,
+  Users, UserCheck, UserX, Loader2, Trash2, Clock, Ban, ShieldCheck, Search, X, Eye, Gem,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useMemo } from "react";
@@ -13,6 +14,7 @@ import { adminApi, type ReviewerItem, type UserItem } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RefreshButton } from "@/components/ui/refresh-button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/utils/html";
 
@@ -94,25 +96,35 @@ function TeamManagement({ adminId }: { adminId: string }) {
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
   });
 
+  const refreshAll = () => {
+    qc.invalidateQueries({ queryKey: ["admin-verified-reviewers", adminId] });
+    qc.invalidateQueries({ queryKey: ["admin-pending-reviewers", adminId] });
+    qc.invalidateQueries({ queryKey: ["admin-users", adminId] });
+  };
+
   return (
     <main className="px-6 py-8 max-w-5xl mx-auto">
-      <h1 className="font-serif text-2xl font-semibold mb-6">Team Management</h1>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <h1 className="font-serif text-2xl font-semibold">Team Management</h1>
+        <RefreshButton onRefresh={refreshAll} />
+      </div>
 
       <SearchInput search={search} setSearch={setSearch} placeholder="Search by name, username, or email…" />
 
-      <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
         <Tabs defaultValue="pending">
-          <TabsList className="flex w-max gap-1 mb-6">
-            <TabsTrigger value="pending">
-              <UserCheck className="size-3.5 mr-1.5" />Pending ({fPending.length}{q && pendingReviewers.length !== fPending.length ? `/${pendingReviewers.length}` : ""})
-            </TabsTrigger>
-            <TabsTrigger value="reviewers">
-              <Users className="size-3.5 mr-1.5" />Active Reviewers ({fVerified.length}{q && verifiedReviewers.length !== fVerified.length ? `/${verifiedReviewers.length}` : ""})
-            </TabsTrigger>
-            <TabsTrigger value="users">
-              <Users className="size-3.5 mr-1.5" />Users ({fUsers.length}{q && users.length !== fUsers.length ? `/${users.length}` : ""})
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+            <TabsList className="flex w-max gap-1 mb-6">
+              <TabsTrigger value="pending">
+                <UserCheck className="size-3.5 mr-1.5" />Pending ({fPending.length}{q && pendingReviewers.length !== fPending.length ? `/${pendingReviewers.length}` : ""})
+              </TabsTrigger>
+              <TabsTrigger value="reviewers">
+                <Users className="size-3.5 mr-1.5" />Active Reviewers ({fVerified.length}{q && verifiedReviewers.length !== fVerified.length ? `/${verifiedReviewers.length}` : ""})
+              </TabsTrigger>
+              <TabsTrigger value="users">
+                <Users className="size-3.5 mr-1.5" />Users ({fUsers.length}{q && users.length !== fUsers.length ? `/${users.length}` : ""})
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* ── Pending Reviewer Requests ─── */}
           <TabsContent value="pending">
@@ -200,7 +212,7 @@ function TeamManagement({ adminId }: { adminId: string }) {
             )}
           </TabsContent>
         </Tabs>
-      </div>
+      
     </main>
   );
 }
@@ -247,7 +259,12 @@ function ReviewerCard({ reviewer, children }: { reviewer: ReviewerItem; children
     <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-border bg-card p-4">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2 mb-0.5">
-          <p className="font-medium text-foreground">{reviewer.fullName}</p>
+          <Link
+            href={`/admin/manage/team/${reviewer._id}`}
+            className="font-medium text-foreground hover:text-primary transition-colors"
+          >
+            {reviewer.fullName}
+          </Link>
           {reviewer.isVerified && (
             <Badge variant="secondary" className="text-xs h-5 px-1.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
               <ShieldCheck className="size-3 mr-1" />Verified
@@ -259,12 +276,26 @@ function ReviewerCard({ reviewer, children }: { reviewer: ReviewerItem; children
             </Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">@{reviewer.userName} · {reviewer.email}</p>
+        <p className="text-xs text-muted-foreground">
+          <Link href={`/admin/manage/team/${reviewer._id}`} className="hover:text-primary transition-colors">@{reviewer.userName}</Link>
+          {" · "}
+          <Link href={`/admin/manage/team/${reviewer._id}`} className="hover:text-primary transition-colors">{reviewer.email}</Link>
+        </p>
         <p className="text-xs text-muted-foreground mt-0.5">
           {reviewer.reviewedBlogs?.length ?? 0} blogs reviewed · Joined {formatDate(reviewer.createdAt)}
         </p>
+        {typeof reviewer.gems === "number" && (
+          <p className="text-xs text-primary font-medium mt-1 flex items-center gap-1">
+            <Gem className="size-3" />{reviewer.gems} gems
+          </p>
+        )}
       </div>
-      <div className="shrink-0 flex items-center gap-2">{children}</div>
+      <div className="shrink-0 flex items-center gap-2">
+        <Button asChild variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground">
+          <Link href={`/admin/manage/team/${reviewer._id}`}><Eye className="size-3.5" />View</Link>
+        </Button>
+        {children}
+      </div>
     </div>
   );
 }
@@ -274,7 +305,12 @@ function UserCard({ user, children }: { user: UserItem; children: React.ReactNod
     <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-border bg-card p-4">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2 mb-0.5">
-          <p className="font-medium text-foreground">{user.fullName}</p>
+          <Link
+            href={`/admin/manage/team/${user._id}`}
+            className="font-medium text-foreground hover:text-primary transition-colors"
+          >
+            {user.fullName}
+          </Link>
           {user.isVerified && (
             <Badge variant="secondary" className="text-xs h-5 px-1.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
               <ShieldCheck className="size-3 mr-1" />Verified
@@ -284,13 +320,27 @@ function UserCard({ user, children }: { user: UserItem; children: React.ReactNod
             <Badge variant="secondary" className="text-xs h-5 px-1.5 capitalize">{user.role}</Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">@{user.userName} · {user.email}</p>
+        <p className="text-xs text-muted-foreground">
+          <Link href={`/admin/manage/team/${user._id}`} className="hover:text-primary transition-colors">@{user.userName}</Link>
+          {" · "}
+          <Link href={`/admin/manage/team/${user._id}`} className="hover:text-primary transition-colors">{user.email}</Link>
+        </p>
         <p className="text-xs text-muted-foreground mt-0.5">
           <Clock className="size-3 inline mr-1" />Joined {formatDate(user.createdAt)}
           {user.status && <span className="ml-2">&middot; {user.status}</span>}
         </p>
+        {typeof user.gems === "number" && (
+          <p className="text-xs text-primary font-medium mt-1 flex items-center gap-1">
+            <Gem className="size-3" />{user.gems} gems
+          </p>
+        )}
       </div>
-      <div className="shrink-0">{children}</div>
+      <div className="shrink-0 flex items-center gap-2">
+        <Button asChild variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground">
+          <Link href={`/admin/manage/team/${user._id}`}><Eye className="size-3.5" />View</Link>
+        </Button>
+        {children}
+      </div>
     </div>
   );
 }

@@ -9,13 +9,15 @@ import {
   FileText, BookOpen, Globe, AlertCircle, EyeOff, MessageCircleWarning,
   Loader2, CheckCheck, Star, ChevronDown, RefreshCw,
   Pencil, FileMinus, Trash2, Clock, Tag, User,
-  ChevronLeft, ChevronRight, Search, X,
+  ChevronLeft, ChevronRight, Search, X, Gem, Plus,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Popover from "@radix-ui/react-popover";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { useDebounce } from "@/hooks/use-debounce";
 import { adminApi, type AdminBlog, type ReviewerItem } from "@/lib/api/admin";
+import { GemsDialog } from "@/components/admin/gems-dialog";
+import { RefreshButton } from "@/components/ui/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -123,7 +125,10 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
 
   return (
     <main className="px-6 py-8 max-w-5xl mx-auto">
-      <h1 className="font-serif text-2xl font-semibold mb-4">Blog Management</h1>
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <h1 className="font-serif text-2xl font-semibold">Blog Management</h1>
+        <RefreshButton onRefresh={invalidateAll} />
+      </div>
 
       {/* Global search */}
       <SearchInput
@@ -274,6 +279,11 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
                       <Button asChild variant="outline" size="sm" className="gap-1.5">
                         <Link href={`/admin/blogs/edit/${blog._id}`}><Pencil className="size-3.5" />Edit</Link>
                       </Button>
+                      <AwardGemsButton
+                        blog={blog}
+                        adminId={adminId}
+                        onAwarded={() => qc.invalidateQueries({ queryKey: ["admin-published", adminId] })}
+                      />
                       <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
                     </div>
                   </BlogCard>
@@ -359,7 +369,14 @@ function BlogCard({ blog, children }: { blog: AdminBlog; children: React.ReactNo
       <div className="min-w-0 flex-1 space-y-1">
         <p className="font-medium text-foreground line-clamp-1">{blog.title}</p>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          {blog.authorDetails && <span className="flex items-center gap-1"><User className="size-3" />{blog.authorDetails.fullName}</span>}
+          {blog.authorDetails && (
+              <Link
+                href={`/admin/manage/team/${blog.authorDetails._id}`}
+                className="flex items-center gap-1 hover:text-primary transition-colors"
+              >
+                <User className="size-3" />{blog.authorDetails.fullName}
+              </Link>
+            )}
           {blog.category && <span className="flex items-center gap-1"><Tag className="size-3" />{blog.category}</span>}
           <span className="flex items-center gap-1"><Clock className="size-3" />{formatDate(blog.lastUpdatedAt || blog.createdAt)}</span>
           {blog.currentReviewer && <span className="text-primary">Reviewer: {blog.currentReviewer}</span>}
@@ -481,6 +498,118 @@ function DiscardButton({ title, isPending, onConfirm }: { title: string; isPendi
   );
 }
 
+function AwardGemsButton({
+  blog, adminId, onAwarded,
+}: { blog: AdminBlog; adminId: string; onAwarded: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [authorGems, setAuthorGems] = useState("10");
+  const [reviewerInputs, setReviewerInputs] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+
+  const alreadyAwarded = !!blog.gems?.awarded;
+
+  // Build unified reviewer list: reviewedBy entries + any previous award entries not in reviewedBy
+  const reviewedByList = blog.reviewedBy ?? [];
+  const prevAwards = alreadyAwarded
+    ? (blog.gems!.reviewerAwards?.length
+        ? blog.gems!.reviewerAwards
+        : blog.gems!.reviewerUserId && blog.gems!.reviewerGems > 0
+          ? [{ userId: blog.gems!.reviewerUserId!, gems: blog.gems!.reviewerGems }]
+          : [])
+    : [];
+
+  const reviewedByIds = new Set(reviewedByList.map((r) => r.reviewerId));
+  // Extra entries from previous awards that are no longer in reviewedBy
+  const extraAwardEntries = prevAwards
+    .filter((a) => !reviewedByIds.has(a.userId))
+    .map((a) => ({ reviewerId: a.userId, reviewerName: undefined as string | undefined }));
+
+  const allReviewers = [...reviewedByList, ...extraAwardEntries];
+
+  const openDialog = () => {
+    if (alreadyAwarded) {
+      // Pre-fill with current awarded values
+      setAuthorGems(String(blog.gems!.authorGems));
+      const prefilled: Record<string, string> = {};
+      for (const a of prevAwards) {
+        if (a.userId) prefilled[a.userId] = String(a.gems);
+      }
+      setReviewerInputs(prefilled);
+    } else {
+      setAuthorGems("10");
+      setReviewerInputs({});
+    }
+    setOpen(true);
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const reviewerAwards = allReviewers
+        .map((r, i) => ({
+          userId: r.reviewerId,
+          gems: parseInt(reviewerInputs[r.reviewerId ?? String(i)] ?? "0") || 0,
+        }))
+        .filter((a) => a.userId && a.gems > 0);
+
+      const payload = { authorGems: parseInt(authorGems) || 0, reviewerAwards };
+
+      if (alreadyAwarded) {
+        await adminApi.updateGems(adminId, blog._id, payload);
+        toast.success("Gems updated.");
+      } else {
+        await adminApi.awardGems(adminId, blog._id, payload);
+        toast.success("Gems awarded!");
+      }
+      setOpen(false);
+      onAwarded();
+    } catch (err) {
+      toast.error(isAxiosError(err) ? (err.response?.data?.error ?? "Failed.") : "Error.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {alreadyAwarded ? (
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-xs">
+            <Gem className="size-3 text-primary shrink-0" />
+            <span className="font-semibold text-primary">{blog.gems!.authorGems}a</span>
+            {prevAwards.map((a, i) => (
+              <span key={`${a.userId ?? ""}-${i}`} className="text-muted-foreground">+{a.gems}r</span>
+            ))}
+          </div>
+          <Button
+            size="icon" variant="ghost"
+            className="size-7 shrink-0 text-muted-foreground hover:text-primary"
+            onClick={openDialog} title="Edit gems"
+          >
+            <Pencil className="size-3" />
+          </Button>
+        </div>
+      ) : (
+        <Button
+          size="sm" variant="outline"
+          className="gap-1.5 border-primary/40 text-primary hover:bg-primary/5"
+          onClick={openDialog}
+        >
+          <Gem className="size-3.5" />Gems
+        </Button>
+      )}
+      <GemsDialog
+        open={open} setOpen={setOpen}
+        title={blog.title} isEditing={alreadyAwarded}
+        authorDetails={blog.authorDetails}
+        authorGems={authorGems} setAuthorGems={setAuthorGems}
+        allReviewers={allReviewers} reviewerInputs={reviewerInputs} setReviewerInputs={setReviewerInputs}
+        loading={loading} onSubmit={handleSubmit}
+      />
+    </>
+  );
+}
+
 function PublishDialog({
   blog, adminId, adminEmail, onPublished,
 }: { blog: AdminBlog; adminId: string; adminEmail: string; onPublished: () => void }) {
@@ -489,6 +618,14 @@ function PublishDialog({
   const [hover, setHover] = useState(0);
   const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Gems state — shown after successful publish
+  const [gemsOpen, setGemsOpen] = useState(false);
+  const [gemsAuthorInput, setGemsAuthorInput] = useState("10");
+  const [gemsReviewerInputs, setGemsReviewerInputs] = useState<Record<string, string>>({});
+  const [gemsLoading, setGemsLoading] = useState(false);
+
+  const reviewers = blog.reviewedBy ?? [];
 
   const handlePublish = async () => {
     if (rating === 0) { toast.error("Please rate this blog."); return; }
@@ -504,7 +641,14 @@ function PublishDialog({
       });
       toast.success("Blog published!");
       setOpen(false);
-      onPublished();
+      // Open gems dialog if gems not yet awarded
+      if (!blog.gems?.awarded) {
+        setGemsAuthorInput("10");
+        setGemsReviewerInputs({});
+        setGemsOpen(true);
+      } else {
+        onPublished();
+      }
     } catch (err) {
       toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Publish failed.") : "Error.");
     } finally {
@@ -512,41 +656,83 @@ function PublishDialog({
     }
   };
 
+  const handleAwardGems = async () => {
+    setGemsLoading(true);
+    try {
+      const reviewerAwards = reviewers
+        .map((r, i) => ({
+          userId: r.reviewerId,
+          gems: parseInt(gemsReviewerInputs[r.reviewerId ?? String(i)] ?? "0") || 0,
+        }))
+        .filter((a) => a.userId && a.gems > 0);
+
+      await adminApi.awardGems(adminId, blog._id, {
+        authorGems: parseInt(gemsAuthorInput) || 0,
+        reviewerAwards,
+      });
+      toast.success("Gems awarded!");
+      setGemsOpen(false);
+      onPublished();
+    } catch (err) {
+      toast.error(isAxiosError(err) ? (err.response?.data?.error ?? "Failed to award gems.") : "Error.");
+    } finally {
+      setGemsLoading(false);
+    }
+  };
+
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <Button size="sm" className="gap-1.5"><CheckCheck className="size-3.5" />Publish</Button>
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-6 shadow-xl">
-          <Dialog.Title className="font-serif text-lg font-semibold">Publish blog</Dialog.Title>
-          <Dialog.Description className="mt-1 text-sm text-muted-foreground line-clamp-2">&ldquo;{blog.title}&rdquo;</Dialog.Description>
-          <div className="mt-4 space-y-4">
-            <div>
-              <p className="mb-2 text-sm font-medium">Final rating</p>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} type="button" onClick={() => setRating(s)} onMouseEnter={() => setHover(s)} onMouseLeave={() => setHover(0)}>
-                    <Star className={`size-7 transition-colors ${s <= (hover || rating) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40"}`} />
-                  </button>
-                ))}
+    <>
+      <GemsDialog
+        open={gemsOpen}
+        setOpen={setGemsOpen}
+        title={blog.title}
+        isEditing={false}
+        authorDetails={blog.authorDetails}
+        authorGems={gemsAuthorInput}
+        setAuthorGems={setGemsAuthorInput}
+        allReviewers={reviewers}
+        reviewerInputs={gemsReviewerInputs}
+        setReviewerInputs={setGemsReviewerInputs}
+        loading={gemsLoading}
+        onSubmit={handleAwardGems}
+        onSkip={() => { setGemsOpen(false); onPublished(); }}
+        skipLabel="Skip"
+      />
+      <Dialog.Root open={open} onOpenChange={setOpen}>
+        <Dialog.Trigger asChild>
+          <Button size="sm" className="gap-1.5"><CheckCheck className="size-3.5" />Publish</Button>
+        </Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-6 shadow-xl">
+            <Dialog.Title className="font-serif text-lg font-semibold">Publish blog</Dialog.Title>
+            <Dialog.Description className="mt-1 text-sm text-muted-foreground line-clamp-2">&ldquo;{blog.title}&rdquo;</Dialog.Description>
+            <div className="mt-4 space-y-4">
+              <div>
+                <p className="mb-2 text-sm font-medium">Final rating</p>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button key={s} type="button" onClick={() => setRating(s)} onMouseEnter={() => setHover(s)} onMouseLeave={() => setHover(0)}>
+                      <Star className={`size-7 transition-colors ${s <= (hover || rating) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40"}`} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="mb-1.5 text-sm font-medium">Remarks (optional)</p>
+                <textarea rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Final review notes…"
+                  className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground" />
               </div>
             </div>
-            <div>
-              <p className="mb-1.5 text-sm font-medium">Remarks (optional)</p>
-              <textarea rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Final review notes…"
-                className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground" />
+            <div className="mt-5 flex justify-end gap-2">
+              <Dialog.Close asChild><Button variant="outline" size="sm">Cancel</Button></Dialog.Close>
+              <Button size="sm" disabled={loading} onClick={handlePublish} className="gap-1.5">
+                {loading ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCheck className="size-3.5" />}Publish
+              </Button>
             </div>
-          </div>
-          <div className="mt-5 flex justify-end gap-2">
-            <Dialog.Close asChild><Button variant="outline" size="sm">Cancel</Button></Dialog.Close>
-            <Button size="sm" disabled={loading} onClick={handlePublish} className="gap-1.5">
-              {loading ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCheck className="size-3.5" />}Publish
-            </Button>
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
   );
 }

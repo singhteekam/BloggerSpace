@@ -137,7 +137,7 @@ export default function CommunityPostPage() {
       {/* Post content */}
       <article
         className="prose prose-sm max-w-none dark:prose-invert mb-10"
-        dangerouslySetInnerHTML={{ __html: post.communityPostContent }}
+        dangerouslySetInnerHTML={{ __html: post.communityPostContent ?? "" }}
       />
 
       <Separator className="mb-10" />

@@ -1128,9 +1128,9 @@ exports.authorPublishedBlogs = async (req, res) => {
       authorDetails: new mongoose.Types.ObjectId(req.query.userId),
       status: "PUBLISHED",
     })
-      .populate("authorDetails")
-      .exec();
-    // console.log(blogs);
+      .populate("authorDetails", "fullName email userName _id")
+      .sort({ lastUpdatedAt: -1 })
+      .lean();
 
     res.json(blogs);
   } catch (error) {

@@ -55,7 +55,8 @@ export function Navbar() {
     : "?";
 
   const normalizedRole = user?.role?.toLowerCase();
-  const isRegularUser = !user || (normalizedRole !== "reviewer" && normalizedRole !== "admin");
+  // Reviewers retain full user writing privileges — only admin is excluded from /newblog
+  const isRegularUser = !user || normalizedRole !== "admin";
 
   const menuNav =
     normalizedRole === "reviewer"
@@ -84,7 +85,9 @@ export function Navbar() {
 
         {/* Desktop nav links */}
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-          {primaryNav.map((item) => {
+          {primaryNav
+            .filter((item) => !item.authRequired || isRegularUser)
+            .map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <Link

@@ -15,17 +15,17 @@ app.use(helmet());
 
 const { onRequest } = require("firebase-functions/v2/https");
 
-// require("dotenv").config(); // Load environment variables from .env file - Production mode
-require("dotenv").config({ path: ".env.local" }); // development mode
+require("dotenv").config(); // Load environment variables from .env file - Production mode
+// require("dotenv").config({ path: ".env.local" }); // development mode
 
-const PORT = process.env.PORT || 5000; // For development
-// const PORT = 8190;  // For production
+// const PORT = process.env.PORT || 5000; // For development
+const PORT = 8190;  // For production
 
 const connectDB = require("./db/db");
 const blogs = require("./routes/blogs");
 const authRoutes = require("./routes/users");
 
-const reviewerRouted = require("./routes/Reviewer/reviewerRoute");
+const reviewerRoutes = require("./routes/Reviewer/reviewerRoute");
 const adminRoutes = require("./routes/Admin/adminRoute");
 const communityRoutes = require("./routes/community");
 const autoWriteBlogs = require("./routes/autoWriteBlogs");
@@ -115,7 +115,7 @@ app.use("/api/users", authRoutes);
 app.use("/api/blogs", blogs);
 
 //Reviewer Panel
-app.use("/api/reviewer/", reviewerRouted);
+app.use("/api/reviewer/", reviewerRoutes);
 
 //Admin Panel
 app.use("/api/admin/", adminRoutes);

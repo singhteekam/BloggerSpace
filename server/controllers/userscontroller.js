@@ -756,6 +756,7 @@ exports.loggedInUserInfo = async (req, res) => {
       profilePicture: user.profilePicture,
       savedBlogs: user.savedBlogs,
       role: user.role ?? "user",
+      gems: user.gems ?? 0,
       createdAt: user.createdAt,
     };
     // console.log("LoggedIn user details fetched");

@@ -244,6 +244,104 @@
   }
 }
 
+/* ─── TipTap table ───────────────────────────────────────────────────────── */
+@layer components {
+  .blog-prose table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5em 0;
+    overflow: hidden;
+    border-radius: 0.5rem;
+  }
+  .blog-prose table td,
+  .blog-prose table th {
+    border: 1px solid var(--border);
+    padding: 0.5em 0.75em;
+    vertical-align: top;
+    position: relative;
+    box-sizing: border-box;
+    min-width: 1em;
+  }
+  .blog-prose table th {
+    background: var(--muted);
+    font-weight: 600;
+    text-align: left;
+  }
+  /* Selected cells in editor */
+  .blog-prose table td.selectedCell,
+  .blog-prose table th.selectedCell {
+    background: color-mix(in oklab, var(--primary) 15%, transparent);
+  }
+  /* Column resize handle */
+  .blog-prose table .column-resize-handle {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .blog-prose table:hover .column-resize-handle {
+    opacity: 0.4;
+  }
+  .blog-prose .tableWrapper {
+    overflow-x: auto;
+    margin: 1.5em 0;
+  }
+  .blog-prose .resize-cursor { cursor: col-resize; }
+}
+
+/* ─── TipTap code block with language label ──────────────────────────────── */
+@layer components {
+  .blog-prose pre {
+    position: relative;
+  }
+  .blog-prose pre[data-language]::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0.5em;
+    right: 0.75em;
+    font-size: 0.7em;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-sans), sans-serif;
+  }
+  /* Basic lowlight syntax highlighting tokens */
+  .blog-prose .hljs-keyword,
+  .blog-prose .hljs-built_in,
+  .blog-prose .hljs-type     { color: #c792ea; }
+  .blog-prose .hljs-string,
+  .blog-prose .hljs-regexp   { color: #c3e88d; }
+  .blog-prose .hljs-number   { color: #f78c6c; }
+  .blog-prose .hljs-comment  { color: #546e7a; font-style: italic; }
+  .blog-prose .hljs-function,
+  .blog-prose .hljs-title    { color: #82aaff; }
+  .blog-prose .hljs-params   { color: #89ddff; }
+  .blog-prose .hljs-literal  { color: #ff5370; }
+  .blog-prose .hljs-variable,
+  .blog-prose .hljs-attr     { color: #ffcb6b; }
+  .blog-prose .hljs-tag      { color: #f07178; }
+  .blog-prose .hljs-name     { color: #f07178; }
+  .blog-prose .hljs-selector-tag,
+  .blog-prose .hljs-selector-class { color: #c792ea; }
+
+  /* Subscript / superscript */
+  .blog-prose sub { vertical-align: sub; font-size: 0.75em; }
+  .blog-prose sup { vertical-align: super; font-size: 0.75em; }
+}
+
+@layer utilities {
+  /* Hide scrollbar while keeping scroll behaviour */
+  .scrollbar-none {
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+}
+
 @layer utilities {
   /* Subtle grid overlay for hero backgrounds */
   .bg-grid {
@@ -251,5 +349,175 @@
       linear-gradient(to right, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
       linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
     background-size: 48px 48px;
+  }
+}
+
+/* ─── TipTap task list ───────────────────────────────────────────────────── */
+@layer components {
+  .blog-prose ul[data-type="taskList"] {
+    list-style: none;
+    padding-left: 0.25em;
+    margin: 1em 0;
+  }
+  .blog-prose ul[data-type="taskList"] li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5em;
+    margin: 0.35em 0;
+  }
+  .blog-prose ul[data-type="taskList"] li > label {
+    flex-shrink: 0;
+    margin-top: 0.2em;
+  }
+  .blog-prose ul[data-type="taskList"] li > label input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--primary);
+    cursor: pointer;
+    border-radius: 0.25rem;
+  }
+  .blog-prose ul[data-type="taskList"] li > div {
+    flex: 1;
+  }
+  .blog-prose ul[data-type="taskList"] li[data-checked="true"] > div {
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+  /* Nested task lists */
+  .blog-prose ul[data-type="taskList"] ul[data-type="taskList"] {
+    padding-left: 1.4em;
+  }
+}
+
+/* ─── TipTap details / accordion ─────────────────────────────────────────── */
+@layer components {
+  .blog-prose details {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    margin: 1.25em 0;
+    overflow: hidden;
+  }
+  .blog-prose details summary {
+    padding: 0.6em 1em;
+    background: var(--muted);
+    cursor: pointer;
+    font-weight: 600;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+  .blog-prose details summary::before {
+    content: "▶";
+    font-size: 0.65em;
+    transition: transform 0.2s;
+    color: var(--muted-foreground);
+  }
+  .blog-prose details[open] summary::before {
+    transform: rotate(90deg);
+  }
+  .blog-prose details div[data-details-content] {
+    padding: 0.75em 1em;
+  }
+}
+
+/* ─── TipTap audio embed ─────────────────────────────────────────────────── */
+@layer components {
+  .blog-prose audio {
+    display: block;
+    width: 100%;
+    max-width: 42rem;
+    margin: 1.25em auto;
+    border-radius: 0.5rem;
+  }
+}
+
+/* ─── TipTap YouTube embed ───────────────────────────────────────────────── */
+@layer components {
+  .blog-prose .youtube-embed,
+  .blog-prose iframe[src*="youtube"] {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.75rem;
+    border: none;
+    margin: 1.5em auto;
+    max-width: 42rem;
+  }
+  /* Wrapper div TipTap wraps iframes in */
+  .blog-prose div[data-youtube-video] {
+    margin: 1.5em 0;
+  }
+  .blog-prose div[data-youtube-video] iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.75rem;
+    border: none;
+  }
+}
+
+/* ─── TipTap Focus extension ─────────────────────────────────────────────── */
+@layer components {
+  .tiptap .has-focus {
+    outline: 2px solid color-mix(in oklab, var(--primary) 35%, transparent);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+}
+
+/* ─── H5 / H6 in blog prose ─────────────────────────────────────────────── */
+@layer components {
+  .blog-prose h5 {
+    font-family: var(--font-serif), ui-serif, Georgia, serif;
+    font-weight: 600;
+    line-height: 1.25;
+    margin: 1.75em 0 0.6em;
+    color: var(--foreground);
+    font-size: 1em;
+  }
+  .blog-prose h6 {
+    font-family: var(--font-serif), ui-serif, Georgia, serif;
+    font-weight: 600;
+    line-height: 1.25;
+    margin: 1.75em 0 0.6em;
+    color: var(--muted-foreground);
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+/* ─── Typography extension smart-quote / em-dash overrides ──────────────── */
+@layer components {
+  /* Typography extension outputs regular Unicode — no extra CSS needed.
+     Styles below ensure consistent rendering for its smart-punctuation output. */
+  .blog-prose p > code { white-space: pre-wrap; word-break: break-word; }
+}
+
+/* ─── RawHtml extension — unknown HTML5 elements stored as opaque blocks ─── */
+@layer components {
+  .raw-html-block {
+    position: relative;
+    border: 1px dashed color-mix(in oklab, var(--primary) 40%, transparent);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    margin: 0.5em 0;
+    min-height: 1.5em;
+    cursor: default;
+    user-select: none;
+  }
+  .raw-html-block::before {
+    content: "HTML";
+    position: absolute;
+    top: -0.6em;
+    left: 0.4em;
+    font-size: 0.6rem;
+    font-family: ui-monospace, monospace;
+    background: var(--card);
+    color: color-mix(in oklab, var(--primary) 70%, transparent);
+    padding: 0 0.25em;
+    line-height: 1;
+    pointer-events: none;
   }
 }

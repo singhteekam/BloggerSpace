@@ -73,6 +73,18 @@ const blogSchema = new mongoose.Schema({
     default: 0,
   },
   comments: [commentSchema],
+  gems: {
+    authorGems:    { type: Number, default: 0 },
+    reviewerGems:  { type: Number, default: 0 },
+    reviewerUserId: { type: mongoose.Schema.Types.ObjectId, ref: "users", default: null },
+    reviewerAwards: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+      gems:   { type: Number, default: 0 },
+    }],
+    awarded:       { type: Boolean, default: false },
+    awardedAt:     { type: Date, default: null },
+    awardedBy:     { type: mongoose.Schema.Types.ObjectId, ref: "users", default: null },
+  },
 });
 
 const Blog = mongoose.model("Blog", blogSchema);

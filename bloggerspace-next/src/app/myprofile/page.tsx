@@ -5,13 +5,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Pencil, Camera, CheckCircle2, BadgeCheck, CalendarDays } from "lucide-react";
+import {
+  Loader2, Pencil, Camera, CheckCircle2, BadgeCheck, CalendarDays,
+  Gem, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BookOpen,
+} from "lucide-react";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAuth } from "@/contexts/auth-context";
-import { userApi } from "@/lib/api/user";
+import { userApi, userGemsApi, type UserGemsTransaction } from "@/lib/api/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
+import { formatDate } from "@/lib/utils/html";
 
 const schema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -53,10 +57,17 @@ export default function MyProfilePage() {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState(false);
+  const [gemsPage, setGemsPage] = useState(1);
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["userinfo"],
     queryFn: () => userApi.getInfo().then((r) => r.data),
+    enabled: !!user,
+  });
+
+  const { data: gemsHistory, isLoading: gemsLoading } = useQuery({
+    queryKey: ["user-gems-history", gemsPage],
+    queryFn: () => userGemsApi.getHistory(gemsPage).then((r) => r.data),
     enabled: !!user,
   });
 
@@ -112,6 +123,10 @@ export default function MyProfilePage() {
   const joinedDate = profile?.createdAt
     ? new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
     : null;
+
+  const gems = profile?.gems ?? 0;
+  const transactions = gemsHistory?.transactions ?? [];
+  const totalGemsPages = gemsHistory?.pages ?? 1;
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
@@ -171,6 +186,56 @@ export default function MyProfilePage() {
 
       <Separator className="my-8" />
 
+      {/* Gems balance */}
+      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+              <Gem className="size-4 text-primary" />
+            </div>
+            <div>
+              <p className="font-semibold">Gems balance</p>
+              <p className="text-xs text-muted-foreground">Earned for publishing &amp; reviewing</p>
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-primary">{gems}</p>
+        </div>
+
+        {/* Transaction history */}
+        {gemsLoading ? (
+          <div className="space-y-2">
+            {[0, 1, 2].map((i) => <Skeleton key={i} className="h-12 rounded-lg" />)}
+          </div>
+        ) : transactions.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-8 text-center text-muted-foreground">
+            <Gem className="size-6" />
+            <p className="text-sm">No gems transactions yet. Publish blogs to earn gems!</p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Transaction history</p>
+            <div className="divide-y divide-border rounded-lg border overflow-hidden">
+              {transactions.map((tx) => (
+                <TransactionRow key={tx._id} tx={tx} />
+              ))}
+            </div>
+            {totalGemsPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-2">
+                <Button size="sm" variant="outline" disabled={gemsPage <= 1} onClick={() => setGemsPage((p) => p - 1)}>
+                  <ChevronLeft className="size-3.5" />
+                </Button>
+                <span className="text-xs text-muted-foreground">{gemsPage} / {totalGemsPages}</span>
+                <Button size="sm" variant="outline" disabled={gemsPage >= totalGemsPages} onClick={() => setGemsPage((p) => p + 1)}>
+                  <ChevronRight className="size-3.5" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <Separator className="my-8" />
+
       {/* Edit form */}
       {editing ? (
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
@@ -207,20 +272,36 @@ export default function MyProfilePage() {
           Edit profile
         </Button>
       )}
-
-      {/* Delete account — hidden for now */}
-      {/* <Separator className="my-8" />
-      <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-5 space-y-3">
-        <div>
-          <p className="font-semibold text-destructive">Danger zone</p>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Permanently delete your account. This action cannot be undone.
-          </p>
-        </div>
-        <Button variant="destructive" size="sm" className="gap-1.5">
-          Delete account
-        </Button>
-      </div> */}
     </main>
+  );
+}
+
+function TransactionRow({ tx }: { tx: UserGemsTransaction }) {
+  const isAward = tx.type === "AWARD";
+  return (
+    <div className="flex items-center gap-3 px-3 py-2.5">
+      <div className={cn(
+        "flex size-7 shrink-0 items-center justify-center rounded-full",
+        isAward ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                : "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+      )}>
+        {isAward ? <TrendingUp className="size-3.5" /> : <TrendingDown className="size-3.5" />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium line-clamp-1">{tx.blogTitle}</p>
+        <p className="text-xs text-muted-foreground">
+          {tx.role === "AUTHOR" ? "As author" : "As reviewer"} · {formatDate(tx.createdAt)}
+        </p>
+      </div>
+      <div className="shrink-0 flex items-center gap-1">
+        <span className={cn(
+          "text-sm font-semibold",
+          isAward ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400",
+        )}>
+          {isAward ? "+" : "-"}{tx.amount}
+        </span>
+        <Gem className="size-3 text-primary" />
+      </div>
+    </div>
   );
 }

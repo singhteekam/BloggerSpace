@@ -32,17 +32,40 @@ export async function fetchBlogsByCategory(
   }
 }
 
-export async function searchBlogs(query: string): Promise<Blog[]> {
+/**
+ * Unified filtered listing — handles search, tag, and category filtering through
+ * the fetchallblogs endpoint which supports all three + pagination.
+ * Use this wherever you need server-side filtered blog results.
+ */
+export async function fetchFilteredBlogs({
+  search,
+  tag,
+  category,
+  page = 1,
+}: {
+  search?: string;
+  tag?: string;
+  category?: string;
+  page?: number;
+}): Promise<BlogListResponse> {
   try {
-    const encoded = encodeURIComponent(query.trim());
-    const res = await fetch(`${BASE}/api/blogs/searchblogs/${encoded}`, {
+    const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) });
+    if (search) params.set("search", search.trim());
+    if (tag) { params.set("filterType", "tag"); params.set("filterValue", tag); }
+    else if (category) { params.set("filterType", "category"); params.set("filterValue", category); }
+    const res = await fetch(`${BASE}/api/blogs/fetchallblogs?${params}`, {
       next: { revalidate: 30 },
     });
-    if (!res.ok) return [];
+    if (!res.ok) return empty(page);
     const data = await res.json();
-    return Array.isArray(data) ? data : (data.blogs ?? []);
+    return {
+      blogs: data.blogs ?? [],
+      total: data.totalCount ?? 0,
+      page: data.currentPage ?? page,
+      pages: data.totalPages ?? 0,
+    };
   } catch {
-    return [];
+    return empty(page);
   }
 }
 
@@ -124,27 +147,8 @@ export async function fetchDistinctTags(): Promise<string[]> {
   }
 }
 
-export async function fetchBlogsByTag(
-  tag: string,
-  page = 1,
-): Promise<BlogListResponse> {
-  try {
-    const encoded = encodeURIComponent(tag);
-    const res = await fetch(
-      `${BASE}/api/blogs/fetchallblogs?filterType=tag&filterValue=${encoded}&page=${page}&limit=${LIMIT}`,
-      { next: { revalidate: 60 } },
-    );
-    if (!res.ok) return empty(page);
-    const data = await res.json();
-    return {
-      blogs: data.blogs ?? [],
-      total: data.totalCount ?? 0,
-      page: data.currentPage ?? page,
-      pages: data.totalPages ?? 0,
-    };
-  } catch {
-    return empty(page);
-  }
+export function fetchBlogsByTag(tag: string, page = 1): Promise<BlogListResponse> {
+  return fetchFilteredBlogs({ tag, page });
 }
 
 function empty(page: number): BlogListResponse {

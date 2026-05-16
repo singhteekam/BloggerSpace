@@ -4,16 +4,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Compass, Pencil, User } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-
-const NAV_ITEMS = [
-  { href: "/", icon: Home, label: "Home" },
-  { href: "/blogs", icon: Compass, label: "Browse" },
-  { href: "/newblog", icon: Pencil, label: "Write" },
-  { href: "/myprofile", icon: User, label: "Profile" },
-] as const;
+import { useAuth } from "@/contexts/auth-context";
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const role = user?.role?.toLowerCase();
+  // Reviewers retain full user writing privileges — only admin is excluded from /newblog
+  const isRegularUser = !user || role !== "admin";
+
+  // Write item is only shown to regular users — admins/reviewers use their own panels
+  const navItems = [
+    { href: "/", icon: Home, label: "Home" },
+    { href: "/blogs", icon: Compass, label: "Browse" },
+    ...(isRegularUser ? [{ href: "/newblog", icon: Pencil, label: "Write" }] : []),
+    { href: role === "admin" ? "/admin/dashboard" : role === "reviewer" ? "/reviewer/dashboard" : "/myprofile", icon: User, label: role === "admin" ? "Admin" : role === "reviewer" ? "Panel" : "Profile" },
+  ] as const;
 
   return (
     <nav
@@ -22,7 +28,7 @@ export function MobileNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="flex items-stretch">
-        {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+        {navItems.map(({ href, icon: Icon, label }) => {
           const active =
             pathname === href ||
             (href !== "/" && pathname.startsWith(href));

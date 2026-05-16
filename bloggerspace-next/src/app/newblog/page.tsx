@@ -70,6 +70,13 @@ function NewBlogForm() {
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
 
+  // Admins must use the admin write page so blogs get ADMIN_DRAFT status, not DRAFT.
+  useEffect(() => {
+    if (!authLoading && user?.role?.toLowerCase() === "admin") {
+      router.replace("/admin/adminblogs/write");
+    }
+  }, [user, authLoading, router]);
+
   const [content, setContent] = useState("");
   const [editorKey, setEditorKey] = useState(0);
   const [tags, setTags] = useState<string[]>([]);

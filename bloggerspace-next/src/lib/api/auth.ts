@@ -8,6 +8,7 @@ export type AuthUser = {
   profilePicture?: string;
   userName?: string;
   isVerified?: boolean;
+  gems?: number;
   createdAt?: string;
 };
 

@@ -12,6 +12,9 @@ const sendEmail = require("../../services/mailer");
 const generateSitemap = require('../../utils/generateSitemap');
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
+const Newsletter = require("../../models/Newsletter");
+const GemsTransaction = require("../../models/GemsTransaction");
+const IST_OFFSET = 330;
 
 exports.adminSignup = async (req, res) => {
   try {
@@ -132,10 +135,39 @@ exports.inReviewBlogs = async (req, res) => {
   try {
     // if (req.session.currentemail) {
     if (req.query.userId) {
-      // Query the Blog model for pending blogs assigned to the reviewer
-      const pendingBlogs = await Blog.find({
-        status: "IN_REVIEW",
-      }).populate("authorDetails").exec();
+      const rawBlogs = await Blog.find({ status: "IN_REVIEW" })
+        .populate("authorDetails", "fullName email userName _id")
+        .lean();
+
+      // Collect unique non-Admin reviewer IDs
+      const reviewerIdSet = new Set();
+      rawBlogs.forEach((b) => {
+        (b.reviewedBy || []).forEach((r) => {
+          const id = r?.ReviewedBy?.Id;
+          if (id && r?.ReviewedBy?.Role !== "Admin") reviewerIdSet.add(id.toString());
+        });
+      });
+      const reviewerObjectIds = [...reviewerIdSet].map((id) => new mongoose.Types.ObjectId(id));
+      const [reviewerUsers, legacyRevs] = reviewerObjectIds.length
+        ? await Promise.all([
+            User.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean(),
+            Reviewer.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean(),
+          ])
+        : [[], []];
+      const nameMap = new Map([
+        ...legacyRevs.map((r) => [r._id.toString(), r.fullName]),
+        ...reviewerUsers.map((r) => [r._id.toString(), r.fullName]),
+      ]);
+
+      const pendingBlogs = rawBlogs.map((b) => ({
+        ...b,
+        reviewedBy: (b.reviewedBy || [])
+          .filter((r) => r?.ReviewedBy?.Role !== "Admin" && r?.ReviewedBy?.Id)
+          .map((r) => ({
+            reviewerId: r.ReviewedBy.Id.toString(),
+            reviewerName: nameMap.get(r.ReviewedBy.Id.toString()),
+          })),
+      }));
 
       res.json(pendingBlogs);
     } else {
@@ -213,7 +245,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
       // ReviewedBy: req.session.currentemail,
       ReviewedBy: {
         Id: new mongoose.Types.ObjectId(req.query.userId),
-        Email: req.query.email,
+        Email: req.body.email || req.query.email,
         Role: req.query.role,
       },
       Revision:"NA",
@@ -305,13 +337,50 @@ exports.publishedBlogs = async (req, res) => {
 
     const publishedQuery = { status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] }, ...searchFilter };
 
-    const blogs = await Blog.find(publishedQuery)
-      .sort({ lastUpdatedAt: -1 })
-      .skip(skip)
-      .limit(Number(limit))
-      .lean();
+    const [rawBlogs, totalCount] = await Promise.all([
+      Blog.find(publishedQuery)
+        .sort({ lastUpdatedAt: -1 })
+        .skip(skip)
+        .limit(Number(limit))
+        .populate("authorDetails", "fullName email userName _id")
+        .lean(),
+      Blog.countDocuments(publishedQuery),
+    ]);
 
-    const totalCount = await Blog.countDocuments(publishedQuery);
+    // Collect unique non-Admin reviewer IDs across all blogs
+    const reviewerIdSet = new Set();
+    rawBlogs.forEach((b) => {
+      (b.reviewedBy || []).forEach((r) => {
+        const id = r?.ReviewedBy?.Id;
+        const role = r?.ReviewedBy?.Role;
+        if (id && role !== "Admin") reviewerIdSet.add(id.toString());
+      });
+    });
+    const reviewerObjectIds = [...reviewerIdSet].map((id) => new mongoose.Types.ObjectId(id));
+
+    // Look up names from User + legacy Reviewer collections in parallel
+    const [reviewerUsers, legacyRevs] = reviewerObjectIds.length
+      ? await Promise.all([
+          User.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean(),
+          Reviewer.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean(),
+        ])
+      : [[], []];
+
+    const nameMap = new Map([
+      ...legacyRevs.map((r) => [r._id.toString(), r.fullName]),
+      ...reviewerUsers.map((r) => [r._id.toString(), r.fullName]),
+    ]);
+
+    // Transform each blog: reviewedBy → [{reviewerId, reviewerName}], skip Admin entries
+    const blogs = rawBlogs.map((b) => ({
+      ...b,
+      reviewedBy: (b.reviewedBy || [])
+        .filter((r) => r?.ReviewedBy?.Role !== "Admin" && r?.ReviewedBy?.Id)
+        .map((r) => ({
+          reviewerId: r.ReviewedBy.Id.toString(),
+          reviewerName: nameMap.get(r.ReviewedBy.Id.toString()),
+        })),
+    }));
 
     res.json({
       blogs,
@@ -628,11 +697,16 @@ exports.removeFromReviewerRole= async(req, res)=>{
 
 exports.discardAnyBlog = async (req, res) => {
   const { id } = req.params;
+  const adminId = req.query.userId;
   try {
     const blog = await Blog.findById(id);
     if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    // Deduct gems if they were awarded for this blog
+    await deductGemsForBlog(blog, adminId);
+
     blog.status = blog.status.startsWith("ADMIN_") ? "ADMIN_DISCARDED" : "DISCARD_QUEUE";
-    blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
+    blog.lastUpdatedAt = new Date(new Date().getTime() + IST_OFFSET * 60000);
     await blog.save();
     res.json({ message: "Blog discarded successfully" });
   } catch (error) {
@@ -955,20 +1029,20 @@ exports.adminDiscardedBlogs = async (req, res) => {
 };
 
 exports.adminWrittenDiscardBlogFromDB = async (req, res) => {
-  const {id}= req.params;
+  const { id } = req.params;
+  const adminId = req.query.userId;
   try {
-    const blog = await Blog.findById({
-      _id: new mongoose.Types.ObjectId(id),
-    });
-    blog.status="ADMIN_DISCARDED";
-    await blog.save();
+    const blog = await Blog.findById({ _id: new mongoose.Types.ObjectId(id) });
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
 
+    await deductGemsForBlog(blog, adminId);
+
+    blog.status = "ADMIN_DISCARDED";
+    await blog.save();
     res.json({ message: "Blog discarded successfully" });
   } catch (error) {
     console.error("Error discarding blogs:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while discarding blogs." });
+    res.status(500).json({ error: "An error occurred while discarding blogs." });
   }
 };
 
@@ -986,13 +1060,37 @@ exports.adminBlogEdit = async (req, res) => {
 
     // Decompress the content before displaying it
     const compressedContentBuffer = Buffer.from(blog.content, "base64");
-    const decompressedContent = pako.inflate(compressedContentBuffer, {
-      to: "string",
-    });
-    blog.content = decompressedContent;
-    console.debug("Blog opened in Edit mode. Blog title: "+ blog.title);
+    const decompressedContent = pako.inflate(compressedContentBuffer, { to: "string" });
 
-    res.json(blog);
+    // Transform reviewedBy: filter out Admin entries, look up reviewer names
+    const rawReviewedBy = blog.reviewedBy || [];
+    const reviewerIds = rawReviewedBy
+      .filter((r) => r?.ReviewedBy?.Role !== "Admin" && r?.ReviewedBy?.Id)
+      .map((r) => r.ReviewedBy.Id);
+
+    const [reviewerUsers, legacyRevs] = reviewerIds.length
+      ? await Promise.all([
+          User.find({ _id: { $in: reviewerIds } }, "fullName _id").lean(),
+          Reviewer.find({ _id: { $in: reviewerIds } }, "fullName _id").lean(),
+        ])
+      : [[], []];
+
+    const nameMap = new Map([
+      ...legacyRevs.map((r) => [r._id.toString(), r.fullName]),
+      ...reviewerUsers.map((r) => [r._id.toString(), r.fullName]),
+    ]);
+
+    const blogObj = blog.toObject();
+    blogObj.content = decompressedContent;
+    blogObj.reviewedBy = rawReviewedBy
+      .filter((r) => r?.ReviewedBy?.Role !== "Admin" && r?.ReviewedBy?.Id)
+      .map((r) => ({
+        reviewerId: r.ReviewedBy.Id.toString(),
+        reviewerName: nameMap.get(r.ReviewedBy.Id.toString()),
+      }));
+
+    console.debug("Blog opened in Edit mode. Blog title: " + blog.title);
+    res.json(blogObj);
   } catch (error) {
     console.error("Error fetching blog blog:", error);
     res.status(500).json({ error: "Server error" });
@@ -1044,20 +1142,43 @@ exports.adminSaveEditedBlog = async (req, res) => {
 // Newsletter
 exports.sendNewsletter = async (req, res) => {
   try {
+    const { selectedUsers, subject, message } = req.body;
+    const adminId = req.query.userId;
 
-    const {selectedUsers, subject, message}= req.body;
     selectedUsers.forEach(async (receiver) => {
       await sendEmail(receiver.value, subject, `<div class="content">${message}</div>`);
     });
-    // Sending mail to admin
     await sendEmail(process.env.EMAIL, subject, message);
-    
+
+    // Persist newsletter for history tracking
+    await Newsletter.create({
+      subject,
+      message,
+      recipients: selectedUsers.map((u) => ({ email: u.value, name: u.label })),
+      recipientCount: selectedUsers.length,
+      sentBy: adminId || null,
+    });
+
     res.json({ message: "Mail sent successfully!!" });
   } catch (error) {
     console.error("Error sending emails...", error);
-    res
-      .status(500)
-      .json({ error: "Error sending emails..." });
+    res.status(500).json({ error: "Error sending emails..." });
+  }
+};
+
+exports.getNewsletterHistory = async (req, res) => {
+  try {
+    const page  = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    const skip  = (page - 1) * limit;
+    const [newsletters, total] = await Promise.all([
+      Newsletter.find({}).sort({ sentAt: -1 }).skip(skip).limit(limit).lean(),
+      Newsletter.countDocuments({}),
+    ]);
+    res.json({ newsletters, total, page, pages: Math.ceil(total / limit) });
+  } catch (error) {
+    console.error("Error fetching newsletter history:", error);
+    res.status(500).json({ error: "Failed to fetch newsletter history" });
   }
 };
 
@@ -1299,3 +1420,340 @@ exports.getAdminSavedBlogs = async (req, res) => {
     res.status(500).json({ error: "Error getting saved blogs" });
   }
 };
+// Temporary file — contents will be appended to adminController.js
+
+// ─── Gems helper ─────────────────────────────────────────────────────────────
+async function deductGemsForBlog(blog, adminId) {
+  if (!blog.gems || !blog.gems.awarded) return;
+  const ops = [];
+  if (blog.gems.authorGems > 0 && blog.authorDetails) {
+    ops.push(
+      User.findByIdAndUpdate(blog.authorDetails, { $inc: { gems: -blog.gems.authorGems } }),
+      GemsTransaction.create({
+        userId: blog.authorDetails,
+        blogId: blog._id, blogTitle: blog.title, blogSlug: blog.slug,
+        type: "DEDUCT", role: "AUTHOR", amount: blog.gems.authorGems,
+        awardedBy: adminId || blog.gems.awardedBy,
+      }),
+    );
+  }
+  // Support multi-reviewer awards array (new) with fallback to legacy single reviewer
+  const reviewerAwards = blog.gems.reviewerAwards && blog.gems.reviewerAwards.length > 0
+    ? blog.gems.reviewerAwards
+    : (blog.gems.reviewerGems > 0 && blog.gems.reviewerUserId
+        ? [{ userId: blog.gems.reviewerUserId, gems: blog.gems.reviewerGems }]
+        : []);
+  for (const award of reviewerAwards) {
+    if (award.gems > 0 && award.userId) {
+      ops.push(
+        User.findByIdAndUpdate(award.userId, { $inc: { gems: -award.gems } }),
+        GemsTransaction.create({
+          userId: award.userId,
+          blogId: blog._id, blogTitle: blog.title, blogSlug: blog.slug,
+          type: "DEDUCT", role: "REVIEWER", amount: award.gems,
+          awardedBy: adminId || blog.gems.awardedBy,
+        }),
+      );
+    }
+  }
+  await Promise.all(ops);
+  blog.gems = {
+    authorGems: 0, reviewerGems: 0, reviewerUserId: null,
+    reviewerAwards: [], awarded: false, awardedAt: null, awardedBy: null,
+  };
+}
+
+// ─── Gems award ───────────────────────────────────────────────────────────────
+exports.awardGems = async (req, res) => {
+  const { blogId } = req.params;
+  // reviewerAwards: [{ userId, gems }] — one entry per reviewer
+  const { authorGems, reviewerAwards } = req.body;
+  const adminId = req.query.userId;
+  try {
+    const blog = await Blog.findById(blogId).populate("authorDetails", "email fullName userName");
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    if (!["PUBLISHED", "ADMIN_PUBLISHED"].includes(blog.status))
+      return res.status(400).json({ error: "Gems can only be awarded to published blogs" });
+    if (blog.gems && blog.gems.awarded)
+      return res.status(409).json({ error: "Gems already awarded for this blog" });
+
+    const aGems = Math.max(0, parseInt(authorGems) || 0);
+    const validReviewerAwards = (Array.isArray(reviewerAwards) ? reviewerAwards : [])
+      .map((a) => ({ userId: a.userId, gems: Math.max(0, parseInt(a.gems) || 0) }))
+      .filter((a) => a.userId && a.gems > 0);
+
+    const ops = [];
+
+    if (aGems > 0 && blog.authorDetails) {
+      ops.push(
+        User.findByIdAndUpdate(blog.authorDetails._id, { $inc: { gems: aGems } }),
+        GemsTransaction.create({
+          userId: blog.authorDetails._id,
+          blogId: blog._id, blogTitle: blog.title, blogSlug: blog.slug,
+          type: "AWARD", role: "AUTHOR", amount: aGems, awardedBy: adminId,
+        }),
+      );
+    }
+    for (const award of validReviewerAwards) {
+      ops.push(
+        User.findByIdAndUpdate(award.userId, { $inc: { gems: award.gems } }),
+        GemsTransaction.create({
+          userId: award.userId,
+          blogId: blog._id, blogTitle: blog.title, blogSlug: blog.slug,
+          type: "AWARD", role: "REVIEWER", amount: award.gems, awardedBy: adminId,
+        }),
+      );
+    }
+    await Promise.all(ops);
+
+    const totalReviewerGems = validReviewerAwards.reduce((s, a) => s + a.gems, 0);
+    blog.gems = {
+      authorGems: aGems,
+      reviewerGems: totalReviewerGems,
+      reviewerUserId: validReviewerAwards[0]?.userId || null,
+      reviewerAwards: validReviewerAwards,
+      awarded: true,
+      awardedAt: new Date(new Date().getTime() + IST_OFFSET * 60000),
+      awardedBy: adminId,
+    };
+    await blog.save();
+
+    // Send email to author
+    if (aGems > 0 && blog.authorDetails && blog.authorDetails.email) {
+      sendEmail(
+        blog.authorDetails.email,
+        `You earned ${aGems} gems on BloggerSpace!`,
+        `<div class="content"><h2>Congratulations, ${blog.authorDetails.fullName || blog.authorDetails.userName}!</h2><p>Admin has awarded you <b>${aGems} gems</b> for your published blog: <b>${blog.title}</b>.</p><p>Keep writing quality content to earn more!</p></div>`
+      ).catch(() => {});
+    }
+    // Send email to each reviewer
+    for (const award of validReviewerAwards) {
+      User.findById(award.userId).then((reviewer) => {
+        if (reviewer && reviewer.email) {
+          sendEmail(
+            reviewer.email,
+            `You earned ${award.gems} gems on BloggerSpace!`,
+            `<div class="content"><h2>Well done, ${reviewer.fullName || reviewer.userName}!</h2><p>Admin has awarded you <b>${award.gems} gems</b> for reviewing the blog: <b>${blog.title}</b>.</p></div>`
+          ).catch(() => {});
+        }
+      });
+    }
+
+    res.json({ message: "Gems awarded successfully", gems: blog.gems });
+  } catch (error) {
+    console.error("Error awarding gems:", error);
+    res.status(500).json({ error: "Failed to award gems" });
+  }
+};
+
+exports.getGemsTransactions = async (req, res) => {
+  try {
+    const page  = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    const skip  = (page - 1) * limit;
+    const filterUserId = req.query.filterUserId || null;
+    const filter = filterUserId ? { userId: new mongoose.Types.ObjectId(filterUserId) } : {};
+    const [transactions, total] = await Promise.all([
+      GemsTransaction.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit)
+        .populate("userId", "fullName userName email").lean(),
+      GemsTransaction.countDocuments(filter),
+    ]);
+    res.json({ transactions, total, page, pages: Math.ceil(total / limit) });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch transactions" });
+  }
+};
+
+// ─── Community comment deletion ───────────────────────────────────────────────
+exports.deleteCommentFromPost = async (req, res) => {
+  const { postId, commentId } = req.params;
+  try {
+    const post = await Community.findById(postId);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+    const before = post.communityPostComments.length;
+    post.communityPostComments = post.communityPostComments.filter(
+      (c) => c._id.toString() !== commentId
+    );
+    if (post.communityPostComments.length === before)
+      return res.status(404).json({ error: "Comment not found" });
+    await post.save();
+    res.json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    res.status(500).json({ error: "Failed to delete comment" });
+  }
+};
+
+// ─── User content view ────────────────────────────────────────────────────────
+exports.getUserContent = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const [user, blogs, communityPosts] = await Promise.all([
+      User.findById(userId).select("fullName userName email profilePicture gems createdAt role isVerified reviewedBlogs").lean(),
+      Blog.find({ authorDetails: userId })
+        .select("title slug status category createdAt lastUpdatedAt gems")
+        .sort({ createdAt: -1 }).lean(),
+      Community.find({ communityPostAuthor: userId })
+        .select("communityPostId communityPostSlug communityPostTopic communityPostCategory createdAt")
+        .sort({ createdAt: -1 }).lean(),
+    ]);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Attach gems earned per reviewed blog
+    const rawReviewed = user.reviewedBlogs || [];
+    if (rawReviewed.length > 0) {
+      const blogObjectIds = rawReviewed
+        .filter((rb) => rb.BlogObjectId)
+        .map((rb) => rb.BlogObjectId);
+
+      const reviewedBlogDocs = blogObjectIds.length
+        ? await Blog.find({ _id: { $in: blogObjectIds } }).select("_id gems").lean()
+        : [];
+
+      const gemsMap = new Map(reviewedBlogDocs.map((b) => [b._id.toString(), b.gems]));
+
+      user.reviewedBlogs = rawReviewed.map((rb) => {
+        const gems = rb.BlogObjectId ? gemsMap.get(rb.BlogObjectId.toString()) : null;
+        let reviewerGems = 0;
+        if (gems?.awarded) {
+          if (gems.reviewerAwards?.length) {
+            const award = gems.reviewerAwards.find((a) => a.userId?.toString() === userId);
+            reviewerGems = award?.gems || 0;
+          } else if (gems.reviewerUserId?.toString() === userId) {
+            reviewerGems = gems.reviewerGems || 0;
+          }
+        }
+        return { ...rb, reviewerGems };
+      });
+    }
+
+    res.json({ user, blogs, communityPosts });
+  } catch (error) {
+    console.error("Error fetching user content:", error);
+    res.status(500).json({ error: "Failed to fetch user content" });
+  }
+};
+
+exports.adminForceDeleteBlog = async (req, res) => {
+  const { blogId } = req.params;
+  const id = blogId;
+  const adminId = req.query.userId;
+  try {
+    const blog = await Blog.findById(id);
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    await deductGemsForBlog(blog, adminId);
+    await Blog.findByIdAndDelete(id);
+    res.json({ message: "Blog deleted successfully" });
+  } catch (error) {
+    console.error("Error force-deleting blog:", error);
+    res.status(500).json({ error: "Failed to delete blog" });
+  }
+};
+
+// ─── Gems update (edit already-awarded gems) ─────────────────────────────────
+exports.updateGems = async (req, res) => {
+  const { blogId } = req.params;
+  const { authorGems, reviewerAwards } = req.body;
+  const adminId = req.query.userId;
+  try {
+    const blog = await Blog.findById(blogId).populate("authorDetails", "email fullName userName");
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    if (!blog.gems || !blog.gems.awarded)
+      return res.status(400).json({ error: "No gems awarded yet — use award first" });
+
+    const newAuthorGems = Math.max(0, parseInt(authorGems) || 0);
+    const newReviewerAwards = (Array.isArray(reviewerAwards) ? reviewerAwards : [])
+      .map((a) => ({ userId: a.userId?.toString(), gems: Math.max(0, parseInt(a.gems) || 0) }))
+      .filter((a) => a.userId);
+
+    const ops = [];
+
+    // Author diff
+    const authorDiff = newAuthorGems - (blog.gems.authorGems || 0);
+    if (authorDiff !== 0 && blog.authorDetails) {
+      ops.push(
+        User.findByIdAndUpdate(blog.authorDetails._id, { $inc: { gems: authorDiff } }),
+        GemsTransaction.create({
+          userId: blog.authorDetails._id,
+          blogId: blog._id, blogTitle: blog.title, blogSlug: blog.slug,
+          type: authorDiff > 0 ? "AWARD" : "DEDUCT",
+          role: "AUTHOR", amount: Math.abs(authorDiff), awardedBy: adminId,
+        }),
+      );
+    }
+
+    // Build old reviewer awards map
+    const oldAwards = blog.gems.reviewerAwards?.length
+      ? blog.gems.reviewerAwards
+      : blog.gems.reviewerUserId && blog.gems.reviewerGems > 0
+        ? [{ userId: blog.gems.reviewerUserId.toString(), gems: blog.gems.reviewerGems }]
+        : [];
+    const oldMap = new Map(oldAwards.map((a) => [a.userId.toString(), a.gems]));
+    const newMap = new Map(newReviewerAwards.map((a) => [a.userId, a.gems]));
+    const allIds = new Set([...oldMap.keys(), ...newMap.keys()]);
+
+    for (const uid of allIds) {
+      const diff = (newMap.get(uid) ?? 0) - (oldMap.get(uid) ?? 0);
+      if (diff !== 0) {
+        ops.push(
+          User.findByIdAndUpdate(uid, { $inc: { gems: diff } }),
+          GemsTransaction.create({
+            userId: uid,
+            blogId: blog._id, blogTitle: blog.title, blogSlug: blog.slug,
+            type: diff > 0 ? "AWARD" : "DEDUCT",
+            role: "REVIEWER", amount: Math.abs(diff), awardedBy: adminId,
+          }),
+        );
+      }
+    }
+
+    await Promise.all(ops);
+
+    const totalReviewerGems = newReviewerAwards.reduce((s, a) => s + a.gems, 0);
+    blog.gems.authorGems = newAuthorGems;
+    blog.gems.reviewerGems = totalReviewerGems;
+    blog.gems.reviewerAwards = newReviewerAwards;
+    blog.gems.reviewerUserId = newReviewerAwards[0]?.userId || blog.gems.reviewerUserId || null;
+    blog.gems.awardedBy = adminId;
+    blog.markModified("gems");
+    await blog.save();
+
+    res.json({ message: "Gems updated successfully", gems: blog.gems });
+  } catch (error) {
+    console.error("Error updating gems:", error);
+    res.status(500).json({ error: "Failed to update gems" });
+  }
+};
+
+// ─── Community post comments (admin view) ────────────────────────────────────
+exports.getPostComments = async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const post = await Community.findById(postId)
+      .populate("communityPostComments.replyCommunityPostAuthor", "fullName email userName")
+      .lean();
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    const comments = post.communityPostComments.map((c) => {
+      let content = c.replyCommunityPostContent ?? "";
+      try {
+        const buf = Buffer.from(content, "base64");
+        content = pako.inflate(buf, { to: "string" });
+      } catch {}
+      return {
+        _id: c._id,
+        content,
+        author: c.replyCommunityPostAuthor,
+        likes: c.replyCommunityPostLikes?.length ?? 0,
+        createdAt: c.createdAt,
+        repliesCount: c.replyCommunityPostComments?.length ?? 0,
+      };
+    });
+
+    res.json({ postId, total: comments.length, comments });
+  } catch (error) {
+    console.error("Error fetching post comments:", error);
+    res.status(500).json({ error: "Failed to fetch comments" });
+  }
+};
+

@@ -41,7 +41,8 @@ export const userMenuNav: NavItem[] = [
 /** Reviewer dropdown items */
 export const reviewerMenuNav: NavItem[] = [
   { title: "Dashboard", href: "/reviewer/dashboard", icon: LayoutDashboard },
-  { title: "My Profile", href: "/reviewer/profile", icon: UserIcon },
+  { title: "My Profile", href: "/myprofile", icon: UserIcon },
+  { title: "My Blogs", href: "/myblogs", icon: BookOpen },
   { title: "Settings", href: "/reviewer/settings", icon: Settings },
   { title: "Change Password", href: "/reviewer/changepassword", icon: Lock },
 ];

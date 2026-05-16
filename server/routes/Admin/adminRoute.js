@@ -23,6 +23,7 @@ const {
   deleteUserAccount,
   getCommunityPosts,
   deleteCommunityPost,
+  deleteCommentFromPost,
   adminNewBlog,
   adminSaveAsDraftBlog,
   adminDraftBlogs,
@@ -32,6 +33,7 @@ const {
   adminBlogEdit,
   adminSaveEditedBlog,
   sendNewsletter,
+  getNewsletterHistory,
   updateSitemapXML,
   downloadExcelReport,
   downloadPDFReport,
@@ -46,6 +48,12 @@ const {
   addBlogToAdminSaved,
   removeBlogFromAdminSaved,
   getAdminSavedBlogs,
+  awardGems,
+  updateGems,
+  getGemsTransactions,
+  getUserContent,
+  adminForceDeleteBlog,
+  getPostComments,
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -110,6 +118,7 @@ router.get("/blogs/editblog/:id", adminMiddleware,adminBlogEdit);
 router.put("/blogs/editblog/save/:id", adminMiddleware,adminSaveEditedBlog);
 
 router.post("/newsletter/send", adminMiddleware, sendNewsletter);
+router.get("/newsletter/history", adminMiddleware, getNewsletterHistory);
 
 router.get("/updatesitemapxml", adminMiddleware, updateSitemapXML);
 
@@ -129,5 +138,18 @@ router.post("/profile/uploadpicture", adminMiddleware, adminUploadProfilePicture
 router.get("/savedblogs", adminMiddleware, getAdminSavedBlogs);
 router.patch("/savedblogs/add", adminMiddleware, addBlogToAdminSaved);
 router.delete("/savedblogs/remove/:blogSlug", adminMiddleware, removeBlogFromAdminSaved);
+
+// Community comment management
+router.get("/community/:postId/comments", adminMiddleware, getPostComments);
+router.delete("/community/:postId/comment/:commentId", adminMiddleware, deleteCommentFromPost);
+
+// Gems
+router.post("/gems/award/:blogId", adminMiddleware, awardGems);
+router.patch("/gems/update/:blogId", adminMiddleware, updateGems);
+router.get("/gems/transactions", adminMiddleware, getGemsTransactions);
+
+// User content (team management profile view)
+router.get("/users/:userId/content", adminMiddleware, getUserContent);
+router.delete("/users/:userId/blog/:blogId", adminMiddleware, adminForceDeleteBlog);
 
 module.exports = router;

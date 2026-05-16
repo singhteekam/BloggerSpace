@@ -95,3 +95,52 @@
 [2026-05-16T01:54:20.148Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
 [2026-05-16T01:54:20.148Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
 [2026-05-16T01:54:20.149Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2026-05-16T02:03:52.689Z] [LOG] [DEBUG] - Searching for blog: 2-c-programming-practice-questions-operators-ifelse-loops-switchcase
+[2026-05-16T02:03:52.816Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
+[2026-05-16T02:03:52.816Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
+[2026-05-16T02:03:52.816Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2026-05-16T18:38:16.412Z] [LOG] [DEBUG] - Topic is available: test
+[2026-05-16T18:38:29.839Z] [LOG] [DEBUG] - New Blog saved as draft. Title: test
+[2026-05-16T18:52:13.666Z] [LOG] [DEBUG] - Searching for blog: fewfw
+[2026-05-16T18:52:13.692Z] [LOG] [INFO] - Blog: fewfw fetched. Content size is: 0.02734375 KB
+[2026-05-16T18:52:13.692Z] [LOG] [INFO] - Blog: fewfw fetched. Content size is: 0.02734375 KB
+[2026-05-16T18:52:13.693Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2026-05-16T22:52:13.343Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T22:52:13.343Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T22:52:13.343Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T22:52:33.908Z] [LOG] [DEBUG] - Topic is available: This is testing 
+[2026-05-16T22:52:34.657Z] [LOG] [DEBUG] - Topic is available: This is testing 1
+[2026-05-16T22:52:35.650Z] [LOG] [DEBUG] - Topic is available: This is testing 160
+[2026-05-16T22:52:36.511Z] [LOG] [DEBUG] - Topic is available: This is testing 1605
+[2026-05-16T22:52:39.124Z] [LOG] [DEBUG] - Topic is available: This is testing 1605 2026
+[2026-05-16T22:52:47.998Z] [LOG] [DEBUG] - New blog created in Pending status. Title: This is testing 1605 2026
+[2026-05-16T22:52:50.791Z] [LOG] [DEBUG] - Email sent to writer:250 2.0.0 OK  1778952171 d9443c01a7336-2bd5cfe49a4sm87850165ad.38 - gsmtp
+[2026-05-16T22:53:32.171Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T22:53:32.171Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T22:53:32.171Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T22:55:50.185Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T22:55:50.185Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T22:55:50.185Z] [LOG] [ERROR] - The password is invalid.
+[2026-05-16T23:46:23.222Z] [LOG] [DEBUG] - Searching for blog: 172-redux-vs-redux-toolkit
+[2026-05-16T23:46:23.435Z] [LOG] [INFO] - Blog: #172 Redux vs Redux Toolkit fetched. Content size is: 1.19140625 KB
+[2026-05-16T23:46:23.435Z] [LOG] [INFO] - Blog: #172 Redux vs Redux Toolkit fetched. Content size is: 1.19140625 KB
+[2026-05-16T23:46:23.436Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2026-05-16T23:46:23.587Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-16T23:46:23.587Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-17T00:53:39.988Z] [LOG] [DEBUG] - Searching for blog: this-is-testing-1605-2026
+[2026-05-17T00:53:40.029Z] [LOG] [INFO] - Blog: This is testing 1605 2026 fetched. Content size is: 0.0390625 KB
+[2026-05-17T00:53:40.029Z] [LOG] [INFO] - Blog: This is testing 1605 2026 fetched. Content size is: 0.0390625 KB
+[2026-05-17T00:53:40.029Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
+[2026-05-17T00:53:40.794Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-17T00:53:40.794Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-17T00:55:36.026Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: T S
+[2026-05-17T00:57:11.022Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2026-05-17T00:59:58.978Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2026-05-17T01:01:38.135Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2026-05-17T01:02:00.153Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T01:04:20.520Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: T S
+[2026-05-17T01:08:39.700Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T01:11:27.679Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-17T01:11:27.679Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-17T01:11:54.926Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T01:14:21.927Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh

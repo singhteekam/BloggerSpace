@@ -17,22 +17,28 @@ exports.getCommunityPostsForSitemap = async (req, res) => {
 
 exports.getAllCommunityPosts = async (req, res) => {
   try {
-    const posts = await Community.find({})
-      .sort({ createdAt: -1 })
-      .populate("communityPostAuthor") // Populate the author field with the User document
-      .exec();
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(Math.max(1, parseInt(req.query.limit) || 20), 50);
+    const skip  = (page - 1) * limit;
 
-    // console.log(typeof posts[1].communityPostContent);
+    const [posts, total] = await Promise.all([
+      Community.find({})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        // Exclude compressed fields — content is not shown in the listing
+        .select({ communityPostContent: 0, "communityPostComments.replyCommunityPostContent": 0 })
+        .populate("communityPostAuthor", "userName fullName profilePicture")
+        .lean(),
+      Community.countDocuments({}),
+    ]);
 
-    for (let i = 0; i < posts.length; i++) {
-      const compressedContentBuffer = Buffer.from(posts[i].communityPostContent, "base64");
-      const decompressedContent = pako.inflate(compressedContentBuffer, {
-        to: "string",
-      });
-      posts[i].communityPostContent= decompressedContent
-    }
-    
-    res.json(posts);
+    res.json({
+      posts,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+    });
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: "Server error" });

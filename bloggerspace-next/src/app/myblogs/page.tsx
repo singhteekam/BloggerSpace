@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Eye, Pencil, Trash2, Loader2, FileText, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Pencil, Trash2, Loader2, FileText, Search, X, ChevronLeft, ChevronRight, Gem } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { myBlogsApi } from "@/lib/api/user";
+import { RefreshButton } from "@/components/ui/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -36,6 +38,7 @@ const TABS = [
 
 export default function MyBlogsPage() {
   const { user, isLoading: authLoading } = useRequireAuth();
+  const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<string>("published");
 
   if (authLoading) return <PageSkeleton />;
@@ -45,12 +48,15 @@ export default function MyBlogsPage() {
     <main className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="font-serif text-3xl font-semibold tracking-tight">My blogs</h1>
-        <Button asChild size="sm">
-          <Link href="/newblog">
-            <Pencil className="size-3.5" />
-            Write new
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <RefreshButton onRefresh={() => qc.invalidateQueries({ queryKey: ["myblogs"] })} />
+          <Button asChild size="sm">
+            <Link href="/newblog">
+              <Pencil className="size-3.5" />
+              Write new
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -191,12 +197,17 @@ function BlogTab({
                   className="flex items-start justify-between gap-4 rounded-xl border border-border bg-card p-4"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex items-center gap-2">
+                    <div className="mb-1 flex items-center gap-2 flex-wrap">
                       <Badge variant={badge.variant} className="text-xs">
                         {badge.label}
                       </Badge>
                       {blog.category && (
                         <span className="text-xs text-muted-foreground">{blog.category}</span>
+                      )}
+                      {blog.gems?.awarded && (blog.gems.authorGems ?? 0) > 0 && (
+                        <span className="flex items-center gap-0.5 text-xs font-medium text-primary">
+                          <Gem className="size-3" />{blog.gems.authorGems} gems
+                        </span>
                       )}
                     </div>
                     <p className="font-medium text-foreground line-clamp-1">{blog.title}</p>
@@ -224,19 +235,11 @@ function BlogTab({
                       </Button>
                     )}
                     {showDiscard && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive"
-                        disabled={discard.isPending}
-                        onClick={() => discard.mutate({ blogId: blog._id, slug: blog.slug })}
-                      >
-                        {discard.isPending ? (
-                          <Loader2 className="size-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="size-3.5" />
-                        )}
-                      </Button>
+                      <DiscardConfirmButton
+                        title={blog.title}
+                        isPending={discard.isPending}
+                        onConfirm={() => discard.mutate({ blogId: blog._id, slug: blog.slug })}
+                      />
                     )}
                   </div>
                 </div>
@@ -269,6 +272,44 @@ function BlogTab({
         </>
       )}
     </div>
+  );
+}
+
+function DiscardConfirmButton({
+  title, isPending, onConfirm,
+}: { title: string; isPending: boolean; onConfirm: () => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger asChild>
+        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" disabled={isPending}>
+          {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-6 shadow-xl">
+          <Dialog.Title className="font-serif text-lg font-semibold">Discard blog?</Dialog.Title>
+          <Dialog.Description className="mt-2 text-sm text-muted-foreground line-clamp-3">
+            &ldquo;{title}&rdquo; will be discarded. This action is difficult to undo.
+          </Dialog.Description>
+          <div className="mt-5 flex justify-end gap-2">
+            <Dialog.Close asChild>
+              <Button variant="outline" size="sm">Cancel</Button>
+            </Dialog.Close>
+            <Button
+              variant="destructive" size="sm"
+              disabled={isPending}
+              onClick={() => { onConfirm(); setOpen(false); }}
+              className="gap-1.5"
+            >
+              {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+              Discard
+            </Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 

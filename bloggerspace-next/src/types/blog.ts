@@ -59,6 +59,13 @@ export type Blog = {
   lastUpdatedAt: string;
   feedbackToAuthor?: ReviewFeedback[];
   reviewedBy?: ReviewRecord[];
+  gems?: {
+    awarded: boolean;
+    authorGems: number;
+    reviewerGems?: number;
+    reviewerUserId?: string;
+    reviewerAwards?: { userId: string; gems: number }[];
+  };
 };
 
 export type BlogListResponse = {

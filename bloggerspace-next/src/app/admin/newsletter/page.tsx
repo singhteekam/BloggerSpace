@@ -4,16 +4,18 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { Mail, Search, CheckSquare, Square, Loader2, Send, Users } from "lucide-react";
+import { Mail, Search, CheckSquare, Square, Loader2, Send, Users, History } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
-import { adminApi, type UserItem } from "@/lib/api/admin";
+import { adminApi, type UserItem, type NewsletterRecord } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
+import { formatDate } from "@/lib/utils/html";
 
 export default function AdminNewsletterPage() {
   const { user, isLoading: authLoading } = useRequireAdmin();
@@ -23,6 +25,30 @@ export default function AdminNewsletterPage() {
 }
 
 function NewsletterComposer({ adminId }: { adminId: string }) {
+  return (
+    <main className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mb-8 flex items-center gap-3">
+        <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Mail className="size-5" />
+        </div>
+        <div>
+          <h1 className="font-serif text-2xl font-semibold tracking-tight">Newsletter</h1>
+          <p className="text-sm text-muted-foreground">Compose and send an email to selected users.</p>
+        </div>
+      </div>
+      <Tabs defaultValue="compose">
+        <TabsList className="mb-6">
+          <TabsTrigger value="compose"><Mail className="size-3.5 mr-1.5" />Compose</TabsTrigger>
+          <TabsTrigger value="history"><History className="size-3.5 mr-1.5" />History</TabsTrigger>
+        </TabsList>
+        <TabsContent value="compose"><ComposeTab adminId={adminId} /></TabsContent>
+        <TabsContent value="history"><HistoryTab adminId={adminId} /></TabsContent>
+      </Tabs>
+    </main>
+  );
+}
+
+function ComposeTab({ adminId }: { adminId: string }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [subject, setSubject] = useState("");
@@ -97,19 +123,6 @@ function NewsletterComposer({ adminId }: { adminId: string }) {
   const canSend = selected.size > 0 && subject.trim() && message.trim();
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Mail className="size-5" />
-        </div>
-        <div>
-          <h1 className="font-serif text-2xl font-semibold tracking-tight">Newsletter</h1>
-          <p className="text-sm text-muted-foreground">
-            Compose and send an email to selected users.
-          </p>
-        </div>
-      </div>
-
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Left — recipient selector */}
         <div className="space-y-4">
@@ -227,7 +240,62 @@ function NewsletterComposer({ adminId }: { adminId: string }) {
           </div>
         </div>
       </div>
-    </main>
+  );
+}
+
+function HistoryTab({ adminId }: { adminId: string }) {
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useQuery({
+    queryKey: ["newsletter-history", adminId, page],
+    queryFn: () => adminApi.getNewsletterHistory(adminId, page).then((r) => r.data),
+  });
+
+  const newsletters = data?.newsletters ?? [];
+  const totalPages = data?.pages ?? 1;
+
+  if (isLoading) return (
+    <div className="space-y-3">
+      {[0,1,2,3].map((i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
+    </div>
+  );
+
+  if (newsletters.length === 0) return (
+    <div className="flex flex-col items-center gap-3 py-20 text-center text-muted-foreground">
+      <History className="size-8" />
+      <p className="text-sm">No newsletters sent yet.</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">{data?.total ?? 0} newsletters sent</p>
+      <div className="divide-y divide-border rounded-xl border">
+        {newsletters.map((n) => (
+          <div key={n._id} className="px-4 py-3 space-y-1">
+            <div className="flex items-start justify-between gap-4">
+              <p className="font-medium text-sm">{n.subject}</p>
+              <Badge variant="secondary" className="shrink-0 text-xs">
+                {n.recipientCount} recipient{n.recipientCount !== 1 ? "s" : ""}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">{formatDate(n.sentAt)}</p>
+            {n.recipients.length > 0 && (
+              <p className="text-xs text-muted-foreground truncate">
+                To: {n.recipients.slice(0, 3).map((r) => r.email).join(", ")}
+                {n.recipients.length > 3 && ` +${n.recipients.length - 3} more`}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Prev</Button>
+          <span className="text-xs text-muted-foreground">{page} / {totalPages}</span>
+          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</Button>
+        </div>
+      )}
+    </div>
   );
 }
 

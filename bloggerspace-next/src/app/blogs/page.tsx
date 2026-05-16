@@ -8,9 +8,7 @@ import { Pagination } from "@/components/blog/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   fetchBlogs,
-  fetchBlogsByCategory,
-  fetchBlogsByTag,
-  searchBlogs,
+  fetchFilteredBlogs,
   fetchDistinctCategories,
   fetchDistinctTags,
 } from "@/lib/api/blogs";
@@ -28,32 +26,18 @@ export default async function BlogsPage({ searchParams }: Props) {
   const { page: pageStr, category, tag, q } = await searchParams;
   const page = Math.max(1, Number(pageStr ?? 1));
 
-  let blogs: import("@/types/blog").Blog[] = [];
-  let totalPages = 0;
-
-  const [categoriesResult, tagsResult] = await Promise.allSettled([
+  const [categoriesResult, tagsResult, blogsResult] = await Promise.allSettled([
     fetchDistinctCategories(),
     fetchDistinctTags(),
+    q?.trim() || tag || category
+      ? fetchFilteredBlogs({ search: q?.trim(), tag, category, page })
+      : fetchBlogs(page),
   ]);
+
   const categories = categoriesResult.status === "fulfilled" ? categoriesResult.value : [];
   const tags = tagsResult.status === "fulfilled" ? tagsResult.value : [];
-
-  if (q?.trim()) {
-    blogs = await searchBlogs(q.trim());
-    totalPages = 1;
-  } else if (tag) {
-    const data = await fetchBlogsByTag(tag, page);
-    blogs = data.blogs;
-    totalPages = data.pages;
-  } else if (category) {
-    const data = await fetchBlogsByCategory(category, page);
-    blogs = data.blogs;
-    totalPages = data.pages;
-  } else {
-    const data = await fetchBlogs(page);
-    blogs = data.blogs;
-    totalPages = data.pages;
-  }
+  const blogsData = blogsResult.status === "fulfilled" ? blogsResult.value : { blogs: [], total: 0, page, pages: 0 };
+  const { blogs, total, pages: totalPages } = blogsData;
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
@@ -78,13 +62,17 @@ export default async function BlogsPage({ searchParams }: Props) {
       </div>
 
       {/* Active filter banner */}
-      {q && blogs.length > 0 && (
+      {q && (total > 0 || blogs.length > 0) && (
         <div className="mb-5 flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3">
           <Search className="size-4 shrink-0 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{blogs.length}</span>{" "}
-            result{blogs.length !== 1 ? "s" : ""} for{" "}
+            <span className="font-medium text-foreground">{total}</span>{" "}
+            result{total !== 1 ? "s" : ""} for{" "}
             <span className="font-medium text-foreground">&ldquo;{q}&rdquo;</span>
+            {totalPages > 1 && (
+              <> &mdash; page <span className="font-medium text-foreground">{page}</span> of{" "}
+              <span className="font-medium text-foreground">{totalPages}</span></>
+            )}
           </p>
         </div>
       )}
@@ -118,7 +106,7 @@ export default async function BlogsPage({ searchParams }: Props) {
             ))}
           </div>
 
-          {!q && (
+          {totalPages > 1 && (
             <div className="mt-10">
               <Suspense>
                 <Pagination page={page} totalPages={totalPages} />

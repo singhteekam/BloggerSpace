@@ -23,6 +23,8 @@ export type AdminBlog = {
     email: string;
     userName: string;
   };
+  reviewedBy?: { reviewerId: string; reviewerName?: string }[];
+  gems?: GemsInfo;
 };
 
 export type AdminBlogDetail = AdminBlog & { content: string };
@@ -39,6 +41,7 @@ export type ReviewerItem = {
   profilePicture?: string;
   createdAt: string;
   reviewedBlogs: unknown[];
+  gems?: number;
 };
 
 export type UserItem = {
@@ -50,6 +53,7 @@ export type UserItem = {
   isVerified?: boolean;
   role?: string;
   createdAt: string;
+  gems?: number;
 };
 
 export type CommunityPost = {
@@ -58,7 +62,7 @@ export type CommunityPost = {
   communityPostSlug: string;
   communityPostTopic: string;
   communityPostCategory: string;
-  communityPostAuthor: { fullName: string; email: string };
+  communityPostAuthor: { _id?: string; fullName: string; email: string };
   createdAt: string;
 };
 
@@ -257,4 +261,123 @@ export const adminApi = {
 
   getAdminSavedSlugs: (userId: string) =>
     api.get<{ slug: string }[]>("/api/admin/savedblogs", { params: p(userId) }),
+
+  // ── Newsletter history ────────────────────────────────────────────────────
+  getNewsletterHistory: (userId: string, page = 1) =>
+    api.get<{ newsletters: NewsletterRecord[]; total: number; page: number; pages: number }>(
+      "/api/admin/newsletter/history",
+      { params: { ...p(userId), page, limit: 20 } },
+    ),
+
+  // ── Community comments ────────────────────────────────────────────────────
+  getPostComments: (postId: string, userId: string) =>
+    api.get<{ postId: string; total: number; comments: PostComment[] }>(
+      `/api/admin/community/${postId}/comments`,
+      { params: p(userId) },
+    ),
+
+  deleteComment: (postId: string, commentId: string, userId: string) =>
+    api.delete<{ message: string }>(`/api/admin/community/${postId}/comment/${commentId}`, { params: p(userId) }),
+
+  // ── Gems ──────────────────────────────────────────────────────────────────
+  awardGems: (
+    userId: string,
+    blogId: string,
+    payload: { authorGems: number; reviewerAwards: { userId: string; gems: number }[] },
+  ) =>
+    api.post<{ message: string; gems: GemsInfo }>(`/api/admin/gems/award/${blogId}`, payload, { params: p(userId) }),
+
+  updateGems: (
+    userId: string,
+    blogId: string,
+    payload: { authorGems: number; reviewerAwards: { userId: string; gems: number }[] },
+  ) =>
+    api.patch<{ message: string; gems: GemsInfo }>(`/api/admin/gems/update/${blogId}`, payload, { params: p(userId) }),
+
+  getGemsTransactions: (userId: string, page = 1, filterUserId?: string) =>
+    api.get<{ transactions: GemsTransaction[]; total: number; page: number; pages: number }>(
+      "/api/admin/gems/transactions",
+      { params: { ...p(userId), page, limit: 20, ...(filterUserId ? { filterUserId } : {}) } },
+    ),
+
+  // ── User content (team management) ───────────────────────────────────────
+  getUserContent: (adminId: string, targetUserId: string) =>
+    api.get<UserContent>(`/api/admin/users/${targetUserId}/content`, { params: p(adminId) }),
+
+  forceDeleteBlog: (adminId: string, targetUserId: string, blogId: string) =>
+    api.delete<{ message: string }>(`/api/admin/users/${targetUserId}/blog/${blogId}`, { params: p(adminId) }),
+};
+
+// ── Extra types ───────────────────────────────────────────────────────────────
+
+export type NewsletterRecord = {
+  _id: string;
+  subject: string;
+  message: string;
+  recipients: { email: string; name: string }[];
+  recipientCount: number;
+  sentAt: string;
+};
+
+export type GemsInfo = {
+  authorGems: number;
+  reviewerGems: number;
+  reviewerUserId?: string;
+  reviewerAwards?: { userId: string; gems: number }[];
+  awarded: boolean;
+  awardedAt?: string;
+};
+
+export type GemsTransaction = {
+  _id: string;
+  userId: { _id: string; fullName: string; userName: string; email: string } | string;
+  blogId: string;
+  blogTitle: string;
+  blogSlug: string;
+  type: "AWARD" | "DEDUCT";
+  role: "AUTHOR" | "REVIEWER";
+  amount: number;
+  createdAt: string;
+};
+
+export type PostComment = {
+  _id: string;
+  content: string;
+  author: { _id: string; fullName: string; userName: string; email: string } | null;
+  likes: number;
+  createdAt: string;
+  repliesCount: number;
+};
+
+export type UserContent = {
+  user: {
+    _id: string;
+    fullName: string;
+    userName: string;
+    email: string;
+    profilePicture?: string;
+    gems: number;
+    createdAt: string;
+    role: string;
+    isVerified: boolean;
+    reviewedBlogs?: { BlogTitle: string; BlogSlug: string; BlogReviewedTime: string; reviewerGems?: number }[];
+  };
+  blogs: {
+    _id: string;
+    title: string;
+    slug: string;
+    status: string;
+    category: string;
+    createdAt: string;
+    lastUpdatedAt?: string;
+    gems?: GemsInfo;
+  }[];
+  communityPosts: {
+    _id: string;
+    communityPostId: string;
+    communityPostSlug: string;
+    communityPostTopic: string;
+    communityPostCategory?: string;
+    createdAt: string;
+  }[];
 };

@@ -6,7 +6,7 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { PenLine, Globe, FileText, Trash2, Loader2, Plus, Clock, Tag, FileMinus, Search, X } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi, type AdminBlog } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
@@ -102,12 +102,16 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
 
           {/* Drafts */}
           <TabsContent value="drafts">
-            <SectionHeader title="Drafts" desc="Admin-written blogs saved as draft — not yet published." />
+            <SectionHeader
+              title="Drafts" desc="Admin-written blogs saved as draft — not yet published."
+              count={fDrafts.length} total={drafts.length}
+            />
             {draftsLoading ? <TabSkeleton /> : fDrafts.length === 0 ? (
               <EmptyState icon={<FileText />} msg={q ? `No results for "${search}".` : "No drafts yet."} />
             ) : (
-              <div className="space-y-3">
-                {fDrafts.map((blog) => (
+              <InfiniteList
+                items={fDrafts}
+                renderItem={(blog) => (
                   <BlogCard key={blog._id} blog={blog}>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Button asChild size="sm" className="gap-1.5">
@@ -116,19 +120,23 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
                       <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
                     </div>
                   </BlogCard>
-                ))}
-              </div>
+                )}
+              />
             )}
           </TabsContent>
 
           {/* Published */}
           <TabsContent value="published">
-            <SectionHeader title="Published" desc="Admin-written blogs live on the site." />
+            <SectionHeader
+              title="Published" desc="Admin-written blogs live on the site."
+              count={fPublished.length} total={published.length}
+            />
             {publishedLoading ? <TabSkeleton /> : fPublished.length === 0 ? (
               <EmptyState icon={<Globe />} msg={q ? `No results for "${search}".` : "No published admin blogs."} />
             ) : (
-              <div className="space-y-3">
-                {fPublished.map((blog) => (
+              <InfiniteList
+                items={fPublished}
+                renderItem={(blog) => (
                   <BlogCard key={blog._id} blog={blog}>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Button asChild variant="outline" size="sm">
@@ -140,27 +148,31 @@ function AdminBlogsList({ adminId }: { adminId: string }) {
                       <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
                     </div>
                   </BlogCard>
-                ))}
-              </div>
+                )}
+              />
             )}
           </TabsContent>
 
           {/* Discarded */}
           <TabsContent value="discarded">
-            <SectionHeader title="Discarded" desc="Admin blogs removed from publication. Delete permanently to remove from DB." />
+            <SectionHeader
+              title="Discarded" desc="Admin blogs removed from publication. Delete permanently to remove from DB."
+              count={fDiscarded.length} total={discarded.length}
+            />
             {discardedLoading ? <TabSkeleton /> : fDiscarded.length === 0 ? (
               <EmptyState icon={<Trash2 />} msg={q ? `No results for "${search}".` : "No discarded blogs."} />
             ) : (
-              <div className="space-y-3">
-                {fDiscarded.map((blog) => (
+              <InfiniteList
+                items={fDiscarded}
+                renderItem={(blog) => (
                   <BlogCard key={blog._id} blog={blog}>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs text-destructive border-destructive/40">Discarded</Badge>
                       <DeletePermanentlyButton title={blog.title} isPending={deleteMutation.isPending} onConfirm={() => deleteMutation.mutate(blog._id)} />
                     </div>
                   </BlogCard>
-                ))}
-              </div>
+                )}
+              />
             )}
           </TabsContent>
         </Tabs>
@@ -188,11 +200,48 @@ function SearchInput({ search, setSearch, placeholder }: { search: string; setSe
   );
 }
 
-function SectionHeader({ title, desc }: { title: string; desc: string }) {
+function SectionHeader({ title, desc, count, total }: { title: string; desc: string; count?: number; total?: number }) {
   return (
     <div className="mb-4">
-      <h2 className="font-semibold text-foreground">{title}</h2>
+      <div className="flex items-center gap-2">
+        <h2 className="font-semibold text-foreground">{title}</h2>
+        {count !== undefined && (
+          <span className="text-sm text-muted-foreground">
+            ({count}{total !== undefined && total !== count ? `/${total}` : ""})
+          </span>
+        )}
+      </div>
       <p className="text-xs text-muted-foreground">{desc}</p>
+    </div>
+  );
+}
+
+const CHUNK = 20;
+
+function InfiniteList({ items, renderItem }: {
+  items: AdminBlog[];
+  renderItem: (item: AdminBlog) => React.ReactNode;
+}) {
+  const [visible, setVisible] = useState(CHUNK);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setVisible(CHUNK); }, [items]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible((v) => v + CHUNK); },
+      { rootMargin: "200px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [items.length]);
+
+  return (
+    <div className="space-y-3">
+      {items.slice(0, visible).map((item) => renderItem(item))}
+      {visible < items.length && <div ref={sentinelRef} className="h-1" />}
     </div>
   );
 }

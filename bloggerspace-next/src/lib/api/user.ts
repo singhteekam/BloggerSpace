@@ -100,6 +100,24 @@ export const userApi = {
     }),
 };
 
+export type UserGemsTransaction = {
+  _id: string;
+  blogTitle: string;
+  blogSlug: string;
+  type: "AWARD" | "DEDUCT";
+  role: "AUTHOR" | "REVIEWER";
+  amount: number;
+  createdAt: string;
+};
+
+export const userGemsApi = {
+  getHistory: (page = 1) =>
+    api.get<{ transactions: UserGemsTransaction[]; total: number; page: number; pages: number }>(
+      "/api/users/gems/history",
+      { params: { page, limit: 20 } },
+    ),
+};
+
 export const myBlogsApi = {
   getDrafts: (userId: string) =>
     api.get<import("@/types/blog").Blog[]>(`/api/blogs/myblogs/saveddraft?userId=${userId}`),
