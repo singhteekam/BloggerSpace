@@ -21,7 +21,18 @@ function createApiClient(): AxiosInstance {
 
   instance.interceptors.response.use(
     (response) => response,
-    (error: AxiosError) => Promise.reject(error),
+    (error: AxiosError) => {
+      // If we had a stored token but the server rejected it (401), the admin
+      // revoked access or the token expired. Clear auth and redirect to login.
+      if (error.response?.status === 401 && authStorage.getToken()) {
+        authStorage.clear();
+        if (typeof window !== "undefined") {
+          const isAdminPath = window.location.pathname.startsWith("/admin");
+          window.location.href = isAdminPath ? "/admin/login" : "/login";
+        }
+      }
+      return Promise.reject(error);
+    },
   );
 
   return instance;
