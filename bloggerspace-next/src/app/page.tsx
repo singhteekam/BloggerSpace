@@ -4,7 +4,7 @@ import Image from "next/image";
 import {
   ArrowRight, Sparkles, ShieldCheck, BookOpen, Users, Pencil,
   MessageSquare, Star, Mail, ExternalLink,
-  CheckCircle2, Globe, Code2, Briefcase, Camera,
+  CheckCircle2, Globe, Code2, Briefcase, Camera, Gem, Trophy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -146,6 +146,27 @@ const PROJECTS = [
   },
 ];
 
+const GEM_REWARDS = [
+  {
+    icon: Pencil,
+    title: "Write & get published",
+    body: "Submit a post for review. When it passes editorial review and goes live, gems are awarded to your profile.",
+    badge: "Author reward",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Review drafts",
+    body: "Reviewers earn gems for every blog they review and help bring to publish-ready quality — a real incentive to give great feedback.",
+    badge: "Reviewer reward",
+  },
+  {
+    icon: Trophy,
+    title: "Grow your reputation",
+    body: "Gems accumulate on your public profile and reflect your total contribution. The more quality work you do, the higher your standing.",
+    badge: "Reputation",
+  },
+];
+
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 
 export default async function Home() {
@@ -163,6 +184,7 @@ export default async function Home() {
       <StatsSection totalBlogs={totalBlogs} />
       <HowItWorksSection />
       <WhatYouCanDoSection />
+      <GemsSection />
       <TestimonialsSection />
       <TechStackSection />
       <DeveloperSection />
@@ -395,7 +417,66 @@ function WhatYouCanDoSection() {
   );
 }
 
-/* ─── 5. Testimonials ─────────────────────────────────────────────────────── */
+/* ─── 5. Gems ─────────────────────────────────────────────────────────────── */
+
+function GemsSection() {
+  return (
+    <section className="bg-muted/30 py-20">
+      <div className="mx-auto max-w-6xl px-6">
+        <ScrollReveal className="mb-12 text-center">
+          <Badge variant="secondary" className="mb-4 gap-1.5">
+            <Gem className="size-3.5 text-amber-500" />
+            Gems &amp; Rewards
+          </Badge>
+          <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+            Earn gems for every contribution
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-balance text-muted-foreground">
+            BloggerSpace rewards quality. Writers and reviewers earn gems that appear on their public profile — the more you contribute, the more you accumulate.
+          </p>
+        </ScrollReveal>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {GEM_REWARDS.map(({ icon: Icon, title, body, badge }, i) => (
+            <ScrollReveal key={title} delay={i * 0.1}>
+              <Spotlight className="h-full rounded-2xl">
+                <Card className="flex h-full flex-col gap-4 p-6 transition-colors hover:bg-card/80">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="inline-flex size-12 items-center justify-center rounded-xl bg-amber-500/10">
+                      <Icon className="size-6 text-amber-500" />
+                    </div>
+                    <Badge variant="outline" className="shrink-0 text-xs">{badge}</Badge>
+                  </div>
+                  <div>
+                    <h3 className="mb-2 font-serif text-xl font-semibold">{title}</h3>
+                    <p className="text-sm leading-7 text-muted-foreground">{body}</p>
+                  </div>
+                </Card>
+              </Spotlight>
+            </ScrollReveal>
+          ))}
+        </div>
+
+        <ScrollReveal className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Button asChild size="lg" className="group">
+            <Link href="/signup">
+              Start writing
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <Link href="/apply-reviewer">
+              <ShieldCheck className="size-4" />
+              Apply as reviewer
+            </Link>
+          </Button>
+        </ScrollReveal>
+      </div>
+    </section>
+  );
+}
+
+/* ─── 6. Testimonials (was 5) ────────────────────────────────────────────── */
 
 function TestimonialCard({ name, initials, image, review, href }: (typeof TESTIMONIALS)[number]) {
   return (

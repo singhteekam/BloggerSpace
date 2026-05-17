@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi } from "@/lib/api/admin";
+import { GemsDialog } from "@/components/admin/gems-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -141,8 +142,11 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
         <TabsContent value="blogs">
           <BlogsTabContent
             blogs={blogs}
+            adminId={adminId}
+            authorUser={{ fullName: user.fullName, email: user.email }}
             onDelete={(id) => deleteBlogMutation.mutate(id)}
             deleting={deleteBlogMutation.isPending}
+            onGemsAwarded={() => qc.invalidateQueries({ queryKey: ["admin-user-content", adminId, targetUserId] })}
           />
         </TabsContent>
 
@@ -156,7 +160,11 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
 
         {isReviewer && (
           <TabsContent value="reviewed">
-            <ReviewedTabContent entries={reviewedBlogs} />
+            <ReviewedTabContent
+              entries={reviewedBlogs}
+              adminId={adminId}
+              onGemsAwarded={() => qc.invalidateQueries({ queryKey: ["admin-user-content", adminId, targetUserId] })}
+            />
           </TabsContent>
         )}
       </Tabs>
@@ -169,12 +177,92 @@ type CommunityEntry = UserContent["communityPosts"][number];
 type ReviewedEntry = NonNullable<UserContent["user"]["reviewedBlogs"]>[number];
 
 function BlogsTabContent({
-  blogs, onDelete, deleting,
-}: { blogs: BlogEntry[]; onDelete: (id: string) => void; deleting: boolean }) {
+  blogs, adminId, authorUser, onDelete, deleting, onGemsAwarded,
+}: {
+  blogs: BlogEntry[];
+  adminId: string;
+  authorUser: { fullName: string; email: string };
+  onDelete: (id: string) => void;
+  deleting: boolean;
+  onGemsAwarded: () => void;
+}) {
   const { visibleItems, hasMore, sentinelRef } = useClientInfinite(blogs);
+
+  const [gemsOpen, setGemsOpen] = useState(false);
+  const [isEditingGems, setIsEditingGems] = useState(false);
+  const [selectedBlog, setSelectedBlog] = useState<BlogEntry | null>(null);
+  const [authorGems, setAuthorGems] = useState("10");
+  const [reviewerInputs, setReviewerInputs] = useState<Record<string, string>>({});
+  const [gemsLoading, setGemsLoading] = useState(false);
+
+  const openAwardGems = (blog: BlogEntry) => {
+    setSelectedBlog(blog);
+    setIsEditingGems(false);
+    setAuthorGems("10");
+    setReviewerInputs({});
+    setGemsOpen(true);
+  };
+
+  const openEditGems = (blog: BlogEntry) => {
+    setSelectedBlog(blog);
+    setIsEditingGems(true);
+    setAuthorGems(String(blog.gems?.authorGems ?? 0));
+    const existing: Record<string, string> = {};
+    if (blog.gems?.reviewerAwards?.length) {
+      blog.gems.reviewerAwards.forEach((a) => { existing[a.userId] = String(a.gems); });
+    } else if (blog.gems?.reviewerUserId && (blog.gems.reviewerGems ?? 0) > 0) {
+      existing[blog.gems.reviewerUserId] = String(blog.gems.reviewerGems);
+    }
+    setReviewerInputs(existing);
+    setGemsOpen(true);
+  };
+
+  const handleSubmitGems = async () => {
+    if (!selectedBlog) return;
+    setGemsLoading(true);
+    try {
+      const reviewerAwards = (selectedBlog.reviewedBy ?? [])
+        .map((r) => ({ userId: r.reviewerId, gems: parseInt(reviewerInputs[r.reviewerId] ?? "0") || 0 }))
+        .filter((r) => r.gems > 0);
+      const payload = { authorGems: parseInt(authorGems) || 0, reviewerAwards };
+      if (isEditingGems) {
+        await adminApi.updateGems(adminId, selectedBlog._id, payload);
+        toast.success("Gems updated!");
+      } else {
+        await adminApi.awardGems(adminId, selectedBlog._id, payload);
+        toast.success("Gems awarded!");
+      }
+      setGemsOpen(false);
+      onGemsAwarded();
+    } catch {
+      toast.error(isEditingGems ? "Failed to update gems." : "Failed to award gems.");
+    } finally {
+      setGemsLoading(false);
+    }
+  };
+
   if (blogs.length === 0) return <Empty icon={<BookOpen />} msg="No blogs found for this user." />;
+
+  const isPublished = (status: string) => status === "PUBLISHED" || status === "ADMIN_PUBLISHED";
+
   return (
     <div>
+      {selectedBlog && (
+        <GemsDialog
+          open={gemsOpen}
+          setOpen={setGemsOpen}
+          title={selectedBlog.title}
+          isEditing={isEditingGems}
+          authorDetails={authorUser}
+          authorGems={authorGems}
+          setAuthorGems={setAuthorGems}
+          allReviewers={selectedBlog.reviewedBy ?? []}
+          reviewerInputs={reviewerInputs}
+          setReviewerInputs={setReviewerInputs}
+          loading={gemsLoading}
+          onSubmit={handleSubmitGems}
+        />
+      )}
       <div className="divide-y divide-border rounded-xl border">
         {visibleItems.map((blog) => (
           <div key={blog._id} className="flex items-start justify-between gap-4 px-4 py-3">
@@ -188,8 +276,8 @@ function BlogsTabContent({
                   {blog.status.replace(/_/g, " ")}
                 </Badge>
                 {blog.gems?.awarded && (
-                  <span className="flex items-center gap-0.5 text-xs text-primary">
-                    <Gem className="size-3" />{blog.gems.authorGems}
+                  <span className="flex items-center gap-0.5 text-xs font-medium text-primary">
+                    <Gem className="size-3" />{blog.gems.authorGems} gems
                   </span>
                 )}
               </div>
@@ -197,12 +285,34 @@ function BlogsTabContent({
                 {blog.category} · {formatDate(blog.createdAt)}
               </p>
             </div>
-            <ConfirmDelete
-              label="Delete blog"
-              description={`Permanently delete "${blog.title}"? This action cannot be undone.`}
-              onConfirm={() => onDelete(blog._id)}
-              loading={deleting}
-            />
+            <div className="flex shrink-0 items-center gap-1">
+              {isPublished(blog.status) && !blog.gems?.awarded && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1 text-xs h-7"
+                  onClick={() => openAwardGems(blog)}
+                >
+                  <Gem className="size-3" />Award Gems
+                </Button>
+              )}
+              {isPublished(blog.status) && blog.gems?.awarded && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1 text-xs h-7 text-primary hover:text-primary"
+                  onClick={() => openEditGems(blog)}
+                >
+                  <Gem className="size-3" />Edit Gems
+                </Button>
+              )}
+              <ConfirmDelete
+                label="Delete blog"
+                description={`Permanently delete "${blog.title}"? This action cannot be undone.`}
+                onConfirm={() => onDelete(blog._id)}
+                loading={deleting}
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -253,18 +363,95 @@ function CommunityTabContent({
   );
 }
 
-function ReviewedTabContent({ entries }: { entries: ReviewedEntry[] }) {
+function ReviewedTabContent({
+  entries, adminId, onGemsAwarded,
+}: {
+  entries: ReviewedEntry[];
+  adminId: string;
+  onGemsAwarded: () => void;
+}) {
   const { visibleItems, hasMore, sentinelRef } = useClientInfinite(entries);
+
+  const [gemsOpen, setGemsOpen] = useState(false);
+  const [isEditingGems, setIsEditingGems] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<ReviewedEntry | null>(null);
+  const [authorGems, setAuthorGems] = useState("10");
+  const [reviewerInputs, setReviewerInputs] = useState<Record<string, string>>({});
+  const [gemsLoading, setGemsLoading] = useState(false);
+
+  const openAwardGems = (entry: ReviewedEntry) => {
+    setSelectedEntry(entry);
+    setIsEditingGems(false);
+    setAuthorGems("10");
+    setReviewerInputs({});
+    setGemsOpen(true);
+  };
+
+  const openEditGems = (entry: ReviewedEntry) => {
+    setSelectedEntry(entry);
+    setIsEditingGems(true);
+    setAuthorGems(String(entry.blogGems?.authorGems ?? 0));
+    const existing: Record<string, string> = {};
+    if (entry.blogGems?.reviewerAwards?.length) {
+      entry.blogGems.reviewerAwards.forEach((a) => { existing[a.userId] = String(a.gems); });
+    } else if (entry.blogGems?.reviewerUserId && (entry.blogGems.reviewerGems ?? 0) > 0) {
+      existing[entry.blogGems.reviewerUserId] = String(entry.blogGems.reviewerGems);
+    }
+    setReviewerInputs(existing);
+    setGemsOpen(true);
+  };
+
+  const handleSubmitGems = async () => {
+    if (!selectedEntry?.blogId) return;
+    setGemsLoading(true);
+    try {
+      const reviewerAwards = (selectedEntry.blogReviewedBy ?? [])
+        .map((r) => ({ userId: r.reviewerId, gems: parseInt(reviewerInputs[r.reviewerId] ?? "0") || 0 }))
+        .filter((r) => r.gems > 0);
+      const payload = { authorGems: parseInt(authorGems) || 0, reviewerAwards };
+      if (isEditingGems) {
+        await adminApi.updateGems(adminId, selectedEntry.blogId, payload);
+        toast.success("Gems updated!");
+      } else {
+        await adminApi.awardGems(adminId, selectedEntry.blogId, payload);
+        toast.success("Gems awarded!");
+      }
+      setGemsOpen(false);
+      onGemsAwarded();
+    } catch {
+      toast.error(isEditingGems ? "Failed to update gems." : "Failed to award gems.");
+    } finally {
+      setGemsLoading(false);
+    }
+  };
+
   if (entries.length === 0) return <Empty icon={<CheckCheck />} msg="No blogs reviewed yet." />;
+
   return (
     <div>
+      {selectedEntry && (
+        <GemsDialog
+          open={gemsOpen}
+          setOpen={setGemsOpen}
+          title={selectedEntry.BlogTitle}
+          isEditing={isEditingGems}
+          authorDetails={selectedEntry.blogAuthor ?? {}}
+          authorGems={authorGems}
+          setAuthorGems={setAuthorGems}
+          allReviewers={selectedEntry.blogReviewedBy ?? []}
+          reviewerInputs={reviewerInputs}
+          setReviewerInputs={setReviewerInputs}
+          loading={gemsLoading}
+          onSubmit={handleSubmitGems}
+        />
+      )}
       <div className="divide-y divide-border rounded-xl border">
         {visibleItems.map((entry, i) => (
           <div key={i} className="flex items-center justify-between gap-4 px-4 py-3">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-0.5">
                 <p className="font-medium text-sm line-clamp-1">{entry.BlogTitle}</p>
-                {entry.reviewerGems != null && entry.reviewerGems > 0 && (
+                {(entry.reviewerGems ?? 0) > 0 && (
                   <span className="flex items-center gap-0.5 text-xs font-medium text-primary">
                     <Gem className="size-3" />{entry.reviewerGems} gems
                   </span>
@@ -274,9 +461,31 @@ function ReviewedTabContent({ entries }: { entries: ReviewedEntry[] }) {
                 <Clock className="size-3" />Reviewed {formatDate(entry.BlogReviewedTime)}
               </p>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/blogs/${entry.BlogSlug}`} target="_blank">View</Link>
-            </Button>
+            <div className="flex shrink-0 items-center gap-1">
+              {entry.blogId && !entry.gemsAwarded && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1 text-xs h-7"
+                  onClick={() => openAwardGems(entry)}
+                >
+                  <Gem className="size-3" />Award Gems
+                </Button>
+              )}
+              {entry.blogId && entry.gemsAwarded && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1 text-xs h-7 text-primary hover:text-primary"
+                  onClick={() => openEditGems(entry)}
+                >
+                  <Gem className="size-3" />Edit Gems
+                </Button>
+              )}
+              <Button asChild variant="outline" size="sm" className="h-7 text-xs">
+                <Link href={`/blogs/${entry.BlogSlug}`} target="_blank">View</Link>
+              </Button>
+            </div>
           </div>
         ))}
       </div>

@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
-const Admin= require("../../models/Admin");
-const Reviewer= require("../../models/Reviewer");
-const User= require("../../models/User");
+const Admin = require("../../models/Admin");
+const User = require("../../models/User");
 const Community= require("../../models/Community");
 const migrateReviewersToUsers = require("../../utils/migrateReviewers");
 const jwt = require("jsonwebtoken");
@@ -49,59 +48,108 @@ exports.adminSignup = async (req, res) => {
 };
 
 
-exports.adminLogin=async (req, res) => {
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+const buildAdminDetails = (admin) => ({
+  _id: admin._id,
+  email: admin.email,
+  fullName: admin.fullName,
+  userName: admin.userName,
+  profilePicture: admin.profilePicture,
+  isVerified: admin.isVerified,
+  role: admin.role,
+  createdAt: admin.createdAt,
+});
+
+exports.adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if the user exists
     const admin = await Admin.findOne({ email });
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
-    }
-    if (!admin.isVerified) {
-      return res.status(404).json({ message: "Admin not verified" });
-    }
+    if (!admin) return res.status(404).json({ message: "Admin not found" });
+    if (!admin.isVerified) return res.status(403).json({ message: "Admin account not verified" });
 
-    // Compare the password
     const isPasswordValid = await bcrypt.compare(password, admin.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
+    if (!isPasswordValid) return res.status(401).json({ message: "Invalid password" });
 
-    // You can generate a JWT token here if you want to implement authentication
-    // Generate JWT token
-    // NEW- Added userId and role to JWT payload; kept currentuserId for backward compat
-    const token = jwt.sign(
-      { userId: admin._id, currentuserId: admin._id, role: "Admin" },
-      // OLD: { currentuserId: admin._id },
-      process.env.CURRENT_JWT_SECRET,
-      {
-        expiresIn: "3d", // Token expiration time
-      }
-    );
-    console.log(token);
-    const adminDetails = {
-      _id: admin._id,
-      email: admin.email,
-      fullName: admin.fullName,
-      userName: admin.userName,
-      profilePicture: admin.profilePicture,
-      isVerified: admin.isVerified,
-      role: admin.role,
-      createdAt: admin.createdAt,
-    };
+    // Credentials valid — send OTP instead of issuing JWT immediately
+    const otp = generateOtp();
+    admin.otpCode = otp;
+    admin.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await admin.save();
 
-    // req.session.currentuserId = admin._id;
-    // req.session.currenttoken = token;
-    // req.session.currentemail = admin.email;
-    // req.session.currentrole = admin.role;
-    // console.log("userId: " + req.session.currentuserId);
+    const html = `
+      <div class="content">
+        <h2>Admin login verification</h2>
+        <p>Someone is trying to sign in to the BloggerSpace Admin panel. If this was you, use the code below to complete sign-in.</p>
+        <div class="otp-code">${otp}</div>
+        <div class="warn-box">This code expires in <strong>10 minutes</strong>. If you did not attempt to log in, your password may be compromised — change it immediately.</div>
+      </div>`;
 
-    res.status(200).json({ message: "Login successful", token, adminDetails });
+    res.status(200).json({ message: "otp_required", email });
+    sendEmail(email, "Admin login verification code — BloggerSpace", html).catch(console.error);
   } catch (error) {
     res.status(500).json({ message: "Login failed", error: error.message });
   }
-}
+};
+
+exports.adminVerifyLoginOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const admin = await Admin.findOne({ email });
+    if (!admin) return res.status(404).json({ message: "Admin not found" });
+
+    if (!admin.otpCode || !admin.otpExpiry) {
+      return res.status(400).json({ message: "No verification code pending. Please log in again." });
+    }
+    if (new Date() > admin.otpExpiry) {
+      return res.status(401).json({ message: "Verification code has expired. Please log in again." });
+    }
+    if (admin.otpCode !== otp) {
+      return res.status(401).json({ message: "Invalid verification code." });
+    }
+
+    admin.otpCode = null;
+    admin.otpExpiry = null;
+    await admin.save();
+
+    const token = jwt.sign(
+      { userId: admin._id, currentuserId: admin._id, role: "Admin" },
+      process.env.CURRENT_JWT_SECRET,
+      { expiresIn: "3d" }
+    );
+
+    res.status(200).json({ message: "Login successful", token, adminDetails: buildAdminDetails(admin) });
+  } catch (error) {
+    res.status(500).json({ message: "Verification failed", error: error.message });
+  }
+};
+
+exports.adminResendLoginOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const admin = await Admin.findOne({ email });
+    if (!admin || !admin.isVerified) return res.status(404).json({ message: "Admin not found" });
+
+    const otp = generateOtp();
+    admin.otpCode = otp;
+    admin.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    await admin.save();
+
+    const html = `
+      <div class="content">
+        <h2>New admin login code</h2>
+        <p>You requested a new verification code for the BloggerSpace Admin panel.</p>
+        <div class="otp-code">${otp}</div>
+        <div class="warn-box">This code expires in <strong>10 minutes</strong>.</div>
+      </div>`;
+
+    res.status(200).json({ message: "New code sent to your email." });
+    sendEmail(email, "New admin login code — BloggerSpace", html).catch(console.error);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to resend code", error: error.message });
+  }
+};
 
 
 // Fetch admin blogs (paginated)
@@ -148,16 +196,10 @@ exports.inReviewBlogs = async (req, res) => {
         });
       });
       const reviewerObjectIds = [...reviewerIdSet].map((id) => new mongoose.Types.ObjectId(id));
-      const [reviewerUsers, legacyRevs] = reviewerObjectIds.length
-        ? await Promise.all([
-            User.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean(),
-            Reviewer.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean(),
-          ])
-        : [[], []];
-      const nameMap = new Map([
-        ...legacyRevs.map((r) => [r._id.toString(), r.fullName]),
-        ...reviewerUsers.map((r) => [r._id.toString(), r.fullName]),
-      ]);
+      const reviewerUsers = reviewerObjectIds.length
+        ? await User.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean()
+        : [];
+      const nameMap = new Map(reviewerUsers.map((r) => [r._id.toString(), r.fullName]));
 
       const pendingBlogs = rawBlogs.map((b) => ({
         ...b,
@@ -358,18 +400,11 @@ exports.publishedBlogs = async (req, res) => {
     });
     const reviewerObjectIds = [...reviewerIdSet].map((id) => new mongoose.Types.ObjectId(id));
 
-    // Look up names from User + legacy Reviewer collections in parallel
-    const [reviewerUsers, legacyRevs] = reviewerObjectIds.length
-      ? await Promise.all([
-          User.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean(),
-          Reviewer.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean(),
-        ])
-      : [[], []];
+    const reviewerUsers = reviewerObjectIds.length
+      ? await User.find({ _id: { $in: reviewerObjectIds } }, "fullName _id").lean()
+      : [];
 
-    const nameMap = new Map([
-      ...legacyRevs.map((r) => [r._id.toString(), r.fullName]),
-      ...reviewerUsers.map((r) => [r._id.toString(), r.fullName]),
-    ]);
+    const nameMap = new Map(reviewerUsers.map((r) => [r._id.toString(), r.fullName]));
 
     // Transform each blog: reviewedBy → [{reviewerId, reviewerName}], skip Admin entries
     const blogs = rawBlogs.map((b) => ({
@@ -417,13 +452,8 @@ exports.publishedBlogs = async (req, res) => {
 exports.allReviewersFromDB = async (req, res) => {
   try {
     if (!req.query.userId) return res.status(400).json({ error: "Missing userId" });
-    // New system: Users with reviewer role
-    const userReviewers = await User.find({ role: "reviewer", isVerified: true });
-    // Legacy: old Reviewer collection (only those not yet migrated)
-    const migratedEmails = new Set(userReviewers.map((u) => u.email));
-    const legacyReviewers = await Reviewer.find({ isVerified: true });
-    const unmigrated = legacyReviewers.filter((r) => !migratedEmails.has(r.email));
-    res.json([...userReviewers, ...unmigrated]);
+    const reviewers = await User.find({ role: "reviewer", reviewerStatus: "approved" });
+    res.json(reviewers);
   } catch (error) {
     console.error("Error fetching Reviewers:", error);
     res.status(500).json({ error: "Failed to fetch Reviewers" });
@@ -553,50 +583,33 @@ exports.fetchAwaitingAuthorFromDB = async (req, res) => {
   }
 }; 
 
-exports.fetchAllVerifiedReviewers= async(req, res)=>{
+exports.fetchAllVerifiedReviewers = async (req, res) => {
   try {
-    // New system: Users with reviewer role approved
-    const userReviewers = await User.find({ role: "reviewer", reviewerStatus: "approved" });
-    // Legacy: old Reviewer collection not yet migrated
-    const migratedEmails = new Set(userReviewers.map((u) => u.email));
-    const legacyReviewers = await Reviewer.find({ isVerified: true });
-    const unmigrated = legacyReviewers.filter((r) => !migratedEmails.has(r.email));
-    res.json([...userReviewers, ...unmigrated]);
+    const reviewers = await User.find({ role: "reviewer", reviewerStatus: "approved" });
+    res.json(reviewers);
   } catch (error) {
     console.log("Error fetching verified reviewers");
     res.status(500).json({ error: "Failed to fetch All verified reviewers" });
   }
-}
+};
 
-exports.fetchAllPendingRequestReviewers= async(req, res)=>{
+exports.fetchAllPendingRequestReviewers = async (req, res) => {
   try {
-    // New system: Users with pending reviewer application
     const pendingUsers = await User.find({ reviewerStatus: "pending" });
-    // Legacy: old Reviewer collection not yet migrated
-    const pendingEmails = new Set(pendingUsers.map((u) => u.email));
-    const legacyPending = await Reviewer.find({ isVerified: false });
-    const unmigrated = legacyPending.filter((r) => !pendingEmails.has(r.email));
-    res.json([...pendingUsers, ...unmigrated]);
+    res.json(pendingUsers);
   } catch (error) {
     console.log("Error fetching pending request reviewers");
     res.status(500).json({ error: "Failed to fetch pending request reviewers" });
   }
-}
+};
 
 exports.rejectReviewerRequest = async (req, res) => {
   const { id } = req.params;
   try {
-    let target = await User.findById(id);
-    if (target) {
-      target.reviewerStatus = "rejected";
-      await target.save();
-    } else {
-      target = await Reviewer.findById(id);
-      if (!target) return res.status(404).json({ error: "Reviewer not found" });
-      target.isVerified = false;
-      target.status = "INACTIVE";
-      await target.save();
-    }
+    const target = await User.findById(id);
+    if (!target) return res.status(404).json({ error: "Reviewer not found" });
+    target.reviewerStatus = "rejected";
+    await target.save();
 
     const receiver = target.email;
     const subject = "Update on your BloggerSpace Reviewer application";
@@ -620,22 +633,12 @@ exports.rejectReviewerRequest = async (req, res) => {
 exports.approveReviewerRequest= async(req, res)=>{
   const {id}= req.params;
   try {
-    // Try User collection first (new system)
-    let target = await User.findById(id);
-    if (target) {
-      target.role = "reviewer";
-      target.reviewerStatus = "approved";
-      target.isVerified = true;
-      target.status = "ACTIVE";
-      await target.save();
-    } else {
-      // Fallback: old Reviewer collection
-      target = await Reviewer.findById(id);
-      if (!target) return res.status(404).json({ error: "Reviewer not found" });
-      target.isVerified = true;
-      target.status = "ACTIVE";
-      await target.save();
-    }
+    const target = await User.findById(id);
+    if (!target) return res.status(404).json({ error: "Reviewer not found" });
+    target.role = "reviewer";
+    target.reviewerStatus = "approved";
+    target.status = "ACTIVE";
+    await target.save();
 
     const receiver = target.email;
     const subject = "You're approved as a BloggerSpace Reviewer!";
@@ -660,22 +663,16 @@ exports.approveReviewerRequest= async(req, res)=>{
 exports.removeFromReviewerRole= async(req, res)=>{
   const {id}= req.params;
   try {
-    // Try User collection first (new system)
-    let target = await User.findById(id);
-    if (target) {
-      target.role = "user";
-      target.reviewerStatus = "rejected";
-      target.isVerified = false;
-      target.status = "INACTIVE";
-      await target.save();
-    } else {
-      // Fallback: old Reviewer collection
-      target = await Reviewer.findById(id);
-      if (!target) return res.status(404).json({ error: "Reviewer not found" });
-      target.isVerified = false;
-      target.status = "INACTIVE";
-      await target.save();
-    }
+    const target = await User.findById(id);
+    if (!target) return res.status(404).json({ error: "Reviewer not found" });
+    const reviewerEmail = target.email;
+    target.role = "user";
+    target.reviewerStatus = "rejected";
+    await target.save();
+    await Blog.updateMany(
+      { currentReviewer: reviewerEmail, status: "UNDER_REVIEW" },
+      { $set: { currentReviewer: "", status: "PENDING_REVIEW", lastUpdatedAt: new Date() } }
+    );
 
     const receiver = target.email;
     const subject = "Your BloggerSpace Reviewer access has been removed";
@@ -683,7 +680,7 @@ exports.removeFromReviewerRole= async(req, res)=>{
       <div class="content">
         <h2>Hi ${target.fullName},</h2>
         <p>Your reviewer access on BloggerSpace has been removed by an admin.</p>
-        <p>If you'd like to re-apply in the future, you can submit a new application from your account settings.</p>
+        <p>You can still use BloggerSpace as a regular user. If you'd like to re-apply in the future, visit your profile settings.</p>
         <div class="warn-box">If you believe this was done in error, please contact us at <a href="mailto:${process.env.EMAIL}">${process.env.EMAIL}</a>.</div>
       </div>`;
 
@@ -771,7 +768,10 @@ exports.migrateReviewersToUsers = async (req, res) => {
 exports.fetchAllUsers= async(req, res)=>{
 
   try {
-    const allUsers = await User.find({status:"ACTIVE"});
+    // Return ACTIVE and INACTIVE users so admin can see and reactivate deactivated accounts
+    const allUsers = await User.find({ status: { $in: ["ACTIVE", "INACTIVE"] } })
+      .select("fullName userName email status isVerified role reviewerStatus gems createdAt")
+      .lean();
     res.json(allUsers);
   } catch (error) {
     console.log("Error fetching all users")
@@ -782,25 +782,67 @@ exports.fetchAllUsers= async(req, res)=>{
 exports.deleteUserAccount = async (req, res) => {
   const { id } = req.params;
   try {
-    const user= await User.findById(id);
-    user.status="DELETED";
-    await user.save();
-    // await User.findByIdAndDelete(id);
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    const receiver = req.query.useremail;
+    const userEmail = user.email;
+    const userName = user.fullName;
+    const wasReviewer = user.role === "reviewer";
+
+    // Permanently delete user from DB
+    await User.findByIdAndDelete(id);
+
+    // If they were a reviewer, reassign any UNDER_REVIEW blogs back to pending
+    if (wasReviewer) {
+      await Blog.updateMany(
+        { currentReviewer: userEmail, status: "UNDER_REVIEW" },
+        { $set: { currentReviewer: "", status: "PENDING_REVIEW", lastUpdatedAt: new Date() } }
+      );
+    }
+
+    const receiver = req.query.useremail || userEmail;
     const subject = "Your BloggerSpace account has been removed";
     const html = `
       <div class="content">
         <h2>Account removed</h2>
-        <p>Your BloggerSpace account has been removed by an admin.</p>
+        <p>Your BloggerSpace account has been permanently removed by an admin.</p>
         <div class="warn-box">If you believe this was done in error or have any questions, please contact us at <a href="mailto:${process.env.EMAIL}">${process.env.EMAIL}</a>.</div>
       </div>
     `;
 
-    res.json({ message: "User Account deleted by admin successfully" });
+    res.json({ message: "User account permanently deleted." });
     await sendEmail(receiver, subject, html);
   } catch (error) {
-    console.log("Error when deleting user account by admin");
+    console.log("Error when deleting user account by admin", error);
+    res.status(500).json({ error: "Failed to delete user account" });
+  }
+};
+
+exports.deactivateUserAccount = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    if (user.status === "INACTIVE") return res.status(400).json({ error: "Account is already deactivated." });
+    user.status = "INACTIVE";
+    await user.save();
+    res.json({ message: "Account deactivated successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to deactivate account" });
+  }
+};
+
+exports.reactivateUserAccount = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    if (user.status === "ACTIVE") return res.status(400).json({ error: "Account is already active." });
+    user.status = "ACTIVE";
+    await user.save();
+    res.json({ message: "Account reactivated successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to reactivate account" });
   }
 };
 
@@ -1068,17 +1110,11 @@ exports.adminBlogEdit = async (req, res) => {
       .filter((r) => r?.ReviewedBy?.Role !== "Admin" && r?.ReviewedBy?.Id)
       .map((r) => r.ReviewedBy.Id);
 
-    const [reviewerUsers, legacyRevs] = reviewerIds.length
-      ? await Promise.all([
-          User.find({ _id: { $in: reviewerIds } }, "fullName _id").lean(),
-          Reviewer.find({ _id: { $in: reviewerIds } }, "fullName _id").lean(),
-        ])
-      : [[], []];
+    const reviewerUsers = reviewerIds.length
+      ? await User.find({ _id: { $in: reviewerIds } }, "fullName _id").lean()
+      : [];
 
-    const nameMap = new Map([
-      ...legacyRevs.map((r) => [r._id.toString(), r.fullName]),
-      ...reviewerUsers.map((r) => [r._id.toString(), r.fullName]),
-    ]);
+    const nameMap = new Map(reviewerUsers.map((r) => [r._id.toString(), r.fullName]));
 
     const blogObj = blog.toObject();
     blogObj.content = decompressedContent;
@@ -1588,10 +1624,10 @@ exports.deleteCommentFromPost = async (req, res) => {
 exports.getUserContent = async (req, res) => {
   const { userId } = req.params;
   try {
-    const [user, blogs, communityPosts] = await Promise.all([
+    const [user, rawBlogs, communityPosts] = await Promise.all([
       User.findById(userId).select("fullName userName email profilePicture gems createdAt role isVerified reviewedBlogs").lean(),
       Blog.find({ authorDetails: userId })
-        .select("title slug status category createdAt lastUpdatedAt gems")
+        .select("title slug status category createdAt lastUpdatedAt gems reviewedBy")
         .sort({ createdAt: -1 }).lean(),
       Community.find({ communityPostAuthor: userId })
         .select("communityPostId communityPostSlug communityPostTopic communityPostCategory createdAt")
@@ -1599,21 +1635,54 @@ exports.getUserContent = async (req, res) => {
     ]);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Attach gems earned per reviewed blog
+    // Fetch reviewed blog docs (gems + reviewedBy + author) for reviewed blogs tab
     const rawReviewed = user.reviewedBlogs || [];
+    const reviewedBlogObjectIds = rawReviewed.filter((rb) => rb.BlogObjectId).map((rb) => rb.BlogObjectId);
+    const reviewedBlogDocs = reviewedBlogObjectIds.length
+      ? await Blog.find({ _id: { $in: reviewedBlogObjectIds } })
+          .select("_id gems reviewedBy authorDetails")
+          .populate("authorDetails", "fullName email")
+          .lean()
+      : [];
+
+    // Collect ALL reviewer IDs from rawBlogs AND reviewedBlogDocs in one pass
+    const allReviewerIdSet = new Set();
+    [...rawBlogs, ...reviewedBlogDocs].forEach((b) => {
+      (b.reviewedBy || []).forEach((r) => {
+        const id = r?.ReviewedBy?.Id;
+        if (id && r?.ReviewedBy?.Role !== "Admin") allReviewerIdSet.add(id.toString());
+      });
+    });
+    const allReviewerObjectIds = [...allReviewerIdSet].map((id) => new mongoose.Types.ObjectId(id));
+    const reviewerUsers = allReviewerObjectIds.length
+      ? await User.find({ _id: { $in: allReviewerObjectIds } }, "fullName _id").lean()
+      : [];
+    const reviewerNameMap = new Map(reviewerUsers.map((r) => [r._id.toString(), r.fullName]));
+
+    // Helper to transform raw reviewedBy array
+    const transformReviewedBy = (raw) =>
+      (raw || [])
+        .filter((r) => r?.ReviewedBy?.Role !== "Admin" && r?.ReviewedBy?.Id)
+        .map((r) => ({ reviewerId: r.ReviewedBy.Id.toString(), reviewerName: reviewerNameMap.get(r.ReviewedBy.Id.toString()) }));
+
+    // Transform author blogs
+    const blogs = rawBlogs.map((b) => ({ ...b, reviewedBy: transformReviewedBy(b.reviewedBy) }));
+
+    // Build map for reviewed blog docs
+    const reviewedBlogDataMap = new Map(
+      reviewedBlogDocs.map((b) => [b._id.toString(), {
+        gems: b.gems,
+        authorDetails: b.authorDetails,
+        blogReviewedBy: transformReviewedBy(b.reviewedBy),
+      }]),
+    );
+
+    // Attach gems + dialog data to each reviewed blog entry
     if (rawReviewed.length > 0) {
-      const blogObjectIds = rawReviewed
-        .filter((rb) => rb.BlogObjectId)
-        .map((rb) => rb.BlogObjectId);
-
-      const reviewedBlogDocs = blogObjectIds.length
-        ? await Blog.find({ _id: { $in: blogObjectIds } }).select("_id gems").lean()
-        : [];
-
-      const gemsMap = new Map(reviewedBlogDocs.map((b) => [b._id.toString(), b.gems]));
-
       user.reviewedBlogs = rawReviewed.map((rb) => {
-        const gems = rb.BlogObjectId ? gemsMap.get(rb.BlogObjectId.toString()) : null;
+        const blogId = rb.BlogObjectId?.toString();
+        const blogData = blogId ? reviewedBlogDataMap.get(blogId) : null;
+        const gems = blogData?.gems;
         let reviewerGems = 0;
         if (gems?.awarded) {
           if (gems.reviewerAwards?.length) {
@@ -1623,7 +1692,24 @@ exports.getUserContent = async (req, res) => {
             reviewerGems = gems.reviewerGems || 0;
           }
         }
-        return { ...rb, reviewerGems };
+        return {
+          ...rb,
+          blogId: blogId || null,
+          reviewerGems,
+          gemsAwarded: gems?.awarded || false,
+          blogGems: gems
+            ? {
+                authorGems: gems.authorGems,
+                reviewerAwards: gems.reviewerAwards,
+                reviewerUserId: gems.reviewerUserId?.toString(),
+                reviewerGems: gems.reviewerGems,
+              }
+            : null,
+          blogAuthor: blogData?.authorDetails
+            ? { fullName: blogData.authorDetails.fullName, email: blogData.authorDetails.email }
+            : null,
+          blogReviewedBy: blogData?.blogReviewedBy || [],
+        };
       });
     }
 

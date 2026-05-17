@@ -207,6 +207,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
+    // Block deactivated accounts
+    if (user.status === "INACTIVE") {
+      return res.status(403).json({ message: "account_deactivated", info: "Your account has been deactivated. Please contact support." });
+    }
+
     // OTP gate — unverified accounts must verify before a session token is issued
     if (!user.isVerified) {
       const otp = generateOtp();
@@ -257,6 +262,7 @@ exports.login = async (req, res) => {
       profilePicture: user.profilePicture,
       savedBlogs: user.savedBlogs,
       role: user.role || "user",
+      reviewerStatus: user.reviewerStatus,
       createdAt: user.createdAt,
     };
 
@@ -335,6 +341,7 @@ exports.verifyOtp = async (req, res) => {
       profilePicture: user.profilePicture,
       savedBlogs: user.savedBlogs,
       role: user.role || "user",
+      reviewerStatus: user.reviewerStatus,
       createdAt: user.createdAt,
     };
 
@@ -756,6 +763,7 @@ exports.loggedInUserInfo = async (req, res) => {
       profilePicture: user.profilePicture,
       savedBlogs: user.savedBlogs,
       role: user.role ?? "user",
+      reviewerStatus: user.reviewerStatus ?? "none",
       gems: user.gems ?? 0,
       createdAt: user.createdAt,
     };
@@ -1295,3 +1303,248 @@ exports.downloadBlog= async (req, res)=>{
   // Finalize the PDF and end the response
   doc.end();
 }
+
+// ── OTP-based login (passwordless sign-in) ──────────────────────────────────
+
+// Request a login OTP (only for already-verified, active accounts)
+exports.requestLoginOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required." });
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Don't reveal whether email is registered
+      return res.status(200).json({ message: "otp_sent", info: "If that email is registered and verified, a code has been sent." });
+    }
+
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Email not verified. Please verify your account first." });
+    }
+
+    if (user.status === "INACTIVE") {
+      return res.status(403).json({ message: "account_deactivated", info: "Your account has been deactivated. Please contact support." });
+    }
+
+    const otp = generateOtp();
+    user.otpCode = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    sendEmail(user.email, "Your BloggerSpace sign-in code", `
+      <div class="content">
+        <h2>Hi ${user.fullName},</h2>
+        <p>Use the code below to sign in to your BloggerSpace account. No password needed.</p>
+        <div class="otp-code">${otp}</div>
+        <div class="info-box">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</div>
+        <p class="text-muted">Didn't request this? You can safely ignore this email — your account is secure.</p>
+      </div>
+    `).catch((err) => logger.error("Failed to send login OTP: " + err));
+
+    logger.debug("Login OTP sent to: " + email);
+    return res.status(200).json({ message: "otp_sent", info: "A sign-in code has been sent to your email." });
+  } catch (error) {
+    logger.error("requestLoginOtp failed: " + error.message);
+    res.status(500).json({ message: "Failed to send OTP.", error: error.message });
+  }
+};
+
+// Verify login OTP and issue a JWT
+exports.verifyLoginOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ message: "Email and OTP are required." });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Email not verified. Please verify your account first." });
+    }
+
+    if (user.status === "INACTIVE") {
+      return res.status(403).json({ message: "account_deactivated", info: "Your account has been deactivated. Please contact support." });
+    }
+
+    if (!user.otpCode || !user.otpExpiry) {
+      return res.status(400).json({ message: "No OTP found. Please request a new one." });
+    }
+
+    if (new Date() > user.otpExpiry) {
+      user.otpCode = null;
+      user.otpExpiry = null;
+      await user.save();
+      return res.status(400).json({ message: "OTP has expired. Please request a new one." });
+    }
+
+    if (user.otpCode !== otp.toString().trim()) {
+      return res.status(400).json({ message: "Incorrect OTP. Please try again." });
+    }
+
+    // Block unapproved reviewer sign-in
+    if (user.role === "reviewer" && user.reviewerStatus !== "approved") {
+      user.otpCode = null;
+      user.otpExpiry = null;
+      await user.save();
+      return res.status(403).json({ message: "Your reviewer application is still pending admin approval." });
+    }
+
+    // Clear OTP and update last login
+    user.otpCode = null;
+    user.otpExpiry = null;
+    user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
+    await user.save();
+
+    const token = jwt.sign(
+      { userId: user._id, currentuserId: user._id, role: user.role || "user" },
+      process.env.CURRENT_JWT_SECRET,
+      { expiresIn: "3d" }
+    );
+
+    const userDetails = {
+      _id: user._id,
+      fullName: user.fullName,
+      userName: user.userName,
+      email: user.email,
+      isVerified: user.isVerified,
+      profilePicture: user.profilePicture,
+      savedBlogs: user.savedBlogs,
+      role: user.role || "user",
+      reviewerStatus: user.reviewerStatus,
+      createdAt: user.createdAt,
+    };
+
+    logger.debug("Login via OTP successful: " + email);
+    return res.status(200).json({ message: "Login successful", token, userDetails });
+  } catch (error) {
+    logger.error("verifyLoginOtp failed: " + error.message);
+    res.status(500).json({ message: "OTP verification failed.", error: error.message });
+  }
+};
+
+// ── OTP-based forgot password ────────────────────────────────────────────────
+
+// Step 1: request OTP for password reset
+exports.forgotPasswordRequestOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required." });
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(200).json({ message: "otp_sent", info: "If that email is registered, a reset code has been sent." });
+    }
+
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Email not verified. Verify your account before resetting your password." });
+    }
+
+    if (user.status === "INACTIVE") {
+      return res.status(403).json({ message: "account_deactivated", info: "Your account has been deactivated. Please contact support." });
+    }
+
+    const otp = generateOtp();
+    user.otpCode = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    sendEmail(user.email, "Your BloggerSpace password reset code", `
+      <div class="content">
+        <h2>Hi ${user.fullName},</h2>
+        <p>We received a request to reset your BloggerSpace password. Enter the code below to proceed.</p>
+        <div class="otp-code">${otp}</div>
+        <div class="info-box">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</div>
+        <p class="text-muted">Didn't request a password reset? You can safely ignore this email — your account is secure.</p>
+      </div>
+    `).catch((err) => logger.error("Failed to send password reset OTP: " + err));
+
+    logger.debug("Password reset OTP sent to: " + email);
+    return res.status(200).json({ message: "otp_sent", info: "A reset code has been sent to your email." });
+  } catch (error) {
+    logger.error("forgotPasswordRequestOtp failed: " + error.message);
+    res.status(500).json({ message: "Failed to send reset code.", error: error.message });
+  }
+};
+
+// Step 2: verify OTP → issue a short-lived reset token
+exports.forgotPasswordVerifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ message: "Email and OTP are required." });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    if (!user.otpCode || !user.otpExpiry) {
+      return res.status(400).json({ message: "No reset code found. Please request a new one." });
+    }
+
+    if (new Date() > user.otpExpiry) {
+      user.otpCode = null;
+      user.otpExpiry = null;
+      await user.save();
+      return res.status(400).json({ message: "Code has expired. Please request a new one." });
+    }
+
+    if (user.otpCode !== otp.toString().trim()) {
+      return res.status(400).json({ message: "Incorrect code. Please try again." });
+    }
+
+    // OTP valid — issue a short-lived reset token (5 min)
+    const resetToken = require("uuid").v4();
+    user.otpCode = null;
+    user.otpExpiry = null;
+    user.resetToken = resetToken;
+    user.resetTokenExpiration = new Date(Date.now() + 5 * 60 * 1000);
+    await user.save();
+
+    logger.debug("Password reset OTP verified for: " + email);
+    return res.status(200).json({ message: "otp_verified", resetToken });
+  } catch (error) {
+    logger.error("forgotPasswordVerifyOtp failed: " + error.message);
+    res.status(500).json({ message: "OTP verification failed.", error: error.message });
+  }
+};
+
+// Step 3: use reset token to set a new password
+exports.forgotPasswordReset = async (req, res) => {
+  try {
+    const { resetToken, newPassword } = req.body;
+    if (!resetToken || !newPassword) {
+      return res.status(400).json({ message: "Reset token and new password are required." });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters." });
+    }
+
+    const user = await User.findOne({ resetToken });
+    if (!user) return res.status(400).json({ message: "Invalid or expired reset token." });
+
+    if (!user.resetTokenExpiration || new Date() > user.resetTokenExpiration) {
+      user.resetToken = null;
+      user.resetTokenExpiration = null;
+      await user.save();
+      return res.status(400).json({ message: "Reset token has expired. Please start over." });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetToken = null;
+    user.resetTokenExpiration = null;
+    await user.save();
+
+    sendEmail(user.email, "Your BloggerSpace password has been changed", `
+      <div class="content">
+        <h2>Password updated</h2>
+        <p>Hi ${user.fullName}, your BloggerSpace password was just changed successfully.</p>
+        <p class="text-muted">If you didn't make this change, please contact support immediately.</p>
+      </div>
+    `).catch((err) => logger.error("Failed to send password change confirmation: " + err));
+
+    logger.debug("Password reset successful for: " + user.email);
+    return res.status(200).json({ message: "Password updated successfully. You can now sign in." });
+  } catch (error) {
+    logger.error("forgotPasswordReset failed: " + error.message);
+    res.status(500).json({ message: "Password reset failed.", error: error.message });
+  }
+};

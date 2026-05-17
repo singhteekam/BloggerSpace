@@ -33,6 +33,11 @@ const {
   fileUpload,
   fetchUploadedFiles,
   uploadProfilePicture2,
+  requestLoginOtp,
+  verifyLoginOtp,
+  forgotPasswordRequestOtp,
+  forgotPasswordVerifyOtp,
+  forgotPasswordReset,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -67,6 +72,15 @@ router.post("/login", login);
 // OTP verification routes (used after signup and for unverified accounts on login)
 router.post("/verify-otp", verifyOtp);
 router.post("/resend-otp", resendOtp);
+
+// Passwordless OTP login
+router.post("/login-otp/request", requestLoginOtp);
+router.post("/login-otp/verify", verifyLoginOtp);
+
+// Forgot password via OTP (replaces email-link flow)
+router.post("/forgot-password/request-otp", forgotPasswordRequestOtp);
+router.post("/forgot-password/verify-otp", forgotPasswordVerifyOtp);
+router.post("/forgot-password/reset", forgotPasswordReset);
 
 // Login with Google
 router.get('/auth/google',

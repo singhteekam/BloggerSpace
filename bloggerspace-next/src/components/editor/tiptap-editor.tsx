@@ -315,9 +315,10 @@ export function TipTapEditor({
   const charCount = editor?.storage.characterCount?.characters() ?? 0;
 
   return (
-    // overflow-hidden is intentionally NOT on the outer div — it would clip portal dropdowns.
-    // The inner content wrapper applies overflow-hidden only to the editable area.
-    <div ref={editorWrapRef} className={cn("relative rounded-xl border border-border bg-card", className)}>
+    // overflow-hidden is intentionally NOT on the outer div — it would clip the bubble menu.
+    // w-full + min-w-0 constrain the wrapper to its parent track so toolbar overflow-x-auto
+    // actually creates a scroll container rather than letting the whole editor expand.
+    <div ref={editorWrapRef} className={cn("relative w-full min-w-0 rounded-xl border border-border bg-card", className)}>
       <EditorToolbar
         editor={editor}
         sourceMode={sourceMode}

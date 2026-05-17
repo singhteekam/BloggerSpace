@@ -4,6 +4,8 @@ const router = express.Router();
 const {
   adminSignup,
   adminLogin,
+  adminVerifyLoginOtp,
+  adminResendLoginOtp,
   inReviewBlogs,
   editInReviewBlog,
   saveEditedInReviewBlog,
@@ -21,6 +23,8 @@ const {
   removeFromReviewerRole,
   fetchAllUsers,
   deleteUserAccount,
+  deactivateUserAccount,
+  reactivateUserAccount,
   getCommunityPosts,
   deleteCommunityPost,
   deleteCommentFromPost,
@@ -61,6 +65,8 @@ const { discardBlogFromDB } = require("../../utils/discardBlog");
 router.post("/signup", adminSignup);
 
 router.post("/login", adminLogin);
+router.post("/login/verify-otp", adminVerifyLoginOtp);
+router.post("/login/resend-otp", adminResendLoginOtp);
 
 router.get("/adminblogs", fetchAdminBlogs);
 
@@ -99,6 +105,8 @@ router.patch("/dashboard/removefromreviewer/:id", adminMiddleware, removeFromRev
 router.get("/dashboard/allusers", adminMiddleware, fetchAllUsers);
 
 router.put("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
+router.patch("/dashboard/deactivateuser/:id", adminMiddleware, deactivateUserAccount);
+router.patch("/dashboard/reactivateuser/:id", adminMiddleware, reactivateUserAccount);
 
 router.get("/community", adminMiddleware, getCommunityPosts);
 

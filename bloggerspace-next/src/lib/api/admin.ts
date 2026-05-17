@@ -91,7 +91,13 @@ const p = (userId: string) => ({ userId, role: "Admin" });
 
 export const adminApi = {
   login: (data: { email: string; password: string }) =>
-    api.post<AdminAuthResponse>("/api/admin/login", data),
+    api.post<{ message: "otp_required"; email: string }>("/api/admin/login", data),
+
+  verifyLoginOtp: (email: string, otp: string) =>
+    api.post<AdminAuthResponse>("/api/admin/login/verify-otp", { email, otp }),
+
+  resendLoginOtp: (email: string) =>
+    api.post<{ message: string }>("/api/admin/login/resend-otp", { email }),
 
   // ── Blog queues ────────────────────────────────────────────────────
   getPendingBlogs: (userId: string) =>
@@ -145,6 +151,12 @@ export const adminApi = {
     api.put<{ message: string }>(`/api/admin/dashboard/deleteuser/${targetUserId}`, {}, {
       params: { ...p(adminId), useremail: userEmail },
     }),
+
+  deactivateUser: (targetUserId: string, adminId: string) =>
+    api.patch<{ message: string }>(`/api/admin/dashboard/deactivateuser/${targetUserId}`, {}, { params: p(adminId) }),
+
+  reactivateUser: (targetUserId: string, adminId: string) =>
+    api.patch<{ message: string }>(`/api/admin/dashboard/reactivateuser/${targetUserId}`, {}, { params: p(adminId) }),
 
   // ── Community ─────────────────────────────────────────────────────
   getCommunityPosts: (userId: string, page = 1, search = "") =>
@@ -360,7 +372,22 @@ export type UserContent = {
     createdAt: string;
     role: string;
     isVerified: boolean;
-    reviewedBlogs?: { BlogTitle: string; BlogSlug: string; BlogReviewedTime: string; reviewerGems?: number }[];
+    reviewedBlogs?: {
+      BlogTitle: string;
+      BlogSlug: string;
+      BlogReviewedTime: string;
+      reviewerGems?: number;
+      blogId?: string | null;
+      gemsAwarded?: boolean;
+      blogGems?: {
+        authorGems?: number;
+        reviewerAwards?: { userId: string; gems: number }[];
+        reviewerUserId?: string;
+        reviewerGems?: number;
+      } | null;
+      blogAuthor?: { fullName?: string; email?: string } | null;
+      blogReviewedBy?: { reviewerId: string; reviewerName?: string }[];
+    }[];
   };
   blogs: {
     _id: string;
@@ -371,6 +398,7 @@ export type UserContent = {
     createdAt: string;
     lastUpdatedAt?: string;
     gems?: GemsInfo;
+    reviewedBy?: { reviewerId: string; reviewerName?: string }[];
   }[];
   communityPosts: {
     _id: string;

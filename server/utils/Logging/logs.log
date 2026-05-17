@@ -3,144 +3,71 @@
 [2025-04-05T00:14:33.693Z] [LOG] [ERROR] - blog not found. Slug: searchblogs
 [2025-07-21T11:25:26.662Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired
 [2025-07-21T11:25:26.662Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired[2025-11-04T22:11:20.740Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
-[2025-11-04T22:11:21.124Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
-[2025-11-04T22:13:47.815Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
-[2025-11-04T22:13:48.083Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
-[2025-11-04T22:14:11.675Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
-[2025-11-04T22:14:11.725Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
-[2026-05-06T16:01:02.329Z] [LOG] [DEBUG] - Searching for blog: test1
-[2026-05-06T16:01:02.365Z] [LOG] [DEBUG] - Searching for blog: test1
-[2026-05-06T16:01:02.433Z] [LOG] [INFO] - Blog: test1 fetched. Content size is: 0.18359375 KB
-[2026-05-06T16:01:02.433Z] [LOG] [INFO] - Blog: test1 fetched. Content size is: 0.18359375 KB
-[2026-05-06T16:01:02.438Z] [LOG] [INFO] - Blog: test1 fetched. Content size is: 0.18359375 KB
-[2026-05-06T16:01:02.433Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-06T16:01:02.438Z] [LOG] [INFO] - Blog: test1 fetched. Content size is: 0.18359375 KB
-[2026-05-06T16:01:02.438Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-06T16:02:10.146Z] [LOG] [DEBUG] - Searching for blog: test1
-[2026-05-06T16:02:10.149Z] [LOG] [DEBUG] - Searching for blog: test1
-[2026-05-06T16:02:10.190Z] [LOG] [INFO] - Blog: test1 fetched. Content size is: 0.18359375 KB
-[2026-05-06T16:02:10.190Z] [LOG] [INFO] - Blog: test1 fetched. Content size is: 0.18359375 KB
-[2026-05-06T16:02:10.190Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-14T16:48:24.270Z] [LOG] [DEBUG] - Searching for blog: best-chrome-extensions-that-feels-like-magic
-[2026-05-14T16:48:24.320Z] [LOG] [INFO] - Blog: Best chrome extensions that feels like magic  fetched. Content size is: 2.30078125 KB
-[2026-05-14T16:48:24.320Z] [LOG] [INFO] - Blog: Best chrome extensions that feels like magic  fetched. Content size is: 2.30078125 KB
-[2026-05-14T16:48:24.321Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-15T01:01:56.318Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
-[2026-05-15T01:02:17.910Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
-[2026-05-15T01:03:17.802Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
-[2026-05-15T01:03:22.890Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
-[2026-05-15T01:03:34.113Z] [LOG] [DEBUG] - Devs Team: Profile picture uploaded successfully.
-[2026-05-15T01:03:34.129Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
-[2026-05-15T01:03:42.590Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
-[2026-05-15T01:07:15.753Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-15T01:07:15.753Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-15T01:07:15.753Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-15T01:07:16.783Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-15T01:07:16.783Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-15T01:07:16.783Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-15T01:08:02.967Z] [LOG] [DEBUG] - New user added. Signup successful.
-[2026-05-15T01:08:05.585Z] [LOG] [DEBUG] - Sign up successful.
-[2026-05-15T01:23:28.075Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T01:23:28.075Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T01:24:22.034Z] [LOG] [DEBUG] - OTP resent to: dynamicdevs.ima@gmail.com
-[2026-05-15T01:24:40.958Z] [LOG] [DEBUG] - Account verified via OTP: dynamicdevs.ima@gmail.com
-[2026-05-15T01:24:47.856Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: test
-[2026-05-15T01:25:06.424Z] [LOG] [ERROR] - User not found with given email.
-[2026-05-15T01:25:06.424Z] [LOG] [ERROR] - User not found with given email.
-[2026-05-15T01:25:06.424Z] [LOG] [ERROR] - User not found with given email.
-[2026-05-15T01:25:23.207Z] [LOG] [DEBUG] - New user created (pending OTP verification): dynamicdevs.ima@gmail.com
-[2026-05-15T01:26:24.555Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T01:26:24.555Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T01:26:48.878Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T01:26:48.878Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T01:27:18.338Z] [LOG] [DEBUG] - Account verified via OTP: dynamicdevs.ima@gmail.com
-[2026-05-15T01:34:52.020Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: test
-[2026-05-15T01:35:59.981Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: test
-[2026-05-15T01:42:16.342Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T01:42:16.342Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T11:49:25.662Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T11:49:25.662Z] [LOG] [INFO] - Login blocked — account not verified, OTP sent: dynamicdevs.ima@gmail.com
-[2026-05-15T23:05:19.649Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
-[2026-05-16T01:14:51.306Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
-[2026-05-16T01:38:39.935Z] [LOG] [DEBUG] - Searching for blog: top-300-interview-questions-html-css-js-react-node-mongodb
-[2026-05-16T01:38:40.010Z] [LOG] [INFO] - Blog: Top 300+ Interview Questions- HTML, CSS, JS, React, Node, MongoDB fetched. Content size is: 23.171875 KB
-[2026-05-16T01:38:40.010Z] [LOG] [INFO] - Blog: Top 300+ Interview Questions- HTML, CSS, JS, React, Node, MongoDB fetched. Content size is: 23.171875 KB
-[2026-05-16T01:38:40.011Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-16T01:38:40.406Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:38:40.406Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:38:40.406Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:38:40.421Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:38:40.421Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:38:40.421Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:06.247Z] [LOG] [DEBUG] - Searching for blog: 2-c-programming-practice-questions-operators-ifelse-loops-switchcase
-[2026-05-16T01:39:06.266Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
-[2026-05-16T01:39:06.266Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
-[2026-05-16T01:39:06.266Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-16T01:39:06.848Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:06.848Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:06.848Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:06.869Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:06.869Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:06.869Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:17.374Z] [LOG] [ERROR] - Added to saved blogs failed: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:17.374Z] [LOG] [ERROR] - Added to saved blogs failed: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:17.374Z] [LOG] [ERROR] - Added to saved blogs failed: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:25.484Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:25.484Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:25.484Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:28.232Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:28.232Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:39:28.232Z] [LOG] [ERROR] - Error getting saved blogs: Cannot read properties of null (reading 'savedBlogs')
-[2026-05-16T01:54:20.080Z] [LOG] [DEBUG] - Searching for blog: 2-c-programming-practice-questions-operators-ifelse-loops-switchcase
-[2026-05-16T01:54:20.148Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
-[2026-05-16T01:54:20.148Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
-[2026-05-16T01:54:20.149Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-16T02:03:52.689Z] [LOG] [DEBUG] - Searching for blog: 2-c-programming-practice-questions-operators-ifelse-loops-switchcase
-[2026-05-16T02:03:52.816Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
-[2026-05-16T02:03:52.816Z] [LOG] [INFO] - Blog: #2) C Programming practice Questions- operators, if-else, loops, switch-case fetched. Content size is: 1.765625 KB
-[2026-05-16T02:03:52.816Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-16T18:38:16.412Z] [LOG] [DEBUG] - Topic is available: test
-[2026-05-16T18:38:29.839Z] [LOG] [DEBUG] - New Blog saved as draft. Title: test
-[2026-05-16T18:52:13.666Z] [LOG] [DEBUG] - Searching for blog: fewfw
-[2026-05-16T18:52:13.692Z] [LOG] [INFO] - Blog: fewfw fetched. Content size is: 0.02734375 KB
-[2026-05-16T18:52:13.692Z] [LOG] [INFO] - Blog: fewfw fetched. Content size is: 0.02734375 KB
-[2026-05-16T18:52:13.693Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-16T22:52:13.343Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T22:52:13.343Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T22:52:13.343Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T22:52:33.908Z] [LOG] [DEBUG] - Topic is available: This is testing 
-[2026-05-16T22:52:34.657Z] [LOG] [DEBUG] - Topic is available: This is testing 1
-[2026-05-16T22:52:35.650Z] [LOG] [DEBUG] - Topic is available: This is testing 160
-[2026-05-16T22:52:36.511Z] [LOG] [DEBUG] - Topic is available: This is testing 1605
-[2026-05-16T22:52:39.124Z] [LOG] [DEBUG] - Topic is available: This is testing 1605 2026
-[2026-05-16T22:52:47.998Z] [LOG] [DEBUG] - New blog created in Pending status. Title: This is testing 1605 2026
-[2026-05-16T22:52:50.791Z] [LOG] [DEBUG] - Email sent to writer:250 2.0.0 OK  1778952171 d9443c01a7336-2bd5cfe49a4sm87850165ad.38 - gsmtp
-[2026-05-16T22:53:32.171Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T22:53:32.171Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T22:53:32.171Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T22:55:50.185Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T22:55:50.185Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T22:55:50.185Z] [LOG] [ERROR] - The password is invalid.
-[2026-05-16T23:46:23.222Z] [LOG] [DEBUG] - Searching for blog: 172-redux-vs-redux-toolkit
-[2026-05-16T23:46:23.435Z] [LOG] [INFO] - Blog: #172 Redux vs Redux Toolkit fetched. Content size is: 1.19140625 KB
-[2026-05-16T23:46:23.435Z] [LOG] [INFO] - Blog: #172 Redux vs Redux Toolkit fetched. Content size is: 1.19140625 KB
-[2026-05-16T23:46:23.436Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-16T23:46:23.587Z] [LOG] [INFO] - Returning from user profile route with data.
-[2026-05-16T23:46:23.587Z] [LOG] [INFO] - Returning from user profile route with data.
-[2026-05-17T00:53:39.988Z] [LOG] [DEBUG] - Searching for blog: this-is-testing-1605-2026
-[2026-05-17T00:53:40.029Z] [LOG] [INFO] - Blog: This is testing 1605 2026 fetched. Content size is: 0.0390625 KB
-[2026-05-17T00:53:40.029Z] [LOG] [INFO] - Blog: This is testing 1605 2026 fetched. Content size is: 0.0390625 KB
-[2026-05-17T00:53:40.029Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
-[2026-05-17T00:53:40.794Z] [LOG] [INFO] - Returning from user profile route with data.
-[2026-05-17T00:53:40.794Z] [LOG] [INFO] - Returning from user profile route with data.
-[2026-05-17T00:55:36.026Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: T S
-[2026-05-17T00:57:11.022Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2026-05-17T00:59:58.978Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2026-05-17T01:01:38.135Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
-[2026-05-17T01:02:00.153Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
-[2026-05-17T01:04:20.520Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: T S
-[2026-05-17T01:08:39.700Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
-[2026-05-17T01:11:27.679Z] [LOG] [INFO] - Returning from user profile route with data.
-[2026-05-17T01:11:27.679Z] [LOG] [INFO] - Returning from user profile route with data.
-[2026-05-17T01:11:54.926Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
-[2026-05-17T01:14:21.927Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2026-05-17T12:25:23.723Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T12:26:45.022Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T12:35:50.054Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T13:14:11.363Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T13:19:45.437Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T13:22:21.311Z] [LOG] [DEBUG] - Login OTP sent to: dynamicdevs.ima@gmail.com
+[2026-05-17T13:22:57.562Z] [LOG] [DEBUG] - Login via OTP successful: dynamicdevs.ima@gmail.com
+[2026-05-17T13:23:01.463Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:23:57.591Z] [LOG] [DEBUG] - Login OTP sent to: dynamicdevs.ima@gmail.com
+[2026-05-17T13:24:09.473Z] [LOG] [DEBUG] - Login via OTP successful: dynamicdevs.ima@gmail.com
+[2026-05-17T13:24:25.088Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:24:31.505Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:25:55.547Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:25:57.129Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:26:57.156Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:27:00.658Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:27:19.081Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:28:10.667Z] [LOG] [DEBUG] - Login OTP sent to: dynamicdevs.ima@gmail.com
+[2026-05-17T13:28:40.269Z] [LOG] [DEBUG] - Login via OTP successful: dynamicdevs.ima@gmail.com
+[2026-05-17T13:28:46.309Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:28:50.433Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:34:35.367Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T13:34:38.650Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T15:11:20.093Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T15:12:24.773Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Devs Team
+[2026-05-17T16:21:29.968Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:21:29.968Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:21:29.968Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:21:31.327Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:21:31.327Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:21:31.327Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:25:22.429Z] [LOG] [DEBUG] - New user created (pending OTP verification): dynamicdevs.ima@gmail.com
+[2026-05-17T16:25:33.004Z] [LOG] [DEBUG] - Account verified via OTP: dynamicdevs.ima@gmail.com
+[2026-05-17T16:25:37.211Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:26:14.131Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:26:14.131Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:26:14.131Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:26:38.244Z] [LOG] [DEBUG] - New user created (pending OTP verification): dynamicdevs.ima@gmail.com
+[2026-05-17T16:27:03.171Z] [LOG] [DEBUG] - Account verified via OTP: dynamicdevs.ima@gmail.com
+[2026-05-17T16:27:12.282Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:30:25.618Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:30:28.763Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:30:41.029Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:30:54.178Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:31:24.794Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:31:51.342Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:31:52.600Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:31:53.596Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:32:18.324Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:32:18.324Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:32:18.324Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-17T16:32:39.222Z] [LOG] [DEBUG] - New user created (pending OTP verification): dynamicdevs.ima@gmail.com
+[2026-05-17T16:32:56.909Z] [LOG] [DEBUG] - Account verified via OTP: dynamicdevs.ima@gmail.com
+[2026-05-17T16:33:09.239Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:33:19.648Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:33:38.527Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:33:40.519Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:42:09.674Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:43:34.792Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:43:49.301Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:44:02.347Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:44:18.402Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:44:44.428Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:44:57.825Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T16:45:12.088Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T17:01:56.638Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T17:02:25.166Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-17T17:02:33.100Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS

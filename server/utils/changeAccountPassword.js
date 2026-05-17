@@ -1,5 +1,5 @@
-const Admin= require("../models/Admin");
-const Reviewer= require("../models/Reviewer");
+const Admin = require("../models/Admin");
+const User = require("../models/User");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
@@ -7,35 +7,26 @@ exports.changeAccountPassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     const userId = req.query.userId;
-    const role= req.query.role;
-    var user;
-    if(role==="Admin"){
-      user = await Admin.findById({
-      _id: new mongoose.Types.ObjectId(userId),
-    });
-    console.log("user: " + user);
-    }
-    else if(role==="Reviewer"){
-      user = await Reviewer.findById({
-      _id: new mongoose.Types.ObjectId(userId),
-    });
-    console.log("user: " + user);
-    }
-    else{
-      res.status(500).json({ error: "Error occured while changing password!!" });
+    const role = req.query.role;
+
+    let user;
+    if (role === "Admin") {
+      user = await Admin.findById(new mongoose.Types.ObjectId(userId));
+    } else {
+      // Reviewers are now in User collection
+      user = await User.findById(new mongoose.Types.ObjectId(userId));
     }
 
-    // Verify the old password
+    if (!user) return res.status(404).json({ error: "User not found" });
+
     const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid old password" });
     }
 
-    // Generate a salt and hash the new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Update the user's password in the database
     user.password = hashedPassword;
     await user.save();
 

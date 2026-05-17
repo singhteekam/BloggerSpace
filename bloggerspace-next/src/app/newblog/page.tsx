@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Cloud,
   CloudOff,
+  Gem,
 } from "lucide-react";
 import {
   Dialog,
@@ -547,6 +548,17 @@ function NewBlogForm() {
               <Eye className="size-3.5" />
               Preview
             </Button>
+          </div>
+        </div>
+
+        {/* Gems reward hint */}
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-900/10">
+          <Gem className="mt-0.5 size-4 shrink-0 text-amber-500" />
+          <div>
+            <p className="text-sm font-medium text-foreground">Earn gems when your blog goes live</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Submit for review → pass editorial review → admin awards gems to your profile. Gems reflect your contribution to the community.
+            </p>
           </div>
         </div>
 

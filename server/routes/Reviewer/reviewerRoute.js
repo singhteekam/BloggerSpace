@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   reviewerSignup,
+  reviewerApply,
   reviewerLogin,
   userDetails,
   uploadUserProfilePicture,
@@ -20,7 +21,11 @@ const { changeAccountPassword } = require("../../utils/changeAccountPassword");
 const { forgotPassword } = require("../../utils/forgotPassword");
 const { resetPassword } = require("../../utils/resetPassword");
 
-router.post("/signup", reviewerSignup);
+// router.post("/signup", reviewerSignup);
+
+// Apply for reviewer role (authenticated, email-verified users only)
+const authenticate = require("../../middlewares/authenticate");
+router.post("/apply", authenticate, reviewerApply);
 
 router.post("/login", reviewerLogin);
 
@@ -56,8 +61,8 @@ router.post("/discardqueue/:id", reviewerMiddleware, discardQueueBlog)
 
 router.post("/changepassword", changeAccountPassword);
 
-router.post("/forgotpassword", forgotPassword);
+// router.post("/forgotpassword", forgotPassword);
 
-router.post("/resetpassword", resetPassword);
+// router.post("/resetpassword", resetPassword);
 
 module.exports = router;

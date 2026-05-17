@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2, ShieldCheck, KeyRound, ArrowLeft, RefreshCw } from "lucide-react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { Logo } from "@/components/brand/logo";
@@ -17,30 +17,62 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/auth-context";
 import { adminApi } from "@/lib/api/admin";
 
-const schema = z.object({
+type Step = "credentials" | "otp";
+
+const credSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
 });
+const otpSchema = z.object({
+  otp: z.string().length(6, "Code must be 6 digits").regex(/^\d+$/, "Digits only"),
+});
 
-type FormValues = z.infer<typeof schema>;
+type CredForm = z.infer<typeof credSchema>;
+type OtpForm = z.infer<typeof otpSchema>;
 
 export default function AdminLoginPage() {
   const { login } = useAuth();
   const router = useRouter();
   const [showPass, setShowPass] = useState(false);
+  const [step, setStep] = useState<Step>("credentials");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [resending, setResending] = useState(false);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-  });
+  const credForm = useForm<CredForm>({ resolver: zodResolver(credSchema) });
+  const otpForm = useForm<OtpForm>({ resolver: zodResolver(otpSchema) });
 
-  const onSubmit = async (data: FormValues) => {
+  const onCredentials = async (data: CredForm) => {
     try {
-      const res = await adminApi.login(data);
+      await adminApi.login(data);
+      setAdminEmail(data.email);
+      setStep("otp");
+      toast.success("Verification code sent to your email.");
+    } catch (err) {
+      toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Login failed.") : "Something went wrong.");
+    }
+  };
+
+  const onOtpVerify = async (data: OtpForm) => {
+    try {
+      const res = await adminApi.verifyLoginOtp(adminEmail, data.otp);
       login(res.data.token, res.data.adminDetails);
       toast.success("Welcome, Admin!");
       router.push("/admin/dashboard");
     } catch (err) {
-      toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Login failed.") : "Something went wrong.");
+      toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Invalid or expired code.") : "Something went wrong.");
+    }
+  };
+
+  const onResend = async () => {
+    setResending(true);
+    try {
+      await adminApi.resendLoginOtp(adminEmail);
+      toast.success("New code sent to your email.");
+      otpForm.reset();
+    } catch (err) {
+      toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed to resend.") : "Something went wrong.");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -56,34 +88,93 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-          <h1 className="font-serif text-2xl font-semibold tracking-tight">Admin sign in</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Access the admin control panel.
-          </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4" noValidate>
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="admin@example.com" autoComplete="email" {...register("email")} />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
-            </div>
+          {/* ── Step 1: Credentials ── */}
+          {step === "credentials" && (
+            <>
+              <h1 className="font-serif text-2xl font-semibold tracking-tight">Admin sign in</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Enter your credentials. A verification code will be sent to your email.
+              </p>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input id="password" type={showPass ? "text" : "password"} placeholder="••••••••" autoComplete="current-password" className="pr-10" {...register("password")} />
-                <button type="button" onClick={() => setShowPass((p) => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label={showPass ? "Hide password" : "Show password"}>
-                  {showPass ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
+              <form onSubmit={credForm.handleSubmit(onCredentials)} className="mt-6 space-y-4" noValidate>
+                <div className="space-y-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="admin@example.com" autoComplete="email" autoFocus
+                    {...credForm.register("email")} />
+                  {credForm.formState.errors.email && (
+                    <p className="text-xs text-destructive">{credForm.formState.errors.email.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Input id="password" type={showPass ? "text" : "password"} placeholder="••••••••"
+                      autoComplete="current-password" className="pr-10" {...credForm.register("password")} />
+                    <button type="button" onClick={() => setShowPass((p) => !p)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      aria-label={showPass ? "Hide password" : "Show password"}>
+                      {showPass ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                  </div>
+                  {credForm.formState.errors.password && (
+                    <p className="text-xs text-destructive">{credForm.formState.errors.password.message}</p>
+                  )}
+                </div>
+
+                <Button type="submit" className="w-full" disabled={credForm.formState.isSubmitting}>
+                  {credForm.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+                  Continue
+                </Button>
+              </form>
+            </>
+          )}
+
+          {/* ── Step 2: OTP ── */}
+          {step === "otp" && (
+            <>
+              <button onClick={() => setStep("credentials")}
+                className="mb-4 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="size-3" />Back
+              </button>
+
+              <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 mb-3">
+                <KeyRound className="size-5 text-primary" />
               </div>
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-            </div>
+              <h1 className="font-serif text-2xl font-semibold tracking-tight">Verify your identity</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                A 6-digit code was sent to <span className="font-medium text-foreground">{adminEmail}</span>.
+                Enter it below to complete sign-in.
+              </p>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-              Sign in as admin
-            </Button>
-          </form>
+              <form onSubmit={otpForm.handleSubmit(onOtpVerify)} className="mt-6 space-y-4" noValidate>
+                <div className="space-y-1.5">
+                  <Label htmlFor="otp">Verification code</Label>
+                  <Input id="otp" inputMode="numeric" maxLength={6} placeholder="000000" autoFocus
+                    {...otpForm.register("otp")} />
+                  {otpForm.formState.errors.otp && (
+                    <p className="text-xs text-destructive">{otpForm.formState.errors.otp.message}</p>
+                  )}
+                </div>
+
+                <Button type="submit" className="w-full" disabled={otpForm.formState.isSubmitting}>
+                  {otpForm.formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+                  Sign in as admin
+                </Button>
+              </form>
+
+              <button onClick={onResend} disabled={resending}
+                className="mt-3 flex w-full items-center justify-center gap-1.5 text-xs text-primary hover:underline disabled:opacity-50">
+                {resending ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
+                Resend code
+              </button>
+
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                Code expires in 10 minutes.
+              </p>
+            </>
+          )}
         </div>
 
         <p className="mt-5 text-center text-sm text-muted-foreground">

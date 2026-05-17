@@ -125,7 +125,7 @@ function ComposeTab({ adminId }: { adminId: string }) {
   return (
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Left — recipient selector */}
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-medium">
               Recipients
@@ -194,7 +194,7 @@ function ComposeTab({ adminId }: { adminId: string }) {
         </div>
 
         {/* Right — compose */}
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <div className="space-y-1.5">
             <Label htmlFor="subject">Subject *</Label>
             <Input

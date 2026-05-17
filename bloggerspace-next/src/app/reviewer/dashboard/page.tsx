@@ -241,7 +241,7 @@ function FilteredList<T extends { _id: string }>({
 }
 
 /* ─── History tab with its own search + pagination ────────────────── */
-function HistoryList({ entries }: { entries: { BlogTitle: string; BlogSlug: string; BlogReviewedTime: string }[] }) {
+function HistoryList({ entries }: { entries: { BlogTitle: string; BlogSlug: string; BlogReviewedTime: string; reviewerGems?: number }[] }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const q = search.trim().toLowerCase();
@@ -282,7 +282,14 @@ function HistoryList({ entries }: { entries: { BlogTitle: string; BlogSlug: stri
             {paginated.map((entry, i) => (
               <div key={i} className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-foreground">{entry.BlogTitle}</p>
+                  <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                    <p className="truncate font-medium text-foreground">{entry.BlogTitle}</p>
+                    {(entry.reviewerGems ?? 0) > 0 && (
+                      <span className="flex items-center gap-0.5 text-xs font-medium text-primary shrink-0">
+                        <Gem className="size-3" />{entry.reviewerGems} gems
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-0.5 text-xs text-muted-foreground flex items-center gap-1">
                     <Clock className="size-3" />{formatDate(entry.BlogReviewedTime)}
                   </p>

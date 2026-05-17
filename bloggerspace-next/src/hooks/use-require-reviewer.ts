@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 
-export function useRequireReviewer(redirectTo = "/reviewer/login") {
+export function useRequireReviewer(redirectTo = "/login") {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 

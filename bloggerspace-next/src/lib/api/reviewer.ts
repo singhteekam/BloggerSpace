@@ -6,6 +6,7 @@ export type ReviewedBlogEntry = {
   BlogTitle: string;
   BlogSlug: string;
   BlogReviewedTime: string;
+  reviewerGems?: number;
 };
 
 export type ReviewerProfile = {

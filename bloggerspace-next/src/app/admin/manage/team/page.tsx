@@ -6,6 +6,7 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
   Users, UserCheck, UserX, Loader2, Trash2, Clock, Ban, ShieldCheck, Search, X, Eye, Gem,
+  RotateCcw, AlertCircle,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useMemo } from "react";
@@ -90,7 +91,25 @@ function TeamManagement({ adminId }: { adminId: string }) {
     mutationFn: ({ userId, email }: { userId: string; email: string }) =>
       adminApi.deleteUser(userId, email, adminId),
     onSuccess: () => {
-      toast.success("User removed.");
+      toast.success("User permanently deleted.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
+  });
+
+  const deactivateMutation = useMutation({
+    mutationFn: (userId: string) => adminApi.deactivateUser(userId, adminId),
+    onSuccess: () => {
+      toast.success("Account deactivated.");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
+  });
+
+  const reactivateMutation = useMutation({
+    mutationFn: (userId: string) => adminApi.reactivateUser(userId, adminId),
+    onSuccess: () => {
+      toast.success("Account reactivated.");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
@@ -193,18 +212,50 @@ function TeamManagement({ adminId }: { adminId: string }) {
 
           {/* ── Users ────────────────────── */}
           <TabsContent value="users">
-            <SectionHeader title="Registered Users" desc="All active user accounts on BloggerSpace." />
+            <SectionHeader title="Registered Users" desc="All user accounts on BloggerSpace, including inactive ones." />
             {usersLoading ? <TabSkeleton /> : fUsers.length === 0 ? (
               <EmptyState icon={<Users />} msg={q ? `No results for "${search}".` : "No users found."} />
             ) : (
               <div className="space-y-3">
                 {fUsers.map((u) => (
                   <UserCard key={u._id} user={u}>
-                    <DeleteConfirmButton
-                      label="Remove user"
-                      desc={`This will soft-delete "${u.fullName}" (${u.email}). They will no longer be able to log in.`}
+                    {u.status === "INACTIVE" ? (
+                      <ConfirmActionButton
+                        label="Reactivate"
+                        icon={<RotateCcw className="size-3.5" />}
+                        dialogTitle="Reactivate account?"
+                        dialogDesc={`Restore login access for ${u.fullName} (${u.email}). They will be able to sign in again.`}
+                        confirmLabel="Reactivate"
+                        isPending={reactivateMutation.isPending}
+                        onConfirm={() => reactivateMutation.mutate(u._id)}
+                        triggerVariant="outline"
+                        confirmVariant="default"
+                      />
+                    ) : (
+                      <ConfirmActionButton
+                        label="Deactivate"
+                        icon={<Ban className="size-3.5" />}
+                        dialogTitle="Deactivate account?"
+                        dialogDesc={`Temporarily disable ${u.fullName}'s (${u.email}) account. They will be unable to log in until reactivated.`}
+                        confirmLabel="Deactivate"
+                        isPending={deactivateMutation.isPending}
+                        onConfirm={() => deactivateMutation.mutate(u._id)}
+                        triggerVariant="outline"
+                        triggerClassName="text-amber-600 hover:text-amber-600 border-amber-300 dark:border-amber-700"
+                        confirmVariant="destructive"
+                      />
+                    )}
+                    <ConfirmActionButton
+                      label="Delete"
+                      icon={<Trash2 className="size-3.5" />}
+                      dialogTitle="Permanently delete user?"
+                      dialogDesc={`This will permanently delete "${u.fullName}" (${u.email}) and all their data. This cannot be undone.`}
+                      confirmLabel="Delete permanently"
                       isPending={deleteUserMutation.isPending}
                       onConfirm={() => deleteUserMutation.mutate({ userId: u._id, email: u.email })}
+                      triggerVariant="ghost"
+                      triggerClassName="text-destructive hover:text-destructive"
+                      confirmVariant="destructive"
                     />
                   </UserCard>
                 ))}
@@ -265,9 +316,13 @@ function ReviewerCard({ reviewer, children }: { reviewer: ReviewerItem; children
           >
             {reviewer.fullName}
           </Link>
-          {reviewer.isVerified && (
+          {reviewer.isVerified ? (
             <Badge variant="secondary" className="text-xs h-5 px-1.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
-              <ShieldCheck className="size-3 mr-1" />Verified
+              <ShieldCheck className="size-3 mr-1" />Email verified
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-xs h-5 px-1.5 text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700">
+              <AlertCircle className="size-3 mr-1" />Email unverified
             </Badge>
           )}
           {reviewer.reviewerStatus && reviewer.reviewerStatus !== "none" && (
@@ -301,8 +356,9 @@ function ReviewerCard({ reviewer, children }: { reviewer: ReviewerItem; children
 }
 
 function UserCard({ user, children }: { user: UserItem; children: React.ReactNode }) {
+  const isInactive = user.status === "INACTIVE";
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-border bg-card p-4">
+    <div className={`flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border bg-card p-4 ${isInactive ? "border-amber-200 dark:border-amber-800/40 opacity-80" : "border-border"}`}>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2 mb-0.5">
           <Link
@@ -316,6 +372,11 @@ function UserCard({ user, children }: { user: UserItem; children: React.ReactNod
               <ShieldCheck className="size-3 mr-1" />Verified
             </Badge>
           )}
+          {isInactive && (
+            <Badge variant="outline" className="text-xs h-5 px-1.5 text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700">
+              Inactive
+            </Badge>
+          )}
           {user.role && user.role !== "user" && (
             <Badge variant="secondary" className="text-xs h-5 px-1.5 capitalize">{user.role}</Badge>
           )}
@@ -327,7 +388,6 @@ function UserCard({ user, children }: { user: UserItem; children: React.ReactNod
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
           <Clock className="size-3 inline mr-1" />Joined {formatDate(user.createdAt)}
-          {user.status && <span className="ml-2">&middot; {user.status}</span>}
         </p>
         {typeof user.gems === "number" && (
           <p className="text-xs text-primary font-medium mt-1 flex items-center gap-1">
@@ -420,33 +480,3 @@ function ConfirmActionButton({
   );
 }
 
-/* ─── Delete confirm button (user deletion) ──────────────────────── */
-function DeleteConfirmButton({
-  label, desc, isPending, onConfirm,
-}: {
-  label: string; desc: string; isPending: boolean; onConfirm: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-          <Trash2 className="size-3.5" />
-        </Button>
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-6 shadow-xl">
-          <Dialog.Title className="font-serif text-lg font-semibold">{label}?</Dialog.Title>
-          <Dialog.Description className="mt-2 text-sm text-muted-foreground">{desc}</Dialog.Description>
-          <div className="mt-5 flex justify-end gap-2">
-            <Dialog.Close asChild><Button variant="outline" size="sm">Cancel</Button></Dialog.Close>
-            <Button variant="destructive" size="sm" disabled={isPending} onClick={() => { onConfirm(); setOpen(false); }} className="gap-1.5">
-              {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}Confirm
-            </Button>
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-}

@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
 const Blog = require("../../models/Blog");
-const Reviewer = require("../../models/Reviewer");
 const User = require("../../models/User");
 const jwt = require("jsonwebtoken");
 const Admin = require("../../models/Admin");
@@ -10,21 +9,13 @@ const sendEmail = require("../../services/mailer");
 const removeDuplicates = require("../../utils/removeDuplicates");
 const validateUsername = require("../../utils/validateUsername");
 
-// Helper: find a reviewer by userId, checking User collection first (new system)
-// then falling back to Reviewer collection (old system / not-yet-migrated).
-async function findReviewerById(userId) {
-  const user = await User.findById(userId);
-  if (user && (user.role === "reviewer" || user.role === "Reviewer")) return { doc: user, source: "user" };
-  const reviewer = await Reviewer.findById(userId);
-  if (reviewer) return { doc: reviewer, source: "reviewer" };
-  return null;
-}
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 exports.reviewerSignup = async (req, res) => {
   try {
-    const { fullName, email, password, motivation } = req.body;
+    const { fullName, email, password } = req.body;
 
-    // Check User collection first — existing user can apply as reviewer
+    // Check User collection first
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       if (existingUser.role === "reviewer" && existingUser.reviewerStatus === "approved") {
@@ -33,85 +24,110 @@ exports.reviewerSignup = async (req, res) => {
       if (existingUser.reviewerStatus === "pending") {
         return res.status(400).json({ message: "An application with this email is already pending review." });
       }
-      // Existing user — just add their reviewer application
-      existingUser.reviewerStatus = "pending";
-      await existingUser.save();
-
-      const motivationHtml = motivation?.trim()
-        ? `<p><strong>Motivation:</strong> ${motivation.trim()}</p>`
-        : "";
-      const adminHtml = `
-        <div class="content">
-          <h2>New Reviewer Application</h2>
-          <p>An existing user has applied to join the BloggerSpace Reviewer Panel.</p>
-          <div class="info-box">
-            <strong>Name:</strong> ${existingUser.fullName}<br>
-            <strong>Email:</strong> ${email}
-            ${motivationHtml ? `<br><strong>Motivation:</strong> ${motivation.trim()}` : ""}
-          </div>
-          <p><a class="btn" href="${process.env.FRONTEND_URL}/admin">Open Admin Panel</a></p>
-        </div>`;
-      const applicantHtml = `
-        <div class="content">
-          <h2>Hi ${existingUser.fullName},</h2>
-          <p>Your application to the <strong>BloggerSpace Reviewer Panel</strong> has been received.</p>
-          <p>Our admin team will review it and notify you by email once approved.</p>
-          <div class="info-box">In the meantime, you can keep using BloggerSpace as a regular reader and writer.</div>
-        </div>`;
-
-      res.status(201).json({ message: "Application submitted successfully." });
-      await sendEmail(process.env.EMAIL, "New Reviewer Application — BloggerSpace", adminHtml);
-      await sendEmail(email, "Application received — BloggerSpace Reviewer Panel", applicantHtml);
-      return;
+      // Existing user must be email-verified before applying
+      if (!existingUser.isVerified) {
+        return res.status(400).json({
+          message: "email_not_verified",
+          info: "Your email is not yet verified. Please verify your account first, then apply for reviewer access from your profile.",
+        });
+      }
+      // Verified existing user — direct them to the in-app apply flow
+      return res.status(400).json({
+        message: "account_exists",
+        info: "You already have a BloggerSpace account. Sign in and use the 'Apply as Reviewer' option in your profile.",
+      });
     }
 
-    // Check old Reviewer collection to prevent duplicate applications
-    const existingReviewer = await Reviewer.findOne({ email });
-    if (existingReviewer) {
-      return res.status(400).json({ message: "An application with this email already exists." });
-    }
-
-    // New applicant — create a User account with reviewer application pending
+    // New applicant — create a regular user account and send email verification OTP.
+    // Reviewer application is submitted separately (from profile) after email is verified.
     const hashedPassword = await bcrypt.hash(password, 10);
+    const otp = generateOtp();
     const newUser = new User({
       fullName,
-      userName: "reviewer" + email.substring(0, email.indexOf("@")).replace(/[^a-zA-Z0-9]/g, ""),
+      userName: "user" + email.substring(0, email.indexOf("@")).replace(/[^a-zA-Z0-9]/g, ""),
       email,
       password: hashedPassword,
       role: "user",
-      reviewerStatus: "pending",
+      reviewerStatus: "none",
       isVerified: false,
-      status: "ACTIVE",
+      status: "INACTIVE",
+      otpCode: otp,
+      otpExpiry: new Date(Date.now() + 10 * 60 * 1000),
     });
     await newUser.save();
 
+    sendEmail(email, "Verify your BloggerSpace email", `
+      <div class="content">
+        <h2>Hi ${fullName},</h2>
+        <p>Welcome to BloggerSpace! To get started, please verify your email address using the code below.</p>
+        <div class="otp-code">${otp}</div>
+        <div class="info-box">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</div>
+        <p>Once verified, you'll be able to sign in and apply for reviewer access from your profile.</p>
+      </div>
+    `).catch((err) => console.error("Failed to send reviewer signup OTP:", err));
+
+    return res.status(201).json({
+      message: "otp_required",
+      email,
+      info: "Account created! Please verify your email to continue. After verification, you can apply for reviewer access from your profile.",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Signup failed. Please try again.", error: error.message });
+  }
+};
+
+// Submit a reviewer application (for already-verified, active users)
+exports.reviewerApply = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const { motivation } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Please verify your email before applying." });
+    }
+    if (user.status !== "ACTIVE") {
+      return res.status(403).json({ message: "Your account is not active." });
+    }
+    if (user.role === "reviewer" && user.reviewerStatus === "approved") {
+      return res.status(400).json({ message: "You are already an approved reviewer." });
+    }
+    if (user.reviewerStatus === "pending") {
+      return res.status(400).json({ message: "Your application is already pending admin review." });
+    }
+
+    user.reviewerStatus = "pending";
+    await user.save();
+
     const motivationHtml = motivation?.trim()
-      ? `<p><strong>Motivation:</strong> ${motivation.trim()}</p>`
+      ? `<br><strong>Motivation:</strong> ${motivation.trim()}`
       : "";
     const adminHtml = `
       <div class="content">
         <h2>New Reviewer Application</h2>
-        <p>A new user has applied to join the BloggerSpace Reviewer Panel.</p>
+        <p>A verified BloggerSpace user has applied to join the Reviewer Panel.</p>
         <div class="info-box">
-          <strong>Name:</strong> ${fullName}<br>
-          <strong>Email:</strong> ${email}
-          ${motivationHtml ? `<br><strong>Motivation:</strong> ${motivation.trim()}` : ""}
+          <strong>Name:</strong> ${user.fullName}<br>
+          <strong>Email:</strong> ${user.email}
+          ${motivationHtml}
         </div>
         <p><a class="btn" href="${process.env.FRONTEND_URL}/admin">Open Admin Panel</a></p>
       </div>`;
     const applicantHtml = `
       <div class="content">
-        <h2>Hi ${fullName},</h2>
-        <p>Thank you for applying to the <strong>BloggerSpace Reviewer Panel</strong>!</p>
-        <p>Your application has been received and is under review by our admin team. We'll notify you by email once it's approved.</p>
-        <div class="info-box">Once approved, you can sign in at the Reviewer Portal with your email and password.</div>
+        <h2>Hi ${user.fullName},</h2>
+        <p>Your application to the <strong>BloggerSpace Reviewer Panel</strong> has been received.</p>
+        <p>Our admin team will review it and notify you by email once approved.</p>
+        <div class="info-box">In the meantime, you can keep using BloggerSpace as a regular user.</div>
       </div>`;
 
-    res.status(201).json({ message: "Application submitted successfully." });
-    await sendEmail(process.env.EMAIL, "New Reviewer Application — BloggerSpace", adminHtml);
-    await sendEmail(email, "Application received — BloggerSpace Reviewer Panel", applicantHtml);
+    res.status(200).json({ message: "Application submitted successfully." });
+    sendEmail(process.env.EMAIL, "New Reviewer Application — BloggerSpace", adminHtml).catch(console.error);
+    sendEmail(user.email, "Application received — BloggerSpace Reviewer Panel", applicantHtml).catch(console.error);
   } catch (error) {
-    res.status(500).json({ message: "Signup failed. Please try again.", error: error.message });
+    res.status(500).json({ message: "Failed to submit application.", error: error.message });
   }
 };
 
@@ -124,6 +140,9 @@ exports.reviewerLogin = async (req, res) => {
     // Try User collection first (new system)
     const userReviewer = await User.findOne({ email });
     if (userReviewer && (userReviewer.role === "reviewer")) {
+      if (userReviewer.status === "INACTIVE") {
+        return res.status(403).json({ message: "account_deactivated", info: "Your account has been deactivated. Please contact support." });
+      }
       if (userReviewer.reviewerStatus !== "approved") {
         return res.status(403).json({ message: "Your reviewer application is pending admin approval." });
       }
@@ -149,37 +168,7 @@ exports.reviewerLogin = async (req, res) => {
       });
     }
 
-    // Fallback: old Reviewer collection
-    const reviewer = await Reviewer.findOne({ email });
-    if (!reviewer) {
-      return res.status(404).json({ message: "Reviewer not found" });
-    }
-    if (!reviewer.isVerified) {
-      return res.status(403).json({ message: "Reviewer not verified" });
-    }
-    const isPasswordValid = await bcrypt.compare(password, reviewer.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
-    const token = jwt.sign(
-      { userId: reviewer._id, currentuserId: reviewer._id, role: "Reviewer" },
-      process.env.CURRENT_JWT_SECRET,
-      { expiresIn: "3d" }
-    );
-    return res.status(200).json({
-      message: "Login successful",
-      token,
-      reviewerDetails: {
-        _id: reviewer._id,
-        email: reviewer.email,
-        fullName: reviewer.fullName,
-        userName: reviewer.userName,
-        profilePicture: reviewer.profilePicture,
-        isVerified: reviewer.isVerified,
-        role: reviewer.role,
-        createdAt: reviewer.createdAt,
-      },
-    });
+    return res.status(404).json({ message: "Reviewer account not found. Please ensure you have a verified BloggerSpace account with reviewer access." });
   } catch (error) {
     res.status(500).json({ message: "Login failed", error: error.message });
   }
@@ -199,11 +188,10 @@ exports.uploadUserProfilePicture = async (req, res) => {
       user.profilePicture = profilePictureData;
       await user.save();
     } else {
-      // Reviewer — check User collection first, then legacy Reviewer collection
-      const found = await findReviewerById(userId);
-      if (!found) return res.status(404).json({ error: "Reviewer not found" });
-      found.doc.profilePicture = profilePictureData;
-      await found.doc.save();
+      const reviewer = await User.findById(userId);
+      if (!reviewer) return res.status(404).json({ error: "Reviewer not found" });
+      reviewer.profilePicture = profilePictureData;
+      await reviewer.save();
     }
 
     res.status(200).json({ newPicture: profilePictureData, message: "Profile picture uploaded successfully" });
@@ -302,20 +290,18 @@ exports.saveEditedPendingBlog = async (req, res) => {
     blog.tags = tags;
     await blog.save();
 
-    // Add to reviewer's reviewedBlogs — check User first, then old Reviewer collection
-    const found = await findReviewerById(req.query.userId);
-    if (found) {
-      const reviewedBlog = {
+    // Add to reviewer's reviewedBlogs in User collection
+    const reviewer = await User.findById(req.query.userId);
+    if (reviewer) {
+      reviewer.reviewedBlogs.push({
         BlogObjectId: blog._id,
         BlogId: blog.blogId,
         BlogTitle: title,
         BlogSlug: slug,
         BlogReviewedTime: new Date(new Date().getTime() + 330 * 60000),
-      };
-      found.doc.reviewedBlogs.push(reviewedBlog);
-      await found.doc.save();
+      });
+      await reviewer.save();
 
-      const receiver = found.doc.email;
       const subject = "Your blog is now under review — BloggerSpace";
       const html = `
         <div class="content">
@@ -325,7 +311,7 @@ exports.saveEditedPendingBlog = async (req, res) => {
           <p><a class="btn" href="${process.env.FRONTEND_URL}/reviewer">Go to Reviewer Dashboard</a></p>
         </div>`;
       res.json({ message: "blog updated successfully" });
-      await sendEmail(receiver, subject, html);
+      await sendEmail(reviewer.email, subject, html);
     } else {
       res.json({ message: "blog updated successfully" });
     }
@@ -364,11 +350,35 @@ exports.userDetails = async (req, res) => {
       });
     }
 
-    // Reviewer — check User collection first (new system), then Reviewer collection (legacy)
     if (role === "Reviewer" || role === "reviewer") {
-      const found = await findReviewerById(userId);
-      if (!found) return res.status(404).json({ error: "Reviewer not found" });
-      const u = found.doc;
+      const u = await User.findById(userId);
+      if (!u) return res.status(404).json({ error: "Reviewer not found" });
+
+      // Enrich reviewedBlogs with reviewer gems from the Blog collection
+      const rawReviewed = u.reviewedBlogs || [];
+      const blogObjectIds = rawReviewed.filter((rb) => rb.BlogObjectId).map((rb) => rb.BlogObjectId);
+      const gemsMap = new Map();
+      if (blogObjectIds.length) {
+        const blogDocs = await Blog.find({ _id: { $in: blogObjectIds } }).select("_id gems").lean();
+        blogDocs.forEach((b) => {
+          const gems = b.gems;
+          if (!gems?.awarded) { gemsMap.set(b._id.toString(), 0); return; }
+          let reviewerGems = 0;
+          const rid = u._id.toString();
+          if (gems.reviewerAwards?.length) {
+            const award = gems.reviewerAwards.find((a) => a.userId?.toString() === rid);
+            reviewerGems = award?.gems || 0;
+          } else if (gems.reviewerUserId?.toString() === rid) {
+            reviewerGems = gems.reviewerGems || 0;
+          }
+          gemsMap.set(b._id.toString(), reviewerGems);
+        });
+      }
+      const enrichedReviewedBlogs = rawReviewed.map((rb) => ({
+        ...rb,
+        reviewerGems: rb.BlogObjectId ? (gemsMap.get(rb.BlogObjectId.toString()) ?? 0) : 0,
+      }));
+
       return res.json({
         _id: u._id,
         fullName: u.fullName,
@@ -376,8 +386,8 @@ exports.userDetails = async (req, res) => {
         email: u.email,
         isVerified: u.isVerified,
         profilePicture: u.profilePicture,
-        role: found.source === "user" ? "reviewer" : u.role,
-        reviewedBlogs: u.reviewedBlogs,
+        role: u.role,
+        reviewedBlogs: enrichedReviewedBlogs,
         createdAt: u.createdAt,
       });
     }
@@ -399,10 +409,10 @@ exports.deleteReviewerAccount = async (req, res) => {
       admin.status = "DELETED";
       await admin.save();
     } else {
-      const found = await findReviewerById(currentuserId);
-      if (!found) return res.status(404).json({ error: "Reviewer not found" });
-      found.doc.status = "DELETED";
-      await found.doc.save();
+      const reviewer = await User.findById(currentuserId);
+      if (!reviewer) return res.status(404).json({ error: "Reviewer not found" });
+      reviewer.status = "DELETED";
+      await reviewer.save();
     }
 
     res.json({ message: "Account deleted successfully" });
@@ -474,11 +484,11 @@ exports.changeUsername = async (req, res) => {
       updatedUser.userName = userName;
       await updatedUser.save();
     } else {
-      const found = await findReviewerById(req.query.userId);
-      if (!found) return res.status(404).json({ error: "Reviewer not found" });
-      found.doc.fullName = fullName;
-      found.doc.userName = userName;
-      await found.doc.save();
+      const reviewer = await User.findById(req.query.userId);
+      if (!reviewer) return res.status(404).json({ error: "Reviewer not found" });
+      reviewer.fullName = fullName;
+      reviewer.userName = userName;
+      await reviewer.save();
     }
 
     res.json({ message: "Username updated successfully" });

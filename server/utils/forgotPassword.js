@@ -1,32 +1,25 @@
 const Admin = require("../models/Admin");
-const Reviewer = require("../models/Reviewer");
+const User = require("../models/User");
 const sendEmail = require("../services/mailer");
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user =
-      (await Admin.findOne({ email })) || (await Reviewer.findOne({ email }));
-   
+    // Check Admin first, then User collection (reviewers are now in User collection)
+    const user = (await Admin.findOne({ email })) || (await User.findOne({ email }));
+
     if (!user) {
-      // User not found, return an error message
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Generate a unique password reset token
     const resetToken = generateResetToken();
-
-    // Save the reset token and its expiration date in the user's document
     user.resetToken = resetToken;
-    user.resetTokenExpiration = Date.now() + 60000; // Token valid for 1 minute
+    user.resetTokenExpiration = Date.now() + 60000;
     await user.save();
 
-    // Create the password reset email
-    // const resetUrl = `http://localhost:4000/resetpassword/${resetToken}`;
     const resetUrl = `${req.protocol}://${req.get("host")}/resetpassword/${resetToken}`;
 
-    const receiver = email;
     const subject = "Password reset request — BloggerSpace";
     const html = `
       <div class="content">
@@ -40,31 +33,19 @@ exports.forgotPassword = async (req, res) => {
       </div>
     `;
 
-    // Send the password reset email
-    await sendEmail(receiver, subject, html);
-
-    // Email sent successfully
+    await sendEmail(email, subject, html);
     return res.status(200).json({ message: "Password reset email sent" });
   } catch (error) {
-    // An error occurred, return an error message
     console.error(error);
-    return res
-      .status(500)
-      .json({ error: "Failed to send password reset email" });
+    return res.status(500).json({ error: "Failed to send password reset email" });
   }
 };
 
-
 function generateResetToken() {
-  const tokenLength = 32;
-  const chars =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let token = "";
-
-  for (let i = 0; i < tokenLength; i++) {
-    const randomIndex = Math.floor(Math.random() * chars.length);
-    token += chars.charAt(randomIndex);
+  for (let i = 0; i < 32; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-
   return token;
 }

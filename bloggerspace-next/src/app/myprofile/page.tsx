@@ -1,13 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Loader2, Pencil, Camera, CheckCircle2, BadgeCheck, CalendarDays,
-  Gem, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BookOpen,
+  Gem, TrendingUp, TrendingDown, ChevronLeft, ChevronRight,
+  ShieldCheck, Clock, LayoutDashboard,
 } from "lucide-react";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { isAxiosError } from "axios";
@@ -53,7 +55,7 @@ function ProfileSkeleton() {
 
 export default function MyProfilePage() {
   const { user, isLoading: authLoading } = useRequireAuth();
-  const { login } = useAuth();
+  const { login, token } = useAuth();
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState(false);
@@ -80,6 +82,14 @@ export default function MyProfilePage() {
     resolver: zodResolver(schema),
     values: profile ? { fullName: profile.fullName, userName: profile.userName ?? "" } : undefined,
   });
+
+  // Sync auth context when API returns fresher role/reviewerStatus (e.g. after admin approves)
+  useEffect(() => {
+    if (!profile || !user || !token) return;
+    if (profile.role !== user.role || profile.reviewerStatus !== user.reviewerStatus) {
+      login(token, { ...user, role: profile.role ?? user.role, reviewerStatus: profile.reviewerStatus ?? user.reviewerStatus });
+    }
+  }, [profile]);
 
   const picMutation = useMutation({
     mutationFn: (file: File) => userApi.uploadProfilePicture(user!._id, file),
@@ -186,8 +196,70 @@ export default function MyProfilePage() {
 
       <Separator className="my-8" />
 
+      {/* Reviewer status CTA */}
+      {user.role !== "Admin" && (
+        <>
+          {(user.reviewerStatus === "none" || user.reviewerStatus === "rejected" || !user.reviewerStatus) && (
+            <div className="mb-6 rounded-xl border border-border bg-card p-5">
+              <div className="flex items-start gap-4">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <ShieldCheck className="size-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm">Become a reviewer</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Help maintain content quality by reviewing blog submissions before they go live.
+                  </p>
+                  {user.reviewerStatus === "rejected" && (
+                    <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                      Your previous application was not approved. You can reapply.
+                    </p>
+                  )}
+                </div>
+                <Button asChild size="sm" variant="outline" className="shrink-0">
+                  <Link href="/apply-reviewer">Apply now</Link>
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {user.reviewerStatus === "pending" && (
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-900/10 p-5">
+              <div className="flex items-center gap-3">
+                <Clock className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-amber-800 dark:text-amber-300">Application under review</p>
+                  <p className="text-xs text-amber-700 dark:text-amber-400">
+                    Our admin team will review your application and notify you by email once a decision is made.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {user.role === "reviewer" && user.reviewerStatus === "approved" && (
+            <div className="mb-6 rounded-xl border border-border bg-card p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <ShieldCheck className="size-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm">Reviewer access active</p>
+                  <p className="text-xs text-muted-foreground">You can review and approve blog submissions.</p>
+                </div>
+                <Button asChild size="sm" variant="outline" className="shrink-0 gap-1.5">
+                  <Link href="/reviewer">
+                    <LayoutDashboard className="size-3.5" />Dashboard
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
       {/* Gems balance */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+      <div className="rounded-xl border border-border bg-card p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
@@ -200,37 +272,59 @@ export default function MyProfilePage() {
           </div>
           <p className="text-3xl font-bold text-primary">{gems}</p>
         </div>
+      </div>
 
-        {/* Transaction history */}
+      {/* Transaction history */}
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <p className="font-semibold text-sm">Transaction history</p>
+          {!gemsLoading && (gemsHistory?.total ?? 0) > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {gemsHistory!.total} transaction{gemsHistory!.total !== 1 ? "s" : ""}
+            </p>
+          )}
+        </div>
+
         {gemsLoading ? (
-          <div className="space-y-2">
+          <div className="p-4 space-y-2">
             {[0, 1, 2].map((i) => <Skeleton key={i} className="h-12 rounded-lg" />)}
           </div>
         ) : transactions.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-8 text-center text-muted-foreground">
+          <div className="flex flex-col items-center gap-2 py-10 text-center text-muted-foreground">
             <Gem className="size-6" />
-            <p className="text-sm">No gems transactions yet. Publish blogs to earn gems!</p>
+            <p className="text-sm">No transactions yet. Publish blogs to earn gems!</p>
           </div>
         ) : (
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Transaction history</p>
-            <div className="divide-y divide-border rounded-lg border overflow-hidden">
+          <>
+            <div className="divide-y divide-border">
               {transactions.map((tx) => (
                 <TransactionRow key={tx._id} tx={tx} />
               ))}
             </div>
-            {totalGemsPages > 1 && (
-              <div className="flex items-center justify-center gap-2 pt-2">
-                <Button size="sm" variant="outline" disabled={gemsPage <= 1} onClick={() => setGemsPage((p) => p - 1)}>
-                  <ChevronLeft className="size-3.5" />
-                </Button>
-                <span className="text-xs text-muted-foreground">{gemsPage} / {totalGemsPages}</span>
-                <Button size="sm" variant="outline" disabled={gemsPage >= totalGemsPages} onClick={() => setGemsPage((p) => p + 1)}>
-                  <ChevronRight className="size-3.5" />
-                </Button>
-              </div>
-            )}
-          </div>
+            <div className="flex items-center justify-between px-5 py-3 border-t border-border bg-muted/30">
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1"
+                disabled={gemsPage <= 1}
+                onClick={() => setGemsPage((p) => p - 1)}
+              >
+                <ChevronLeft className="size-3.5" />Previous
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                Page {gemsPage} of {totalGemsPages}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1"
+                disabled={gemsPage >= totalGemsPages}
+                onClick={() => setGemsPage((p) => p + 1)}
+              >
+                Next<ChevronRight className="size-3.5" />
+              </Button>
+            </div>
+          </>
         )}
       </div>
 

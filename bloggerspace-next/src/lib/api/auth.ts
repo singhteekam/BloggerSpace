@@ -8,6 +8,7 @@ export type AuthUser = {
   profilePicture?: string;
   userName?: string;
   isVerified?: boolean;
+  reviewerStatus?: "none" | "pending" | "approved" | "rejected";
   gems?: number;
   createdAt?: string;
 };
@@ -23,13 +24,6 @@ export type AuthResponse = {
 /** Shape returned by POST /api/users/signup */
 export type SignupResponse = {
   message: string;
-};
-
-/** Shape returned by POST /api/reviewer/login */
-export type ReviewerAuthResponse = {
-  message: string;
-  token: string;
-  reviewerDetails: AuthUser;
 };
 
 export type LoginPayload = { email: string; password: string };
@@ -62,12 +56,30 @@ export const authApi = {
   resendOtp: (email: string) =>
     api.post<{ message: string }>("/api/users/resend-otp", { email }),
 
+  // Passwordless OTP login
+  requestLoginOtp: (email: string) =>
+    api.post<{ message: string; info: string }>("/api/users/login-otp/request", { email }),
+
+  verifyLoginOtp: (email: string, otp: string) =>
+    api.post<AuthResponse>("/api/users/login-otp/verify", { email, otp }),
+
+  // Forgot password via OTP
+  forgotPasswordRequestOtp: (email: string) =>
+    api.post<{ message: string; info: string }>("/api/users/forgot-password/request-otp", { email }),
+
+  forgotPasswordVerifyOtp: (email: string, otp: string) =>
+    api.post<{ message: string; resetToken: string }>("/api/users/forgot-password/verify-otp", { email, otp }),
+
+  forgotPasswordReset: (resetToken: string, newPassword: string) =>
+    api.post<{ message: string }>("/api/users/forgot-password/reset", { resetToken, newPassword }),
+
+  // Legacy link-based forgot password (kept for backward compat)
   forgotPassword: (email: string) =>
     api.post("/api/users/forgotpassword", { email }),
 
   resetPassword: (token: string, newPassword: string) =>
     api.post("/api/users/resetpassword", { token, newPassword }),
 
-  reviewerLogin: (data: LoginPayload) =>
-    api.post<ReviewerAuthResponse>("/api/reviewer/login", data),
+  reviewerApply: (motivation?: string) =>
+    api.post<{ message: string }>("/api/reviewer/apply", { motivation }),
 };

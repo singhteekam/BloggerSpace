@@ -1,43 +1,32 @@
 const bcrypt = require("bcrypt");
-const Reviewer = require("../models/Reviewer");
 const Admin = require("../models/Admin");
+const User = require("../models/User");
 
-// Resetting password
 exports.resetPassword = async (req, res) => {
   const { resetToken, password } = req.body;
 
   try {
+    // Check Admin first, then User collection (reviewers are now in User collection)
     const user =
       (await Admin.findOne({
-        resetToken: resetToken,
+        resetToken,
         resetTokenExpiration: { $gt: Date.now() },
       })) ||
-      (await Reviewer.findOne({
-        resetToken: resetToken,
+      (await User.findOne({
+        resetToken,
         resetTokenExpiration: { $gt: Date.now() },
       }));
 
     if (!user) {
-    // User not found, return an error message
-    return res.status(404).json({ error: "Invalid reset link" });
+      return res.status(404).json({ error: "Invalid reset link" });
     }
 
-    // Hash the new password
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({ error: "Failed to reset password" });
-      }
-
-      // Update the user's password and reset token fields
-      user.password = hashedPassword;
-      user.resetToken = undefined;
-      user.resetTokenExpiration = undefined;
-
-    });
-    // Save the updated user object
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetToken = undefined;
+    user.resetTokenExpiration = undefined;
     await user.save();
-      
+
     res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to reset password" });
