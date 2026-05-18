@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { BadgeCheck, BookOpen, Users, Calendar, Eye, Heart, Mail } from "lucide-react";
+import { BadgeCheck, BookOpen, Users, Calendar, Eye, Heart, Mail, Star, TrendingUp, MessageSquare } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { FollowButton } from "@/components/user/follow-button";
@@ -84,6 +84,42 @@ export default async function PublicProfilePage({ params }: Props) {
               <span className="text-muted-foreground">following</span>
             </span>
           </div>
+
+          {/* Phase 5 — creator score card (only when score > 0) */}
+          {(profile.creatorScore ?? 0) > 0 && profile.creatorStats && (
+            <div className="mt-4 inline-flex flex-wrap items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-900/40 dark:bg-amber-900/10">
+              <span className="flex items-center gap-1.5">
+                <TrendingUp className="size-4 text-amber-600 dark:text-amber-400" />
+                <span className="text-xs font-medium text-amber-700 dark:text-amber-400">Creator Score</span>
+                <span className="text-base font-bold text-amber-700 dark:text-amber-400">
+                  {profile.creatorScore}
+                </span>
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {profile.creatorStats.scoredBlogCount} scored
+                {" · "}avg {profile.creatorStats.avg}
+                {" · "}best {profile.creatorStats.best}
+              </span>
+            </div>
+          )}
+
+          {/* Phase 6 — reviewer score card (only when at least one review is scored) */}
+          {(profile.reviewerScoreCount ?? 0) > 0 && (
+            <div className="mt-3 inline-flex flex-wrap items-center gap-3 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 dark:border-sky-900/40 dark:bg-sky-900/10">
+              <span className="flex items-center gap-1.5">
+                <MessageSquare className="size-4 text-sky-600 dark:text-sky-400" />
+                <span className="text-xs font-medium text-sky-700 dark:text-sky-400">Reviewer Score</span>
+                <span className="flex items-center gap-0.5 text-base font-bold text-sky-700 dark:text-sky-400">
+                  <Star className="size-3.5 fill-current" />
+                  {profile.reviewerScoreAvg}
+                </span>
+              </span>
+              <span className="text-xs text-muted-foreground">
+                from {profile.reviewerScoreCount} review{profile.reviewerScoreCount !== 1 ? "s" : ""}
+                {" · "}best {profile.reviewerScoreBest}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Follow button — client component, handles own auth check */}
@@ -146,6 +182,12 @@ export default async function PublicProfilePage({ params }: Props) {
                     <Heart className="size-3" />
                     {(blog.blogLikes?.length ?? 0).toLocaleString()} likes
                   </span>
+                  {(blog.blogScore ?? 0) > 0 && (
+                    <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                      <Star className="size-3 fill-current" />
+                      {blog.blogScore}
+                    </span>
+                  )}
                   {blog.lastUpdatedAt && (
                     <span>{formatDate(blog.lastUpdatedAt)}</span>
                   )}

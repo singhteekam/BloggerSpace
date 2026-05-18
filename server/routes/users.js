@@ -222,6 +222,11 @@ router.post("/fileupload", fileUpload);
 
 router.get("/uploadedfiles/fetch", fetchUploadedFiles);
 
+// Redemption requests (Phase 4)
+const { createRedemption, listOwnRedemptions } = require("../controllers/redemptionController");
+router.post("/redemptions", authenticate, createRedemption);
+router.get("/redemptions/me", authenticate, listOwnRedemptions);
+
 // Gems transaction history for logged-in user
 const GemsTransaction = require("../models/GemsTransaction");
 router.get("/gems/history", authenticate, async (req, res) => {

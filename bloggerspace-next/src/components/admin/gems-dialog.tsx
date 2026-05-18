@@ -1,6 +1,6 @@
 "use client";
 
-import { Gem, User, Loader2 } from "lucide-react";
+import { Gem, User, Loader2, AlertCircle } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,10 @@ export interface GemsDialogAuthor {
   fullName?: string;
   email?: string;
 }
+
+// Phase 2 — per-blog cap fallbacks (overridden by AdminConfig via props).
+const DEFAULT_MAX_AUTHOR_GEMS = 10;
+const DEFAULT_MAX_REVIEWER_GEMS = 5;
 
 export function GemsDialog({
   open,
@@ -30,6 +34,8 @@ export function GemsDialog({
   onSubmit,
   onSkip,
   skipLabel,
+  maxAuthorGems = DEFAULT_MAX_AUTHOR_GEMS,
+  maxReviewerGems = DEFAULT_MAX_REVIEWER_GEMS,
 }: {
   open: boolean;
   setOpen: (v: boolean) => void;
@@ -45,7 +51,18 @@ export function GemsDialog({
   onSubmit: () => void;
   onSkip?: () => void;
   skipLabel?: string;
+  /** Per-blog cap for author gems. From AdminConfig.perBlogAuthorGemsCap. */
+  maxAuthorGems?: number;
+  /** Per-blog cap per reviewer. From AdminConfig.perBlogReviewerGemsCap. */
+  maxReviewerGems?: number;
 }) {
+  // Validation: any input over its cap blocks submit.
+  const authorOver = (parseInt(authorGems) || 0) > maxAuthorGems;
+  const reviewerOver = Object.values(reviewerInputs).some(
+    (v) => (parseInt(v) || 0) > maxReviewerGems,
+  );
+  const hasCapViolation = authorOver || reviewerOver;
+
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
@@ -75,14 +92,28 @@ export function GemsDialog({
                 <Badge variant="secondary" className="text-xs shrink-0">Author</Badge>
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Gems</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs text-muted-foreground">Gems</label>
+                  <span className="text-[11px] text-muted-foreground">Max {maxAuthorGems}</span>
+                </div>
                 <input
                   type="number"
                   min={0}
+                  max={maxAuthorGems}
                   value={authorGems}
                   onChange={(e) => setAuthorGems(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className={`w-full rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 ${
+                    authorOver
+                      ? "border-destructive focus:ring-destructive/30"
+                      : "border-input focus:ring-ring"
+                  }`}
                 />
+                {authorOver && (
+                  <p className="flex items-center gap-1 text-[11px] text-destructive">
+                    <AlertCircle className="size-3" />
+                    Exceeds per-blog author cap ({maxAuthorGems})
+                  </p>
+                )}
               </div>
             </div>
 
@@ -110,16 +141,38 @@ export function GemsDialog({
                         <Badge variant="outline" className="text-xs shrink-0">Reviewer</Badge>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">Gems</label>
-                        <input
-                          type="number"
-                          min={0}
-                          value={reviewerInputs[key] ?? (isEditing ? "0" : "5")}
-                          onChange={(e) =>
-                            setReviewerInputs((prev) => ({ ...prev, [key]: e.target.value }))
-                          }
-                          className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                        />
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs text-muted-foreground">Gems</label>
+                          <span className="text-[11px] text-muted-foreground">Max {maxReviewerGems}</span>
+                        </div>
+                        {(() => {
+                          const value = reviewerInputs[key] ?? (isEditing ? "0" : String(Math.min(5, maxReviewerGems)));
+                          const over = (parseInt(value) || 0) > maxReviewerGems;
+                          return (
+                            <>
+                              <input
+                                type="number"
+                                min={0}
+                                max={maxReviewerGems}
+                                value={value}
+                                onChange={(e) =>
+                                  setReviewerInputs((prev) => ({ ...prev, [key]: e.target.value }))
+                                }
+                                className={`w-full rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 ${
+                                  over
+                                    ? "border-destructive focus:ring-destructive/30"
+                                    : "border-input focus:ring-ring"
+                                }`}
+                              />
+                              {over && (
+                                <p className="flex items-center gap-1 text-[11px] text-destructive">
+                                  <AlertCircle className="size-3" />
+                                  Exceeds per-blog reviewer cap ({maxReviewerGems})
+                                </p>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
                   );
@@ -142,7 +195,13 @@ export function GemsDialog({
                 <Button variant="outline" size="sm">Cancel</Button>
               </Dialog.Close>
             )}
-            <Button size="sm" disabled={loading} onClick={onSubmit} className="gap-1.5">
+            <Button
+              size="sm"
+              disabled={loading || hasCapViolation}
+              onClick={onSubmit}
+              className="gap-1.5"
+              title={hasCapViolation ? "Reduce values to within caps" : undefined}
+            >
               {loading ? (
                 <Loader2 className="size-3.5 animate-spin" />
               ) : (

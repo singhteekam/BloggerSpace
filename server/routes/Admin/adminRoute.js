@@ -55,6 +55,10 @@ const {
   awardGems,
   updateGems,
   getGemsTransactions,
+  grantGems,
+  reverseGrant,
+  setBlogScore,
+  setReviewerScore,
   getUserContent,
   adminForceDeleteBlog,
   getPostComments,
@@ -155,9 +159,33 @@ router.delete("/community/:postId/comment/:commentId", adminMiddleware, deleteCo
 router.post("/gems/award/:blogId", adminMiddleware, awardGems);
 router.patch("/gems/update/:blogId", adminMiddleware, updateGems);
 router.get("/gems/transactions", adminMiddleware, getGemsTransactions);
+// Phase 3 — admin grants (non-blog gem rewards)
+router.post("/gems/grant/:userId", adminMiddleware, grantGems);
+router.post("/gems/reverse/:txnId", adminMiddleware, reverseGrant);
+
+// Phase 5 — admin-assigned blog quality score
+router.patch("/blogs/:id/score", adminMiddleware, setBlogScore);
+
+// Phase 6 — admin-assigned reviewer quality score (one per blog+reviewer pair)
+router.patch("/blogs/:blogId/reviewer-score/:reviewerId", adminMiddleware, setReviewerScore);
 
 // User content (team management profile view)
 router.get("/users/:userId/content", adminMiddleware, getUserContent);
 router.delete("/users/:userId/blog/:blogId", adminMiddleware, adminForceDeleteBlog);
+
+// Admin platform configuration (singleton — gems, redemption, scoring caps)
+const { getAdminConfig, updateAdminConfig } = require("../../controllers/Admin/adminConfigController");
+router.get("/config", adminMiddleware, getAdminConfig);
+router.patch("/config", adminMiddleware, updateAdminConfig);
+
+// Phase 4 — redemption requests admin review
+const {
+  listAllRedemptions,
+  fulfillRedemption,
+  rejectRedemption,
+} = require("../../controllers/redemptionController");
+router.get("/redemptions", adminMiddleware, listAllRedemptions);
+router.patch("/redemptions/:id/fulfill", adminMiddleware, fulfillRedemption);
+router.patch("/redemptions/:id/reject", adminMiddleware, rejectRedemption);
 
 module.exports = router;

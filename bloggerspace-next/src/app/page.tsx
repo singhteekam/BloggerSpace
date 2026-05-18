@@ -5,6 +5,7 @@ import {
   ArrowRight, Sparkles, ShieldCheck, BookOpen, Users, Pencil,
   MessageSquare, Star, Mail, ExternalLink,
   CheckCircle2, Globe, Code2, Briefcase, Camera, Gem, Trophy,
+  TrendingUp, Gift, BadgeCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

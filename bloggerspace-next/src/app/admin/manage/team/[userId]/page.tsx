@@ -7,11 +7,14 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
   ArrowLeft, BookOpen, MessageSquare, Trash2, Gem, BadgeCheck,
-  CalendarDays, Mail, Loader2, CheckCheck, Clock,
+  CalendarDays, Mail, Loader2, CheckCheck, Clock, Sparkles, Undo2, History, Star,
 } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
-import { adminApi } from "@/lib/api/admin";
+import { useAdminConfig } from "@/hooks/use-admin-config";
+import { adminApi, type GemsTransaction as GemsTxn } from "@/lib/api/admin";
 import { GemsDialog } from "@/components/admin/gems-dialog";
+import { GrantGemsDialog } from "@/components/admin/grant-gems-dialog";
+import { ReviewerScoreDialog } from "@/components/admin/reviewer-score-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -83,6 +86,8 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.error ?? "Failed.") : "Error."),
   });
 
+  const [grantOpen, setGrantOpen] = useState(false);
+
   if (isLoading) return <PageSkeleton />;
   if (!data) return <div className="p-10 text-center text-muted-foreground">User not found.</div>;
 
@@ -114,13 +119,27 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
               <span className="flex items-center gap-1"><CalendarDays className="size-3" />Joined {formatDate(user.createdAt)}</span>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-1.5 rounded-lg bg-primary/5 px-3 py-2">
-            <Gem className="size-4 text-primary" />
-            <span className="font-semibold text-primary">{user.gems ?? 0}</span>
-            <span className="text-xs text-muted-foreground">gems</span>
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <div className="flex items-center gap-1.5 rounded-lg bg-primary/5 px-3 py-2">
+              <Gem className="size-4 text-primary" />
+              <span className="font-semibold text-primary">{user.gems ?? 0}</span>
+              <span className="text-xs text-muted-foreground">gems</span>
+            </div>
+            <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setGrantOpen(true)}>
+              <Sparkles className="size-3.5" />Grant gems
+            </Button>
           </div>
         </div>
       </div>
+
+      <GrantGemsDialog
+        open={grantOpen}
+        setOpen={setGrantOpen}
+        adminId={adminId}
+        targetUserId={targetUserId}
+        targetUserName={user.fullName}
+        onGranted={() => qc.invalidateQueries({ queryKey: ["admin-user-content", adminId, targetUserId] })}
+      />
 
       <Separator className="mb-6" />
 
@@ -137,6 +156,9 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
               <CheckCheck className="size-3.5 mr-1.5" />Reviewed ({reviewedBlogs.length})
             </TabsTrigger>
           )}
+          <TabsTrigger value="grants">
+            <Sparkles className="size-3.5 mr-1.5" />Grants
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="blogs">
@@ -163,10 +185,16 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
             <ReviewedTabContent
               entries={reviewedBlogs}
               adminId={adminId}
+              targetUserId={targetUserId}
+              reviewerName={user.fullName}
               onGemsAwarded={() => qc.invalidateQueries({ queryKey: ["admin-user-content", adminId, targetUserId] })}
             />
           </TabsContent>
         )}
+
+        <TabsContent value="grants">
+          <GrantsTabContent adminId={adminId} targetUserId={targetUserId} />
+        </TabsContent>
       </Tabs>
     </main>
   );
@@ -186,6 +214,7 @@ function BlogsTabContent({
   deleting: boolean;
   onGemsAwarded: () => void;
 }) {
+  const { data: adminConfig } = useAdminConfig(adminId);
   const { visibleItems, hasMore, sentinelRef } = useClientInfinite(blogs);
 
   const [gemsOpen, setGemsOpen] = useState(false);
@@ -261,6 +290,8 @@ function BlogsTabContent({
           setReviewerInputs={setReviewerInputs}
           loading={gemsLoading}
           onSubmit={handleSubmitGems}
+          maxAuthorGems={adminConfig?.perBlogAuthorGemsCap}
+          maxReviewerGems={adminConfig?.perBlogReviewerGemsCap}
         />
       )}
       <div className="divide-y divide-border rounded-xl border">
@@ -364,12 +395,15 @@ function CommunityTabContent({
 }
 
 function ReviewedTabContent({
-  entries, adminId, onGemsAwarded,
+  entries, adminId, targetUserId, reviewerName, onGemsAwarded,
 }: {
   entries: ReviewedEntry[];
   adminId: string;
+  targetUserId: string;
+  reviewerName: string;
   onGemsAwarded: () => void;
 }) {
+  const { data: adminConfig } = useAdminConfig(adminId);
   const { visibleItems, hasMore, sentinelRef } = useClientInfinite(entries);
 
   const [gemsOpen, setGemsOpen] = useState(false);
@@ -378,6 +412,12 @@ function ReviewedTabContent({
   const [authorGems, setAuthorGems] = useState("10");
   const [reviewerInputs, setReviewerInputs] = useState<Record<string, string>>({});
   const [gemsLoading, setGemsLoading] = useState(false);
+
+  // Phase 6 — reviewer score dialog state
+  const [scoreOpen, setScoreOpen] = useState(false);
+  const [scoringEntry, setScoringEntry] = useState<ReviewedEntry | null>(null);
+  // local optimistic score cache: blogId → score
+  const [localScores, setLocalScores] = useState<Record<string, number>>({});
 
   const openAwardGems = (entry: ReviewedEntry) => {
     setSelectedEntry(entry);
@@ -443,57 +483,263 @@ function ReviewedTabContent({
           setReviewerInputs={setReviewerInputs}
           loading={gemsLoading}
           onSubmit={handleSubmitGems}
+          maxAuthorGems={adminConfig?.perBlogAuthorGemsCap}
+          maxReviewerGems={adminConfig?.perBlogReviewerGemsCap}
         />
       )}
+
+      {scoringEntry?.blogId && (
+        <ReviewerScoreDialog
+          open={scoreOpen}
+          setOpen={setScoreOpen}
+          adminId={adminId}
+          blogId={scoringEntry.blogId}
+          blogTitle={scoringEntry.BlogTitle}
+          reviewerId={targetUserId}
+          reviewerName={reviewerName}
+          currentScore={
+            scoringEntry.blogId != null
+              ? (localScores[scoringEntry.blogId] ?? (scoringEntry as ReviewedEntry & { reviewScore?: number | null }).reviewScore ?? null)
+              : null
+          }
+          onSaved={(newScore) => {
+            if (scoringEntry.blogId) {
+              setLocalScores((prev) => ({ ...prev, [scoringEntry.blogId!]: newScore }));
+            }
+          }}
+        />
+      )}
+
       <div className="divide-y divide-border rounded-xl border">
-        {visibleItems.map((entry, i) => (
-          <div key={i} className="flex items-center justify-between gap-4 px-4 py-3">
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                <p className="font-medium text-sm line-clamp-1">{entry.BlogTitle}</p>
-                {(entry.reviewerGems ?? 0) > 0 && (
-                  <span className="flex items-center gap-0.5 text-xs font-medium text-primary">
-                    <Gem className="size-3" />{entry.reviewerGems} gems
-                  </span>
-                )}
+        {visibleItems.map((entry, i) => {
+          const existingScore =
+            entry.blogId != null
+              ? (localScores[entry.blogId] ?? (entry as ReviewedEntry & { reviewScore?: number | null }).reviewScore ?? null)
+              : null;
+          return (
+            <div key={i} className="flex items-center justify-between gap-4 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                  <p className="font-medium text-sm line-clamp-1">{entry.BlogTitle}</p>
+                  {(entry.reviewerGems ?? 0) > 0 && (
+                    <span className="flex items-center gap-0.5 text-xs font-medium text-primary">
+                      <Gem className="size-3" />{entry.reviewerGems} gems
+                    </span>
+                  )}
+                  {existingScore != null && (
+                    <span className="flex items-center gap-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+                      <Star className="size-3 fill-current" />{existingScore}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Clock className="size-3" />Reviewed {formatDate(entry.BlogReviewedTime)}
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <Clock className="size-3" />Reviewed {formatDate(entry.BlogReviewedTime)}
-              </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-1">
-              {entry.blogId && !entry.gemsAwarded && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-1 text-xs h-7"
-                  onClick={() => openAwardGems(entry)}
-                >
-                  <Gem className="size-3" />Award Gems
+              <div className="flex shrink-0 items-center gap-1">
+                {entry.blogId && (
+                  <Button
+                    variant={existingScore != null ? "ghost" : "outline"}
+                    size="sm"
+                    className={`gap-1 text-xs h-7 ${existingScore != null ? "text-amber-600 hover:text-amber-700 dark:text-amber-400" : ""}`}
+                    onClick={() => { setScoringEntry(entry); setScoreOpen(true); }}
+                  >
+                    <Star className="size-3" />
+                    {existingScore != null ? `Score ${existingScore}` : "Score Review"}
+                  </Button>
+                )}
+                {entry.blogId && !entry.gemsAwarded && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 text-xs h-7"
+                    onClick={() => openAwardGems(entry)}
+                  >
+                    <Gem className="size-3" />Award Gems
+                  </Button>
+                )}
+                {entry.blogId && entry.gemsAwarded && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1 text-xs h-7 text-primary hover:text-primary"
+                    onClick={() => openEditGems(entry)}
+                  >
+                    <Gem className="size-3" />Edit Gems
+                  </Button>
+                )}
+                <Button asChild variant="outline" size="sm" className="h-7 text-xs">
+                  <Link href={`/blogs/${entry.BlogSlug}`} target="_blank">View</Link>
                 </Button>
-              )}
-              {entry.blogId && entry.gemsAwarded && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-1 text-xs h-7 text-primary hover:text-primary"
-                  onClick={() => openEditGems(entry)}
-                >
-                  <Gem className="size-3" />Edit Gems
-                </Button>
-              )}
-              <Button asChild variant="outline" size="sm" className="h-7 text-xs">
-                <Link href={`/blogs/${entry.BlogSlug}`} target="_blank">View</Link>
-              </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       {hasMore && <div ref={sentinelRef} className="h-1 mt-2" />}
       <p className="mt-2 text-xs text-muted-foreground text-right">
         Showing {Math.min(visibleItems.length, entries.length)} of {entries.length} review{entries.length !== 1 ? "s" : ""}
       </p>
     </div>
+  );
+}
+
+// ─── Grants tab (Phase 3) ─────────────────────────────────────────────────────
+// Shows ADMIN_GRANT and ADMIN_GRANT_REVERSE transactions for this user, with a
+// Reverse button on any grant that's within the reversal window and not yet reversed.
+function GrantsTabContent({ adminId, targetUserId }: { adminId: string; targetUserId: string }) {
+  const qc = useQueryClient();
+  const { data: cfg } = useAdminConfig(adminId);
+  const windowHours = cfg?.grantReverseWindowHours ?? 24;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-gem-grants", targetUserId],
+    queryFn: () =>
+      adminApi
+        .getGemsTransactions(adminId, 1, targetUserId, "ADMIN_GRANT,ADMIN_GRANT_REVERSE")
+        .then((r) => r.data),
+  });
+
+  const reverseMutation = useMutation({
+    mutationFn: ({ txnId, reason }: { txnId: string; reason: string }) =>
+      adminApi.reverseGrant(adminId, txnId, { reason }),
+    onSuccess: () => {
+      toast.success("Grant reversed.");
+      qc.invalidateQueries({ queryKey: ["admin-gem-grants", targetUserId] });
+      qc.invalidateQueries({ queryKey: ["admin-user-content", adminId, targetUserId] });
+    },
+    onError: (err) =>
+      toast.error(
+        isAxiosError(err)
+          ? (err.response?.data?.error ?? "Failed to reverse grant.")
+          : "Failed to reverse grant.",
+      ),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        {[0, 1, 2].map((i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
+      </div>
+    );
+  }
+
+  const txns = data?.transactions ?? [];
+  if (txns.length === 0) {
+    return <Empty icon={<History />} msg="No admin grants for this user yet." />;
+  }
+
+  const now = Date.now();
+  const windowMs = windowHours * 60 * 60 * 1000;
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-muted-foreground">
+        Reversal window: {windowHours}h after the grant was created.
+      </p>
+      {txns.map((t: GemsTxn) => {
+        const isReverse = t.source === "ADMIN_GRANT_REVERSE";
+        const ageMs = now - new Date(t.createdAt).getTime();
+        const withinWindow = ageMs <= windowMs;
+        const canReverse = !isReverse && !t.reversedByTxnId && withinWindow;
+        return (
+          <div
+            key={t._id}
+            className={`flex items-start justify-between gap-4 rounded-lg border px-4 py-3 ${
+              isReverse ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
+            }`}
+          >
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant={isReverse ? "destructive" : "default"} className="text-[10px]">
+                  {isReverse ? "REVERSED" : "GRANT"}
+                </Badge>
+                <span className={`font-semibold ${isReverse ? "text-destructive" : "text-primary"}`}>
+                  {isReverse ? "−" : "+"}{t.amount} gems
+                </span>
+                {t.reversedByTxnId && !isReverse && (
+                  <Badge variant="outline" className="text-[10px] gap-1">
+                    <Undo2 className="size-2.5" />Reversed
+                  </Badge>
+                )}
+              </div>
+              {t.note && (
+                <p className="text-xs text-muted-foreground italic break-words">&ldquo;{t.note}&rdquo;</p>
+              )}
+              <p className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Clock className="size-2.5" />
+                {formatDate(t.createdAt)} &middot; by{" "}
+                {typeof t.awardedBy === "object" && t.awardedBy
+                  ? (t.awardedBy.fullName ?? t.awardedBy.email ?? "admin")
+                  : "admin"}
+              </p>
+            </div>
+            {canReverse && (
+              <ReverseGrantButton
+                onReverse={(reason) => reverseMutation.mutate({ txnId: t._id, reason })}
+                loading={reverseMutation.isPending}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ReverseGrantButton({
+  onReverse,
+  loading,
+}: {
+  onReverse: (reason: string) => void;
+  loading: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+
+  const handleConfirm = () => {
+    onReverse(reason.trim());
+    setOpen(false);
+    setReason("");
+  };
+
+  return (
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger asChild>
+        <Button size="sm" variant="outline" className="gap-1.5 shrink-0">
+          <Undo2 className="size-3" />Reverse
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-5 shadow-xl">
+          <Dialog.Title className="font-serif text-base font-semibold">Reverse this grant?</Dialog.Title>
+          <Dialog.Description className="mt-1 text-xs text-muted-foreground">
+            Gems will be deducted back from the user&apos;s balance. This action is logged.
+          </Dialog.Description>
+          <div className="mt-4 space-y-1.5">
+            <label className="text-xs font-medium">Reason (optional)</label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="e.g. Granted wrong user / typo"
+              maxLength={500}
+              rows={3}
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div className="mt-5 flex justify-end gap-2">
+            <Dialog.Close asChild>
+              <Button variant="outline" size="sm" disabled={loading}>Cancel</Button>
+            </Dialog.Close>
+            <Button size="sm" variant="destructive" disabled={loading} onClick={handleConfirm} className="gap-1.5">
+              {loading ? <Loader2 className="size-3.5 animate-spin" /> : <Undo2 className="size-3.5" />}
+              Reverse
+            </Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 

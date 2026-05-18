@@ -206,6 +206,9 @@ export function TipTapEditor({
       StarterKit.configure({
         heading: { levels: [1, 2, 3, 4, 5, 6] },
         codeBlock: false,
+        // Disable StarterKit's bundled copies — configured explicitly below
+        link: false,
+        underline: false,
       }),
       Placeholder.configure({ placeholder }),
       Link.configure({

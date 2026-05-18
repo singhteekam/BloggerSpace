@@ -12,6 +12,7 @@ import {
 import * as Popover from "@radix-ui/react-popover";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
+import { useAdminConfig } from "@/hooks/use-admin-config";
 import { adminApi, type GemsInfo } from "@/lib/api/admin";
 import { GemsDialog } from "@/components/admin/gems-dialog";
 import { useAutoSave } from "@/hooks/use-autosave";
@@ -39,6 +40,7 @@ function toSlug(title: string) {
 export default function AdminBlogEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: blogId } = use(params);
   const { user, isLoading: authLoading } = useRequireAdmin();
+  const { data: adminConfig } = useAdminConfig(user?._id);
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -372,6 +374,8 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
         onSubmit={handleAwardGems}
         onSkip={justPublished ? () => router.push("/admin/manage/blogs") : undefined}
         skipLabel={justPublished ? "Skip" : undefined}
+        maxAuthorGems={adminConfig?.perBlogAuthorGemsCap}
+        maxReviewerGems={adminConfig?.perBlogReviewerGemsCap}
       />
 
       <main className="mx-auto max-w-4xl px-6 py-10">

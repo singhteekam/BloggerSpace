@@ -53,9 +53,27 @@ export function ChatWidget() {
     if (open) scrollToBottom();
   }, [messages, open, scrollToBottom]);
 
+  // Auto-focus the input only on non-mobile so the keyboard doesn't pop up
+  // immediately and disorient mobile users — they tap the input themselves.
   useEffect(() => {
-    if (open) textareaRef.current?.focus();
+    if (!open) return;
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    if (!isMobile) textareaRef.current?.focus();
   }, [open]);
+
+  // Hide the floating button when the footer scrolls into view so it doesn't
+  // cover footer links / content the user is trying to read.
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    const footer = document.querySelector("footer");
+    if (!footer) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setHidden(entry.isIntersecting),
+      { threshold: 0.05 },
+    );
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
 
   async function handleSend() {
     const text = input.trim();
@@ -73,29 +91,47 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* Floating toggle button */}
+      {/* Floating toggle — pill with text on sm+, icon-only on mobile.
+          Auto-hides when footer is in view so it doesn't cover content. */}
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close chat" : `Chat with ${CHAT_BOT_NAME}`}
         className={cn(
-          "fixed bottom-6 right-6 z-50 flex size-14 items-center justify-center rounded-full shadow-lg transition-all duration-200",
-          "bg-primary text-primary-foreground hover:scale-105 active:scale-95",
-          open && "rotate-90",
+          "group fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full font-medium shadow-lg transition-all duration-300",
+          "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground",
+          "hover:shadow-xl hover:scale-[1.03] active:scale-95",
+          "ring-1 ring-primary/20",
+          // Icon-only on mobile, pill with text on sm+
+          open
+            ? "size-12 justify-center p-0"
+            : "size-12 justify-center p-0 sm:size-auto sm:px-4 sm:py-2.5",
+          // Auto-hide near footer (only when chat is closed — let the user still
+          // be able to close an open chat via the same button).
+          hidden && !open && "translate-y-24 opacity-0 pointer-events-none",
         )}
       >
-        {open ? <X className="size-5" /> : <MessageCircle className="size-6" />}
+        {open ? (
+          <X className="size-5" />
+        ) : (
+          <>
+            <MessageCircle className="size-5 shrink-0" />
+            <span className="hidden text-sm sm:inline">Ask {CHAT_BOT_NAME}</span>
+            {/* Tiny pulse dot to draw attention */}
+            <span className="absolute right-0 top-0 size-2.5 -translate-y-0.5 translate-x-0.5 rounded-full bg-amber-400 ring-2 ring-card animate-pulse" />
+          </>
+        )}
       </button>
 
       {/* Chat panel */}
       <div
         className={cn(
-          "fixed bottom-24 right-6 z-50 flex w-[360px] max-w-[calc(100vw-1.5rem)] flex-col rounded-2xl border border-border bg-card shadow-2xl",
+          "fixed bottom-20 right-5 z-50 flex w-[360px] max-w-[calc(100vw-1.5rem)] flex-col rounded-2xl border border-border bg-card shadow-2xl",
           "transition-all duration-200 origin-bottom-right",
           open
             ? "scale-100 opacity-100 pointer-events-auto"
             : "scale-95 opacity-0 pointer-events-none",
         )}
-        style={{ maxHeight: "min(560px, calc(100dvh - 7rem))" }}
+        style={{ maxHeight: "min(560px, calc(100dvh - 6rem))" }}
       >
         {/* Header */}
         <div className="flex items-center gap-3 rounded-t-2xl border-b border-border bg-muted/40 px-4 py-3">

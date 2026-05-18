@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Mail,
   Shield,
+  Gift,
 } from "lucide-react";
 
 export type NavItem = {
@@ -50,6 +51,7 @@ export const reviewerMenuNav: NavItem[] = [
 /** Admin dropdown items */
 export const adminMenuNav: NavItem[] = [
   { title: "Admin Panel", href: "/admin/dashboard", icon: ShieldCheck },
+  { title: "Redemptions", href: "/admin/redemptions", icon: Gift },
   { title: "Newsletter", href: "/admin/newsletter", icon: Mail },
   { title: "Saved Blogs", href: "/admin/savedblogs", icon: Bookmark },
   { title: "My Profile", href: "/admin/profile", icon: UserIcon },

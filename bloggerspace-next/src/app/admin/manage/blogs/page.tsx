@@ -14,9 +14,11 @@ import {
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Popover from "@radix-ui/react-popover";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
+import { useAdminConfig } from "@/hooks/use-admin-config";
 import { useDebounce } from "@/hooks/use-debounce";
 import { adminApi, type AdminBlog, type ReviewerItem } from "@/lib/api/admin";
 import { GemsDialog } from "@/components/admin/gems-dialog";
+import { BlogScoreDialog } from "@/components/admin/blog-score-dialog";
 import { RefreshButton } from "@/components/ui/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -284,6 +286,11 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
                         adminId={adminId}
                         onAwarded={() => qc.invalidateQueries({ queryKey: ["admin-published", adminId] })}
                       />
+                      <BlogScoreButton
+                        blog={blog}
+                        adminId={adminId}
+                        onSaved={() => qc.invalidateQueries({ queryKey: ["admin-published", adminId] })}
+                      />
                       <DiscardButton title={blog.title} isPending={discardMutation.isPending} onConfirm={() => discardMutation.mutate(blog._id)} />
                     </div>
                   </BlogCard>
@@ -501,6 +508,7 @@ function DiscardButton({ title, isPending, onConfirm }: { title: string; isPendi
 function AwardGemsButton({
   blog, adminId, onAwarded,
 }: { blog: AdminBlog; adminId: string; onAwarded: () => void }) {
+  const { data: adminConfig } = useAdminConfig(adminId);
   const [open, setOpen] = useState(false);
   const [authorGems, setAuthorGems] = useState("10");
   const [reviewerInputs, setReviewerInputs] = useState<Record<string, string>>({});
@@ -605,6 +613,49 @@ function AwardGemsButton({
         authorGems={authorGems} setAuthorGems={setAuthorGems}
         allReviewers={allReviewers} reviewerInputs={reviewerInputs} setReviewerInputs={setReviewerInputs}
         loading={loading} onSubmit={handleSubmit}
+        maxAuthorGems={adminConfig?.perBlogAuthorGemsCap}
+        maxReviewerGems={adminConfig?.perBlogReviewerGemsCap}
+      />
+    </>
+  );
+}
+
+// Phase 5 — small button that opens the BlogScoreDialog. Renders the current
+// score as a badge when set (so admin can see it at a glance in the blog list).
+function BlogScoreButton({
+  blog, adminId, onSaved,
+}: { blog: AdminBlog; adminId: string; onSaved: () => void }) {
+  const [open, setOpen] = useState(false);
+  const currentScore = blog.blogScore ?? 0;
+
+  return (
+    <>
+      {currentScore > 0 ? (
+        <Button
+          size="sm" variant="outline"
+          className="gap-1.5 border-amber-500/40 text-amber-700 hover:bg-amber-500/5 dark:text-amber-400"
+          onClick={() => setOpen(true)}
+          title="Edit blog score"
+        >
+          <Star className="size-3.5 fill-current" />Score {currentScore}
+        </Button>
+      ) : (
+        <Button
+          size="sm" variant="outline"
+          className="gap-1.5"
+          onClick={() => setOpen(true)}
+        >
+          <Star className="size-3.5" />Score
+        </Button>
+      )}
+      <BlogScoreDialog
+        open={open}
+        setOpen={setOpen}
+        adminId={adminId}
+        blogId={blog._id}
+        blogTitle={blog.title}
+        currentScore={currentScore}
+        onSaved={onSaved}
       />
     </>
   );
@@ -613,6 +664,7 @@ function AwardGemsButton({
 function PublishDialog({
   blog, adminId, adminEmail, onPublished,
 }: { blog: AdminBlog; adminId: string; adminEmail: string; onPublished: () => void }) {
+  const { data: adminConfig } = useAdminConfig(adminId);
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -697,6 +749,8 @@ function PublishDialog({
         onSubmit={handleAwardGems}
         onSkip={() => { setGemsOpen(false); onPublished(); }}
         skipLabel="Skip"
+        maxAuthorGems={adminConfig?.perBlogAuthorGemsCap}
+        maxReviewerGems={adminConfig?.perBlogReviewerGemsCap}
       />
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Trigger asChild>

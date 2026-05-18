@@ -13,7 +13,22 @@ const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 const Newsletter = require("../../models/Newsletter");
 const GemsTransaction = require("../../models/GemsTransaction");
+const AdminConfig = require("../../models/AdminConfig");
+const ReviewScore = require("../../models/ReviewScore");
 const IST_OFFSET = 330;
+
+// Default caps if no AdminConfig doc exists yet (defensive — Phase 1 lazily
+// creates one on first GET, but a request could land before that read).
+const DEFAULT_PER_BLOG_AUTHOR_CAP = 10;
+const DEFAULT_PER_BLOG_REVIEWER_CAP = 5;
+
+async function loadPerBlogCaps() {
+  const cfg = await AdminConfig.findOne({}).select("perBlogAuthorGemsCap perBlogReviewerGemsCap").lean();
+  return {
+    authorCap: cfg?.perBlogAuthorGemsCap ?? DEFAULT_PER_BLOG_AUTHOR_CAP,
+    reviewerCap: cfg?.perBlogReviewerGemsCap ?? DEFAULT_PER_BLOG_REVIEWER_CAP,
+  };
+}
 
 exports.adminSignup = async (req, res) => {
   try {
@@ -1518,6 +1533,23 @@ exports.awardGems = async (req, res) => {
       .map((a) => ({ userId: a.userId, gems: Math.max(0, parseInt(a.gems) || 0) }))
       .filter((a) => a.userId && a.gems > 0);
 
+    // ── Per-blog cap enforcement (Phase 2) ──
+    // Caps apply to the cumulative gems on this blog. Since `awardGems` is the
+    // first-time award (gated by `blog.gems.awarded === false` above), the cap
+    // check is simply `aGems <= authorCap` and `each reviewer.gems <= reviewerCap`.
+    const { authorCap, reviewerCap } = await loadPerBlogCaps();
+    if (aGems > authorCap) {
+      return res.status(400).json({
+        error: `Author gems exceed cap (${aGems} > ${authorCap}). Max ${authorCap} gems per blog for the author.`,
+      });
+    }
+    const overReviewer = validReviewerAwards.find((a) => a.gems > reviewerCap);
+    if (overReviewer) {
+      return res.status(400).json({
+        error: `Reviewer gems exceed cap (${overReviewer.gems} > ${reviewerCap}). Max ${reviewerCap} gems per blog per reviewer.`,
+      });
+    }
+
     const ops = [];
 
     if (aGems > 0 && blog.authorDetails) {
@@ -1588,15 +1620,286 @@ exports.getGemsTransactions = async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
     const skip  = (page - 1) * limit;
     const filterUserId = req.query.filterUserId || null;
-    const filter = filterUserId ? { userId: new mongoose.Types.ObjectId(filterUserId) } : {};
+    // Optional source filter (e.g. "ADMIN_GRANT" to show only admin grants).
+    // Accepts comma-separated list: "ADMIN_GRANT,ADMIN_GRANT_REVERSE".
+    const sourceParam = req.query.source || null;
+    const filter = {};
+    if (filterUserId) filter.userId = new mongoose.Types.ObjectId(filterUserId);
+    if (sourceParam) {
+      const sources = sourceParam.split(",").map((s) => s.trim()).filter(Boolean);
+      filter.source = sources.length > 1 ? { $in: sources } : sources[0];
+    }
     const [transactions, total] = await Promise.all([
       GemsTransaction.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit)
-        .populate("userId", "fullName userName email").lean(),
+        .populate("userId", "fullName userName email")
+        .populate("awardedBy", "fullName userName email")
+        .lean(),
       GemsTransaction.countDocuments(filter),
     ]);
     res.json({ transactions, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch transactions" });
+  }
+};
+
+// ─── Admin gem grant (Phase 3) ────────────────────────────────────────────────
+// Admin grants gems to a specific user with an appreciation note. Email sent.
+// Validates amount falls within [minGrantGems, maxGrantGems] from AdminConfig.
+const { awardGems: ledgerAward, reverseTransaction: ledgerReverse } = require("../../utils/gemsLedger");
+
+exports.grantGems = async (req, res) => {
+  const { userId: targetUserId } = req.params;
+  const { amount, note } = req.body;
+  const adminId = req.query.userId;
+  try {
+    const amt = parseInt(amount);
+    if (!Number.isFinite(amt) || amt <= 0) {
+      return res.status(400).json({ error: "amount must be a positive integer" });
+    }
+
+    const cfg = await AdminConfig.findOne({}).select("minGrantGems maxGrantGems").lean();
+    const minGrant = cfg?.minGrantGems ?? 0;
+    const maxGrant = cfg?.maxGrantGems ?? 100;
+    if (amt < minGrant || amt > maxGrant) {
+      return res.status(400).json({
+        error: `Amount must be between ${minGrant} and ${maxGrant} gems`,
+      });
+    }
+
+    const targetUser = await User.findById(targetUserId).select("fullName userName email status").lean();
+    if (!targetUser) return res.status(404).json({ error: "User not found" });
+    if (targetUser.status === "INACTIVE") {
+      return res.status(400).json({ error: "Cannot grant gems to an inactive user" });
+    }
+
+    const cleanNote = (note ?? "").toString().trim().slice(0, 500);
+
+    const { balance, txn } = await ledgerAward({
+      userId: targetUserId,
+      amount: amt,
+      source: "ADMIN_GRANT",
+      awardedBy: adminId,
+      note: cleanNote,
+    });
+
+    // Send appreciation email (best-effort — log failure but don't fail request)
+    if (targetUser.email) {
+      sendEmail(
+        targetUser.email,
+        `You received ${amt} gems on BloggerSpace!`,
+        `<div class="content">
+          <h2>You earned ${amt} gems!</h2>
+          <p>Hi ${targetUser.fullName || targetUser.userName || "there"},</p>
+          <p>Admin has awarded you <b>${amt} gems</b> on BloggerSpace.</p>
+          ${cleanNote ? `<p style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px;margin:16px 0;"><b>Note from admin:</b><br/>${escapeHtml(cleanNote)}</p>` : ""}
+          <p>Your new balance: <b>${balance} gems</b>. Keep contributing to earn more!</p>
+        </div>`
+      ).catch((e) => console.error("[grantGems] email send failed:", e?.message));
+    }
+
+    res.status(201).json({
+      message: "Gems granted successfully",
+      balance,
+      transaction: txn,
+    });
+  } catch (error) {
+    console.error("Error granting gems:", error);
+    res.status(500).json({ error: error.message || "Failed to grant gems" });
+  }
+};
+
+// Reverse a previous ADMIN_GRANT within the configured reversal window.
+// Creates an ADMIN_GRANT_REVERSE ledger entry and decrements the user balance.
+exports.reverseGrant = async (req, res) => {
+  const { txnId } = req.params;
+  const { reason } = req.body;
+  const adminId = req.query.userId;
+  try {
+    const original = await GemsTransaction.findById(txnId).lean();
+    if (!original) return res.status(404).json({ error: "Transaction not found" });
+    if (original.source !== "ADMIN_GRANT") {
+      return res.status(400).json({ error: "Only admin grants can be reversed" });
+    }
+    if (original.reversedByTxnId) {
+      return res.status(409).json({ error: "This grant has already been reversed" });
+    }
+
+    const cfg = await AdminConfig.findOne({}).select("grantReverseWindowHours").lean();
+    const windowHours = cfg?.grantReverseWindowHours ?? 24;
+    const ageMs = Date.now() - new Date(original.createdAt).getTime();
+    if (ageMs > windowHours * 60 * 60 * 1000) {
+      return res.status(400).json({
+        error: `Reversal window (${windowHours}h) has passed for this grant`,
+      });
+    }
+
+    const { balance, reverseTxn } = await ledgerReverse({
+      txnId,
+      reversedBy: adminId,
+      reason: (reason ?? "").toString().trim().slice(0, 500),
+    });
+
+    res.json({
+      message: "Grant reversed successfully",
+      balance,
+      reverseTransaction: reverseTxn,
+    });
+  } catch (error) {
+    console.error("Error reversing grant:", error);
+    res.status(500).json({ error: error.message || "Failed to reverse grant" });
+  }
+};
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// ─── Blog scoring (Phase 5) ───────────────────────────────────────────────────
+// Admin sets a 0..maxBlogScore value on a blog. We then recompute the author's
+// User.creatorScore from scratch (sum of blogScore across their published blogs)
+// so the cached aggregate stays correct regardless of edge cases (a previously
+// scored blog being deleted, unpublished, status changed, etc.).
+exports.setBlogScore = async (req, res) => {
+  const { id } = req.params;
+  const { score } = req.body;
+  const adminId = req.query.userId;
+
+  try {
+    const s = parseInt(score);
+    if (!Number.isFinite(s) || s < 0) {
+      return res.status(400).json({ error: "score must be a non-negative integer" });
+    }
+
+    const cfg = await AdminConfig.findOne({}).select("maxBlogScore").lean();
+    const maxBlogScore = cfg?.maxBlogScore ?? 10;
+    if (s > maxBlogScore) {
+      return res.status(400).json({
+        error: `Score exceeds cap (${s} > ${maxBlogScore})`,
+      });
+    }
+
+    const blog = await Blog.findById(id);
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    if (!["PUBLISHED", "ADMIN_PUBLISHED"].includes(blog.status)) {
+      return res.status(400).json({
+        error: "Scores can only be assigned to published blogs",
+      });
+    }
+
+    blog.blogScore = s;
+    blog.blogScoreUpdatedAt = new Date(new Date().getTime() + IST_OFFSET * 60000);
+    blog.blogScoreUpdatedBy = adminId;
+    await blog.save();
+
+    // Recompute creatorScore from scratch (authoritative) — covers the case
+    // where this is a re-score, a previously deleted blog adjusted things, etc.
+    const authorId = blog.authorDetails;
+    let newCreatorScore = 0;
+    if (authorId) {
+      const agg = await Blog.aggregate([
+        {
+          $match: {
+            authorDetails: new mongoose.Types.ObjectId(authorId.toString()),
+            status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+          },
+        },
+        { $group: { _id: null, sum: { $sum: { $ifNull: ["$blogScore", 0] } } } },
+      ]);
+      newCreatorScore = agg[0]?.sum ?? 0;
+      await User.findByIdAndUpdate(authorId, { creatorScore: newCreatorScore });
+    }
+
+    res.json({
+      message: "Blog score updated",
+      blogScore: blog.blogScore,
+      creatorScore: newCreatorScore,
+    });
+  } catch (error) {
+    console.error("Error setting blog score:", error);
+    res.status(500).json({ error: "Failed to set blog score" });
+  }
+};
+
+// ─── Reviewer scoring (Phase 6) ──────────────────────────────────────────────
+// Admin assigns a quality score to a reviewer for their review of a specific
+// blog. One score per (blog, reviewer) pair — re-scoring upserts. After each
+// change the reviewer's User.reviewerScore{Avg,Count,Best} fields are
+// recomputed from scratch via aggregation so drift is impossible.
+exports.setReviewerScore = async (req, res) => {
+  const { blogId, reviewerId } = req.params;
+  const { score, note } = req.body;
+  const adminId = req.query.userId;
+
+  try {
+    const s = parseInt(score);
+    if (!Number.isFinite(s) || s < 0) {
+      return res.status(400).json({ error: "score must be a non-negative integer" });
+    }
+
+    const cfg = await AdminConfig.findOne({}).select("maxBlogScore").lean();
+    const maxBlogScore = cfg?.maxBlogScore ?? 10;
+    if (s > maxBlogScore) {
+      return res.status(400).json({
+        error: `Score exceeds cap (${s} > ${maxBlogScore})`,
+      });
+    }
+
+    // Confirm the reviewer actually reviewed this blog
+    const blog = await Blog.findById(blogId).select("reviewedBy title").lean();
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    const didReview = (blog.reviewedBy || []).some(
+      (r) => r?.ReviewedBy?.Id?.toString() === reviewerId && r?.ReviewedBy?.Role !== "Admin",
+    );
+    if (!didReview) {
+      return res.status(400).json({ error: "This reviewer did not review this blog" });
+    }
+
+    // Upsert the per-blog review score
+    await ReviewScore.findOneAndUpdate(
+      { blogId: new mongoose.Types.ObjectId(blogId), reviewerId: new mongoose.Types.ObjectId(reviewerId) },
+      {
+        score: s,
+        note: (note || "").slice(0, 500),
+        awardedBy: adminId,
+        awardedAt: new Date(new Date().getTime() + IST_OFFSET * 60000),
+      },
+      { upsert: true, new: true },
+    );
+
+    // Recompute reviewer aggregate from scratch
+    const agg = await ReviewScore.aggregate([
+      { $match: { reviewerId: new mongoose.Types.ObjectId(reviewerId) } },
+      {
+        $group: {
+          _id: null,
+          sum:   { $sum: "$score" },
+          count: { $sum: 1 },
+          best:  { $max: "$score" },
+        },
+      },
+    ]);
+    const count = agg[0]?.count ?? 0;
+    const avg   = count ? +(agg[0].sum / count).toFixed(1) : 0;
+    const best  = agg[0]?.best ?? 0;
+
+    await User.findByIdAndUpdate(reviewerId, {
+      reviewerScoreAvg:   avg,
+      reviewerScoreCount: count,
+      reviewerScoreBest:  best,
+    });
+
+    res.json({
+      message: "Reviewer score updated",
+      reviewerScore: s,
+      reviewerScoreAvg: avg,
+      reviewerScoreCount: count,
+    });
+  } catch (error) {
+    console.error("Error setting reviewer score:", error);
+    res.status(500).json({ error: "Failed to set reviewer score" });
   }
 };
 
@@ -1638,12 +1941,18 @@ exports.getUserContent = async (req, res) => {
     // Fetch reviewed blog docs (gems + reviewedBy + author) for reviewed blogs tab
     const rawReviewed = user.reviewedBlogs || [];
     const reviewedBlogObjectIds = rawReviewed.filter((rb) => rb.BlogObjectId).map((rb) => rb.BlogObjectId);
-    const reviewedBlogDocs = reviewedBlogObjectIds.length
-      ? await Blog.find({ _id: { $in: reviewedBlogObjectIds } })
-          .select("_id gems reviewedBy authorDetails")
-          .populate("authorDetails", "fullName email")
-          .lean()
-      : [];
+    const [reviewedBlogDocs, existingReviewScores] = await Promise.all([
+      reviewedBlogObjectIds.length
+        ? Blog.find({ _id: { $in: reviewedBlogObjectIds } })
+            .select("_id gems reviewedBy authorDetails")
+            .populate("authorDetails", "fullName email")
+            .lean()
+        : Promise.resolve([]),
+      // Fetch any existing scores this reviewer has for these blogs
+      reviewedBlogObjectIds.length
+        ? ReviewScore.find({ blogId: { $in: reviewedBlogObjectIds }, reviewerId: userId }).lean()
+        : Promise.resolve([]),
+    ]);
 
     // Collect ALL reviewer IDs from rawBlogs AND reviewedBlogDocs in one pass
     const allReviewerIdSet = new Set();
@@ -1677,7 +1986,12 @@ exports.getUserContent = async (req, res) => {
       }]),
     );
 
-    // Attach gems + dialog data to each reviewed blog entry
+    // Map of blogId → existing reviewer score for this reviewer (Phase 6)
+    const reviewScoreMap = new Map(
+      existingReviewScores.map((rs) => [rs.blogId.toString(), rs.score]),
+    );
+
+    // Attach gems + dialog data + reviewer score to each reviewed blog entry
     if (rawReviewed.length > 0) {
       user.reviewedBlogs = rawReviewed.map((rb) => {
         const blogId = rb.BlogObjectId?.toString();
@@ -1709,6 +2023,8 @@ exports.getUserContent = async (req, res) => {
             ? { fullName: blogData.authorDetails.fullName, email: blogData.authorDetails.email }
             : null,
           blogReviewedBy: blogData?.blogReviewedBy || [],
+          // Phase 6 — existing admin-assigned review score for this entry (null = not yet scored)
+          reviewScore: blogId != null ? (reviewScoreMap.get(blogId) ?? null) : null,
         };
       });
     }
@@ -1751,6 +2067,23 @@ exports.updateGems = async (req, res) => {
     const newReviewerAwards = (Array.isArray(reviewerAwards) ? reviewerAwards : [])
       .map((a) => ({ userId: a.userId?.toString(), gems: Math.max(0, parseInt(a.gems) || 0) }))
       .filter((a) => a.userId);
+
+    // ── Per-blog cap enforcement (Phase 2) ──
+    // The cap applies to the resulting per-blog total. Since `Blog.gems.authorGems`
+    // and each `reviewerAwards[i].gems` already represent cumulative per-blog
+    // values (not deltas), validating the new value <= cap is enough.
+    const { authorCap, reviewerCap } = await loadPerBlogCaps();
+    if (newAuthorGems > authorCap) {
+      return res.status(400).json({
+        error: `Author gems exceed cap (${newAuthorGems} > ${authorCap}). Max ${authorCap} gems per blog for the author.`,
+      });
+    }
+    const overReviewer = newReviewerAwards.find((a) => a.gems > reviewerCap);
+    if (overReviewer) {
+      return res.status(400).json({
+        error: `Reviewer gems exceed cap (${overReviewer.gems} > ${reviewerCap}). Max ${reviewerCap} gems per blog per reviewer.`,
+      });
+    }
 
     const ops = [];
 

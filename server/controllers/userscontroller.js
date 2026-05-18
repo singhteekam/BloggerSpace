@@ -783,7 +783,7 @@ exports.userProfile = async (req, res) => {
     const viewerId = req.query.viewerId || null;
 
     const user = await User.findOne({ userName })
-      .select("fullName userName email profilePicture isVerified followers following createdAt")
+      .select("fullName userName email profilePicture isVerified followers following createdAt creatorScore reviewerScoreAvg reviewerScoreCount reviewerScoreBest")
       .lean()
       .exec();
 
@@ -796,14 +796,22 @@ exports.userProfile = async (req, res) => {
     const [local, domain] = user.email.split("@");
     const maskedEmail = `${local[0]}${"*".repeat(Math.min(local.length - 1, 5))}@${domain}`;
 
-    // Fetch published blogs with stats
+    // Fetch published blogs with stats (incl. blogScore — Phase 5)
     const blogs = await Blogs.find({
       authorDetails: user._id,
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
     })
-      .select("title slug blogViews blogLikes category tags createdAt lastUpdatedAt")
+      .select("title slug blogViews blogLikes category tags createdAt lastUpdatedAt blogScore")
       .sort({ lastUpdatedAt: -1 })
       .lean();
+
+    // Derived creator-stats: total contribution + avg + best. The UI shows
+    // these next to the sum so 100 mediocre blogs vs 5 excellent ones look
+    // visually distinct.
+    const scoredBlogs = blogs.filter((b) => (b.blogScore ?? 0) > 0);
+    const scoreSum = scoredBlogs.reduce((acc, b) => acc + (b.blogScore ?? 0), 0);
+    const scoreAvg = scoredBlogs.length ? +(scoreSum / scoredBlogs.length).toFixed(1) : 0;
+    const scoreBest = scoredBlogs.reduce((m, b) => Math.max(m, b.blogScore ?? 0), 0);
 
     const isFollowing = viewerId
       ? user.followers.some((id) => id.toString() === viewerId)
@@ -822,6 +830,17 @@ exports.userProfile = async (req, res) => {
       isFollowing,
       blogs,
       createdAt: user.createdAt,
+      // Phase 5 — public creator stats
+      creatorScore: user.creatorScore ?? scoreSum, // fall back to live sum if cache is stale
+      creatorStats: {
+        scoredBlogCount: scoredBlogs.length,
+        avg: scoreAvg,
+        best: scoreBest,
+      },
+      // Phase 6 — public reviewer stats (hidden when count = 0)
+      reviewerScoreAvg:   user.reviewerScoreAvg ?? 0,
+      reviewerScoreCount: user.reviewerScoreCount ?? 0,
+      reviewerScoreBest:  user.reviewerScoreBest ?? 0,
     });
   } catch (error) {
     logger.error("Error fetching user profile: " + error);

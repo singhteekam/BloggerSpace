@@ -68,6 +68,18 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   gems: { type: Number, default: 0 },
+
+  // Phase 5 — cached sum of blogScores across all published blogs by this user.
+  // Recomputed on every blogScore change. Default 0 so existing user docs
+  // remain valid; recompute happens lazily the next time a blog is scored.
+  creatorScore: { type: Number, default: 0, min: 0 },
+
+  // Phase 6 — cached reviewer-quality aggregate across all ReviewScore docs.
+  // All three are recomputed from scratch whenever a ReviewScore is saved.
+  reviewerScoreAvg:   { type: Number, default: 0, min: 0 },
+  reviewerScoreCount: { type: Number, default: 0, min: 0 },
+  reviewerScoreBest:  { type: Number, default: 0, min: 0 },
+
   resetToken: String,
   resetTokenExpiration: Date,
   // OTP-based email verification fields

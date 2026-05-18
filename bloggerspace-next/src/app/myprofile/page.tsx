@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAuth } from "@/contexts/auth-context";
 import { userApi, userGemsApi, type UserGemsTransaction } from "@/lib/api/user";
+import { RedemptionSection } from "@/components/user/redemption-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -144,7 +145,7 @@ export default function MyProfilePage() {
 
       {/* Avatar + info */}
       <div className="flex items-center gap-6">
-        <div className="relative">
+        <div className="relative shrink-0">
           <UserAvatar
             src={profile?.profilePicture}
             name={profile?.fullName ?? "?"}
@@ -168,9 +169,9 @@ export default function MyProfilePage() {
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         </div>
 
-        <div className="space-y-0.5">
+        <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-lg font-semibold">{profile?.fullName}</p>
+            <p className="text-lg font-semibold wrap-break-word">{profile?.fullName}</p>
             {profile?.isVerified && (
               <Badge variant="secondary" className="gap-1 px-2 py-0.5 text-xs text-primary">
                 <BadgeCheck className="size-3 fill-primary text-primary-foreground" />
@@ -183,12 +184,12 @@ export default function MyProfilePage() {
               </Badge>
             )}
           </div>
-          <p className="text-sm text-muted-foreground">@{profile?.userName ?? "—"}</p>
-          <p className="text-sm text-muted-foreground">{profile?.email ?? user.email}</p>
+          <p className="text-sm text-muted-foreground wrap-break-word">@{profile?.userName ?? "—"}</p>
+          <p className="text-sm text-muted-foreground break-all">{profile?.email ?? user.email}</p>
           {joinedDate && (
             <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <CalendarDays className="size-3.5" />
-              Joined {joinedDate}
+              <CalendarDays className="size-3.5 shrink-0" />
+              <span>Joined {joinedDate}</span>
             </p>
           )}
         </div>
@@ -260,18 +261,23 @@ export default function MyProfilePage() {
 
       {/* Gems balance */}
       <div className="rounded-xl border border-border bg-card p-5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <Gem className="size-4 text-primary" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-semibold">Gems balance</p>
-              <p className="text-xs text-muted-foreground">Earned for publishing &amp; reviewing</p>
+              <p className="truncate text-xs text-muted-foreground">Earned for publishing &amp; reviewing</p>
             </div>
           </div>
-          <p className="text-3xl font-bold text-primary">{gems}</p>
+          <p className="shrink-0 text-3xl font-bold text-primary">{gems}</p>
         </div>
+      </div>
+
+      {/* Redemption (Phase 4) */}
+      <div className="mt-4">
+        <RedemptionSection gemsBalance={gems} />
       </div>
 
       {/* Transaction history */}

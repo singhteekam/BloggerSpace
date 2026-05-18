@@ -25,6 +25,7 @@ export type AdminBlog = {
   };
   reviewedBy?: { reviewerId: string; reviewerName?: string }[];
   gems?: GemsInfo;
+  blogScore?: number;
 };
 
 export type AdminBlogDetail = AdminBlog & { content: string };
@@ -306,10 +307,98 @@ export const adminApi = {
   ) =>
     api.patch<{ message: string; gems: GemsInfo }>(`/api/admin/gems/update/${blogId}`, payload, { params: p(userId) }),
 
-  getGemsTransactions: (userId: string, page = 1, filterUserId?: string) =>
+  getGemsTransactions: (
+    userId: string,
+    page = 1,
+    filterUserId?: string,
+    source?: string,
+  ) =>
     api.get<{ transactions: GemsTransaction[]; total: number; page: number; pages: number }>(
       "/api/admin/gems/transactions",
-      { params: { ...p(userId), page, limit: 20, ...(filterUserId ? { filterUserId } : {}) } },
+      {
+        params: {
+          ...p(userId),
+          page,
+          limit: 20,
+          ...(filterUserId ? { filterUserId } : {}),
+          ...(source ? { source } : {}),
+        },
+      },
+    ),
+
+  // Phase 3 — admin grants (non-blog gem rewards) + reversal within window
+  grantGems: (
+    adminId: string,
+    targetUserId: string,
+    payload: { amount: number; note?: string },
+  ) =>
+    api.post<{ message: string; balance: number; transaction: GemsTransaction }>(
+      `/api/admin/gems/grant/${targetUserId}`,
+      payload,
+      { params: p(adminId) },
+    ),
+
+  reverseGrant: (
+    adminId: string,
+    txnId: string,
+    payload: { reason?: string },
+  ) =>
+    api.post<{ message: string; balance: number; reverseTransaction: GemsTransaction }>(
+      `/api/admin/gems/reverse/${txnId}`,
+      payload,
+      { params: p(adminId) },
+    ),
+
+  // Phase 5 — admin-assigned blog quality score
+  setBlogScore: (adminId: string, blogId: string, score: number) =>
+    api.patch<{ message: string; blogScore: number; creatorScore: number }>(
+      `/api/admin/blogs/${blogId}/score`,
+      { score },
+      { params: p(adminId) },
+    ),
+
+  // Phase 6 — admin-assigned reviewer quality score (per blog)
+  setReviewerScore: (
+    adminId: string,
+    blogId: string,
+    reviewerId: string,
+    score: number,
+    note?: string,
+  ) =>
+    api.patch<{ message: string; reviewerScore: number; reviewerScoreAvg: number; reviewerScoreCount: number }>(
+      `/api/admin/blogs/${blogId}/reviewer-score/${reviewerId}`,
+      { score, note },
+      { params: p(adminId) },
+    ),
+
+  // Phase 4 — redemption requests admin review
+  listRedemptions: (
+    adminId: string,
+    page = 1,
+    status?: "PENDING" | "FULFILLED" | "REJECTED",
+  ) =>
+    api.get<{
+      requests: AdminRedemptionRequest[];
+      total: number;
+      pendingCount: number;
+      page: number;
+      pages: number;
+    }>("/api/admin/redemptions", {
+      params: { ...p(adminId), page, limit: 20, ...(status ? { status } : {}) },
+    }),
+
+  fulfillRedemption: (adminId: string, id: string, payload: { note?: string }) =>
+    api.patch<{ message: string; request: AdminRedemptionRequest }>(
+      `/api/admin/redemptions/${id}/fulfill`,
+      payload,
+      { params: p(adminId) },
+    ),
+
+  rejectRedemption: (adminId: string, id: string, payload: { reason?: string }) =>
+    api.patch<{ message: string; request: AdminRedemptionRequest }>(
+      `/api/admin/redemptions/${id}/reject`,
+      payload,
+      { params: p(adminId) },
     ),
 
   // ── User content (team management) ───────────────────────────────────────
@@ -340,15 +429,28 @@ export type GemsInfo = {
   awardedAt?: string;
 };
 
+export type GemsTxnSource =
+  | "BLOG_AWARD"
+  | "ADMIN_GRANT"
+  | "ADMIN_GRANT_REVERSE"
+  | "REDEMPTION_DEDUCT"
+  | "REDEMPTION_REFUND";
+
 export type GemsTransaction = {
   _id: string;
   userId: { _id: string; fullName: string; userName: string; email: string } | string;
-  blogId: string;
-  blogTitle: string;
-  blogSlug: string;
+  blogId?: string;
+  blogTitle?: string;
+  blogSlug?: string;
   type: "AWARD" | "DEDUCT";
-  role: "AUTHOR" | "REVIEWER";
+  role?: "AUTHOR" | "REVIEWER";
   amount: number;
+  // Phase 1 additions — present on all new txns; defaults applied for legacy rows.
+  source?: GemsTxnSource;
+  note?: string;
+  reversedByTxnId?: string | null;
+  redemptionRequestId?: string | null;
+  awardedBy?: { _id: string; fullName: string; userName: string; email: string } | string | null;
   createdAt: string;
 };
 
@@ -387,6 +489,8 @@ export type UserContent = {
       } | null;
       blogAuthor?: { fullName?: string; email?: string } | null;
       blogReviewedBy?: { reviewerId: string; reviewerName?: string }[];
+      /** Phase 6 — admin-assigned review quality score; null = not yet scored */
+      reviewScore?: number | null;
     }[];
   };
   blogs: {
@@ -408,4 +512,70 @@ export type UserContent = {
     communityPostCategory?: string;
     createdAt: string;
   }[];
+};
+
+// ── Admin config (platform-wide settings) ────────────────────────────
+// Mirror of server/models/AdminConfig.js. All numbers are integers.
+export type AdminConfigDoc = {
+  _id: string;
+  // Redemption
+  gemValuePaise: number;
+  minRedeemGems: number;
+  maxRedeemGems: number;
+  redemptionCooldownDays: number;
+  newAccountFlagDays: number;
+  redemptionMethods: string[];
+  // Grants
+  minGrantGems: number;
+  maxGrantGems: number;
+  grantReverseWindowHours: number;
+  // Per-blog caps
+  perBlogAuthorGemsCap: number;
+  perBlogReviewerGemsCap: number;
+  // Scoring
+  maxBlogScore: number;
+  // Audit
+  updatedAt: string;
+  updatedBy: string | null;
+};
+
+export type AdminConfigUpdatePayload = Partial<
+  Omit<AdminConfigDoc, "_id" | "updatedAt" | "updatedBy">
+>;
+
+export const adminConfigApi = {
+  get: (adminId: string) =>
+    api.get<AdminConfigDoc>("/api/admin/config", { params: p(adminId) }),
+
+  update: (adminId: string, payload: AdminConfigUpdatePayload) =>
+    api.patch<AdminConfigDoc>("/api/admin/config", payload, { params: p(adminId) }),
+};
+
+// ── Redemption requests (Phase 4) — admin view ─────────────────────────────
+export type AdminRedemptionRequest = {
+  _id: string;
+  // Populated by the backend
+  userId: {
+    _id: string;
+    fullName: string;
+    userName: string;
+    email: string;
+    gems: number;
+    createdAt: string;
+    isVerified: boolean;
+  } | string;
+  gemsAmount: number;
+  valueInPaise: number;
+  method: "AMAZON_GIFT_CARD";
+  recipientEmail: string;
+  status: "PENDING" | "FULFILLED" | "REJECTED";
+  isFlagged: boolean;
+  flagReason: string;
+  fulfilledAt?: string | null;
+  fulfilledBy?: { _id: string; fullName: string; email: string } | string | null;
+  fulfillmentNote?: string;
+  rejectedAt?: string | null;
+  rejectedBy?: { _id: string; fullName: string; email: string } | string | null;
+  rejectionReason?: string;
+  createdAt: string;
 };

@@ -85,6 +85,13 @@ const blogSchema = new mongoose.Schema({
     awardedAt:     { type: Date, default: null },
     awardedBy:     { type: mongoose.Schema.Types.ObjectId, ref: "users", default: null },
   },
+
+  // Phase 5 — admin-assigned blog quality score (0..AdminConfig.maxBlogScore).
+  // Default 0 so existing blogs read cleanly without a backfill script.
+  // Aggregated into User.creatorScore whenever this is changed.
+  blogScore: { type: Number, default: 0, min: 0 },
+  blogScoreUpdatedAt: { type: Date, default: null },
+  blogScoreUpdatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "admins", default: null },
 });
 
 const Blog = mongoose.model("Blog", blogSchema);

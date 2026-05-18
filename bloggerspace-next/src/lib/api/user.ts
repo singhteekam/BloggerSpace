@@ -13,6 +13,7 @@ export type PublicBlog = {
   blogLikes: { userId: string }[];
   createdAt: string;
   lastUpdatedAt: string;
+  blogScore?: number;
 };
 
 export type PublicProfile = {
@@ -27,6 +28,17 @@ export type PublicProfile = {
   isFollowing: boolean;
   blogs: PublicBlog[];
   createdAt: string;
+  // Phase 5 — public creator stats
+  creatorScore?: number;
+  creatorStats?: {
+    scoredBlogCount: number;
+    avg: number;
+    best: number;
+  };
+  // Phase 6 — public reviewer stats
+  reviewerScoreAvg?: number;
+  reviewerScoreCount?: number;
+  reviewerScoreBest?: number;
 };
 
 export async function fetchPublicProfile(
@@ -102,11 +114,18 @@ export const userApi = {
 
 export type UserGemsTransaction = {
   _id: string;
-  blogTitle: string;
-  blogSlug: string;
+  blogTitle?: string;
+  blogSlug?: string;
   type: "AWARD" | "DEDUCT";
-  role: "AUTHOR" | "REVIEWER";
+  role?: "AUTHOR" | "REVIEWER";
   amount: number;
+  source?:
+    | "BLOG_AWARD"
+    | "ADMIN_GRANT"
+    | "ADMIN_GRANT_REVERSE"
+    | "REDEMPTION_DEDUCT"
+    | "REDEMPTION_REFUND";
+  note?: string;
   createdAt: string;
 };
 
@@ -116,6 +135,53 @@ export const userGemsApi = {
       "/api/users/gems/history",
       { params: { page, limit: 20 } },
     ),
+};
+
+// ── Redemption requests (Phase 4) ───────────────────────────────────────────
+export type RedemptionRequestRecord = {
+  _id: string;
+  userId: string;
+  gemsAmount: number;
+  valueInPaise: number;
+  method: "AMAZON_GIFT_CARD";
+  recipientEmail: string;
+  status: "PENDING" | "FULFILLED" | "REJECTED";
+  isFlagged: boolean;
+  flagReason: string;
+  fulfilledAt?: string | null;
+  fulfillmentNote?: string;
+  rejectedAt?: string | null;
+  rejectionReason?: string;
+  createdAt: string;
+};
+
+export type RedemptionListResponse = {
+  requests: RedemptionRequestRecord[];
+  total: number;
+  pendingCount: number;
+  cooldownDaysLeft: number;
+  page: number;
+  pages: number;
+  config: {
+    gemValuePaise: number;
+    minRedeemGems: number;
+    maxRedeemGems: number;
+    redemptionCooldownDays: number;
+    methods: string[];
+  };
+};
+
+export const redemptionApi = {
+  create: (amount: number) =>
+    api.post<{ message: string; balance: number; request: RedemptionRequestRecord }>(
+      "/api/users/redemptions",
+      { amount },
+    ),
+
+  listMine: (page = 1) =>
+    api.get<RedemptionListResponse>("/api/users/redemptions/me", {
+      params: { page, limit: 10 },
+    }),
 };
 
 export const myBlogsApi = {
