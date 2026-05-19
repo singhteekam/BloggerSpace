@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Code2, Briefcase, AtSign, Mail, ExternalLink } from "lucide-react";
-
-// lucide-react v1 removed brand icons — using generic equivalents
-const Github = Code2;
-const Linkedin = Briefcase;
-const Twitter = AtSign;
+import { Mail, ExternalLink } from "lucide-react";
+import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons/brand-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -26,19 +22,19 @@ const TECH_STACK = [
 
 const SOCIAL_LINKS = [
   {
-    icon: Github,
+    icon: GitHubIcon,
     label: "GitHub",
     href: "https://github.com/singhteekam",
     handle: "singhteekam",
   },
   {
-    icon: Linkedin,
+    icon: LinkedInIcon,
     label: "LinkedIn",
     href: "https://linkedin.com/in/singhteekam",
     handle: "singhteekam",
   },
   {
-    icon: Twitter,
+    icon: XIcon,
     label: "X (Twitter)",
     href: "https://x.com/singhteekam",
     handle: "@singhteekam",

@@ -22,7 +22,7 @@ const EDITABLE_FIELDS = [
   "maxBlogScore",
 ];
 
-const VALID_REDEMPTION_METHODS = ["AMAZON_GIFT_CARD"];
+const VALID_REDEMPTION_METHODS = ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"];
 
 /**
  * GET /api/admin/config

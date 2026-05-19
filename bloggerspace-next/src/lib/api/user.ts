@@ -138,12 +138,19 @@ export const userGemsApi = {
 };
 
 // ── Redemption requests (Phase 4) ───────────────────────────────────────────
+export type RedemptionMethod = "AMAZON_GIFT_CARD" | "FLIPKART_GIFT_CARD";
+
+export const REDEMPTION_METHOD_LABELS: Record<RedemptionMethod, string> = {
+  AMAZON_GIFT_CARD: "Amazon Pay gift card",
+  FLIPKART_GIFT_CARD: "Flipkart gift card",
+};
+
 export type RedemptionRequestRecord = {
   _id: string;
   userId: string;
   gemsAmount: number;
   valueInPaise: number;
-  method: "AMAZON_GIFT_CARD";
+  method: RedemptionMethod;
   recipientEmail: string;
   status: "PENDING" | "FULFILLED" | "REJECTED";
   isFlagged: boolean;
@@ -172,10 +179,10 @@ export type RedemptionListResponse = {
 };
 
 export const redemptionApi = {
-  create: (amount: number) =>
+  create: (amount: number, method: RedemptionMethod) =>
     api.post<{ message: string; balance: number; request: RedemptionRequestRecord }>(
       "/api/users/redemptions",
-      { amount },
+      { amount, method },
     ),
 
   listMine: (page = 1) =>

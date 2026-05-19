@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi, type AdminRedemptionRequest } from "@/lib/api/admin";
+import { REDEMPTION_METHOD_LABELS } from "@/lib/api/user";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -123,6 +124,7 @@ function RequestList({ adminId, status }: { adminId: string; status: StatusFilte
 function RequestCard({ adminId, req }: { adminId: string; req: AdminRedemptionRequest }) {
   const user = typeof req.userId === "object" ? req.userId : null;
   const valueRupees = (req.valueInPaise / 100).toFixed(2);
+  const methodLabel = REDEMPTION_METHOD_LABELS[req.method] ?? req.method;
 
   // Account age in days — useful context for the flag
   const accountAgeDays = user?.createdAt
@@ -140,6 +142,9 @@ function RequestCard({ adminId, req }: { adminId: string; req: AdminRedemptionRe
             <span className="flex items-center gap-0.5 text-lg font-semibold text-primary">
               <IndianRupee className="size-4" />{valueRupees}
             </span>
+            <Badge variant="secondary" className="gap-1 text-[10px]">
+              <Gift className="size-2.5" />{methodLabel}
+            </Badge>
             <StatusBadge status={req.status} />
             {req.isFlagged && req.status === "PENDING" && (
               <Badge variant="outline" className="gap-1 border-amber-300 text-amber-700 dark:text-amber-400">
@@ -214,7 +219,14 @@ function RequestCard({ adminId, req }: { adminId: string; req: AdminRedemptionRe
       {req.status === "PENDING" && (
         <div className="mt-4 flex flex-wrap justify-end gap-2">
           <RejectButton adminId={adminId} requestId={req._id} />
-          <FulfillButton adminId={adminId} requestId={req._id} amount={req.gemsAmount} valueRupees={valueRupees} email={req.recipientEmail} />
+          <FulfillButton
+            adminId={adminId}
+            requestId={req._id}
+            amount={req.gemsAmount}
+            valueRupees={valueRupees}
+            email={req.recipientEmail}
+            methodLabel={methodLabel}
+          />
         </div>
       )}
     </div>
@@ -232,8 +244,8 @@ function StatusBadge({ status }: { status: AdminRedemptionRequest["status"] }) {
 
 // ─── Fulfill action ──────────────────────────────────────────────────────────
 function FulfillButton({
-  adminId, requestId, amount, valueRupees, email,
-}: { adminId: string; requestId: string; amount: number; valueRupees: string; email: string }) {
+  adminId, requestId, amount, valueRupees, email, methodLabel,
+}: { adminId: string; requestId: string; amount: number; valueRupees: string; email: string; methodLabel: string }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
@@ -262,7 +274,7 @@ function FulfillButton({
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-5 shadow-xl">
           <Dialog.Title className="font-serif text-base font-semibold">Mark as fulfilled?</Dialog.Title>
           <Dialog.Description className="mt-1 text-xs text-muted-foreground">
-            Confirm that you&apos;ve sent the ₹{valueRupees} Amazon gift card to <b>{email}</b>. The user will receive a confirmation email.
+            Confirm that you&apos;ve sent the ₹{valueRupees} <b>{methodLabel}</b> to <b>{email}</b>. The user will receive a confirmation email.
           </Dialog.Description>
           <div className="mt-4 space-y-1.5">
             <label className="text-xs font-medium">Note (optional)</label>

@@ -566,7 +566,7 @@ export type AdminRedemptionRequest = {
   } | string;
   gemsAmount: number;
   valueInPaise: number;
-  method: "AMAZON_GIFT_CARD";
+  method: "AMAZON_GIFT_CARD" | "FLIPKART_GIFT_CARD";
   recipientEmail: string;
   status: "PENDING" | "FULFILLED" | "REJECTED";
   isFlagged: boolean;

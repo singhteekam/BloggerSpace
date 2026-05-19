@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const IST_OFFSET = 330;
 
 /**
- * A user-initiated request to redeem gems for an Amazon gift card (Phase 4).
+ * A user-initiated request to redeem gems for a gift card (Phase 4).
+ * Supported methods: Amazon Pay gift card, Flipkart gift card.
  *
  * Lifecycle: PENDING → FULFILLED (admin manually sent gift card)
  *                    └→ REJECTED  (gems automatically refunded)
@@ -29,7 +30,7 @@ const redemptionRequestSchema = new mongoose.Schema({
 
   method: {
     type: String,
-    enum: ["AMAZON_GIFT_CARD"],
+    enum: ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"],
     required: true,
     default: "AMAZON_GIFT_CARD",
   },

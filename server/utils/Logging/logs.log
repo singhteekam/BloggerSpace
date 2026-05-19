@@ -113,3 +113,43 @@
 [2026-05-18T16:07:13.512Z] [LOG] [DEBUG] - Inside viewBlogRoute function.
 [2026-05-18T16:07:13.692Z] [LOG] [INFO] - Returning from user profile route with data.
 [2026-05-18T16:07:13.692Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T21:49:59.797Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T21:49:59.797Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:00:02.328Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:00:02.328Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:07:46.889Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-18T22:07:58.340Z] [LOG] [DEBUG] - Dynamic TS: Profile picture uploaded successfully.
+[2026-05-18T22:07:58.369Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-18T22:08:05.537Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:08:05.537Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:08:23.597Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:08:23.597Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:17:39.619Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:17:39.619Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:21:18.830Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:21:18.830Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:21:26.801Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Dynamic TS
+[2026-05-18T22:22:41.950Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:22:41.950Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:22:58.337Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:22:58.337Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:29:02.489Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:29:02.489Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:29:09.628Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:29:09.628Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:29:18.494Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T22:29:18.494Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T23:25:58.035Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T23:25:58.035Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-18T23:26:41.913Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-18T23:26:41.913Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-18T23:26:41.913Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-18T23:26:42.972Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2026-05-18T23:26:42.972Z] [LOG] [INFO] - User is not logged in.. Redirecting to login page.
+[2026-05-18T23:27:36.853Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-18T23:27:36.853Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-18T23:27:36.853Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-19T05:50:17.118Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-19T05:50:17.118Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-19T05:55:26.575Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-19T05:55:26.575Z] [LOG] [INFO] - Returning from user profile route with data.

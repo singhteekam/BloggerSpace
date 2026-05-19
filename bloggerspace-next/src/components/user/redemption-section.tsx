@@ -14,7 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { redemptionApi, type RedemptionRequestRecord } from "@/lib/api/user";
+import {
+  redemptionApi,
+  REDEMPTION_METHOD_LABELS,
+  type RedemptionMethod,
+  type RedemptionRequestRecord,
+} from "@/lib/api/user";
 import { formatDate } from "@/lib/utils/html";
 
 /**
@@ -72,7 +77,7 @@ export function RedemptionSection({ gemsBalance }: { gemsBalance: number }) {
             <p className="font-semibold text-sm">Redeem gems for gift cards</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
               {cfg
-                ? <>Convert your gems into Amazon gift cards. <b>{minGems}</b> gem{minGems === 1 ? "" : "s"} = <b>₹{((minGems * cfg.gemValuePaise) / 100).toFixed(2)}</b></>
+                ? <>Convert your gems into Amazon Pay or Flipkart gift cards. <b>{minGems}</b> gem{minGems === 1 ? "" : "s"} = <b>₹{((minGems * cfg.gemValuePaise) / 100).toFixed(2)}</b></>
                 : "Loading rate…"}
             </p>
           </div>
@@ -124,6 +129,7 @@ export function RedemptionSection({ gemsBalance }: { gemsBalance: number }) {
           maxGems={Math.min(maxGems, gemsBalance)}
           gemValuePaise={cfg.gemValuePaise}
           rateRupees={rateRupees}
+          methods={(cfg.methods ?? ["AMAZON_GIFT_CARD"]) as RedemptionMethod[]}
           onSuccess={() => {
             qc.invalidateQueries({ queryKey: ["redemption-history"] });
             qc.invalidateQueries({ queryKey: ["userinfo"] });
@@ -137,6 +143,7 @@ export function RedemptionSection({ gemsBalance }: { gemsBalance: number }) {
 // ─── Per-row in history ─────────────────────────────────────────────────────
 function RedemptionRow({ req }: { req: RedemptionRequestRecord }) {
   const valueRupees = (req.valueInPaise / 100).toFixed(2);
+  const methodLabel = REDEMPTION_METHOD_LABELS[req.method] ?? req.method;
 
   const statusConfig = {
     PENDING:   { icon: Clock,        cls: "border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-900/10",   text: "text-amber-700 dark:text-amber-400", label: "Pending review" },
@@ -154,6 +161,9 @@ function RedemptionRow({ req }: { req: RedemptionRequestRecord }) {
             <span className="font-semibold text-sm">
               {req.gemsAmount} gems → ₹{valueRupees}
             </span>
+            <Badge variant="outline" className="text-[10px]">
+              {methodLabel}
+            </Badge>
             <Badge variant="outline" className={`text-[10px] gap-1 ${s.text}`}>
               <Icon className="size-2.5" />{s.label}
             </Badge>
@@ -187,6 +197,7 @@ function RedeemDialog({
   maxGems,
   gemValuePaise,
   rateRupees,
+  methods,
   onSuccess,
 }: {
   open: boolean;
@@ -196,13 +207,18 @@ function RedeemDialog({
   maxGems: number;  // already capped to user balance
   gemValuePaise: number;
   rateRupees: string;
+  methods: RedemptionMethod[];
   onSuccess: () => void;
 }) {
   const [amount, setAmount] = useState<string>("");
+  const [method, setMethod] = useState<RedemptionMethod>(methods[0] ?? "AMAZON_GIFT_CARD");
 
   // Reset when reopened
   useEffect(() => {
-    if (open) setAmount(String(Math.min(maxGems, Math.max(minGems, gemsBalance))));
+    if (open) {
+      setAmount(String(Math.min(maxGems, Math.max(minGems, gemsBalance))));
+      setMethod(methods[0] ?? "AMAZON_GIFT_CARD");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -212,7 +228,7 @@ function RedeemDialog({
   const canSubmit = !outOfRange && numAmount >= minGems && numAmount <= maxGems;
 
   const mutation = useMutation({
-    mutationFn: () => redemptionApi.create(numAmount),
+    mutationFn: () => redemptionApi.create(numAmount, method),
     onSuccess: () => {
       toast.success(`Submitted! ${numAmount} gems → ₹${previewRupees}`);
       setOpen(false);
@@ -236,8 +252,8 @@ function RedeemDialog({
             <Gift className="size-4 text-primary" />Redeem gems
           </Dialog.Title>
           <Dialog.Description className="mt-1 text-sm text-muted-foreground">
-            Submit a request to convert your gems into an Amazon gift card.
-            Admin will review and email it to you.
+            Submit a request to convert your gems into a gift card. Admin will
+            review and email it to you.
           </Dialog.Description>
 
           <div className="mt-5 space-y-4">
@@ -247,6 +263,35 @@ function RedeemDialog({
               <span className="flex items-center gap-1 font-semibold">
                 <IndianRupee className="size-3" />{rateRupees} per gem
               </span>
+            </div>
+
+            {/* Gift card method selector */}
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Gift card</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {methods.map((m) => {
+                  const selected = method === m;
+                  return (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setMethod(m)}
+                      className={`rounded-lg border px-3 py-2.5 text-left text-xs transition-colors ${
+                        selected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary/40"
+                          : "border-border bg-card hover:bg-muted/40"
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <Gift className={`size-3.5 ${selected ? "text-primary" : "text-muted-foreground"}`} />
+                        <span className="font-medium text-foreground">
+                          {REDEMPTION_METHOD_LABELS[m] ?? m}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="space-y-1.5">
@@ -281,7 +326,9 @@ function RedeemDialog({
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm dark:border-emerald-900/40 dark:bg-emerald-900/10">
                 <p className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">You&apos;ll receive</span>
-                  <b className="text-emerald-700 dark:text-emerald-400">₹{previewRupees}</b>
+                  <b className="text-emerald-700 dark:text-emerald-400">
+                    ₹{previewRupees} {REDEMPTION_METHOD_LABELS[method] ?? method}
+                  </b>
                 </p>
                 <p className="mt-1 flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Balance after</span>

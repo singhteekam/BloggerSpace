@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Tailwind v4 defaults dark: to prefers-color-scheme. Re-bind it to the
+   .dark class so our theme toggle controls all dark: utilities. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * BloggerSpace — Palette A "Editorial Indigo"
  * All semantic tokens are CSS variables so the entire palette can be swapped

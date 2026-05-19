@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { Loader2, Save, Settings as SettingsIcon, Gem, Award, BookOpen, Coins } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Gem, Award, BookOpen, Coins, Gift } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminConfigApi, type AdminConfigDoc, type AdminConfigUpdatePayload } from "@/lib/api/admin";
+import { REDEMPTION_METHOD_LABELS, type RedemptionMethod } from "@/lib/api/user";
+
+const ALL_REDEMPTION_METHODS: RedemptionMethod[] = ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"];
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -116,6 +119,44 @@ function SettingsForm({ adminId }: { adminId: string }) {
           <Field label="Flag accounts younger than (days)" hint="Admin review required for these users">
             <Input type="number" min={0} value={form.newAccountFlagDays ?? ""} onChange={setNum("newAccountFlagDays")} />
           </Field>
+          <div className="min-w-0 space-y-1.5 sm:col-span-2">
+            <Label className="text-xs font-medium text-muted-foreground">Enabled gift cards</Label>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {ALL_REDEMPTION_METHODS.map((m) => {
+                const enabled = (form.redemptionMethods ?? config.redemptionMethods ?? []).includes(m);
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => {
+                      const current = form.redemptionMethods ?? config.redemptionMethods ?? [];
+                      const next = enabled
+                        ? current.filter((x) => x !== m)
+                        : [...current, m];
+                      // Don't allow disabling all — keep at least one
+                      if (next.length === 0) {
+                        toast.warning("At least one gift card must remain enabled.");
+                        return;
+                      }
+                      setForm((f) => ({ ...f, redemptionMethods: next }));
+                    }}
+                    className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-left text-xs transition-colors ${
+                      enabled
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/40"
+                        : "border-border bg-card hover:bg-muted/40"
+                    }`}
+                  >
+                    <Gift className={`size-3.5 ${enabled ? "text-primary" : "text-muted-foreground"}`} />
+                    <span className="font-medium text-foreground">{REDEMPTION_METHOD_LABELS[m]}</span>
+                    <span className={`ml-auto text-[10px] font-semibold ${enabled ? "text-primary" : "text-muted-foreground"}`}>
+                      {enabled ? "Enabled" : "Disabled"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-muted-foreground">Users will only see enabled gift cards in their redemption dialog.</p>
+          </div>
         </Section>
 
         {/* Admin grants */}

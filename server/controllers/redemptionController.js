@@ -29,6 +29,13 @@ const sendEmail = require("../services/mailer");
 const IST_OFFSET = 330;
 const istNow = () => new Date(new Date().getTime() + IST_OFFSET * 60000);
 
+// Human-readable label for each gift-card vendor.
+// Used in confirmation emails and any UI-facing text the backend renders.
+const METHOD_LABELS = {
+  AMAZON_GIFT_CARD: "Amazon Pay gift card",
+  FLIPKART_GIFT_CARD: "Flipkart gift card",
+};
+
 // Defaults if AdminConfig is missing (defensive — Phase 1 lazily creates it).
 const DEFAULTS = {
   gemValuePaise: 50,
@@ -36,6 +43,7 @@ const DEFAULTS = {
   maxRedeemGems: 2000,
   redemptionCooldownDays: 7,
   newAccountFlagDays: 7,
+  redemptionMethods: ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"],
 };
 
 async function loadConfig() {
@@ -46,13 +54,17 @@ async function loadConfig() {
     maxRedeemGems: cfg.maxRedeemGems ?? DEFAULTS.maxRedeemGems,
     redemptionCooldownDays: cfg.redemptionCooldownDays ?? DEFAULTS.redemptionCooldownDays,
     newAccountFlagDays: cfg.newAccountFlagDays ?? DEFAULTS.newAccountFlagDays,
+    redemptionMethods:
+      Array.isArray(cfg.redemptionMethods) && cfg.redemptionMethods.length > 0
+        ? cfg.redemptionMethods
+        : DEFAULTS.redemptionMethods,
   };
 }
 
 // ─── User: create redemption request ─────────────────────────────────────────
 exports.createRedemption = async (req, res) => {
   const userId = req.query.userId; // set by authenticate middleware
-  const { amount } = req.body;
+  const { amount, method } = req.body;
 
   if (!userId) return res.status(401).json({ error: "Not authenticated" });
 
@@ -62,6 +74,15 @@ exports.createRedemption = async (req, res) => {
   }
 
   const cfg = await loadConfig();
+
+  // Resolve & validate method: must be one of the platform-enabled methods.
+  // Falls back to the first enabled method when the client omits it.
+  const chosenMethod = method || cfg.redemptionMethods[0];
+  if (!cfg.redemptionMethods.includes(chosenMethod)) {
+    return res.status(400).json({
+      error: `Unsupported redemption method: ${chosenMethod}`,
+    });
+  }
 
   if (amt < cfg.minRedeemGems || amt > cfg.maxRedeemGems) {
     return res.status(400).json({
@@ -143,7 +164,7 @@ exports.createRedemption = async (req, res) => {
           userId,
           gemsAmount: amt,
           valueInPaise,
-          method: "AMAZON_GIFT_CARD",
+          method: chosenMethod,
           recipientEmail: user.email,
           status: "PENDING",
           isFlagged,
@@ -231,7 +252,7 @@ exports.listOwnRedemptions = async (req, res) => {
         minRedeemGems: cfg.minRedeemGems,
         maxRedeemGems: cfg.maxRedeemGems,
         redemptionCooldownDays: cfg.redemptionCooldownDays,
-        methods: ["AMAZON_GIFT_CARD"],
+        methods: cfg.redemptionMethods,
       },
     });
   } catch (error) {
@@ -296,13 +317,14 @@ exports.fulfillRedemption = async (req, res) => {
     // Best-effort email to user
     const user = await User.findById(request.userId).select("email fullName userName").lean();
     if (user?.email) {
+      const methodLabel = METHOD_LABELS[request.method] || "gift card";
       sendEmail(
         user.email,
         `Your redemption has been fulfilled — ${request.gemsAmount} gems`,
         `<div class="content">
           <h2>Your redemption is on its way!</h2>
           <p>Hi ${user.fullName || user.userName || "there"},</p>
-          <p>We've sent your <b>Amazon gift card worth ₹${(request.valueInPaise / 100).toFixed(2)}</b> to <b>${request.recipientEmail}</b>. Please check your inbox (and spam folder) shortly.</p>
+          <p>We've sent your <b>${methodLabel} worth ₹${(request.valueInPaise / 100).toFixed(2)}</b> to <b>${request.recipientEmail}</b>. Please check your inbox (and spam folder) shortly.</p>
           ${request.fulfillmentNote ? `<p style="background:#ecfdf5;border-left:4px solid #10b981;padding:12px;margin:16px 0;"><b>Note from admin:</b><br/>${escapeHtml(request.fulfillmentNote)}</p>` : ""}
           <p>Thank you for being part of BloggerSpace!</p>
         </div>`

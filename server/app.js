@@ -28,6 +28,7 @@ const authRoutes = require("./routes/users");
 const reviewerRoutes = require("./routes/Reviewer/reviewerRoute");
 const adminRoutes = require("./routes/Admin/adminRoute");
 const communityRoutes = require("./routes/community");
+const reviewsRoutes  = require("./routes/reviewsRoute");
 const autoWriteBlogs = require("./routes/autoWriteBlogs");
 
 const sitemapRouter = require("./routes/sitemap");
@@ -122,6 +123,9 @@ app.use("/api/admin/", adminRoutes);
 
 // Community
 app.use("/api/community", communityRoutes);
+
+// Reviews (public + user-submitted + admin moderation)
+app.use("/api/reviews", reviewsRoutes);
 
 //Auto Writing Blogs
 app.use("/api/autowrite", autoWriteBlogs);

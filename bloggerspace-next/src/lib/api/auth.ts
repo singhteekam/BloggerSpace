@@ -8,6 +8,7 @@ export type AuthUser = {
   profilePicture?: string;
   userName?: string;
   isVerified?: boolean;
+  status?: string;
   reviewerStatus?: "none" | "pending" | "approved" | "rejected";
   gems?: number;
   createdAt?: string;

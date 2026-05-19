@@ -16,7 +16,7 @@ const adminConfigSchema = new mongoose.Schema({
   newAccountFlagDays: { type: Number, default: 7, min: 0 },
   redemptionMethods: {
     type: [String],
-    default: ["AMAZON_GIFT_CARD"],
+    default: ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"],
   },
 
   // ── Admin gem grants ────────────────────────────────────────

@@ -55,7 +55,7 @@ export function Spotlight({
           translateY: "-50%",
         }}
       />
-      <div className="relative">{children}</div>
+      <div className="relative h-full">{children}</div>
     </div>
   );
 }

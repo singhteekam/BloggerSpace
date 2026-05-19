@@ -4,8 +4,8 @@ import Image from "next/image";
 import {
   ArrowRight, Sparkles, ShieldCheck, BookOpen, Users, Pencil,
   MessageSquare, Star, Mail, ExternalLink,
-  CheckCircle2, Globe, Code2, Briefcase, Camera, Gem, Trophy,
-  TrendingUp, Gift, BadgeCheck,
+  CheckCircle2, Globe, Gem,
+  TrendingUp, Gift,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,10 @@ import {
   SiNodedotjs, SiExpress, SiMongodb, SiVercel,
   SiFirebase, SiJsonwebtokens, SiAxios,
 } from "react-icons/si";
+import { GitHubIcon, LinkedInIcon, InstagramIcon } from "@/components/icons/brand-icons";
 import { ContactForm } from "./_sections/contact-form";
+import { GemsProfileCard } from "./_sections/gems-profile-card";
+import { ReviewsSection } from "./_sections/reviews-section";
 
 
 export const metadata: Metadata = {
@@ -83,40 +86,6 @@ const ACTIONS = [
   },
 ];
 
-const TESTIMONIALS = [
-  {
-    name: "Mohit Sharma",
-    initials: "MS",
-    image: "/users/mohit.jpeg",
-    href: "https://bloggerspace.singhteekam.in/user/mohitnsr882",
-    review:
-      "My experience as a reviewer and writer has reached new heights. The platform's draft and editing tools allow me to focus on creating high-quality content.",
-  },
-  {
-    name: "Saksham Kumar",
-    initials: "SK",
-    image: "/users/saksham.jpeg",
-    href: "https://bloggerspace.singhteekam.in/user/kums6765",
-    review:
-      "BloggerSpace has exceeded my expectations with its exceptional writing features and user-friendly interface.",
-  },
-  {
-    name: "Abhay Chaudhary",
-    initials: "AC",
-    image: "/users/abhay.jpeg",
-    href: "https://bloggerspace.singhteekam.in/user/abhayc041",
-    review:
-      "The supportive community further enhances the overall experience, making BloggerSpace a standout choice for any writer.",
-  },
-  {
-    name: "Harendra Singh",
-    initials: "HS",
-    image: "/users/hs.jpeg",
-    href: "https://bloggerspace.singhteekam.in/user/harendrasingh2021",
-    review:
-      "My experience with BloggerSpace has been nothing short of exceptional. The platform's advanced features have made blogging a breeze.",
-  },
-];
 
 const TECH_STACK: { label: string; Icon: React.ComponentType<{ size?: number; className?: string }>; iconColor: string }[] = [
   { label: "Next.js",      Icon: SiNextdotjs,     iconColor: "text-foreground" },
@@ -147,26 +116,6 @@ const PROJECTS = [
   },
 ];
 
-const GEM_REWARDS = [
-  {
-    icon: Pencil,
-    title: "Write & get published",
-    body: "Submit a post for review. When it passes editorial review and goes live, gems are awarded to your profile.",
-    badge: "Author reward",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Review drafts",
-    body: "Reviewers earn gems for every blog they review and help bring to publish-ready quality — a real incentive to give great feedback.",
-    badge: "Reviewer reward",
-  },
-  {
-    icon: Trophy,
-    title: "Grow your reputation",
-    body: "Gems accumulate on your public profile and reflect your total contribution. The more quality work you do, the higher your standing.",
-    badge: "Reputation",
-  },
-];
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 
@@ -186,7 +135,7 @@ export default async function Home() {
       <HowItWorksSection />
       <WhatYouCanDoSection />
       <GemsSection />
-      <TestimonialsSection />
+      <ReviewsSection />
       <TechStackSection />
       <DeveloperSection />
       <ContactSection />
@@ -213,7 +162,7 @@ function HeroSection({ totalBlogs }: { totalBlogs: number }) {
             className="gap-1.5 bg-card/60 px-3.5 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
           >
             <Sparkles className="size-3.5 text-accent" aria-hidden="true" />
-            Now live — write, review, discuss
+            Write · Review · Earn gems &amp; rewards
           </Badge>
         </FadeIn>
 
@@ -249,8 +198,22 @@ function HeroSection({ totalBlogs }: { totalBlogs: number }) {
           </div>
         </FadeIn>
 
+        <FadeIn delay={0.55}>
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+            {[
+              { icon: <Gem className="size-3 text-primary" />, label: "Earn gems for writing & reviewing" },
+              { icon: <Star className="size-3 text-amber-500 fill-amber-500" />, label: "Public blog & reviewer scores" },
+              { icon: <Gift className="size-3 text-emerald-500" />, label: "Redeem for gift cards" },
+            ].map(({ icon, label }) => (
+              <span key={label} className="flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-3 py-1 backdrop-blur">
+                {icon}{label}
+              </span>
+            ))}
+          </div>
+        </FadeIn>
+
         {totalBlogs > 0 && (
-          <FadeIn delay={0.55}>
+          <FadeIn delay={0.7}>
             <p className="text-xs text-muted-foreground">
               Join{" "}
               <span className="font-semibold text-foreground">
@@ -262,7 +225,7 @@ function HeroSection({ totalBlogs }: { totalBlogs: number }) {
         )}
 
         <Stagger
-          delay={0.6}
+          delay={0.8}
           stagger={0.1}
           className="mt-4 grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3"
         >
@@ -422,43 +385,179 @@ function WhatYouCanDoSection() {
 
 function GemsSection() {
   return (
-    <section className="bg-muted/30 py-20">
+    <section className="py-20">
       <div className="mx-auto max-w-6xl px-6">
+
+        {/* Header */}
         <ScrollReveal className="mb-12 text-center">
           <Badge variant="secondary" className="mb-4 gap-1.5">
-            <Gem className="size-3.5 text-amber-500" />
+            <Gem className="size-3.5 text-primary" />
             Gems &amp; Rewards
           </Badge>
           <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-            Earn gems for every contribution
+            Contribute. Score. Redeem.
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-balance text-muted-foreground">
-            BloggerSpace rewards quality. Writers and reviewers earn gems that appear on their public profile — the more you contribute, the more you accumulate.
+          <p className="mx-auto mt-4 max-w-xl text-balance text-muted-foreground">
+            Every quality contribution is rewarded — gems for your work, public scores for your reputation, and real-world rewards when you're ready to cash out.
           </p>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {GEM_REWARDS.map(({ icon: Icon, title, body, badge }, i) => (
-            <ScrollReveal key={title} delay={i * 0.1}>
-              <Spotlight className="h-full rounded-2xl">
-                <Card className="flex h-full flex-col gap-4 p-6 transition-colors hover:bg-card/80">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="inline-flex size-12 items-center justify-center rounded-xl bg-amber-500/10">
-                      <Icon className="size-6 text-amber-500" />
-                    </div>
-                    <Badge variant="outline" className="shrink-0 text-xs">{badge}</Badge>
+        {/* ── Row 1: Writer path | Reviewer path | Profile mockup ── */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
+
+          {/* Writer path */}
+          <ScrollReveal delay={0} className="h-full">
+            <Spotlight className="h-full rounded-2xl">
+              <Card className="flex h-full flex-col p-6 transition-colors hover:bg-card/80">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="inline-flex size-10 items-center justify-center rounded-xl bg-primary/10">
+                    <Pencil className="size-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="mb-2 font-serif text-xl font-semibold">{title}</h3>
-                    <p className="text-sm leading-7 text-muted-foreground">{body}</p>
+                    <h3 className="font-serif text-lg font-semibold">As a Writer</h3>
+                    <p className="text-xs text-muted-foreground">Write · Publish · Earn</p>
                   </div>
-                </Card>
-              </Spotlight>
-            </ScrollReveal>
-          ))}
+                </div>
+
+                <ul className="mb-5 flex-1 space-y-2.5 text-sm text-muted-foreground">
+                  {[
+                    "Submit a draft for human editorial review",
+                    "Gems land on your profile when your blog goes live",
+                    "Admin rates each published blog 0–10 for quality",
+                    "Scores accumulate into your public Creator Score",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Creator score callout */}
+                <div className="rounded-lg border border-warning/30 bg-warning/10 px-3 py-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <TrendingUp className="size-3.5 text-warning" />
+                    <span className="text-xs font-semibold text-warning">Creator Score</span>
+                  </div>
+                  <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">
+                    The sum of all your blog quality scores — shown publicly on your profile.
+                  </p>
+                </div>
+              </Card>
+            </Spotlight>
+          </ScrollReveal>
+
+          {/* Reviewer path */}
+          <ScrollReveal delay={0.1} className="h-full">
+            <Spotlight className="h-full rounded-2xl">
+              <Card className="flex h-full flex-col p-6 transition-colors hover:bg-card/80">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="inline-flex size-10 items-center justify-center rounded-xl bg-sky-500/10">
+                    <ShieldCheck className="size-5 text-sky-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-lg font-semibold">As a Reviewer</h3>
+                    <p className="text-xs text-muted-foreground">Review · Score · Build rep</p>
+                  </div>
+                </div>
+
+                <ul className="mb-5 flex-1 space-y-2.5 text-sm text-muted-foreground">
+                  {[
+                    "Get assigned blog drafts to review",
+                    "Leave structured feedback and help authors improve",
+                    "Earn gems when the blog you reviewed publishes",
+                    "Admin rates your review quality 0–10 per review",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-sky-500" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Reviewer score callout */}
+                <div className="rounded-lg border border-info/30 bg-info/10 px-3 py-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <MessageSquare className="size-3.5 text-info" />
+                    <span className="text-xs font-semibold text-info">Reviewer Score</span>
+                  </div>
+                  <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">
+                    Your average review quality (e.g. ★ 8.4 from 5 reviews) — shown publicly on your profile.
+                  </p>
+                </div>
+              </Card>
+            </Spotlight>
+          </ScrollReveal>
+
+          {/* Profile card — real data when logged in, earnings showcase otherwise */}
+          <ScrollReveal delay={0.2} className="h-full">
+            <Spotlight className="h-full rounded-2xl">
+              <GemsProfileCard />
+            </Spotlight>
+          </ScrollReveal>
         </div>
 
-        <ScrollReveal className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        {/* ── Row 2: Score breakdown strip ── */}
+        <ScrollReveal>
+          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {[
+              {
+                icon: <Star className="size-5 fill-warning text-warning" />,
+                bg: "bg-warning/10",
+                title: "Blog quality score",
+                body: "Each published blog can receive a 0–10 score from the admin team, reflecting depth, clarity, and originality.",
+              },
+              {
+                icon: <TrendingUp className="size-5 text-warning" />,
+                bg: "bg-warning/10",
+                title: "Creator Score",
+                body: "The running total of all your blog scores — every great post adds to it. Shown prominently on your public profile.",
+              },
+              {
+                icon: <MessageSquare className="size-5 text-info" />,
+                bg: "bg-info/10",
+                title: "Reviewer Score",
+                body: "Your average review rating across all scored reviews. A high score signals trustworthy, constructive feedback.",
+              },
+            ].map(({ icon, bg, title, body }) => (
+              <div key={title} className="flex gap-4 rounded-xl border border-border bg-card p-4">
+                <div className={`mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-lg ${bg}`}>
+                  {icon}
+                </div>
+                <div>
+                  <p className="mb-1 text-sm font-semibold">{title}</p>
+                  <p className="text-xs leading-5 text-muted-foreground">{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollReveal>
+
+        {/* ── Row 3: Redemption banner ── */}
+        <ScrollReveal>
+          <div className="mb-10 flex flex-col items-center gap-5 rounded-2xl border border-success/30 bg-success/10 p-6 sm:flex-row">
+            <div className="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-success/15">
+              <Gift className="size-7 text-success" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="font-serif text-lg font-semibold text-foreground">
+                Redeem gems for real rewards
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                Accumulated enough gems? Exchange them for <strong>Amazon Pay</strong> or <strong>Flipkart gift cards</strong> directly from your profile — no third-party apps, no waiting.
+              </p>
+            </div>
+            <Button asChild size="sm" variant="outline" className="shrink-0 gap-1.5 border-success/50">
+              <Link href="/signup">
+                Start earning
+                <ArrowRight className="size-3.5" />
+              </Link>
+            </Button>
+          </div>
+        </ScrollReveal>
+
+        {/* CTAs */}
+        <ScrollReveal className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button asChild size="lg" className="group">
             <Link href="/signup">
               Start writing
@@ -472,71 +571,12 @@ function GemsSection() {
             </Link>
           </Button>
         </ScrollReveal>
+
       </div>
     </section>
   );
 }
 
-/* ─── 6. Testimonials (was 5) ────────────────────────────────────────────── */
-
-function TestimonialCard({ name, initials, image, review, href }: (typeof TESTIMONIALS)[number]) {
-  return (
-    <div className="mx-3 w-72 shrink-0 rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="relative size-10 shrink-0 overflow-hidden rounded-full bg-primary/10">
-          <Image
-            src={image}
-            alt={name}
-            fill
-            className="object-cover"
-            sizes="40px"
-          />
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-foreground">{name}</p>
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="size-3 fill-accent text-accent" />
-            ))}
-          </div>
-        </div>
-      </div>
-      <p className="text-sm leading-6 text-muted-foreground italic">{review}</p>
-      <Link
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-      >
-        View profile <ExternalLink className="size-3" />
-      </Link>
-    </div>
-  );
-}
-
-function TestimonialsSection() {
-  return (
-    <section className="overflow-hidden py-20">
-      <div className="mx-auto max-w-6xl px-6">
-        <ScrollReveal className="mb-12 text-center">
-          <Badge variant="secondary" className="mb-4">Reviews</Badge>
-          <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-            What our users say
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-balance text-muted-foreground">
-            Real feedback from writers and reviewers who call BloggerSpace home.
-          </p>
-        </ScrollReveal>
-      </div>
-
-      <Marquee duration={40}>
-        {TESTIMONIALS.map((t) => (
-          <TestimonialCard key={t.name} {...t} />
-        ))}
-      </Marquee>
-    </section>
-  );
-}
 
 /* ─── 6. Tech Stack ───────────────────────────────────────────────────────── */
 
@@ -555,10 +595,10 @@ function TechStackSection() {
         {TECH_STACK.map(({ label, Icon, iconColor }) => (
           <div
             key={label}
-            className="mx-3 flex shrink-0 items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-2.5 shadow-sm"
+            className="mx-3 flex h-28 w-24 shrink-0 flex-col items-center justify-between rounded-xl border border-border bg-card px-3 py-4 shadow-sm"
           >
-            <Icon size={20} className={iconColor} />
-            <span className="text-sm font-medium text-foreground">{label}</span>
+            <Icon size={36} className={iconColor} />
+            <span className="text-center text-xs font-medium text-foreground">{label}</span>
           </div>
         ))}
       </Marquee>
@@ -569,10 +609,10 @@ function TechStackSection() {
 /* ─── 7. Developer ────────────────────────────────────────────────────────── */
 
 const SOCIALS = [
-  { href: "https://in.linkedin.com/in/singhteekam", icon: Briefcase, label: "LinkedIn" },
-  { href: "https://github.com/singhteekam", icon: Code2, label: "GitHub" },
+  { href: "https://in.linkedin.com/in/singhteekam", icon: LinkedInIcon, label: "LinkedIn" },
+  { href: "https://github.com/singhteekam", icon: GitHubIcon, label: "GitHub" },
   { href: "mailto:singhteekam.in@gmail.com", icon: Mail, label: "Email" },
-  { href: "https://www.instagram.com/singh__teekam/", icon: Camera, label: "Instagram" },
+  { href: "https://www.instagram.com/singh__teekam/", icon: InstagramIcon, label: "Instagram" },
 ];
 
 function DeveloperSection() {
@@ -651,7 +691,7 @@ function DeveloperSection() {
                         </Button>
                         <Button asChild size="sm" variant="ghost" className="h-7 gap-1 text-xs">
                           <Link href={source} target="_blank" rel="noopener noreferrer">
-                            <Code2 className="size-3" />
+                            <GitHubIcon size={12} className="size-3" />
                             Source
                           </Link>
                         </Button>
@@ -721,7 +761,7 @@ function ContactSection() {
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <Code2 className="size-4 text-primary" />
+                      <GitHubIcon size={16} className="size-4 text-primary" />
                     </div>
                     <Link
                       href="https://github.com/singhteekam"
