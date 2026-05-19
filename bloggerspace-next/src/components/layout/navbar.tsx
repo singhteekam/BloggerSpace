@@ -186,7 +186,7 @@ export function Navbar() {
               </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="flex w-72 flex-col">
+            <SheetContent side="right" className="flex w-72 flex-col overflow-hidden">
               <SheetTitle className="sr-only">Navigation menu</SheetTitle>
 
               <div className="mb-2 mt-1">
@@ -211,7 +211,7 @@ export function Navbar() {
                 </div>
               )}
 
-              <nav className="mt-3 flex flex-col gap-1" aria-label="Mobile navigation">
+              <nav className="mt-3 flex flex-1 flex-col gap-1 overflow-y-auto min-h-0" aria-label="Mobile navigation">
                 {/* Primary nav — hide Write for non-users */}
                 {primaryNav
                   .filter((item) => isRegularUser || item.href !== "/newblog")

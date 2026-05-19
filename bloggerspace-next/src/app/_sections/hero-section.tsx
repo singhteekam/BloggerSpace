@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, BookOpen } from "lucide-react";
+import { Sparkles, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { AnimatedGradient } from "@/components/animated/animated-gradient";
 import { Spotlight } from "@/components/animated/spotlight";
 import { siteConfig } from "@/lib/constants/site";
 import { HERO_PILLS, HERO_FEATURE_CARDS } from "@/lib/constants/home";
+import { AuthCtaButton } from "./auth-cta-button";
 
 export function HeroSection({ totalBlogs }: { totalBlogs: number }) {
   return (
@@ -48,12 +49,12 @@ export function HeroSection({ totalBlogs }: { totalBlogs: number }) {
 
         <FadeIn delay={0.45}>
           <div className="flex flex-col items-center gap-3 sm:flex-row">
-            <Button asChild size="lg" className="group">
-              <Link href="/signup">
-                Start writing
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </Button>
+            <AuthCtaButton
+              label="Start writing"
+              size="lg"
+              className="group"
+              arrowClassName="size-4 transition-transform group-hover:translate-x-0.5"
+            />
             <Button asChild size="lg" variant="outline">
               <Link href="/blogs">
                 <BookOpen className="size-4" />

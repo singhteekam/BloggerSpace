@@ -21,10 +21,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const storedToken = authStorage.getToken();
+    if (!storedToken) {
+      setIsLoading(false);
+      return;
+    }
     const storedUser = authStorage.getUserCache<AuthUser>();
-    if (storedToken && storedUser) {
+    if (storedUser) {
       setToken(storedToken);
       setUser(storedUser);
+    } else {
+      // Token exists but cached user is missing or corrupted — clear stale token
+      // so the user lands on a clean login page rather than a half-broken state.
+      authStorage.clear();
     }
     setIsLoading(false);
   }, []);

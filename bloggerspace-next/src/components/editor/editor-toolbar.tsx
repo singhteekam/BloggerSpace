@@ -318,7 +318,7 @@ export function EditorToolbar({ editor, sourceMode, onToggleSource }: ToolbarPro
       {/* ══ Row 2: Lists · Blocks · Insert · Tools ══════════════════════════════ */}
       {/* Source toggle is always outside the disabled wrapper so it stays clickable */}
       <div className="flex items-center border-t border-border/30">
-      <div className={cn("flex flex-1 items-center gap-0.5 overflow-x-auto scrollbar-none px-2 py-1.5", sourceMode && "pointer-events-none opacity-40")}>
+      <div className={cn("flex flex-1 min-w-0 items-center gap-0.5 overflow-x-auto scrollbar-none px-2 py-1.5", sourceMode && "pointer-events-none opacity-40")}>
 
         {/* Lists — direct buttons */}
         <Btn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} title="Bullet list"><List className="size-4" /></Btn>

@@ -247,7 +247,7 @@ export function TipTapEditor({
     content: initialBody,
     editorProps: {
       attributes: {
-        class: `blog-prose focus:outline-none px-8 py-6`,
+        class: `blog-prose focus:outline-none px-4 py-4 sm:px-8 sm:py-6`,
         style: `min-height: ${minHeight}`,
       },
     },

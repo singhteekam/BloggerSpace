@@ -96,7 +96,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       secure: false,
-      maxAge: 1800000, // Set session expiration to 1 minute (60,000 ms) 1800000 means 30 minutes
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days — keeps OAuth sessions alive across tab/browser restarts
     }, // Adjust this based on your deployment configuration (e.g., true for HTTPS)
     // cookie: { secure: true }, // Adjust this based on your deployment configuration (e.g., true for HTTPS)
   })

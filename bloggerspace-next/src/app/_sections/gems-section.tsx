@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-  ArrowRight, ShieldCheck, Pencil, MessageSquare,
+  ShieldCheck, Pencil, MessageSquare,
   CheckCircle2, Gem, TrendingUp, Gift,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   WRITER_BULLETS, REVIEWER_BULLETS, SCORE_BREAKDOWN_CARDS,
 } from "@/lib/constants/home";
 import { GemsProfileCard } from "./gems-profile-card";
+import { AuthCtaButton } from "./auth-cta-button";
 
 export function GemsSection() {
   return (
@@ -148,23 +149,24 @@ export function GemsSection() {
                 Accumulated enough gems? Exchange them for <strong>Amazon Pay</strong> or <strong>Flipkart gift cards</strong> directly from your profile — no third-party apps, no waiting.
               </p>
             </div>
-            <Button asChild size="sm" variant="outline" className="shrink-0 gap-1.5 border-success/50">
-              <Link href="/signup">
-                Start earning
-                <ArrowRight className="size-3.5" />
-              </Link>
-            </Button>
+            <AuthCtaButton
+              label="Start earning"
+              size="sm"
+              variant="outline"
+              className="shrink-0 gap-1.5 border-success/50"
+              arrowClassName="size-3.5"
+            />
           </div>
         </ScrollReveal>
 
         {/* CTAs */}
         <ScrollReveal className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Button asChild size="lg" className="group">
-            <Link href="/signup">
-              Start writing
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </Button>
+          <AuthCtaButton
+            label="Start writing"
+            size="lg"
+            className="group"
+            arrowClassName="size-4 transition-transform group-hover:translate-x-0.5"
+          />
           <Button asChild size="lg" variant="outline">
             <Link href="/apply-reviewer">
               <ShieldCheck className="size-4" />
