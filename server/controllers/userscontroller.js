@@ -251,7 +251,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, currentuserId: user._id, role: user.role || "user" },
       process.env.CURRENT_JWT_SECRET,
-      { expiresIn: "3d" }
+      { expiresIn: "30d" }
     );
     const userDetails = {
       _id: user._id,
@@ -329,7 +329,7 @@ exports.verifyOtp = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, currentuserId: user._id, role: user.role || "user" },
       process.env.CURRENT_JWT_SECRET,
-      { expiresIn: "3d" }
+      { expiresIn: "30d" }
     );
 
     const userDetails = {
@@ -1149,7 +1149,7 @@ exports.authPassportCallback = async (req, res) => {
           { userId: user._id, currentuserId: user._id, email: user.email, role: user.role || "user" },
           process.env.CURRENT_JWT_SECRET,
           {
-            expiresIn: "3d",
+            expiresIn: "30d",
           }
         );
 
@@ -1417,7 +1417,7 @@ exports.verifyLoginOtp = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, currentuserId: user._id, role: user.role || "user" },
       process.env.CURRENT_JWT_SECRET,
-      { expiresIn: "3d" }
+      { expiresIn: "30d" }
     );
 
     const userDetails = {

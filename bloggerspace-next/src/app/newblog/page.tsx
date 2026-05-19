@@ -530,12 +530,12 @@ function NewBlogForm() {
           />
 
           {/* Size meter + Preview */}
-          <div className="flex items-center justify-between pt-1">
-            <div className={`flex items-center gap-1.5 text-xs ${sizeWarning ? "text-amber-500" : "text-muted-foreground"}`}>
-              {sizeWarning ? <AlertTriangle className="size-3.5" /> : <HardDrive className="size-3.5" />}
-              {contentKb} KB
+          <div className="flex items-center justify-between gap-2 pt-1">
+            <div className={`flex min-w-0 flex-1 flex-wrap items-center gap-1.5 text-xs ${sizeWarning ? "text-amber-500" : "text-muted-foreground"}`}>
+              {sizeWarning ? <AlertTriangle className="size-3.5 shrink-0" /> : <HardDrive className="size-3.5 shrink-0" />}
+              <span className="shrink-0">{contentKb} KB</span>
               {sizeWarning && (
-                <span>— Large content (inline images inflate size). Consider linking images by URL instead of uploading.</span>
+                <span className="wrap-break-word">— Large content (inline images inflate size). Consider linking images by URL instead of uploading.</span>
               )}
             </div>
             <Button

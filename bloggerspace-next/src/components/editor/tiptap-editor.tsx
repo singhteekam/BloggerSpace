@@ -302,9 +302,13 @@ export function TipTapEditor({
       const rect = posToDOMRect(view, selection.from, selection.to);
       const wrapRect = editorWrapRef.current?.getBoundingClientRect();
       if (!wrapRect) return;
+      const menuW = 220; // approximate bubble menu width
+      const editorW = editorWrapRef.current?.offsetWidth ?? 0;
+      const rawLeft = (rect.left + rect.right) / 2 - wrapRect.left - menuW / 2;
       setBubblePos({
         top: rect.top - wrapRect.top - 44,
-        left: Math.max(0, (rect.left + rect.right) / 2 - wrapRect.left - 120),
+        // Clamp so the menu stays within the editor's horizontal bounds
+        left: Math.max(0, Math.min(Math.max(0, editorW - menuW), rawLeft)),
       });
     };
     editor.on("selectionUpdate", update);

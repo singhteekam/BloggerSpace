@@ -131,8 +131,10 @@ export function EditorToolbar({ editor, sourceMode, onToggleSource }: ToolbarPro
   const [matchCount, setMatchCount] = useState(0);
   const [uploading, setUploading] = useState(false);
 
-  // Dropdown open states (only for items that remain dropdowns)
+  // Dropdown open states
   const [styleOpen, setStyleOpen] = useState(false);
+  const [alignOpen, setAlignOpen] = useState(false);
+  const [listOpen, setListOpen] = useState(false);
   const [blockOpen, setBlockOpen] = useState(false);
   const [insertOpen, setInsertOpen] = useState(false);
   const [specialOpen, setSpecialOpen] = useState(false);
@@ -141,14 +143,16 @@ export function EditorToolbar({ editor, sourceMode, onToggleSource }: ToolbarPro
 
   // Trigger refs (used by DropPortal to measure position)
   const styleRef = useRef<HTMLDivElement>(null);
+  const alignRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const blockRef = useRef<HTMLDivElement>(null);
   const insertRef = useRef<HTMLDivElement>(null);
   const specialRef = useRef<HTMLDivElement>(null);
   const emojiRef = useRef<HTMLDivElement>(null);
 
   const closeAll = useCallback(() => {
-    setStyleOpen(false); setBlockOpen(false);
-    setInsertOpen(false); setSpecialOpen(false); setEmojiOpen(false);
+    setStyleOpen(false); setAlignOpen(false); setListOpen(false);
+    setBlockOpen(false); setInsertOpen(false); setSpecialOpen(false); setEmojiOpen(false);
   }, []);
 
   // Close on outside click — portals are identified by data-toolbar-portal attribute
@@ -158,6 +162,8 @@ export function EditorToolbar({ editor, sourceMode, onToggleSource }: ToolbarPro
       if (target.closest?.("[data-toolbar-portal]")) return;
       if (
         !styleRef.current?.contains(target) &&
+        !alignRef.current?.contains(target) &&
+        !listRef.current?.contains(target) &&
         !blockRef.current?.contains(target) &&
         !insertRef.current?.contains(target) &&
         !specialRef.current?.contains(target) &&
@@ -246,6 +252,19 @@ export function EditorToolbar({ editor, sourceMode, onToggleSource }: ToolbarPro
     return "Normal";
   };
 
+  const alignIcon = () => {
+    if (editor.isActive({ textAlign: "center" })) return <AlignCenter className="size-4" />;
+    if (editor.isActive({ textAlign: "right" })) return <AlignRight className="size-4" />;
+    if (editor.isActive({ textAlign: "justify" })) return <AlignJustify className="size-4" />;
+    return <AlignLeft className="size-4" />;
+  };
+
+  const listIcon = () => {
+    if (editor.isActive("orderedList")) return <ListOrdered className="size-4" />;
+    if (editor.isActive("taskList")) return <ListChecks className="size-4" />;
+    return <List className="size-4" />;
+  };
+
   const isInTable = editor.isActive("table");
   const isInCodeBlock = editor.isActive("codeBlock");
   const currentLang = editor.getAttributes("codeBlock").language ?? "plaintext";
@@ -254,10 +273,10 @@ export function EditorToolbar({ editor, sourceMode, onToggleSource }: ToolbarPro
     : EMOJIS;
 
   return (
-    <div className="border-b border-border bg-muted/30">
+    <div className="overflow-hidden border-b border-border bg-muted/30">
 
-      {/* ══ Row 1: History · Style · Text formatting · Alignment ════════════════ */}
-      <div className={cn("flex items-center gap-0.5 overflow-x-auto scrollbar-none px-2 py-1.5", sourceMode && "pointer-events-none opacity-40")}>
+      <div className="flex items-start">
+      <div className={cn("flex flex-1 flex-wrap items-center gap-0.5 px-2 py-1.5", sourceMode && "pointer-events-none opacity-40")}>
 
         {/* History */}
         <Btn onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Undo"><Undo2 className="size-4" /></Btn>
@@ -308,22 +327,34 @@ export function EditorToolbar({ editor, sourceMode, onToggleSource }: ToolbarPro
 
         <Sep />
 
-        {/* Alignment — direct buttons, no dropdown */}
-        <Btn onClick={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })} title="Align left"><AlignLeft className="size-4" /></Btn>
-        <Btn onClick={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })} title="Align center"><AlignCenter className="size-4" /></Btn>
-        <Btn onClick={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })} title="Align right"><AlignRight className="size-4" /></Btn>
-        <Btn onClick={() => editor.chain().focus().setTextAlign("justify").run()} active={editor.isActive({ textAlign: "justify" })} title="Justify"><AlignJustify className="size-4" /></Btn>
-      </div>
+        {/* ── Alignment dropdown */}
+        <div className="relative shrink-0" ref={alignRef}>
+          <DropBtn onClick={() => { closeAll(); setAlignOpen(v => !v); }} active={alignOpen || editor.isActive({ textAlign: "center" }) || editor.isActive({ textAlign: "right" }) || editor.isActive({ textAlign: "justify" })} title="Text alignment">
+            {alignIcon()}
+            <ChevronDown className="size-3" />
+          </DropBtn>
+          <DropPortal open={alignOpen} triggerRef={alignRef}>
+            <DropItem onClick={() => { editor.chain().focus().setTextAlign("left").run(); closeAll(); }} active={editor.isActive({ textAlign: "left" })}><AlignLeft className="size-4" /> Align left</DropItem>
+            <DropItem onClick={() => { editor.chain().focus().setTextAlign("center").run(); closeAll(); }} active={editor.isActive({ textAlign: "center" })}><AlignCenter className="size-4" /> Align center</DropItem>
+            <DropItem onClick={() => { editor.chain().focus().setTextAlign("right").run(); closeAll(); }} active={editor.isActive({ textAlign: "right" })}><AlignRight className="size-4" /> Align right</DropItem>
+            <DropItem onClick={() => { editor.chain().focus().setTextAlign("justify").run(); closeAll(); }} active={editor.isActive({ textAlign: "justify" })}><AlignJustify className="size-4" /> Justify</DropItem>
+          </DropPortal>
+        </div>
 
-      {/* ══ Row 2: Lists · Blocks · Insert · Tools ══════════════════════════════ */}
-      {/* Source toggle is always outside the disabled wrapper so it stays clickable */}
-      <div className="flex items-center border-t border-border/30">
-      <div className={cn("flex flex-1 min-w-0 items-center gap-0.5 overflow-x-auto scrollbar-none px-2 py-1.5", sourceMode && "pointer-events-none opacity-40")}>
+        <Sep />
 
-        {/* Lists — direct buttons */}
-        <Btn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} title="Bullet list"><List className="size-4" /></Btn>
-        <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title="Ordered list"><ListOrdered className="size-4" /></Btn>
-        <Btn onClick={() => editor.chain().focus().toggleTaskList().run()} active={editor.isActive("taskList")} title="Task list"><ListChecks className="size-4" /></Btn>
+        {/* ── Lists dropdown */}
+        <div className="relative shrink-0" ref={listRef}>
+          <DropBtn onClick={() => { closeAll(); setListOpen(v => !v); }} active={listOpen || editor.isActive("bulletList") || editor.isActive("orderedList") || editor.isActive("taskList")} title="Lists">
+            {listIcon()}
+            <ChevronDown className="size-3" />
+          </DropBtn>
+          <DropPortal open={listOpen} triggerRef={listRef}>
+            <DropItem onClick={() => { editor.chain().focus().toggleBulletList().run(); closeAll(); }} active={editor.isActive("bulletList")}><List className="size-4" /> Bullet list</DropItem>
+            <DropItem onClick={() => { editor.chain().focus().toggleOrderedList().run(); closeAll(); }} active={editor.isActive("orderedList")}><ListOrdered className="size-4" /> Ordered list</DropItem>
+            <DropItem onClick={() => { editor.chain().focus().toggleTaskList().run(); closeAll(); }} active={editor.isActive("taskList")}><ListChecks className="size-4" /> Task list</DropItem>
+          </DropPortal>
+        </div>
 
         <Sep />
 
@@ -440,8 +471,8 @@ export function EditorToolbar({ editor, sourceMode, onToggleSource }: ToolbarPro
         <Btn onClick={() => { closeAll(); setFindOpen(v => !v); }} active={findOpen} title="Find & Replace"><Search className="size-4" /></Btn>
       </div>
 
-      {/* Source toggle — outside the disabled wrapper, always clickable */}
-      <div className="flex shrink-0 items-center pr-2">
+      {/* Source toggle — outside disabled wrapper, always clickable */}
+      <div className="flex shrink-0 items-center py-1.5 pr-2">
         <Btn onClick={onToggleSource} active={sourceMode} title={sourceMode ? "Switch to visual editor" : "Edit source HTML"}><Code2 className="size-4" /></Btn>
       </div>
     </div>
