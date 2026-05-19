@@ -1,6 +1,7 @@
-import { streamText, convertToModelMessages, isTextUIPart, type UIMessage } from "ai";
+import { streamText, convertToModelMessages, stepCountIs, type UIMessage } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { CHAT_RATE_LIMIT, CHAT_MAX_HISTORY } from "@/lib/constants/chat";
+import { chatTools } from "@/lib/chat/tools";
 
 // In-memory sliding-window rate limiter (resets on server restart / cold start)
 const rateLimitMap = new Map<string, number[]>();
@@ -16,59 +17,49 @@ function isRateLimited(key: string): boolean {
   return false;
 }
 
-// Fetch at most 5 relevant blog titles from the backend to inject as context
-async function fetchBlogContext(query: string): Promise<string> {
-  try {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    if (!backendUrl) return "";
-    const url = `${backendUrl}/api/blogs/fetchallblogs?search=${encodeURIComponent(query)}&limit=5`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
-    if (!res.ok) return "";
-    const data = await res.json();
-    const blogs: Array<{ title?: string; author?: string }> =
-      data?.blogs ?? data ?? [];
-    if (!blogs.length) return "";
-    const list = blogs
-      .map((b) => `• "${b.title ?? "Untitled"}"${b.author ? ` by ${b.author}` : ""}`)
-      .join("\n");
-    return `\n\nRelated blogs on BloggerSpace:\n${list}`;
-  } catch {
-    return "";
-  }
-}
-
-// Detect whether the user's last message is blog-related so we enrich context
-function isBlogQuery(text: string): boolean {
-  const lower = text.toLowerCase();
-  return (
-    lower.includes("blog") ||
-    lower.includes("article") ||
-    lower.includes("post") ||
-    lower.includes("write") ||
-    lower.includes("read") ||
-    lower.includes("topic")
-  );
-}
-
 const SYSTEM_PROMPT = `You are Sage, the assistant for BloggerSpace — a blogging platform.
 
-# Facts you know about BloggerSpace
-- It is a blogging platform with three user types: regular users (readers), authors (write blogs), and reviewers (review drafts).
-- Authors write blog drafts in a rich-text editor and submit for review.
-- Reviewers read submitted drafts, provide feedback, and approve or reject them.
-- Once approved by a reviewer and an admin, blogs are published publicly.
-- Gems are reputation points. Authors earn gems when their blog is approved and published. Reviewers earn gems for completed reviews. Gems are displayed on public profiles.
-- Anyone can register as a regular user. Existing regular users can apply to become a reviewer from their profile page.
-- Users can save blogs to read later, follow authors, and comment on published blogs.
-- The platform sends newsletter emails curated by admins.
-- Login supports email/password and OTP (one-time password via email).
+# What you can do
+You have tools to look up live data. ALWAYS use a tool when the user asks about blogs, topics, categories, or tags — never fabricate titles, authors, or URLs. Pick the right tool:
+- searchBlogs — user names a topic or keyword they want to read about
+- getRecentBlogs — user asks for latest/newest blogs without naming a topic
+- getTopBlogs — user asks for trending/popular/most-read blogs
+- getBlogsByCategory — user names a category
+- getBlogsByTag — user names a tag
+- listCategories — user asks what topics/categories exist
+- listTags — user asks what tags exist
+
+After a tool returns, summarise the result clearly and always present each blog as a Markdown link in this exact form: \`[Blog title](url)\` — author and a short excerpt below it.
+
+# Facts about BloggerSpace
+- A blogging platform with three user types: regular users (readers), authors (write blogs), and reviewers (review drafts).
+- Authors write drafts in a rich-text editor and submit for review. Reviewers leave feedback and approve/reject. Approved drafts are reviewed by an admin, then published.
+- Gems are reputation points. Authors earn gems when their blog is approved. Reviewers earn gems for completed reviews. Gems show on public profiles and can be redeemed for Amazon Pay / Flipkart gift cards.
+- Anyone can register. Existing users can apply to become a reviewer from their profile.
+- Users can save blogs, follow authors, comment on published blogs.
+- Login supports email/password and email OTP.
+
+# Navigation routes (use these as clickable Markdown links when relevant)
+- Sign up: [/signup](/signup)
+- Log in: [/login](/login)
+- Browse all blogs: [/blogs](/blogs)
+- Write a new blog (login required): [/newblog](/newblog)
+- My blogs: [/myblogs](/myblogs)
+- My profile: [/myprofile](/myprofile)
+- Saved blogs: [/savedblogs](/savedblogs)
+- Apply to be a reviewer: [/apply-reviewer](/apply-reviewer)
+- Community: [/community](/community)
+- Settings: [/settings](/settings)
+- About the developer: [/aboutdeveloper](/aboutdeveloper)
 
 # Style rules
-- Be concise. Under 150 words by default. Use Markdown: **bold** for key terms, bullet lists for steps, NEVER use literal asterisks around list items.
-- For step-by-step answers, use a numbered list.
-- If you are about to mention a specific blog title, ONLY mention it if it appears in the "Related blogs on BloggerSpace" section provided to you. NEVER invent blog titles, author names, or feature names that aren't listed in these rules.
-- If asked about something not covered in these rules (specific pricing, exact URLs, API details, etc.), say: "I'm not sure about that specifically — you can check the relevant page or contact support."
-- Do not pretend to know live data (number of users, trending blogs, etc.) unless it appears in the context above.`;
+- Be concise. Under 150 words by default.
+- Use Markdown: **bold** for key terms, numbered lists for steps, bullet lists for blogs.
+- For blogs from a tool result, render each as: \`- [Title](/blogs/slug) — *Author Name*\` followed by a one-line excerpt if useful.
+- For navigation, write things like "You can [start writing](/newblog) here."
+- If a tool returns 0 results, say so honestly and offer to search with different keywords or list categories.
+- If asked about something not covered (specific pricing, exact URLs not listed above, raw API details), say: "I'm not sure about that specifically — you can check the relevant page or contact support."
+- Do not invent live data (user counts, exact totals, etc.) — only use what tools return.`;
 
 export async function POST(req: Request) {
   // Rate limit by IP
@@ -92,23 +83,7 @@ export async function POST(req: Request) {
     });
   }
 
-  // Trim history to stay within token budget
   const trimmed = messages.slice(-CHAT_MAX_HISTORY);
-
-  // Extract the last user text for blog-context enrichment
-  const lastUserMessage = [...trimmed]
-    .reverse()
-    .find((m) => m.role === "user");
-  const lastUserText =
-    lastUserMessage?.parts
-      .filter(isTextUIPart)
-      .map((p) => p.text)
-      .join(" ") ?? "";
-
-  // Optionally inject live blog context
-  const blogContext = isBlogQuery(lastUserText)
-    ? await fetchBlogContext(lastUserText)
-    : "";
 
   if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     console.error("[chat] GOOGLE_GENERATIVE_AI_API_KEY not set");
@@ -123,12 +98,13 @@ export async function POST(req: Request) {
   });
 
   try {
-    // gemini-flash-latest tracks the current stable Flash model with broader free-tier quota.
-    // 2.0-flash hits "exceeded quota" faster on free tier.
     const result = streamText({
       model: google("gemini-2.5-flash"),
-      system: SYSTEM_PROMPT + blogContext,
+      system: SYSTEM_PROMPT,
       messages: await convertToModelMessages(trimmed),
+      tools: chatTools,
+      // Allow up to 4 tool-call rounds before forcing a final answer
+      stopWhen: stepCountIs(4),
       onError: ({ error }) => {
         console.error("[chat] streamText error:", error);
       },
