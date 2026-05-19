@@ -153,3 +153,12 @@
 [2026-05-19T05:50:17.118Z] [LOG] [INFO] - Returning from user profile route with data.
 [2026-05-19T05:55:26.575Z] [LOG] [INFO] - Returning from user profile route with data.
 [2026-05-19T05:55:26.575Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-19T22:19:06.663Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2026-05-19T22:21:30.121Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-19T22:21:30.121Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-19T22:27:23.821Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-19T22:27:23.821Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-19T22:35:24.948Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-19T22:35:24.948Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-19T22:35:24.948Z] [LOG] [ERROR] - User not found with given email.
+[2026-05-19T23:31:13.574Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
