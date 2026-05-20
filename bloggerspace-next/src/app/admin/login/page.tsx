@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
       setStep("otp");
       toast.success("Verification code sent to your email.");
       */
-      const res = await adminApi.login(data) as { data: { token: string; adminDetails: import("@/lib/api/auth").AuthUser } };
+      const res = await adminApi.login(data);
       login(res.data.token, res.data.adminDetails);
       toast.success("Welcome, Admin!");
       router.push("/admin/dashboard");

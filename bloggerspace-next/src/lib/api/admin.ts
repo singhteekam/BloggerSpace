@@ -92,7 +92,7 @@ const p = (userId: string) => ({ userId, role: "Admin" });
 
 export const adminApi = {
   login: (data: { email: string; password: string }) =>
-    api.post<{ message: "otp_required"; email: string }>("/api/admin/login", data),
+    api.post<AdminAuthResponse>("/api/admin/login", data),
 
   verifyLoginOtp: (email: string, otp: string) =>
     api.post<AdminAuthResponse>("/api/admin/login/verify-otp", { email, otp }),

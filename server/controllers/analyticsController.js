@@ -1,14 +1,5 @@
 const VisitorLog = require("../models/VisitorLog");
 
-let geoip = null;
-try { geoip = require("geoip-lite"); } catch (_) {}
-
-function getIp(req) {
-  const fwd = req.headers["x-forwarded-for"];
-  if (fwd) return fwd.split(",")[0].trim();
-  return req.socket?.remoteAddress ?? req.ip ?? "";
-}
-
 function getDevice(ua = "") {
   if (/mobile/i.test(ua) && !/tablet|ipad/i.test(ua)) return "mobile";
   if (/tablet|ipad/i.test(ua)) return "tablet";
@@ -32,21 +23,14 @@ function getMonthKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function getCountryCode(ip) {
-  if (!geoip || !ip || ip === "::1" || ip === "127.0.0.1" || ip.startsWith("192.168") || ip.startsWith("10.")) return "XX";
-  const geo = geoip.lookup(ip);
-  return geo?.country ?? "XX";
-}
-
 exports.trackVisit = async (req, res) => {
   try {
     const { page = "/", referrer = "" } = req.body;
     if (!page || page.startsWith("/admin") || page.startsWith("/api")) {
       return res.status(200).json({ ok: true });
     }
-    const ip = getIp(req);
     const ua = req.headers["user-agent"] ?? "";
-    const countryCode = getCountryCode(ip);
+    const countryCode = "XX"; // Country lookup removed (geoip-lite too large for Firebase Functions)
     const device = getDevice(ua);
     const now = new Date();
 
