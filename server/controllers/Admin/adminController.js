@@ -87,12 +87,13 @@ exports.adminLogin = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, admin.password);
     if (!isPasswordValid) return res.status(401).json({ message: "Invalid password" });
 
-    // Credentials valid — send OTP instead of issuing JWT immediately
+    // OTP FLOW TEMPORARILY DISABLED — direct JWT login
+    // To re-enable: uncomment the block below and remove the direct-login block
+    /*
     const otp = generateOtp();
     admin.otpCode = otp;
-    admin.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    admin.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
     await admin.save();
-
     const html = `
       <div class="content">
         <h2>Admin login verification</h2>
@@ -100,9 +101,16 @@ exports.adminLogin = async (req, res) => {
         <div class="otp-code">${otp}</div>
         <div class="warn-box">This code expires in <strong>10 minutes</strong>. If you did not attempt to log in, your password may be compromised — change it immediately.</div>
       </div>`;
-
     res.status(200).json({ message: "otp_required", email });
     sendEmail(email, "Admin login verification code — BloggerSpace", html).catch(console.error);
+    */
+
+    const token = jwt.sign(
+      { userId: admin._id, currentuserId: admin._id, role: "Admin" },
+      process.env.CURRENT_JWT_SECRET,
+      { expiresIn: "30d" }
+    );
+    res.status(200).json({ message: "Login successful", token, adminDetails: buildAdminDetails(admin) });
   } catch (error) {
     res.status(500).json({ message: "Login failed", error: error.message });
   }

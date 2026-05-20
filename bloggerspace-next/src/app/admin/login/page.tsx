@@ -43,10 +43,18 @@ export default function AdminLoginPage() {
 
   const onCredentials = async (data: CredForm) => {
     try {
+      // OTP FLOW TEMPORARILY DISABLED — direct login
+      // To re-enable: uncomment the OTP block and remove the direct-login block
+      /*
       await adminApi.login(data);
       setAdminEmail(data.email);
       setStep("otp");
       toast.success("Verification code sent to your email.");
+      */
+      const res = await adminApi.login(data) as { data: { token: string; adminDetails: import("@/lib/api/auth").AuthUser } };
+      login(res.data.token, res.data.adminDetails);
+      toast.success("Welcome, Admin!");
+      router.push("/admin/dashboard");
     } catch (err) {
       toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Login failed.") : "Something went wrong.");
     }

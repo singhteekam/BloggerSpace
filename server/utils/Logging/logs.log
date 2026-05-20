@@ -162,3 +162,5 @@
 [2026-05-19T22:35:24.948Z] [LOG] [ERROR] - User not found with given email.
 [2026-05-19T22:35:24.948Z] [LOG] [ERROR] - User not found with given email.
 [2026-05-19T23:31:13.574Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2026-05-20T19:48:47.532Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-20T19:48:47.532Z] [LOG] [INFO] - Returning from user profile route with data.
