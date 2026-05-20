@@ -25,21 +25,21 @@ function getMonthKey(d = new Date()) {
 
 exports.trackVisit = async (req, res) => {
   try {
-    const { page = "/", referrer = "" } = req.body;
+    const { page = "/", referrer = "", visitorId = "" } = req.body;
     if (!page || page.startsWith("/admin") || page.startsWith("/api")) {
       return res.status(200).json({ ok: true });
     }
     const ua = req.headers["user-agent"] ?? "";
-    const countryCode = "XX"; // Country lookup removed (geoip-lite too large for Firebase Functions)
     const device = getDevice(ua);
     const now = new Date();
+    const dayKey = getDayKey(now);
 
     await VisitorLog.create({
       page,
-      countryCode,
+      visitorId,
       device,
       referrer: (() => { try { return referrer ? new URL(referrer).hostname : ""; } catch (_) { return ""; } })(),
-      dayKey: getDayKey(now),
+      dayKey,
       weekKey: getWeekKey(now),
       monthKey: getMonthKey(now),
       timestamp: now,
@@ -62,45 +62,76 @@ exports.getAnalytics = async (req, res) => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
     const startKey = getDayKey(thirtyDaysAgo);
 
-    const [todayCount, weekCount, monthCount, totalCount, countryData, pageData, deviceData, timelineRaw] =
-      await Promise.all([
-        VisitorLog.countDocuments({ dayKey: todayKey }),
-        VisitorLog.countDocuments({ weekKey }),
-        VisitorLog.countDocuments({ monthKey }),
-        VisitorLog.countDocuments(),
-        VisitorLog.aggregate([
-          { $group: { _id: "$countryCode", count: { $sum: 1 } } },
-          { $sort: { count: -1 } },
-          { $limit: 15 },
-        ]),
-        VisitorLog.aggregate([
-          { $group: { _id: "$page", count: { $sum: 1 } } },
-          { $sort: { count: -1 } },
-          { $limit: 10 },
-        ]),
-        VisitorLog.aggregate([
-          { $group: { _id: "$device", count: { $sum: 1 } } },
-        ]),
-        VisitorLog.aggregate([
-          { $match: { dayKey: { $gte: startKey } } },
-          { $group: { _id: "$dayKey", count: { $sum: 1 } } },
-          { $sort: { _id: 1 } },
-        ]),
-      ]);
+    const [
+      todayViews, weekViews, monthViews, totalViews,
+      todayUnique, weekUnique, monthUnique, totalUnique,
+      pageData, deviceData, referrerData, hourData, timelineRaw,
+    ] = await Promise.all([
+      // Page views (all hits)
+      VisitorLog.countDocuments({ dayKey: todayKey }),
+      VisitorLog.countDocuments({ weekKey }),
+      VisitorLog.countDocuments({ monthKey }),
+      VisitorLog.countDocuments(),
+      // Unique visitors (distinct visitorId per period)
+      VisitorLog.distinct("visitorId", { dayKey: todayKey, visitorId: { $ne: "" } }).then((r) => r.length),
+      VisitorLog.distinct("visitorId", { weekKey, visitorId: { $ne: "" } }).then((r) => r.length),
+      VisitorLog.distinct("visitorId", { monthKey, visitorId: { $ne: "" } }).then((r) => r.length),
+      VisitorLog.distinct("visitorId", { visitorId: { $ne: "" } }).then((r) => r.length),
+      // Top pages
+      VisitorLog.aggregate([
+        { $group: { _id: "$page", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+      ]),
+      // Devices
+      VisitorLog.aggregate([
+        { $group: { _id: "$device", count: { $sum: 1 } } },
+      ]),
+      // Top referrers
+      VisitorLog.aggregate([
+        { $match: { referrer: { $nin: ["", null] } } },
+        { $group: { _id: "$referrer", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+      ]),
+      // Traffic by hour of day (UTC)
+      VisitorLog.aggregate([
+        { $group: { _id: { $hour: "$timestamp" }, count: { $sum: 1 } } },
+        { $sort: { _id: 1 } },
+      ]),
+      // 30-day daily timeline
+      VisitorLog.aggregate([
+        { $match: { dayKey: { $gte: startKey } } },
+        { $group: { _id: "$dayKey", views: { $sum: 1 }, visitors: { $addToSet: "$visitorId" } } },
+        { $sort: { _id: 1 } },
+      ]),
+    ]);
 
-    const timelineMap = Object.fromEntries(timelineRaw.map((d) => [d._id, d.count]));
+    const timelineMap = Object.fromEntries(
+      timelineRaw.map((d) => [d._id, {
+        views: d.views,
+        visitors: d.visitors.filter((v) => v !== "").length,
+      }])
+    );
     const timeline = Array.from({ length: 30 }, (_, i) => {
       const d = new Date(now);
       d.setDate(d.getDate() - (29 - i));
       const key = getDayKey(d);
-      return { date: key, count: timelineMap[key] ?? 0 };
+      return { date: key, views: timelineMap[key]?.views ?? 0, visitors: timelineMap[key]?.visitors ?? 0 };
     });
 
+    const hourMap = Object.fromEntries(hourData.map((h) => [h._id, h.count]));
+    const hours = Array.from({ length: 24 }, (_, i) => ({ hour: i, count: hourMap[i] ?? 0 }));
+
     res.json({
-      summary: { todayCount, weekCount, monthCount, totalCount },
-      countries: countryData.map((c) => ({ code: c._id, count: c.count })),
+      summary: {
+        todayViews, weekViews, monthViews, totalViews,
+        todayUnique, weekUnique, monthUnique, totalUnique,
+      },
       pages: pageData.map((p) => ({ page: p._id, count: p.count })),
       devices: deviceData.map((d) => ({ device: d._id, count: d.count })),
+      referrers: referrerData.map((r) => ({ referrer: r._id, count: r.count })),
+      hours,
       timeline,
     });
   } catch (err) {

@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { BarChart2, Globe, Monitor, Smartphone, Tablet, RefreshCw } from "lucide-react";
+import { BarChart2, Monitor, Smartphone, Tablet, RefreshCw, Link2, Clock, Eye, Users } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
-import { analyticsApi, type AnalyticsData } from "@/lib/api/analytics";
+import { analyticsApi, type AnalyticsData, type TimelinePoint } from "@/lib/api/analytics";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -14,76 +15,32 @@ export default function AdminAnalyticsPage() {
   return <AnalyticsDashboard userId={user._id} />;
 }
 
-// ── Country code → flag emoji ────────────────────────────────────────────────
-function flag(code: string) {
-  if (!code || code === "XX" || code.length !== 2) return "🌍";
-  return String.fromCodePoint(
-    ...code.toUpperCase().split("").map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
-  );
-}
-
-// Country code → name (common subset)
-const COUNTRY_NAMES: Record<string, string> = {
-  IN: "India", US: "United States", GB: "United Kingdom", CA: "Canada",
-  AU: "Australia", DE: "Germany", FR: "France", SG: "Singapore",
-  AE: "UAE", PK: "Pakistan", BD: "Bangladesh", NP: "Nepal",
-  LK: "Sri Lanka", MY: "Malaysia", PH: "Philippines", NL: "Netherlands",
-  SE: "Sweden", NO: "Norway", DK: "Denmark", IT: "Italy",
-  ES: "Spain", BR: "Brazil", MX: "Mexico", JP: "Japan",
-  KR: "South Korea", CN: "China", ZA: "South Africa", NG: "Nigeria",
-  XX: "Unknown",
-};
-
-function countryName(code: string) {
-  return COUNTRY_NAMES[code] ?? code;
-}
-
-// ── SVG Bar Chart (30-day timeline) ─────────────────────────────────────────
-function TimelineChart({ data }: { data: { date: string; count: number }[] }) {
-  const max = Math.max(...data.map((d) => d.count), 1);
-  const w = 700;
-  const h = 100;
-  const barW = Math.floor(w / data.length) - 1;
+// ── SVG Bar Chart ─────────────────────────────────────────────────────────────
+function TimelineChart({ data, mode }: { data: TimelinePoint[]; mode: "views" | "visitors" }) {
+  const vals = data.map((d) => (mode === "views" ? d.views : d.visitors));
+  const max = Math.max(...vals, 1);
+  const W = 700; const H = 100;
+  const barW = Math.floor(W / data.length) - 1;
 
   return (
-    <svg
-      viewBox={`0 0 ${w} ${h + 20}`}
-      className="w-full"
-      aria-label="30-day visit timeline"
-    >
+    <svg viewBox={`0 0 ${W} ${H + 20}`} className="w-full" aria-label="30-day timeline">
       {data.map((d, i) => {
-        const barH = Math.max(2, (d.count / max) * h);
-        const x = i * (barW + 1);
-        const y = h - barH;
-        const isToday = i === data.length - 1;
+        const val = mode === "views" ? d.views : d.visitors;
+        const barH = Math.max(2, (val / max) * H);
         return (
           <g key={d.date}>
-            <rect
-              x={x}
-              y={y}
-              width={barW}
-              height={barH}
-              rx={2}
-              className={isToday ? "fill-primary" : "fill-primary/40"}
-            />
-            <title>{`${d.date}: ${d.count} visits`}</title>
+            <rect x={i * (barW + 1)} y={H - barH} width={barW} height={barH} rx={2}
+              className={i === data.length - 1 ? "fill-primary" : "fill-primary/40"} />
+            <title>{`${d.date}: ${val} ${mode}`}</title>
           </g>
         );
       })}
-      {/* X-axis labels — show every 7th day */}
       {data.map((d, i) => {
         if (i % 7 !== 0 && i !== data.length - 1) return null;
-        const x = i * (barW + 1) + barW / 2;
         return (
-          <text
-            key={`lbl-${i}`}
-            x={x}
-            y={h + 16}
-            textAnchor="middle"
-            fontSize={9}
-            className="fill-muted-foreground"
-          >
-            {d.date.slice(5)} {/* MM-DD */}
+          <text key={`lbl-${i}`} x={i * (barW + 1) + barW / 2} y={H + 16}
+            textAnchor="middle" fontSize={9} className="fill-muted-foreground">
+            {d.date.slice(5)}
           </text>
         );
       })}
@@ -91,7 +48,34 @@ function TimelineChart({ data }: { data: { date: string; count: number }[] }) {
   );
 }
 
-// ── Mini bar for tables ───────────────────────────────────────────────────────
+// ── SVG Hourly heatmap ────────────────────────────────────────────────────────
+function HourlyChart({ data }: { data: { hour: number; count: number }[] }) {
+  const max = Math.max(...data.map((d) => d.count), 1);
+  const W = 700; const H = 60;
+  const barW = Math.floor(W / 24) - 1;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H + 18}`} className="w-full" aria-label="Traffic by hour">
+      {data.map((d) => {
+        const barH = Math.max(2, (d.count / max) * H);
+        return (
+          <g key={d.hour}>
+            <rect x={d.hour * (barW + 1)} y={H - barH} width={barW} height={barH} rx={2}
+              className={d.count === max ? "fill-emerald-500" : "fill-emerald-500/40"} />
+            <title>{`${String(d.hour).padStart(2, "0")}:00 — ${d.count} visits`}</title>
+          </g>
+        );
+      })}
+      {[0, 6, 12, 18, 23].map((h) => (
+        <text key={h} x={h * (barW + 1) + barW / 2} y={H + 14}
+          textAnchor="middle" fontSize={9} className="fill-muted-foreground">
+          {`${String(h).padStart(2, "0")}h`}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
 function MiniBar({ pct }: { pct: number }) {
   return (
     <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
@@ -103,6 +87,7 @@ function MiniBar({ pct }: { pct: number }) {
 // ── Main dashboard ────────────────────────────────────────────────────────────
 function AnalyticsDashboard({ userId }: { userId: string }) {
   const qc = useQueryClient();
+  const [timelineMode, setTimelineMode] = useState<"views" | "visitors">("views");
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-analytics", userId],
@@ -110,21 +95,29 @@ function AnalyticsDashboard({ userId }: { userId: string }) {
     staleTime: 5 * 60 * 1000,
   });
 
-  const refresh = () => qc.invalidateQueries({ queryKey: ["admin-analytics"] });
-
   if (isLoading || !data) return <AnalyticsSkeleton />;
 
-  const { summary, countries, pages, devices, timeline } = data as AnalyticsData;
-
-  const totalVisits = summary.totalCount;
-  const topCountryCount = countries[0]?.count ?? 1;
-  const topPageCount = pages[0]?.count ?? 1;
-  const totalDevices = devices.reduce((s, d) => s + d.count, 0) || 1;
+  const { summary, pages, devices, referrers, hours, timeline } = data as AnalyticsData;
+  const totalViews    = summary.totalViews;
+  const topPageCount  = pages[0]?.count ?? 1;
+  const topRefCount   = referrers[0]?.count ?? 1;
+  const totalDevices  = devices.reduce((s, d) => s + d.count, 0) || 1;
 
   const deviceMap = Object.fromEntries(devices.map((d) => [d.device, d.count]));
   const desktop = deviceMap["desktop"] ?? 0;
   const mobile  = deviceMap["mobile"]  ?? 0;
   const tablet  = deviceMap["tablet"]  ?? 0;
+
+  const peakHour = hours.reduce((best, h) => (h.count > best.count ? h : best), { hour: 0, count: 0 });
+
+  const summaryCards = [
+    { period: "Today",      views: summary.todayViews,  unique: summary.todayUnique },
+    { period: "This Week",  views: summary.weekViews,   unique: summary.weekUnique },
+    { period: "This Month", views: summary.monthViews,  unique: summary.monthUnique },
+    { period: "All Time",   views: summary.totalViews,  unique: summary.totalUnique },
+  ];
+
+  const colors = ["text-sky-500", "text-emerald-500", "text-violet-500", "text-amber-500"];
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
@@ -139,71 +132,87 @@ function AnalyticsDashboard({ userId }: { userId: string }) {
             <p className="text-sm text-muted-foreground">Visitor insights &amp; traffic overview</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={refresh} className="gap-1.5">
+        <Button variant="outline" size="sm"
+          onClick={() => qc.invalidateQueries({ queryKey: ["admin-analytics"] })}
+          className="gap-1.5">
           <RefreshCw className="size-3.5" />
           Refresh
         </Button>
       </div>
 
-      {/* Summary cards */}
+      {/* Summary cards — views + unique visitors side by side */}
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          { label: "Today",      value: summary.todayCount,  color: "text-sky-500" },
-          { label: "This Week",  value: summary.weekCount,   color: "text-emerald-500" },
-          { label: "This Month", value: summary.monthCount,  color: "text-violet-500" },
-          { label: "All Time",   value: summary.totalCount,  color: "text-amber-500" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-border bg-card p-4">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value.toLocaleString()}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground leading-tight">{s.label}</p>
+        {summaryCards.map((s, i) => (
+          <div key={s.period} className="rounded-xl border border-border bg-card p-4 space-y-3">
+            <p className="text-xs text-muted-foreground font-medium">{s.period}</p>
+            <div className="flex items-end justify-between gap-2">
+              <div>
+                <p className={`text-xl font-bold ${colors[i]}`}>{s.views.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
+                  <Eye className="size-2.5" />Views
+                </p>
+              </div>
+              <div className="text-right">
+                <p className={`text-xl font-bold ${colors[i]}/70`}>{s.unique.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5 justify-end">
+                  <Users className="size-2.5" />Unique
+                </p>
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* 30-day timeline */}
+      {/* 30-day timeline with toggle */}
       <div className="mb-6 rounded-2xl border border-border bg-card p-5">
-        <p className="mb-4 text-sm font-semibold text-foreground">Last 30 Days</p>
-        {timeline.length > 0 ? (
-          <TimelineChart data={timeline} />
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-foreground">Last 30 Days</p>
+          <div className="flex items-center gap-1 rounded-lg border border-border p-0.5 text-xs">
+            <button
+              onClick={() => setTimelineMode("views")}
+              className={`rounded-md px-2.5 py-1 font-medium transition-colors ${timelineMode === "views" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Views
+            </button>
+            <button
+              onClick={() => setTimelineMode("visitors")}
+              className={`rounded-md px-2.5 py-1 font-medium transition-colors ${timelineMode === "visitors" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              Unique
+            </button>
+          </div>
+        </div>
+        {timeline.some((d) => d.views > 0) ? (
+          <TimelineChart data={timeline} mode={timelineMode} />
         ) : (
-          <p className="text-sm text-muted-foreground py-8 text-center">No data yet.</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">No data yet.</p>
         )}
       </div>
 
-      {/* Countries + Top Pages */}
-      <div className="mb-6 grid gap-6 lg:grid-cols-2">
-        {/* Countries */}
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <Globe className="size-4 text-sky-500" />
-            <p className="text-sm font-semibold text-foreground">Countries</p>
+      {/* Hourly heatmap */}
+      <div className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Clock className="size-4 text-emerald-500" />
+            <p className="text-sm font-semibold text-foreground">Traffic by Hour</p>
           </div>
-          {countries.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No data yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {countries.map((c) => (
-                <div key={c.code}>
-                  <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="flex items-center gap-1.5 font-medium text-foreground">
-                      <span className="text-base leading-none">{flag(c.code)}</span>
-                      {countryName(c.code)}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {c.count.toLocaleString()}
-                      <span className="ml-1 text-[10px]">
-                        ({Math.round((c.count / (totalVisits || 1)) * 100)}%)
-                      </span>
-                    </span>
-                  </div>
-                  <MiniBar pct={(c.count / topCountryCount) * 100} />
-                </div>
-              ))}
-            </div>
+          {peakHour.count > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Peak: <span className="font-medium text-foreground">
+                {String(peakHour.hour).padStart(2, "0")}:00–{String((peakHour.hour + 1) % 24).padStart(2, "0")}:00 UTC
+              </span>
+            </p>
           )}
         </div>
+        {hours.some((h) => h.count > 0) ? (
+          <HourlyChart data={hours} />
+        ) : (
+          <p className="py-6 text-center text-sm text-muted-foreground">No data yet.</p>
+        )}
+      </div>
 
-        {/* Top Pages */}
+      {/* Top Pages + Top Referrers */}
+      <div className="mb-6 grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="mb-4 flex items-center gap-2">
             <BarChart2 className="size-4 text-violet-500" />
@@ -216,15 +225,44 @@ function AnalyticsDashboard({ userId }: { userId: string }) {
               {pages.map((p) => (
                 <div key={p.page}>
                   <div className="mb-1 flex items-center justify-between text-xs">
-                    <span
-                      className="max-w-[65%] truncate font-medium text-foreground"
-                      title={p.page}
-                    >
+                    <span className="max-w-[68%] truncate font-medium text-foreground" title={p.page}>
                       {p.page}
                     </span>
-                    <span className="text-muted-foreground">{p.count.toLocaleString()}</span>
+                    <span className="text-muted-foreground">
+                      {p.count.toLocaleString()}
+                      <span className="ml-1 text-[10px]">({Math.round((p.count / (totalViews || 1)) * 100)}%)</span>
+                    </span>
                   </div>
                   <MiniBar pct={(p.count / topPageCount) * 100} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <Link2 className="size-4 text-sky-500" />
+            <p className="text-sm font-semibold text-foreground">Top Referrers</p>
+          </div>
+          {referrers.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No referrer data yet — direct/bookmark traffic has no referrer.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {referrers.map((r) => (
+                <div key={r.referrer}>
+                  <div className="mb-1 flex items-center justify-between text-xs">
+                    <span className="max-w-[68%] truncate font-medium text-foreground" title={r.referrer}>
+                      {r.referrer}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {r.count.toLocaleString()}
+                      <span className="ml-1 text-[10px]">({Math.round((r.count / (totalViews || 1)) * 100)}%)</span>
+                    </span>
+                  </div>
+                  <MiniBar pct={(r.count / topRefCount) * 100} />
                 </div>
               ))}
             </div>
@@ -255,7 +293,7 @@ function AnalyticsDashboard({ userId }: { userId: string }) {
         </div>
       </div>
 
-      {totalVisits === 0 && (
+      {totalViews === 0 && (
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Analytics will populate as visitors browse the site.
         </p>
@@ -269,12 +307,13 @@ function AnalyticsSkeleton() {
     <div className="mx-auto max-w-5xl px-6 py-10 space-y-6">
       <Skeleton className="h-12 w-64" />
       <div className="grid grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
       </div>
-      <Skeleton className="h-40 rounded-2xl" />
+      <Skeleton className="h-36 rounded-2xl" />
+      <Skeleton className="h-28 rounded-2xl" />
       <div className="grid gap-6 lg:grid-cols-2">
-        <Skeleton className="h-64 rounded-2xl" />
-        <Skeleton className="h-64 rounded-2xl" />
+        <Skeleton className="h-56 rounded-2xl" />
+        <Skeleton className="h-56 rounded-2xl" />
       </div>
       <Skeleton className="h-36 rounded-2xl" />
     </div>

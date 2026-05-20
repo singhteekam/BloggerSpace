@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const logger = require("./../utils/Logging/logs");
 const User = require("../models/User");
+const Admin = require("../models/Admin");
 
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -10,6 +11,16 @@ const authenticate = async (req, res, next) => {
     // Try CURRENT_JWT_SECRET first (new unified tokens)
     try {
       const decoded = jwt.verify(token, process.env.CURRENT_JWT_SECRET);
+
+      // Admin tokens: look up in Admin collection, not User collection
+      if (decoded.role === "Admin") {
+        const admin = await Admin.findById(decoded.userId).select("_id").lean();
+        if (!admin) return res.status(401).json({ message: "Admin session invalid." });
+        if (!req.query.userId) req.query.userId = decoded.userId?.toString();
+        req.userRole = "Admin";
+        return next();
+      }
+
       // DB check — catches admin-initiated deactivation
       const user = await User.findById(decoded.userId).select("status").lean();
       if (!user || user.status === "INACTIVE") {
