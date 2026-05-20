@@ -14,6 +14,7 @@ import {
   Shield,
   Gift,
   MessageSquare,
+  BarChart2,
 } from "lucide-react";
 
 export type NavItem = {
@@ -52,6 +53,7 @@ export const reviewerMenuNav: NavItem[] = [
 /** Admin dropdown items */
 export const adminMenuNav: NavItem[] = [
   { title: "Admin Panel", href: "/admin/dashboard", icon: ShieldCheck },
+  { title: "Analytics",   href: "/admin/analytics",  icon: BarChart2 },
   { title: "Redemptions", href: "/admin/redemptions", icon: Gift },
   { title: "Reviews", href: "/admin/reviews", icon: MessageSquare },
   { title: "Newsletter", href: "/admin/newsletter", icon: Mail },

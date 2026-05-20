@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ReadingProgress } from "@/components/layout/reading-progress";
 import { ChatWidget } from "@/components/chat/chat-widget";
+import { TrackPageView } from "@/components/analytics/track-pageview";
 import { siteConfig } from "@/lib/constants/site";
 import { websiteJsonLd } from "@/lib/utils/json-ld";
 import "./globals.css";
@@ -104,6 +105,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
         />
         <Providers>
+          <TrackPageView />
           <ReadingProgress />
           <Navbar />
           {children}

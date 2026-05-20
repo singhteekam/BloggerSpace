@@ -30,6 +30,7 @@ const adminRoutes = require("./routes/Admin/adminRoute");
 const communityRoutes = require("./routes/community");
 const reviewsRoutes  = require("./routes/reviewsRoute");
 const autoWriteBlogs = require("./routes/autoWriteBlogs");
+const analyticsRoutes = require("./routes/analyticsRoute");
 
 const sitemapRouter = require("./routes/sitemap");
 
@@ -129,6 +130,9 @@ app.use("/api/reviews", reviewsRoutes);
 
 //Auto Writing Blogs
 app.use("/api/autowrite", autoWriteBlogs);
+
+// Analytics
+app.use("/api/analytics", analyticsRoutes);
 
 //For capturing logs
 const { uploadLogsToGitHub, fetchLogsFile } = require("./utils/uploadToGitHub");
