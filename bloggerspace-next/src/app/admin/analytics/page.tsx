@@ -213,7 +213,7 @@ function AnalyticsDashboard({ userId }: { userId: string }) {
 
       {/* Top Pages + Top Referrers */}
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-5">
           <div className="mb-4 flex items-center gap-2">
             <BarChart2 className="size-4 text-violet-500" />
             <p className="text-sm font-semibold text-foreground">Top Pages</p>
@@ -224,11 +224,11 @@ function AnalyticsDashboard({ userId }: { userId: string }) {
             <div className="space-y-3">
               {pages.map((p) => (
                 <div key={p.page}>
-                  <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="max-w-[68%] truncate font-medium text-foreground" title={p.page}>
+                  <div className="mb-1 flex min-w-0 items-center gap-2 text-xs">
+                    <span className="flex-1 min-w-0 truncate font-medium text-foreground" title={p.page}>
                       {p.page}
                     </span>
-                    <span className="text-muted-foreground">
+                    <span className="shrink-0 text-muted-foreground">
                       {p.count.toLocaleString()}
                       <span className="ml-1 text-[10px]">({Math.round((p.count / (totalViews || 1)) * 100)}%)</span>
                     </span>
@@ -240,7 +240,7 @@ function AnalyticsDashboard({ userId }: { userId: string }) {
           )}
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-5">
           <div className="mb-4 flex items-center gap-2">
             <Link2 className="size-4 text-sky-500" />
             <p className="text-sm font-semibold text-foreground">Top Referrers</p>
@@ -253,11 +253,11 @@ function AnalyticsDashboard({ userId }: { userId: string }) {
             <div className="space-y-3">
               {referrers.map((r) => (
                 <div key={r.referrer}>
-                  <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="max-w-[68%] truncate font-medium text-foreground" title={r.referrer}>
+                  <div className="mb-1 flex min-w-0 items-center gap-2 text-xs">
+                    <span className="flex-1 min-w-0 truncate font-medium text-foreground" title={r.referrer}>
                       {r.referrer}
                     </span>
-                    <span className="text-muted-foreground">
+                    <span className="shrink-0 text-muted-foreground">
                       {r.count.toLocaleString()}
                       <span className="ml-1 text-[10px]">({Math.round((r.count / (totalViews || 1)) * 100)}%)</span>
                     </span>

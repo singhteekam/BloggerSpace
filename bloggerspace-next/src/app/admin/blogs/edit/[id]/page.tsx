@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Loader2, Save, X, ChevronsUpDown, Check,
   Cloud, CloudOff, Eye, CheckCheck, FileMinus, Star, Gem, User, Pencil, Plus,
+  HardDrive, AlertTriangle,
 } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -599,6 +600,21 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
               placeholder="Blog content…"
               minHeight="520px"
             />
+            {/* Size meter */}
+            {(() => {
+              const bytes = new Blob([content]).size;
+              const kb = (bytes / 1024).toFixed(1);
+              const warn = bytes > 200 * 1024;
+              return (
+                <div className={`flex min-w-0 flex-wrap items-center gap-1.5 pt-1 text-xs ${warn ? "text-amber-500" : "text-muted-foreground"}`}>
+                  {warn ? <AlertTriangle className="size-3.5 shrink-0" /> : <HardDrive className="size-3.5 shrink-0" />}
+                  <span className="shrink-0">{kb} KB</span>
+                  {warn && (
+                    <span className="wrap-break-word">— Large content (inline images inflate size). Consider linking images by URL.</span>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Action bar */}

@@ -10,17 +10,29 @@ const User   = require("../models/User");
  */
 const getApprovedReviews = async (req, res) => {
   try {
-    const docs = await Review.find({ status: "approved" })
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(50, parseInt(req.query.limit) || 0); // 0 = all (legacy)
+    const skip  = limit ? (page - 1) * limit : 0;
+
+    const query = Review.find({ status: "approved" })
       .sort({ approvedAt: -1 })
-      .select("fullName userName rating body approvedAt userId")
+      .select("fullName userName rating body approvedAt createdAt userId")
       .populate("userId", "profilePicture")
       .lean();
+    if (limit) { query.skip(skip).limit(limit); }
+
+    const [docs, total] = await Promise.all([
+      query,
+      Review.countDocuments({ status: "approved" }),
+    ]);
+
     const reviews = docs.map((r) => ({
       ...r,
       profilePicture: r.userId?.profilePicture ?? null,
       userId: r.userId?._id ?? null,
     }));
-    res.json({ reviews });
+
+    res.json({ reviews, total, page, pages: limit ? Math.ceil(total / limit) : 1 });
   } catch (err) {
     console.error("getApprovedReviews:", err);
     res.status(500).json({ message: "Server error" });

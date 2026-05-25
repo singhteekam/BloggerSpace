@@ -15,6 +15,7 @@ import {
   Gift,
   MessageSquare,
   BarChart2,
+  Wrench,
 } from "lucide-react";
 
 export type NavItem = {
@@ -59,6 +60,7 @@ export const adminMenuNav: NavItem[] = [
   { title: "Newsletter", href: "/admin/newsletter", icon: Mail },
   { title: "Saved Blogs", href: "/admin/savedblogs", icon: Bookmark },
   { title: "My Profile", href: "/admin/profile", icon: UserIcon },
+  { title: "Maintenance", href: "/admin/maintenance", icon: Wrench },
   { title: "Settings", href: "/admin/settings", icon: Settings },
   { title: "Change Password", href: "/admin/changepassword", icon: Lock },
 ];
@@ -68,7 +70,7 @@ export const footerNav = {
     { title: "Browse blogs", href: "/blogs" },
     { title: "Admin Picks", href: "/adminblogs" },
     { title: "Community", href: "/community" },
-    // { title: "Sitemap", href: "/sitemap.xml" },
+    { title: "Reviews", href: "/reviews" },
   ],
   company: [
     { title: "About", href: "/about" },

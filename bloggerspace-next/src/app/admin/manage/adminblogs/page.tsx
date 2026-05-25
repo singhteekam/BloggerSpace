@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { PenLine, Globe, FileText, Trash2, Loader2, Plus, Clock, Tag, FileMinus, Search, X } from "lucide-react";
+import { PenLine, Globe, FileText, Trash2, Loader2, Plus, Clock, Tag, FileMinus, Search, X, Database } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { formatDate } from "@/lib/utils/html";
+import { formatDate, formatDocSize } from "@/lib/utils/html";
 
 export default function AdminBlogsWritePage() {
   const { user, isLoading: authLoading } = useRequireAdmin();
@@ -247,6 +247,7 @@ function InfiniteList({ items, renderItem }: {
 }
 
 function BlogCard({ blog, children }: { blog: AdminBlog; children: React.ReactNode }) {
+  const docSize = formatDocSize(new TextEncoder().encode(JSON.stringify(blog)).length);
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0 flex-1 space-y-1">
@@ -254,6 +255,7 @@ function BlogCard({ blog, children }: { blog: AdminBlog; children: React.ReactNo
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {blog.category && <span className="flex items-center gap-1"><Tag className="size-3" />{blog.category}</span>}
           <span className="flex items-center gap-1"><Clock className="size-3" />{formatDate(blog.lastUpdatedAt || blog.createdAt)}</span>
+          <span className="flex items-center gap-1"><Database className="size-3" />{docSize}</span>
         </div>
       </div>
       <div className="shrink-0">{children}</div>

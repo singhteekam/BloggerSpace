@@ -31,23 +31,29 @@ export type MyReviewResponse = {
 };
 
 // ── Server-side fetch (used in page.tsx server component) ────────────────────
-export async function fetchApprovedReviews(): Promise<Review[]> {
+export async function fetchApprovedReviews(
+  page = 1,
+  limit = 9,
+): Promise<{ reviews: Review[]; total: number; pages: number }> {
   try {
-    const res = await fetch(`${BASE}/api/reviews/approved`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return [];
-    const { reviews } = await res.json();
-    return reviews ?? [];
+    const res = await fetch(
+      `${BASE}/api/reviews/approved?page=${page}&limit=${limit}`,
+      { next: { revalidate: 300 } },
+    );
+    if (!res.ok) return { reviews: [], total: 0, pages: 0 };
+    return await res.json();
   } catch {
-    return [];
+    return { reviews: [], total: 0, pages: 0 };
   }
 }
 
 // ── Client-side API ──────────────────────────────────────────────────────────
 export const reviewsApi = {
-  getApproved: () =>
-    api.get<{ reviews: Review[] }>("/api/reviews/approved"),
+  getApproved: (page = 1, limit = 12) =>
+    api.get<{ reviews: Review[]; total: number; page: number; pages: number }>(
+      "/api/reviews/approved",
+      { params: { page, limit } },
+    ),
 
   getMyReview: () =>
     api.get<MyReviewResponse>("/api/reviews/me"),

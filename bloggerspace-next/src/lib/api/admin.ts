@@ -534,6 +534,8 @@ export type AdminConfigDoc = {
   perBlogReviewerGemsCap: number;
   // Scoring
   maxBlogScore: number;
+  // Maintenance
+  maintenanceMode: boolean;
   // Audit
   updatedAt: string;
   updatedBy: string | null;

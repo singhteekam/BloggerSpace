@@ -31,6 +31,9 @@ const adminConfigSchema = new mongoose.Schema({
   // ── Scoring ─────────────────────────────────────────────────
   maxBlogScore: { type: Number, default: 10, min: 1 },
 
+  // ── Maintenance mode ───────────────────────────────────────────
+  maintenanceMode: { type: Boolean, default: false },
+
   // ── Audit ───────────────────────────────────────────────────
   updatedAt: {
     type: Date,

@@ -11,6 +11,13 @@ export function htmlToText(html: string, maxLength = 160): string {
     .slice(0, maxLength);
 }
 
+/** Format a byte count to human-readable document size (KB / MB) */
+export function formatDocSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
 /** Format a date string to "12 Jan 2025" */
 export function formatDate(dateStr: string): string {
   try {

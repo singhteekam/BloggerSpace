@@ -15,6 +15,7 @@ const Newsletter = require("../../models/Newsletter");
 const GemsTransaction = require("../../models/GemsTransaction");
 const AdminConfig = require("../../models/AdminConfig");
 const ReviewScore = require("../../models/ReviewScore");
+const { uploadImageToGitHub } = require("../../utils/uploadImageToGitHub");
 const IST_OFFSET = 330;
 
 // Default caps if no AdminConfig doc exists yet (defensive — Phase 1 lazily
@@ -1429,9 +1430,18 @@ exports.adminUploadProfilePicture = async (req, res) => {
     const admin = await Admin.findById(adminId);
     if (!admin) return res.status(404).json({ error: "Admin not found" });
 
-    admin.profilePicture = profilePicture.buffer.toString("base64");
+    const ext = profilePicture.mimetype === "image/png" ? "png"
+      : profilePicture.mimetype === "image/webp" ? "webp"
+      : profilePicture.mimetype === "image/gif" ? "gif"
+      : "jpg";
+    const cdnUrl = await uploadImageToGitHub(
+      profilePicture.buffer,
+      `profile-pictures/admin-${adminId}.${ext}`,
+    );
+
+    admin.profilePicture = cdnUrl;
     await admin.save();
-    res.json({ message: "Profile picture updated." });
+    res.json({ message: "Profile picture updated.", profilePicture: cdnUrl });
   } catch (error) {
     res.status(500).json({ error: "Failed to upload profile picture" });
   }

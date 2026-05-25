@@ -6,7 +6,7 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
   MessageSquare, Loader2, Trash2, Search, X,
-  ChevronDown, ChevronUp, User, Heart, MessageCircle, ExternalLink,
+  ChevronDown, ChevronUp, User, Heart, MessageCircle, ExternalLink, Database,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useEffect, useRef } from "react";
@@ -17,7 +17,7 @@ import { RefreshButton } from "@/components/ui/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatDate } from "@/lib/utils/html";
+import { formatDate, formatDocSize } from "@/lib/utils/html";
 
 export default function AdminCommunityPage() {
   const { user, isLoading: authLoading } = useRequireAdmin();
@@ -107,7 +107,7 @@ function CommunityManagement({ adminId }: { adminId: string }) {
           {posts.map((post) => (
             <PostCard
               key={post._id}
-              post={post}
+              post={post as CommunityPost & Record<string, unknown>}
               adminId={adminId}
               onDeletePost={() => deleteMutation.mutate(post._id)}
               deletingPost={deleteMutation.isPending}
@@ -130,7 +130,7 @@ function CommunityManagement({ adminId }: { adminId: string }) {
 function PostCard({
   post, adminId, onDeletePost, deletingPost, onDeleteComment, deletingComment,
 }: {
-  post: CommunityPost;
+  post: CommunityPost & Record<string, unknown>;
   adminId: string;
   onDeletePost: () => void;
   deletingPost: boolean;
@@ -138,6 +138,7 @@ function PostCard({
   deletingComment: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const docSize = formatDocSize(new TextEncoder().encode(JSON.stringify(post)).length);
 
   const { data: commentsData, isLoading: commentsLoading } = useQuery({
     queryKey: ["admin-post-comments", post._id],
@@ -155,7 +156,7 @@ function PostCard({
             <Badge variant="secondary" className="mb-1 text-xs">{post.communityPostCategory}</Badge>
           )}
           <p className="font-medium text-foreground line-clamp-2">{post.communityPostTopic}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
             {post.communityPostAuthor?._id ? (
               <Link
                 href={`/admin/manage/team/${post.communityPostAuthor._id}`}
@@ -166,8 +167,11 @@ function PostCard({
             ) : (
               <span>{post.communityPostAuthor?.fullName ?? "Anonymous"}</span>
             )}
-            {" · "}{formatDate(post.createdAt)}
-          </p>
+            <span>·</span>
+            <span>{formatDate(post.createdAt)}</span>
+            <span>·</span>
+            <span className="flex items-center gap-0.5"><Database className="size-3" />{docSize}</span>
+          </div>
         </div>
         <div className="shrink-0 flex items-center gap-1.5">
           <Link

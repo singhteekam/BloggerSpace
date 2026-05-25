@@ -7,6 +7,7 @@ import { HowItWorksSection } from "./_sections/how-it-works-section";
 import { WhatYouCanDoSection } from "./_sections/what-you-can-do-section";
 import { GemsSection } from "./_sections/gems-section";
 import { ReviewsSection } from "./_sections/reviews-section";
+import { fetchApprovedReviews } from "@/lib/api/reviews";
 import { TechStackSection } from "./_sections/tech-stack-section";
 import { DeveloperSection } from "./_sections/developer-section";
 import { ContactSection } from "./_sections/contact-section";
@@ -26,6 +27,8 @@ export default async function Home() {
     totalBlogs = 0;
   }
 
+  const { reviews, total: reviewsTotal } = await fetchApprovedReviews(1, 9);
+
   return (
     <main className="relative isolate overflow-hidden bg-background">
       <HeroSection totalBlogs={totalBlogs} />
@@ -33,7 +36,7 @@ export default async function Home() {
       <HowItWorksSection />
       <WhatYouCanDoSection />
       <GemsSection />
-      <ReviewsSection />
+      <ReviewsSection reviews={reviews} total={reviewsTotal} />
       <TechStackSection />
       <DeveloperSection />
       <ContactSection />

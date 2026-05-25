@@ -106,6 +106,17 @@ app.use(
 // Sitemap (must be after CORS so cross-origin admin requests work)
 app.use("/api", sitemapRouter);
 
+// Public maintenance-mode check — Next.js middleware polls this
+const AdminConfig = require("./models/AdminConfig");
+app.get("/api/maintenance", async (req, res) => {
+  try {
+    const config = await AdminConfig.findOne({}).lean();
+    res.json({ maintenanceMode: config?.maintenanceMode ?? false });
+  } catch {
+    res.json({ maintenanceMode: false });
+  }
+});
+
 // Passport Login/Signup
 app.use(passport.initialize());
 app.use(passport.session(false));

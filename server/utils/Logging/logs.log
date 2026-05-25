@@ -164,3 +164,27 @@
 [2026-05-19T23:31:13.574Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
 [2026-05-20T19:48:47.532Z] [LOG] [INFO] - Returning from user profile route with data.
 [2026-05-20T19:48:47.532Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-25T23:54:44.376Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-25T23:54:44.376Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-05-25T23:54:44.397Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-25T23:54:44.397Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-25T23:54:44.397Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:07:18.931Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: Teekam Singh
+[2026-05-26T00:47:24.455Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:47:24.455Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:47:24.455Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:52:31.005Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:52:31.005Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:52:31.005Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:59:20.945Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:59:20.945Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T00:59:20.945Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:10:46.475Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:10:46.475Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:10:46.475Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:12:53.592Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:12:53.592Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:12:53.592Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:18:09.043Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:18:09.043Z] [LOG] [ERROR] - The requested User not found of username: adminteekam
+[2026-05-26T01:18:09.043Z] [LOG] [ERROR] - The requested User not found of username: adminteekam

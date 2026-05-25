@@ -13,6 +13,7 @@ const validateUsername = require("../utils/validateUsername");
 const Visit = require("../models/Visitor");
 const logger = require("./../utils/Logging/logs");
 const passport = require("../services/passportAuth.js");
+const { uploadImageToGitHub } = require("../utils/uploadImageToGitHub");
 const PDFDocument = require('pdfkit');
 
 // Returns a random 6-digit numeric OTP string
@@ -683,17 +684,21 @@ exports.uploadProfilePicture2 = async (req, res) => {
 
       console.log("File uploaded:", profilePicture);
 
-      // Convert the file buffer to a Base64 string
-      const profilePictureData = profilePicture.buffer.toString("base64");
-
-      // Save the profile picture to the user's database record
-      console.log("user idddd:  ", userId);
       const user = await User.findById(userId);
       if (!user) {
           return res.status(404).json({ error: "User not found" });
       }
 
-      user.profilePicture = profilePictureData;
+      const ext = profilePicture.mimetype === "image/png" ? "png"
+        : profilePicture.mimetype === "image/webp" ? "webp"
+        : profilePicture.mimetype === "image/gif" ? "gif"
+        : "jpg";
+      const cdnUrl = await uploadImageToGitHub(
+        profilePicture.buffer,
+        `profile-pictures/${userId}.${ext}`,
+      );
+
+      user.profilePicture = cdnUrl;
       await user.save();
 
       logger.debug(`${user.fullName}: Profile picture uploaded successfully.`);

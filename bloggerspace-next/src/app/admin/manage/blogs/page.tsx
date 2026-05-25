@@ -9,7 +9,7 @@ import {
   FileText, BookOpen, Globe, AlertCircle, EyeOff, MessageCircleWarning,
   Loader2, CheckCheck, Star, ChevronDown, RefreshCw,
   Pencil, FileMinus, Trash2, Clock, Tag, User,
-  ChevronLeft, ChevronRight, Search, X, Gem, Plus,
+  ChevronLeft, ChevronRight, Search, X, Gem, Plus, Database,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Popover from "@radix-ui/react-popover";
@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { formatDate } from "@/lib/utils/html";
+import { formatDate, formatDocSize } from "@/lib/utils/html";
 
 export default function AdminBlogsPage() {
   const { user, isLoading: authLoading } = useRequireAdmin();
@@ -371,6 +371,7 @@ function SectionHeader({ title, desc }: { title: string; desc: string }) {
 }
 
 function BlogCard({ blog, children }: { blog: AdminBlog; children: React.ReactNode }) {
+  const docSize = formatDocSize(new TextEncoder().encode(JSON.stringify(blog)).length);
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0 flex-1 space-y-1">
@@ -387,6 +388,7 @@ function BlogCard({ blog, children }: { blog: AdminBlog; children: React.ReactNo
           {blog.category && <span className="flex items-center gap-1"><Tag className="size-3" />{blog.category}</span>}
           <span className="flex items-center gap-1"><Clock className="size-3" />{formatDate(blog.lastUpdatedAt || blog.createdAt)}</span>
           {blog.currentReviewer && <span className="text-primary">Reviewer: {blog.currentReviewer}</span>}
+          <span className="flex items-center gap-1"><Database className="size-3" />{docSize}</span>
         </div>
       </div>
       <div className="shrink-0">{children}</div>
