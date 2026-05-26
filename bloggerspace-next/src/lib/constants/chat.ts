@@ -1,4 +1,4 @@
-export const CHAT_BOT_NAME = "Sage";
+export const CHAT_BOT_NAME = "BlogMate";
 
 export const CHAT_BOT_TAGLINE = "Your BloggerSpace assistant";
 

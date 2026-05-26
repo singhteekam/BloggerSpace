@@ -88,7 +88,7 @@ A full-stack blogging platform where every post is reviewed by a real human befo
 - One pending redemption request at a time (enforced by both UI and backend)
 - Redemption history with PENDING / FULFILLED / REJECTED statuses
 
-### AI Assistant — Sage
+### AI Assistant — BlogMate
 - In-page chat widget powered by Google Gemini
 - Searches live blog data: by topic, category, tag, trending, or recent
 - Renders results as clickable Markdown links with author and excerpt
@@ -209,7 +209,7 @@ Create `bloggerspace-next/.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:5000
 NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
 
-# Google Gemini (AI chatbot — Sage)
+# Google Gemini (AI chatbot — BlogMate)
 GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key
 ```
 

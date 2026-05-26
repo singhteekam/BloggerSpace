@@ -1,9 +1,9 @@
 /**
- * Tool definitions for the Sage chatbot.
+ * Tool definitions for the BlogMate chatbot.
  *
  * Each tool is callable by the LLM during a streamed chat turn. The LLM picks
  * which tool(s) to invoke based on the user's intent. Tools return concise,
- * structured data (titles, URLs, authors, excerpts) so Sage can reply with
+ * structured data (titles, URLs, authors, excerpts) so BlogMate can reply with
  * clickable Markdown links instead of fabricating blog titles.
  */
 import { tool } from "ai";

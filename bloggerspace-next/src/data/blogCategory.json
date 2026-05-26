@@ -16,6 +16,10 @@
     "label": "Accounting"
   },
   {
+    "value": "Accessibility",
+    "label": "Accessibility"
+  },
+  {
     "value": "ActionScript",
     "label": "ActionScript"
   },
@@ -72,6 +76,10 @@
     "label": "API Development"
   },
   {
+    "value": "API Security",
+    "label": "API Security"
+  },
+  {
     "value": "App Development",
     "label": "App Development"
   },
@@ -116,6 +124,10 @@
     "label": "Back-end Development"
   },
   {
+    "value": "Bash Scripting",
+    "label": "Bash Scripting"
+  },
+  {
     "value": "Big Data",
     "label": "Big Data"
   },
@@ -152,6 +164,10 @@
     "label": "Business Development"
   },
   {
+    "value": "Business Intelligence",
+    "label": "Business Intelligence"
+  },
+  {
     "value": "C",
     "label": "C"
   },
@@ -168,8 +184,16 @@
     "label": "Calculus"
   },
   {
+    "value": "Career Development",
+    "label": "Career Development"
+  },
+  {
     "value": "Chemistry",
     "label": "Chemistry"
+  },
+  {
+    "value": "CI/CD",
+    "label": "CI/CD"
   },
   {
     "value": "Cloud Computing",
@@ -178,6 +202,10 @@
   {
     "value": "Cloud Security",
     "label": "Cloud Security"
+  },
+  {
+    "value": "Competitive Programming",
+    "label": "Competitive Programming"
   },
   {
     "value": "Computer Architecture",
@@ -240,6 +268,10 @@
     "label": "Data Structures and Algorithms"
   },
   {
+    "value": "Data Visualization",
+    "label": "Data Visualization"
+  },
+  {
     "value": "Database Administration",
     "label": "Database Administration"
   },
@@ -250,6 +282,10 @@
   {
     "value": "Dart",
     "label": "Dart"
+  },
+  {
+    "value": "Debugging",
+    "label": "Debugging"
   },
   {
     "value": "Deep Learning",
@@ -292,8 +328,20 @@
     "label": "Economics"
   },
   {
+    "value": "Edge Computing",
+    "label": "Edge Computing"
+  },
+  {
+    "value": "Elasticsearch",
+    "label": "Elasticsearch"
+  },
+  {
     "value": "Electrical Engineering",
     "label": "Electrical Engineering"
+  },
+  {
+    "value": "Email Marketing",
+    "label": "Email Marketing"
   },
   {
     "value": "Embedded Systems",
@@ -316,6 +364,10 @@
     "label": "Excel"
   },
   {
+    "value": "Express.js",
+    "label": "Express.js"
+  },
+  {
     "value": "Firebase",
     "label": "Firebase"
   },
@@ -332,8 +384,20 @@
     "label": "Financial Modeling"
   },
   {
+    "value": "Flutter",
+    "label": "Flutter"
+  },
+  {
+    "value": "Front-end Development",
+    "label": "Front-end Development"
+  },
+  {
     "value": "Game Development",
     "label": "Game Development"
+  },
+  {
+    "value": "Generative AI",
+    "label": "Generative AI"
   },
   {
     "value": "Genetics",
@@ -348,8 +412,24 @@
     "label": "Git"
   },
   {
+    "value": "GitHub",
+    "label": "GitHub"
+  },
+  {
+    "value": "Go (Golang)",
+    "label": "Go (Golang)"
+  },
+  {
+    "value": "Google Cloud Platform",
+    "label": "Google Cloud Platform"
+  },
+  {
     "value": "Graphic Design",
     "label": "Graphic Design"
+  },
+  {
+    "value": "GraphQL",
+    "label": "GraphQL"
   },
   {
     "value": "Hadoop",
@@ -378,6 +458,10 @@
   {
     "value": "Information Systems",
     "label": "Information Systems"
+  },
+  {
+    "value": "Infrastructure as Code",
+    "label": "Infrastructure as Code"
   },
   {
     "value": "Internet of Things",
@@ -424,6 +508,14 @@
     "label": "Journalism"
   },
   {
+    "value": "JSON",
+    "label": "JSON"
+  },
+  {
+    "value": "Kafka",
+    "label": "Kafka"
+  },
+  {
     "value": "Kotlin",
     "label": "Kotlin"
   },
@@ -436,12 +528,20 @@
     "label": "Laravel"
   },
   {
+    "value": "Large Language Models (LLMs)",
+    "label": "Large Language Models (LLMs)"
+  },
+  {
     "value": "Linear Algebra",
     "label": "Linear Algebra"
   },
   {
     "value": "Linked List",
     "label": "Linked List"
+  },
+  {
+    "value": "Linux",
+    "label": "Linux"
   },
   {
     "value": "Machine Learning",
@@ -528,8 +628,20 @@
     "label": "Numerical Methods"
   },
   {
+    "value": "NumPy",
+    "label": "NumPy"
+  },
+  {
     "value": "Object-Oriented Programming",
     "label": "Object-Oriented Programming"
+  },
+  {
+    "value": "Open Source",
+    "label": "Open Source"
+  },
+  {
+    "value": "OpenAI",
+    "label": "OpenAI"
   },
   {
     "value": "Operating Systems",
@@ -538,6 +650,10 @@
   {
     "value": "Oracle",
     "label": "Oracle"
+  },
+  {
+    "value": "Pandas",
+    "label": "Pandas"
   },
   {
     "value": "Parallel Computing",
@@ -584,6 +700,10 @@
     "label": "Podcasting"
   },
   {
+    "value": "PostgreSQL",
+    "label": "PostgreSQL"
+  },
+  {
     "value": "Power BI",
     "label": "Power BI"
   },
@@ -604,6 +724,10 @@
     "label": "Project Management"
   },
   {
+    "value": "Prompt Engineering",
+    "label": "Prompt Engineering"
+  },
+  {
     "value": "Psychology",
     "label": "Psychology"
   },
@@ -614,6 +738,10 @@
   {
     "value": "Python",
     "label": "Python"
+  },
+  {
+    "value": "PyTorch",
+    "label": "PyTorch"
   },
   {
     "value": "Queue",
@@ -644,6 +772,14 @@
     "label": "Recruitment"
   },
   {
+    "value": "Redis",
+    "label": "Redis"
+  },
+  {
+    "value": "Reinforcement Learning",
+    "label": "Reinforcement Learning"
+  },
+  {
     "value": "Relational Databases",
     "label": "Relational Databases"
   },
@@ -660,6 +796,10 @@
     "label": "Renewable Energy"
   },
   {
+    "value": "REST API",
+    "label": "REST API"
+  },
+  {
     "value": "Robotics",
     "label": "Robotics"
   },
@@ -668,8 +808,16 @@
     "label": "Ruby on Rails"
   },
   {
+    "value": "Rust",
+    "label": "Rust"
+  },
+  {
     "value": "Sales",
     "label": "Sales"
+  },
+  {
+    "value": "Sass/SCSS",
+    "label": "Sass/SCSS"
   },
   {
     "value": "Scala",
@@ -716,6 +864,14 @@
     "label": "Solar Energy"
   },
   {
+    "value": "Solidity",
+    "label": "Solidity"
+  },
+  {
+    "value": "Spring Boot",
+    "label": "Spring Boot"
+  },
+  {
     "value": "SQL",
     "label": "SQL"
   },
@@ -756,6 +912,10 @@
     "label": "System Security"
   },
   {
+    "value": "Tailwind CSS",
+    "label": "Tailwind CSS"
+  },
+  {
     "value": "TensorFlow",
     "label": "TensorFlow"
   },
@@ -764,12 +924,20 @@
     "label": "Theology"
   },
   {
+    "value": "Time Complexity",
+    "label": "Time Complexity"
+  },
+  {
     "value": "TypeScript",
     "label": "TypeScript"
   },
   {
     "value": "UI/UX Design",
     "label": "UI/UX Design"
+  },
+  {
+    "value": "Unity",
+    "label": "Unity"
   },
   {
     "value": "Unix",
@@ -782,6 +950,10 @@
   {
     "value": "User Experience",
     "label": "User Experience"
+  },
+  {
+    "value": "Version Control",
+    "label": "Version Control"
   },
   {
     "value": "VFX",
@@ -800,6 +972,10 @@
     "label": "Web Analytics"
   },
   {
+    "value": "WebAssembly",
+    "label": "WebAssembly"
+  },
+  {
     "value": "Web Development",
     "label": "Web Development"
   },
@@ -810,6 +986,10 @@
   {
     "value": "Web Security",
     "label": "Web Security"
+  },
+  {
+    "value": "Web Sockets",
+    "label": "Web Sockets"
   },
   {
     "value": "Wireless Communication",

@@ -4,7 +4,8 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { X, Eye, Pencil, Clock } from "lucide-react";
+import { X, Eye, Pencil, Clock, ChevronsUpDown, Check, HardDrive, AlertTriangle } from "lucide-react";
+import * as Popover from "@radix-ui/react-popover";
 import { useAuth } from "@/contexts/auth-context";
 import { communityApi } from "@/lib/api/community";
 import { BLOG_CATEGORIES } from "@/lib/utils/blogCategories";
@@ -37,6 +38,9 @@ export default function NewCommunityPostPage() {
   const [tagInput, setTagInput] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [mode, setMode] = useState<"edit" | "preview">("edit");
+  const [otherCategory, setOtherCategory] = useState("");
+  const [catOpen, setCatOpen] = useState(false);
+  const [catSearch, setCatSearch] = useState("");
 
   useEffect(() => {
     if (!isLoading && !user) router.replace("/login");
@@ -75,7 +79,8 @@ export default function NewCommunityPostPage() {
 
   const submitPost = async () => {
     const plainText = content.replace(/<[^>]+>/g, "").trim();
-    if (!topic.trim() || !category || !plainText) {
+    const effectiveCategory = category === "Other" ? otherCategory.trim() : category;
+    if (!topic.trim() || !effectiveCategory || !plainText) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -84,7 +89,7 @@ export default function NewCommunityPostPage() {
       await communityApi.createPost(user._id, {
         communityPostSlug: slug || slugify(topic.trim()),
         communityPostTopic: topic.trim(),
-        communityPostCategory: category,
+        communityPostCategory: effectiveCategory,
         communityPostContent: content.trim(),
       });
       toast.success("Discussion posted!");
@@ -100,14 +105,18 @@ export default function NewCommunityPostPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    submitPost();
-  };
-
   const authorName = user.fullName ?? user.userName ?? user.email;
+  const effectiveCategoryDisplay = category === "Other" && otherCategory.trim() ? otherCategory.trim() : category;
   const previewReady =
-    topic.trim() && category && content.replace(/<[^>]+>/g, "").trim();
+    topic.trim() && effectiveCategoryDisplay && content.replace(/<[^>]+>/g, "").trim();
+
+  const filteredCategories = catSearch
+    ? BLOG_CATEGORIES.filter((c) => c.toLowerCase().includes(catSearch.toLowerCase()))
+    : BLOG_CATEGORIES;
+
+  const contentBytes = new Blob([content]).size;
+  const contentKb = (contentBytes / 1024).toFixed(1);
+  const sizeWarning = contentBytes > 200 * 1024;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -157,9 +166,9 @@ export default function NewCommunityPostPage() {
       {mode === "preview" && (
         <div className="space-y-6 rounded-xl border border-border bg-card p-6">
           <div>
-            {category && (
+            {effectiveCategoryDisplay && (
               <div className="mb-3">
-                <Badge variant="secondary">{category}</Badge>
+                <Badge variant="secondary">{effectiveCategoryDisplay}</Badge>
               </div>
             )}
             <h2 className="font-serif text-2xl font-semibold leading-snug tracking-tight">
@@ -216,7 +225,7 @@ export default function NewCommunityPostPage() {
 
       {/* ── Edit mode ────────────────────────────────────────── */}
       {mode === "edit" && (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={(e) => { e.preventDefault(); submitPost(); }} className="space-y-6">
           {/* Title */}
           <div className="space-y-1.5">
             <Label htmlFor="topic">Title *</Label>
@@ -268,23 +277,72 @@ export default function NewCommunityPostPage() {
 
           {/* Category + Tags row */}
           <div className="grid gap-4 sm:grid-cols-2">
-            {/* Category */}
+            {/* Category combobox */}
             <div className="space-y-1.5">
-              <Label htmlFor="category">Category *</Label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">Select a category…</option>
-                {BLOG_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <Label>Category *</Label>
+              <Popover.Root open={catOpen} onOpenChange={setCatOpen}>
+                <Popover.Trigger asChild>
+                  <button
+                    type="button"
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <span className={category ? "text-foreground" : "text-muted-foreground"}>
+                      {category || "Select category…"}
+                    </span>
+                    <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
+                  </button>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content
+                    className="z-50 w-(--radix-popover-trigger-width) overflow-hidden rounded-md border border-border bg-popover shadow-md"
+                    sideOffset={4}
+                    align="start"
+                  >
+                    <div className="border-b border-border p-2">
+                      <Input
+                        placeholder="Search categories…"
+                        value={catSearch}
+                        onChange={(e) => setCatSearch(e.target.value)}
+                        className="h-8 text-sm"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="max-h-60 overflow-y-auto p-1">
+                      {filteredCategories.length === 0 ? (
+                        <p className="py-6 text-center text-sm text-muted-foreground">No categories found.</p>
+                      ) : (
+                        filteredCategories.map((cat) => (
+                          <button
+                            key={cat}
+                            type="button"
+                            onClick={() => {
+                              setCategory(cat);
+                              setCatOpen(false);
+                              setCatSearch("");
+                            }}
+                            className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <Check
+                              className={`size-3.5 shrink-0 ${category === cat ? "opacity-100" : "opacity-0"}`}
+                            />
+                            {cat}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+              {category === "Other" && (
+                <div className="mt-2 space-y-1">
+                  <Input
+                    placeholder="Specify your category…"
+                    value={otherCategory}
+                    onChange={(e) => setOtherCategory(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">Required when "Other" is selected.</p>
+                </div>
+              )}
             </div>
 
             {/* Tags */}
@@ -360,6 +418,13 @@ export default function NewCommunityPostPage() {
               placeholder="Describe your question, issue, or idea in detail…"
               minHeight="300px"
             />
+            <div className={`flex min-w-0 flex-1 flex-wrap items-center gap-1.5 pt-0.5 text-xs ${sizeWarning ? "text-amber-500" : "text-muted-foreground"}`}>
+              {sizeWarning ? <AlertTriangle className="size-3.5 shrink-0" /> : <HardDrive className="size-3.5 shrink-0" />}
+              <span className="shrink-0">{contentKb} KB</span>
+              {sizeWarning && (
+                <span className="wrap-break-word">— Large content (inline images inflate size). Consider linking images by URL instead of uploading.</span>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-3">
