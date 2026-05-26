@@ -72,6 +72,10 @@
     "label": "Anthropology"
   },
   {
+    "value": "Apache Spark",
+    "label": "Apache Spark"
+  },
+  {
     "value": "API Development",
     "label": "API Development"
   },
@@ -220,6 +224,10 @@
     "label": "Computer Networks"
   },
   {
+    "value": "Computer Science",
+    "label": "Computer Science"
+  },
+  {
     "value": "Computer Vision",
     "label": "Computer Vision"
   },
@@ -234,6 +242,10 @@
   {
     "value": "Copywriting",
     "label": "Copywriting"
+  },
+  {
+    "value": "Cross-Platform Development",
+    "label": "Cross-Platform Development"
   },
   {
     "value": "Cryptography",
@@ -258,6 +270,10 @@
   {
     "value": "Data Mining",
     "label": "Data Mining"
+  },
+  {
+    "value": "Data Privacy",
+    "label": "Data Privacy"
   },
   {
     "value": "Data Science",
@@ -302,6 +318,10 @@
   {
     "value": "DevOps",
     "label": "DevOps"
+  },
+  {
+    "value": "DevSecOps",
+    "label": "DevSecOps"
   },
   {
     "value": "Digital Marketing",
@@ -368,6 +388,10 @@
     "label": "Express.js"
   },
   {
+    "value": "Figma",
+    "label": "Figma"
+  },
+  {
     "value": "Firebase",
     "label": "Firebase"
   },
@@ -390,6 +414,10 @@
   {
     "value": "Front-end Development",
     "label": "Front-end Development"
+  },
+  {
+    "value": "Functional Programming",
+    "label": "Functional Programming"
   },
   {
     "value": "Game Development",
@@ -450,6 +478,10 @@
   {
     "value": "Human Resources",
     "label": "Human Resources"
+  },
+  {
+    "value": "Image Processing",
+    "label": "Image Processing"
   },
   {
     "value": "Information Security",
@@ -544,6 +576,10 @@
     "label": "Linux"
   },
   {
+    "value": "Low-Code",
+    "label": "Low-Code"
+  },
+  {
     "value": "Machine Learning",
     "label": "Machine Learning"
   },
@@ -570,6 +606,10 @@
   {
     "value": "Microbiology",
     "label": "Microbiology"
+  },
+  {
+    "value": "Microcontrollers",
+    "label": "Microcontrollers"
   },
   {
     "value": "Microservices",
@@ -600,6 +640,10 @@
     "label": "Music Production"
   },
   {
+    "value": "MySQL",
+    "label": "MySQL"
+  },
+  {
     "value": "Nanotechnology",
     "label": "Nanotechnology"
   },
@@ -610,6 +654,14 @@
   {
     "value": "Networking",
     "label": "Networking"
+  },
+  {
+    "value": "Neural Networks",
+    "label": "Neural Networks"
+  },
+  {
+    "value": "No-Code",
+    "label": "No-Code"
   },
   {
     "value": "Next.js",
@@ -776,6 +828,10 @@
     "label": "Redis"
   },
   {
+    "value": "Regular Expressions",
+    "label": "Regular Expressions"
+  },
+  {
     "value": "Reinforcement Learning",
     "label": "Reinforcement Learning"
   },
@@ -856,6 +912,10 @@
     "label": "Software Development"
   },
   {
+    "value": "Software Engineering",
+    "label": "Software Engineering"
+  },
+  {
     "value": "Software Testing",
     "label": "Software Testing"
   },
@@ -900,6 +960,10 @@
     "label": "String"
   },
   {
+    "value": "Svelte",
+    "label": "Svelte"
+  },
+  {
     "value": "Swift",
     "label": "Swift"
   },
@@ -918,6 +982,10 @@
   {
     "value": "TensorFlow",
     "label": "TensorFlow"
+  },
+  {
+    "value": "Terraform",
+    "label": "Terraform"
   },
   {
     "value": "Theology",
@@ -968,6 +1036,10 @@
     "label": "Visual Arts"
   },
   {
+    "value": "Vue.js",
+    "label": "Vue.js"
+  },
+  {
     "value": "Web Analytics",
     "label": "Web Analytics"
   },
@@ -992,6 +1064,10 @@
     "label": "Web Sockets"
   },
   {
+    "value": "Web3",
+    "label": "Web3"
+  },
+  {
     "value": "Wireless Communication",
     "label": "Wireless Communication"
   },
@@ -1002,6 +1078,10 @@
   {
     "value": "Writing",
     "label": "Writing"
+  },
+  {
+    "value": "XML",
+    "label": "XML"
   },
   {
     "value": "YouTube Marketing",
