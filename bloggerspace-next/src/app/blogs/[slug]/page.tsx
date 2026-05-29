@@ -17,7 +17,7 @@ import { formatDate, htmlToText } from "@/lib/utils/html";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/utils/json-ld";
 import { siteConfig } from "@/lib/constants/site";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 type Props = { params: Promise<{ slug: string }> };
 

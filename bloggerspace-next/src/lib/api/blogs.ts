@@ -6,7 +6,7 @@ const LIMIT = 9;
 export async function fetchBlogs(page = 1): Promise<BlogListResponse> {
   try {
     const res = await fetch(`${BASE}/api/blogs/allblogs?page=${page}&limit=${LIMIT}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return empty(page);
     return res.json();
@@ -23,7 +23,7 @@ export async function fetchBlogsByCategory(
     const encoded = encodeURIComponent(category);
     const res = await fetch(
       `${BASE}/api/blogs/allblogs/category/${encoded}?page=${page}&limit=${LIMIT}`,
-      { next: { revalidate: 60 } },
+      { next: { revalidate: 3600 } },
     );
     if (!res.ok) return empty(page);
     return res.json();
@@ -54,7 +54,7 @@ export async function fetchFilteredBlogs({
     if (tag) { params.set("filterType", "tag"); params.set("filterValue", tag); }
     else if (category) { params.set("filterType", "category"); params.set("filterValue", category); }
     const res = await fetch(`${BASE}/api/blogs/fetchallblogs?${params}`, {
-      next: { revalidate: 30 },
+      cache: "no-store",
     });
     if (!res.ok) return empty(page);
     const data = await res.json();
@@ -74,7 +74,7 @@ export async function fetchBlogBySlug(
 ): Promise<{ blog: Blog; alreadyLiked: boolean } | null> {
   try {
     const res = await fetch(`${BASE}/api/blogs/${slug}`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return null;
     return res.json();
@@ -86,7 +86,7 @@ export async function fetchBlogBySlug(
 export async function fetchRelatedBlogs(blogId: number): Promise<Blog[]> {
   try {
     const res = await fetch(`${BASE}/api/blogs/${blogId}/related`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -99,7 +99,7 @@ export async function fetchRelatedBlogs(blogId: number): Promise<Blog[]> {
 export async function fetchTopBlogs(): Promise<Blog[]> {
   try {
     const res = await fetch(`${BASE}/api/blogs/topviewedblogs`, {
-      next: { revalidate: 120 },
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -112,7 +112,7 @@ export async function fetchTopBlogs(): Promise<Blog[]> {
 export async function fetchAdminPublishedBlogs(page = 1): Promise<BlogListResponse> {
   try {
     const res = await fetch(`${BASE}/api/blogs/adminpublished?page=${page}&limit=${LIMIT}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return empty(page);
     return res.json();
@@ -124,7 +124,7 @@ export async function fetchAdminPublishedBlogs(page = 1): Promise<BlogListRespon
 export async function fetchDistinctCategories(): Promise<string[]> {
   try {
     const res = await fetch(`${BASE}/api/blogs/categories`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -137,7 +137,7 @@ export async function fetchDistinctCategories(): Promise<string[]> {
 export async function fetchDistinctTags(): Promise<string[]> {
   try {
     const res = await fetch(`${BASE}/api/blogs/tags`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return [];
     const data = await res.json();

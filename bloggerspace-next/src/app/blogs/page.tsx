@@ -13,6 +13,10 @@ import {
   fetchDistinctTags,
 } from "@/lib/api/blogs";
 
+// Search params make every URL unique — ISR would create a cache entry per
+// query/tag/category combination. SSR is cheaper and gives always-fresh results.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Browse Blogs",
   description: "Discover reviewed, high-quality articles from the BloggerSpace community.",

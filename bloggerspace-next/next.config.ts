@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  allowedDevOrigins: ['192.168.1.38'],
+  allowedDevOrigins: ['192.168.1.38', "192.168.1.55"],
 
   // Baseline security headers. Full CSP is tuned in Phase 13 once we know all
   // third-party origins (AdSense, Sentry, OAuth, etc.).

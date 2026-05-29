@@ -49,7 +49,7 @@ export async function fetchPublicProfile(
     const url = viewerId
       ? `${BASE}/api/users/profile/${username}?viewerId=${viewerId}`
       : `${BASE}/api/users/profile/${username}`;
-    const res = await fetch(url, { next: { revalidate: 60 } });
+    const res = await fetch(url, { next: { revalidate: 3600 } });
     if (!res.ok) return null;
     return res.json();
   } catch {
