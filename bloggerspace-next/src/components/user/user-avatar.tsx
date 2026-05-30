@@ -34,6 +34,8 @@ export function UserAvatar({ src, name, size = "md", className }: Props) {
       <img
         src={picSrc}
         alt={name}
+        draggable={false}
+        onContextMenu={(e) => e.preventDefault()}
         className={cn("rounded-full object-cover shrink-0", wrap, className)}
       />
     );

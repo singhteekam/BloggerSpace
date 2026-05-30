@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { ProtectedImage } from "@/components/ui/protected-image";
 import Link from "next/link";
 import { Mail, ExternalLink } from "lucide-react";
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons/brand-icons";
@@ -61,7 +61,7 @@ export default function AboutDeveloperPage() {
 
         <FadeIn delay={0.05}>
           <div className="mx-auto mb-6 size-24 overflow-hidden rounded-full ring-2 ring-primary/20 sm:size-28">
-            <Image
+            <ProtectedImage
               src="/brand/dev.jpeg"
               alt="Teekam Singh"
               width={112}

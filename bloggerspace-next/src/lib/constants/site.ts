@@ -9,7 +9,7 @@ export const siteConfig = {
   ogImage: "/brand/og-default.png",
   author: {
     name: "Teekam Singh",
-    url: process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? "https://teekam.web.app",
+    url: process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? "https://portfolio.singhteekam.in",
     email: "singhteekam.in@gmail.com",
   },
   keywords: [

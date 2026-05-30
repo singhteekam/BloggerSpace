@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { ProtectedImage } from "@/components/ui/protected-image";
 import { Globe, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,43 +25,50 @@ export function DeveloperSection() {
           <Card className="overflow-hidden">
             <div className="grid grid-cols-1 divide-y divide-border md:grid-cols-2 md:divide-x md:divide-y-0">
               {/* Left — bio */}
-              <div className="p-8">
-                <div className="mb-5 flex items-center gap-4">
-                  <div className="relative size-16 shrink-0 overflow-hidden rounded-full ring-2 ring-primary/20">
-                    <Image
-                      src="/brand/dev.jpeg"
-                      alt="Teekam Singh"
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
+              <div className="flex flex-col justify-between gap-6 p-8">
+                <div>
+                  <div className="mb-5 flex items-center gap-4">
+                    <div className="relative size-16 shrink-0 overflow-hidden rounded-full ring-2 ring-primary/20">
+                      <ProtectedImage
+                        src="/brand/dev.jpeg"
+                        alt="Teekam Singh"
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-xl font-semibold">Teekam Singh</h3>
+                      <p className="text-sm text-muted-foreground">Full-stack developer</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-serif text-xl font-semibold">Teekam Singh</h3>
-                    <p className="text-sm text-muted-foreground">Full-stack developer</p>
-                  </div>
+
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    Hi, I&apos;m Teekam Singh — building and maintaining BloggerSpace, adding new
+                    features, fixing bugs, and keeping the server running 24×7. It would be a
+                    great help if you explore the site and share your feedback.
+                  </p>
                 </div>
 
-                <p className="text-sm leading-7 text-muted-foreground">
-                  Hi, I&apos;m Teekam Singh — building and maintaining BloggerSpace, adding new
-                  features, fixing bugs, and keeping the server running 24×7. It would be a
-                  great help if you explore the site and share your feedback.
-                </p>
-
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <Button asChild size="sm" variant="outline" className="gap-1.5">
-                    <Link href={siteConfig.author.url} target="_blank" rel="noopener noreferrer">
-                      <Globe className="size-3.5" />
-                      Portfolio
-                    </Link>
-                  </Button>
-                  {DEVELOPER_SOCIALS.map(({ href, icon: Icon, label }) => (
-                    <Button key={label} asChild size="sm" variant="ghost" className="size-9 p-0">
-                      <Link href={href} target="_blank" rel="noopener noreferrer" aria-label={label}>
-                        <Icon className="size-4" />
+                <div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button asChild size="sm" variant="outline" className="gap-1.5">
+                      <Link href={siteConfig.author.url} target="_blank" rel="noopener noreferrer">
+                        <Globe className="size-3.5" />
+                        Portfolio
                       </Link>
                     </Button>
-                  ))}
+                    {DEVELOPER_SOCIALS.map(({ href, icon: Icon, label }) => (
+                      <Button key={label} asChild size="sm" variant="ghost" className="size-9 p-0">
+                        <Link href={href} target="_blank" rel="noopener noreferrer" aria-label={label}>
+                          <Icon className="size-4" />
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    Open to freelance, collaboration, and feedback — feel free to reach out.
+                  </p>
                 </div>
               </div>
 
@@ -84,12 +91,14 @@ export function DeveloperSection() {
                             Live demo
                           </Link>
                         </Button>
-                        <Button asChild size="sm" variant="ghost" className="h-7 gap-1 text-xs">
-                          <Link href={source} target="_blank" rel="noopener noreferrer">
-                            <GitHubIcon size={12} className="size-3" />
-                            Source
-                          </Link>
-                        </Button>
+                        {source && (
+                          <Button asChild size="sm" variant="ghost" className="h-7 gap-1 text-xs">
+                            <Link href={source} target="_blank" rel="noopener noreferrer">
+                              <GitHubIcon size={12} className="size-3" />
+                              Source
+                            </Link>
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ))}

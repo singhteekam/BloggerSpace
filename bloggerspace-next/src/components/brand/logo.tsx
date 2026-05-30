@@ -20,6 +20,7 @@ export function Logo({ variant = "lockup", className, size = 32 }: LogoProps) {
           width={size}
           height={size}
           className="shrink-0"
+          draggable={false}
           priority
         />
       )}

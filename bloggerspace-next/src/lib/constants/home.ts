@@ -1,9 +1,8 @@
 import type { ComponentType } from "react";
 import {
-  ArrowRight, Sparkles, ShieldCheck, BookOpen, Users, Pencil,
-  MessageSquare, Star, Mail, ExternalLink,
-  CheckCircle2, Globe, Gem,
-  TrendingUp, Gift,
+  ShieldCheck, BookOpen, Users, Pencil,
+  MessageSquare, Star, Mail,
+  Gem, TrendingUp, Gift,
 } from "lucide-react";
 import {
   SiNextdotjs, SiReact, SiTypescript, SiTailwindcss,
@@ -159,7 +158,17 @@ export const DEVELOPER_SOCIALS: { href: string; icon: IconType; label: string }[
   { href: "https://www.instagram.com/singh__teekam/",   icon: InstagramIcon, label: "Instagram" },
 ];
 
-export const DEVELOPER_PROJECTS = [
+export const DEVELOPER_PROJECTS: {
+  name: string;
+  description: string;
+  demo: string;
+  source?: string;
+}[] = [
+  {
+    name: "GameStation",
+    description: "Online games hub",
+    demo: "https://games.singhteekam.in/",
+  },
   {
     name: "BrainQuiz",
     description: "KBC-style quiz game",

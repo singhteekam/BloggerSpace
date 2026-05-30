@@ -1,6 +1,19 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Prevent image drag, save, and selection site-wide */
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+/* Re-enable pointer events only where images need to be clickable */
+a img, button img, [role="button"] img {
+  pointer-events: auto;
+}
+
 /* Tailwind v4 defaults dark: to prefers-color-scheme. Re-bind it to the
    .dark class so our theme toggle controls all dark: utilities. */
 @custom-variant dark (&:where(.dark, .dark *));
