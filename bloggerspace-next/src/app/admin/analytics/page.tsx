@@ -6,7 +6,7 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
   BarChart2, Monitor, Smartphone, Tablet, RefreshCw, Link2, Clock, Eye, Users,
-  Globe, Chrome, MonitorSmartphone, Search, X, ChevronLeft, ChevronRight, Trash2,
+  Globe, MonitorSmartphone, Search, X, ChevronLeft, ChevronRight, Trash2,
   Loader2, MapPin, Activity, ListFilter,
 } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
@@ -185,7 +185,7 @@ function OverviewTab({ userId }: { userId: string }) {
         <BreakdownCard icon={<MapPin className="size-4 text-rose-500" />} title="Top Countries" scope
           empty="No country data yet."
           items={countries.map((c) => ({ label: `${flag(c.country)} ${c.country}`, count: c.count }))} total={totalViews} />
-        <BreakdownCard icon={<Chrome className="size-4 text-amber-500" />} title="Browsers" scope
+        <BreakdownCard icon={<Globe className="size-4 text-amber-500" />} title="Browsers" scope
           items={browsers.map((b) => ({ label: b.browser, count: b.count }))} total={totalViews} />
         <BreakdownCard icon={<MonitorSmartphone className="size-4 text-teal-500" />} title="Operating Systems" scope
           items={os.map((o) => ({ label: o.os, count: o.count }))} total={totalViews} />
