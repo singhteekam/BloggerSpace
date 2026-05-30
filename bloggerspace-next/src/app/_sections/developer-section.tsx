@@ -67,7 +67,7 @@ export function DeveloperSection() {
                     ))}
                   </div>
                   <p className="mt-4 text-xs text-muted-foreground">
-                    Open to freelance, collaboration, and feedback — feel free to reach out.
+                    Open to collaboration and feedback — feel free to reach out.
                   </p>
                 </div>
               </div>

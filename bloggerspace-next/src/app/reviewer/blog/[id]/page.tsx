@@ -23,11 +23,10 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/utils/html";
-import categoryData from "@/data/blogCategory.json";
-import tagsData from "@/data/blogTags.json";
+import { BLOG_CATEGORIES, BLOG_TAGS } from "@/lib/utils/blogCategories";
 
-const CATEGORIES = (categoryData as { value: string; label: string }[]).map((c) => c.value);
-const ALL_TAGS = tagsData as string[];
+const CATEGORIES = BLOG_CATEGORIES;
+const ALL_TAGS = BLOG_TAGS;
 
 function toSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-").replace(/-+/g, "-");

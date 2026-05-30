@@ -18,7 +18,7 @@ export function TechStackSection() {
             {TECH_STACK.map(({ label, Icon, iconColor }) => (
               <div
                 key={label}
-                className="flex flex-col items-center gap-2 opacity-60 transition-opacity duration-200 hover:opacity-100"
+                className="flex flex-col items-center gap-2 opacity-80 transition-opacity duration-200 hover:opacity-100"
               >
                 <Icon size={28} className={iconColor} />
                 <span className="text-xs font-medium text-muted-foreground">{label}</span>

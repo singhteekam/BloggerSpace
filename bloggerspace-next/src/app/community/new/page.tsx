@@ -8,16 +8,15 @@ import { X, Eye, Pencil, Clock, ChevronsUpDown, Check, HardDrive, AlertTriangle 
 import * as Popover from "@radix-ui/react-popover";
 import { useAuth } from "@/contexts/auth-context";
 import { communityApi } from "@/lib/api/community";
-import { BLOG_CATEGORIES } from "@/lib/utils/blogCategories";
+import { BLOG_CATEGORIES, BLOG_TAGS } from "@/lib/utils/blogCategories";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import tagsData from "@/data/blogTags.json";
 
-const ALL_TAGS = tagsData as string[];
+const ALL_TAGS = BLOG_TAGS;
 
 function slugify(text: string) {
   return text

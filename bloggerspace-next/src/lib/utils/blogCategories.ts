@@ -1,40 +1,10 @@
-export const BLOG_CATEGORIES = [
-  "3D Animation","3D Modeling","3D Printing","Accounting","ActionScript","Advertising",
-  "Aerospace Engineering","Agile Methodologies","AI Ethics","AI Tools","Algorithm Design",
-  "Amazon Web Services (AWS)","Analytics","Android Development","Angular","Animation",
-  "Anthropology","API Development","App Development","Arduino","Array","Art",
-  "Artificial Intelligence","Astrophysics","Astronomy","Augmented Reality","Automation","Azure",
-  "Back-end Development","Big Data","Bioinformatics","Biology","Biotechnology","Blockchain",
-  "Blogging","Branding","Business Analysis","Business Development","C","C#","C++","Calculus",
-  "Chemistry","Cloud Computing","Cloud Security","Computer Architecture","Computer Graphics",
-  "Computer Networks","Computer Vision","Content Creation","Content Management Systems",
-  "Copywriting","Cryptography","CSS","Cybersecurity","Data Analytics","Data Engineering",
-  "Data Mining","Data Science","Data Structures and Algorithms","Database Administration",
-  "Database Design","Dart","Deep Learning","Design Patterns","Design Thinking","DevOps",
-  "Digital Marketing","Digital Signal Processing","Django","Docker","E-commerce","Economics",
-  "Electrical Engineering","Embedded Systems","English Grammar","Entrepreneurship",
-  "Ethical Hacking","Excel","Firebase","Finite Element Analysis","Finance","Financial Modeling",
-  "Game Development","Genetics","Geography","Git","Graphic Design","Hadoop","Health & Wellness",
-  "Holography","HTML","Human Resources","Information Security","Information Systems",
-  "Internet of Things","Interview Experience","Interview Questions","iOS Development",
-  "IT Management","Java","JavaScript","Jenkins","JIRA","Joomla","Journalism","Kotlin",
-  "Kubernetes","Laravel","Linear Algebra","Linked List","Machine Learning","Marketing",
-  "Mathematics","Mechanical Engineering","Media Studies","Meteorology","Microbiology",
-  "Microservices","MERN Stack","Mobile App Testing","Mobile Development","MongoDB",
-  "Motivational","Music Production","Nanotechnology","Natural Language Processing","Networking",
-  "Next.js","Node.js","Nuclear Physics","Numerical Methods","Object-Oriented Programming",
-  "Operating Systems","Oracle","Parallel Computing","Particle Physics","Penetration Testing",
-  "Personal Development","Philosophy","Photography","Physical Education","Physics","PHP",
-  "Pinterest Marketing","Podcasting","Power BI","Predictive Analytics","Product Management",
-  "Programming Languages","Project Management","Psychology","Public Relations","Python",
-  "Queue","Quantum Computing","Quantum Mechanics","R Programming","React Native","React.js",
-  "Recruitment","Relational Databases","Religious","Religious Studies","Renewable Energy",
-  "Robotics","Ruby on Rails","Sales","Scala","Science","Scriptwriting",
-  "Search Engine Optimization (SEO)","Self-Driving Cars","Serverless Computing",
-  "Social Media Marketing","Software Architecture","Software Development","Software Testing",
-  "Solar Energy","SQL","Stack","Startups","Statistical Analysis","Statistics","Stock Market",
-  "String","Swift","System Design","System Security","TensorFlow","Theology","TypeScript",
-  "UI/UX Design","Unix","Urban Planning","User Experience","VFX","Virtual Reality",
-  "Visual Arts","Web Analytics","Web Development","Web Scraping","Web Security",
-  "Wireless Communication","WordPress","Writing","YouTube Marketing","Zoology","Other",
-] as const;
+import categoryData from "@/data/blogCategory.json";
+import tagsData from "@/data/blogTags.json";
+
+/** All blog categories as a plain string array. Single source of truth. */
+export const BLOG_CATEGORIES: string[] = (
+  categoryData as { value: string; label: string }[]
+).map((c) => c.value);
+
+/** All blog tags as a plain string array. Single source of truth. */
+export const BLOG_TAGS: string[] = tagsData as string[];

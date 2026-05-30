@@ -137,14 +137,14 @@ export const SCORE_BREAKDOWN_CARDS: { icon: IconType; iconClassName: string; bg:
 
 // ── Tech stack ───────────────────────────────────────────────────────────────
 export const TECH_STACK: { label: string; Icon: IconType; iconColor: string }[] = [
-  { label: "Next.js",      Icon: SiNextdotjs,     iconColor: "text-foreground" },
+  { label: "Next.js",      Icon: SiNextdotjs,     iconColor: "text-gray-800 dark:text-gray-100" },
   { label: "React 19",     Icon: SiReact,         iconColor: "text-sky-500" },
   { label: "TypeScript",   Icon: SiTypescript,    iconColor: "text-blue-500" },
-  { label: "Tailwind CSS", Icon: SiTailwindcss,   iconColor: "text-cyan-400" },
-  { label: "Node.js",      Icon: SiNodedotjs,     iconColor: "text-green-500" },
-  { label: "Express",      Icon: SiExpress,       iconColor: "text-muted-foreground" },
-  { label: "MongoDB",      Icon: SiMongodb,       iconColor: "text-emerald-500" },
-  { label: "Vercel",       Icon: SiVercel,        iconColor: "text-foreground" },
+  { label: "Tailwind CSS", Icon: SiTailwindcss,   iconColor: "text-cyan-500" },
+  { label: "Node.js",      Icon: SiNodedotjs,     iconColor: "text-green-600" },
+  { label: "Express",      Icon: SiExpress,       iconColor: "text-gray-600 dark:text-gray-300" },
+  { label: "MongoDB",      Icon: SiMongodb,       iconColor: "text-emerald-600" },
+  { label: "Vercel",       Icon: SiVercel,        iconColor: "text-gray-800 dark:text-gray-100" },
   { label: "Firebase",     Icon: SiFirebase,      iconColor: "text-orange-400" },
   { label: "JWT",          Icon: SiJsonwebtokens, iconColor: "text-pink-500" },
   { label: "Axios",        Icon: SiAxios,         iconColor: "text-purple-400" },

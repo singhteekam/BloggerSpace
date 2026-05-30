@@ -20,10 +20,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BLOG_CATEGORIES } from "@/lib/utils/blogCategories";
-import tagsData from "@/data/blogTags.json";
+import { BLOG_CATEGORIES, BLOG_TAGS } from "@/lib/utils/blogCategories";
 
-const ALL_TAGS = tagsData as string[];
+const ALL_TAGS = BLOG_TAGS;
 
 function toSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-").replace(/-+/g, "-");
