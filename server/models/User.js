@@ -91,6 +91,19 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  // Periodic re-verification fields
+  lastVerifiedAt: {
+    type: Date,
+    default: null,
+  },
+  reverifyAttempts: {
+    type: Number,
+    default: 0,
+  },
+  reverifyLockedUntil: {
+    type: Date,
+    default: null,
+  },
   createdAt: {
     type: Date,
     // default: Date.now,

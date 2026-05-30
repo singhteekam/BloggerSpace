@@ -38,6 +38,8 @@ const {
   forgotPasswordRequestOtp,
   forgotPasswordVerifyOtp,
   forgotPasswordReset,
+  sendReverifyOtp,
+  verifyReverifyOtp,
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
@@ -80,6 +82,10 @@ router.post("/login-otp/verify", verifyLoginOtp);
 // Forgot password via OTP (replaces email-link flow)
 router.post("/forgot-password/request-otp", forgotPasswordRequestOtp);
 router.post("/forgot-password/verify-otp", forgotPasswordVerifyOtp);
+
+// Periodic re-verification (Email-auth users only)
+router.post("/reverify-otp/send", sendReverifyOtp);
+router.post("/reverify-otp/verify", verifyReverifyOtp);
 router.post("/forgot-password/reset", forgotPasswordReset);
 
 // Login with Google

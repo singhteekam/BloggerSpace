@@ -20,6 +20,8 @@ const EDITABLE_FIELDS = [
   "perBlogReviewerGemsCap",
   // Scoring
   "maxBlogScore",
+  // Re-verification
+  "reverificationPeriodDays",
   // Maintenance
   "maintenanceMode",
 ];
@@ -100,6 +102,9 @@ exports.updateAdminConfig = async (req, res) => {
     }
     if (merged.minGrantGems > merged.maxGrantGems) {
       return res.status(400).json({ message: "minGrantGems must be ≤ maxGrantGems" });
+    }
+    if (updates.reverificationPeriodDays !== undefined && updates.reverificationPeriodDays < 1) {
+      return res.status(400).json({ message: "reverificationPeriodDays must be at least 1" });
     }
 
     updates.updatedAt = new Date(new Date().getTime() + IST_OFFSET * 60000);

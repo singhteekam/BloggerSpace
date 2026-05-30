@@ -794,7 +794,7 @@ exports.fetchAllUsers= async(req, res)=>{
   try {
     // Return ACTIVE and INACTIVE users so admin can see and reactivate deactivated accounts
     const allUsers = await User.find({ status: { $in: ["ACTIVE", "INACTIVE"] } })
-      .select("fullName userName email status isVerified role reviewerStatus gems createdAt")
+      .select("fullName userName email status isVerified role reviewerStatus gems createdAt authType lastLogin lastVerifiedAt reverifyAttempts")
       .lean();
     res.json(allUsers);
   } catch (error) {

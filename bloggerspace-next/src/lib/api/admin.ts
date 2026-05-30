@@ -43,6 +43,9 @@ export type ReviewerItem = {
   createdAt: string;
   reviewedBlogs: unknown[];
   gems?: number;
+  authType?: string;
+  lastLogin?: string;
+  lastVerifiedAt?: string | null;
 };
 
 export type UserItem = {
@@ -55,6 +58,10 @@ export type UserItem = {
   role?: string;
   createdAt: string;
   gems?: number;
+  authType?: string;
+  lastLogin?: string;
+  lastVerifiedAt?: string | null;
+  reverifyAttempts?: number;
 };
 
 export type CommunityPost = {
@@ -534,6 +541,8 @@ export type AdminConfigDoc = {
   perBlogReviewerGemsCap: number;
   // Scoring
   maxBlogScore: number;
+  // Re-verification
+  reverificationPeriodDays: number;
   // Maintenance
   maintenanceMode: boolean;
   // Audit

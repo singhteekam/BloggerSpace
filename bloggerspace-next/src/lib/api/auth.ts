@@ -37,6 +37,13 @@ export type OtpRequiredResponse = {
   info: string;
 };
 
+/** Returned by POST /api/users/login when periodic re-verification is due */
+export type ReverificationRequiredResponse = {
+  message: "reverification_required";
+  email: string;
+  info: string;
+};
+
 /** Returned by POST /api/users/verify-otp on success — logs the user in */
 export type VerifyOtpResponse = {
   message: string;
@@ -73,6 +80,13 @@ export const authApi = {
 
   forgotPasswordReset: (resetToken: string, newPassword: string) =>
     api.post<{ message: string }>("/api/users/forgot-password/reset", { resetToken, newPassword }),
+
+  // Periodic re-verification (email/password users only)
+  sendReverifyOtp: (email: string) =>
+    api.post<{ message: string; info: string }>("/api/users/reverify-otp/send", { email }),
+
+  verifyReverifyOtp: (email: string, otp: string) =>
+    api.post<AuthResponse>("/api/users/reverify-otp/verify", { email, otp }),
 
   // Legacy link-based forgot password (kept for backward compat)
   forgotPassword: (email: string) =>

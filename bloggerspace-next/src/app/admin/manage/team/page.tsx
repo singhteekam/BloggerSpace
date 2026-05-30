@@ -6,7 +6,7 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
   Users, UserCheck, UserX, Loader2, Trash2, Clock, Ban, ShieldCheck, Search, X, Eye, Gem,
-  RotateCcw, AlertCircle,
+  RotateCcw, AlertCircle, LogIn,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useMemo } from "react";
@@ -330,6 +330,7 @@ function ReviewerCard({ reviewer, children }: { reviewer: ReviewerItem; children
               {reviewer.reviewerStatus}
             </Badge>
           )}
+          {reviewer.authType && <AuthTypeBadge authType={reviewer.authType} />}
         </div>
         <p className="text-xs text-muted-foreground">
           <Link href={`/admin/manage/team/${reviewer._id}`} className="hover:text-primary transition-colors">@{reviewer.userName}</Link>
@@ -338,7 +339,9 @@ function ReviewerCard({ reviewer, children }: { reviewer: ReviewerItem; children
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
           {reviewer.reviewedBlogs?.length ?? 0} blogs reviewed · Joined {formatDate(reviewer.createdAt)}
+          {reviewer.lastLogin && <> · <LogIn className="size-3 inline mr-0.5" />Last login {formatDate(reviewer.lastLogin)}</>}
         </p>
+        <ReverifyLine authType={reviewer.authType} lastVerifiedAt={reviewer.lastVerifiedAt} />
         {typeof reviewer.gems === "number" && (
           <p className="text-xs text-primary font-medium mt-1 flex items-center gap-1">
             <Gem className="size-3" />{reviewer.gems} gems
@@ -380,6 +383,7 @@ function UserCard({ user, children }: { user: UserItem; children: React.ReactNod
           {user.role && user.role !== "user" && (
             <Badge variant="secondary" className="text-xs h-5 px-1.5 capitalize">{user.role}</Badge>
           )}
+          {user.authType && <AuthTypeBadge authType={user.authType} />}
         </div>
         <p className="text-xs text-muted-foreground">
           <Link href={`/admin/manage/team/${user._id}`} className="hover:text-primary transition-colors">@{user.userName}</Link>
@@ -388,7 +392,9 @@ function UserCard({ user, children }: { user: UserItem; children: React.ReactNod
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
           <Clock className="size-3 inline mr-1" />Joined {formatDate(user.createdAt)}
+          {user.lastLogin && <> · <LogIn className="size-3 inline mr-0.5" />Last login {formatDate(user.lastLogin)}</>}
         </p>
+        <ReverifyLine authType={user.authType} lastVerifiedAt={user.lastVerifiedAt} />
         {typeof user.gems === "number" && (
           <p className="text-xs text-primary font-medium mt-1 flex items-center gap-1">
             <Gem className="size-3" />{user.gems} gems
@@ -402,6 +408,51 @@ function UserCard({ user, children }: { user: UserItem; children: React.ReactNod
         {children}
       </div>
     </div>
+  );
+}
+
+function AuthTypeBadge({ authType }: { authType: string }) {
+  const map: Record<string, string> = {
+    Email:  "text-slate-600 border-slate-300 dark:text-slate-300 dark:border-slate-600",
+    Google: "text-blue-600 border-blue-300 dark:text-blue-400 dark:border-blue-700",
+    Github: "text-purple-600 border-purple-300 dark:text-purple-400 dark:border-purple-700",
+  };
+  const cls = map[authType] ?? map.Email;
+  return (
+    <Badge variant="outline" className={`text-xs h-5 px-1.5 ${cls}`}>
+      {authType}
+    </Badge>
+  );
+}
+
+// Shows the re-verification clock for Email/password users (the only ones it applies to).
+// OAuth users auto-refresh on every login, so the clock is not meaningful for them.
+function ReverifyLine({ authType, lastVerifiedAt }: { authType?: string; lastVerifiedAt?: string | null }) {
+  const isEmailAuth = !authType || authType === "Email";
+  if (!isEmailAuth) {
+    return (
+      <p className="text-xs text-muted-foreground mt-0.5">
+        <ShieldCheck className="size-3 inline mr-1 text-green-600 dark:text-green-400" />
+        Auto-verified via {authType}
+      </p>
+    );
+  }
+
+  if (!lastVerifiedAt) {
+    return (
+      <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+        <AlertCircle className="size-3 inline mr-1" />
+        Never re-verified
+      </p>
+    );
+  }
+
+  const daysAgo = Math.floor((Date.now() - new Date(lastVerifiedAt).getTime()) / 86_400_000);
+  return (
+    <p className="text-xs text-muted-foreground mt-0.5">
+      <ShieldCheck className="size-3 inline mr-1" />
+      Last verified {formatDate(lastVerifiedAt)} ({daysAgo}d ago)
+    </p>
   );
 }
 

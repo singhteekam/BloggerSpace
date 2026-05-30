@@ -42,6 +42,7 @@ export const ROUTES = {
   FORGOT_PASSWORD:    "/forgotpassword",
   RESET_PASSWORD:     "/resetpassword",
   VERIFY_OTP:         "/verify-otp",
+  REVERIFY:           "/reverify",
   AUTH_SUCCESS:       "/auth-success",
 
   // ── BloggerSpace Platform (user dashboard) ─────────────────────────────────

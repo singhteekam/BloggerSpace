@@ -47,19 +47,17 @@ passport.use(
         console.log(password);
 
         user = new User({
-          // googleId: profile.id,
           fullName: profile.displayName,
           userName: profile.emails[0].value
             .substring(0, profile.emails[0].value.indexOf("@"))
             .replace(/[^a-zA-Z0-9 ]/g, ""),
           email: profile.emails[0].value,
-          profilePicture: Buffer.from(response.data, "binary").toString(
-            "base64"
-          ),
+          profilePicture: Buffer.from(response.data, "binary").toString("base64"),
           password: await bcrypt.hash(password, 10),
           isVerified: profile.emails[0].verified,
           authType: "Google",
           status: "ACTIVE",
+          lastVerifiedAt: new Date(),
         });
         await user.save();
 
@@ -101,11 +99,10 @@ passport.use(
           user.userName= profile.emails[0].value
             .substring(0, profile.emails[0].value.indexOf("@"))
             .replace(/[^a-zA-Z0-9 ]/g, "");
-          user.profilePicture= Buffer.from(response.data, "binary").toString(
-            "base64"
-          );
+          user.profilePicture= Buffer.from(response.data, "binary").toString("base64");
           user.isVerified= profile.emails[0].verified;
           user.authType= "Google";
+          user.lastVerifiedAt = new Date();
         await user.save();
 
       const receiver = profile.emails[0].value;
@@ -169,19 +166,17 @@ passport.use(
         console.log(password);
 
         user = new User({
-          // googleId: profile.id,
           fullName: profile.displayName,
           userName: emailResponse.data[0].email
             .substring(0, emailResponse.data[0].email.indexOf("@"))
             .replace(/[^a-zA-Z0-9 ]/g, ""),
           email: emailResponse.data[0].email,
-          profilePicture: Buffer.from(response.data, "binary").toString(
-            "base64"
-          ),
+          profilePicture: Buffer.from(response.data, "binary").toString("base64"),
           password: await bcrypt.hash(password, 10),
           isVerified: "true",
           authType: "Github",
           status: "ACTIVE",
+          lastVerifiedAt: new Date(),
         });
         await user.save();
 
@@ -223,11 +218,10 @@ passport.use(
         user.userName= emailResponse.data[0].email
           .substring(0, emailResponse.data[0].email.indexOf("@"))
           .replace(/[^a-zA-Z0-9 ]/g, "");
-        user.profilePicture= Buffer.from(response.data, "binary").toString(
-          "base64"
-        );
+        user.profilePicture= Buffer.from(response.data, "binary").toString("base64");
         user.isVerified= "true";
         user.authType= "Github";
+        user.lastVerifiedAt = new Date();
       await user.save();
 
     const receiver = emailResponse.data[0].email;

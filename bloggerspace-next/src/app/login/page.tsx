@@ -75,6 +75,15 @@ export default function LoginPage() {
           router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`);
           return;
         }
+        if (err.response?.status === 403 && msg === "reverification_required") {
+          toast.info("Periodic re-verification required. A code has been sent to your email.");
+          router.push(`/reverify?email=${encodeURIComponent(data.email)}`);
+          return;
+        }
+        if (err.response?.status === 403 && msg === "reverify_locked") {
+          toast.error("Too many failed attempts. Please try again in 30 minutes.");
+          return;
+        }
         if (err.response?.status === 403 && msg === "account_deactivated") {
           toast.error("Your account has been deactivated. Please contact support.");
           return;

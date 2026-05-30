@@ -31,6 +31,10 @@ const adminConfigSchema = new mongoose.Schema({
   // ── Scoring ─────────────────────────────────────────────────
   maxBlogScore: { type: Number, default: 10, min: 1 },
 
+  // ── Periodic re-verification ────────────────────────────────────
+  // Days before an Email-auth user must re-verify. OAuth users auto-refresh on login.
+  reverificationPeriodDays: { type: Number, default: 30, min: 1 },
+
   // ── Maintenance mode ───────────────────────────────────────────
   maintenanceMode: { type: Boolean, default: false },
 

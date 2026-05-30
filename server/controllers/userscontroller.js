@@ -13,6 +13,20 @@ const validateUsername = require("../utils/validateUsername");
 const Visit = require("../models/Visitor");
 const logger = require("./../utils/Logging/logs");
 const passport = require("../services/passportAuth.js");
+const AdminConfig = require("../models/AdminConfig");
+
+// ── Re-verification helpers ───────────────────────────────────────────────────
+const REVERIFY_MAX_ATTEMPTS = 5;
+const REVERIFY_LOCKOUT_MS   = 30 * 60 * 1000; // 30 minutes
+
+let _configCache = { value: null, expiresAt: 0 };
+async function getReverificationPeriod() {
+  if (_configCache.value && Date.now() < _configCache.expiresAt) return _configCache.value;
+  const config = await AdminConfig.findOne({}).lean();
+  const period = config?.reverificationPeriodDays ?? 30;
+  _configCache = { value: period, expiresAt: Date.now() + 60_000 };
+  return period;
+}
 const { uploadImageToGitHub } = require("../utils/uploadImageToGitHub");
 const PDFDocument = require('pdfkit');
 
@@ -238,6 +252,34 @@ exports.login = async (req, res) => {
       });
     }
 
+    // ── Periodic re-verification gate (Email auth only) ──────────────
+    const periodDays = await getReverificationPeriod();
+    const lastVerified = user.lastVerifiedAt;
+    const daysSince = lastVerified
+      ? (Date.now() - new Date(lastVerified).getTime()) / 86_400_000
+      : Infinity;
+
+    if (daysSince > periodDays) {
+      // Check lockout from previous failed re-verification attempts
+      if (user.reverifyLockedUntil && new Date() < new Date(user.reverifyLockedUntil)) {
+        return res.status(403).json({
+          message: "reverify_locked",
+          info: "Too many failed verification attempts. Please try again later.",
+          lockedUntil: user.reverifyLockedUntil,
+        });
+      }
+
+      // Don't issue a JWT. The /reverify page will request the OTP on mount
+      // (single source of truth for sending — avoids duplicate emails).
+      logger.info("Login blocked — re-verification required: " + user.email);
+      return res.status(403).json({
+        message: "reverification_required",
+        email: user.email,
+        info: `Your account requires periodic re-verification every ${periodDays} days.`,
+      });
+    }
+    // ──────────────────────────────────────────────────────────────────
+
     // Updating user's last login
     const previousLogin = user.lastLogin;
     user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
@@ -323,6 +365,7 @@ exports.verifyOtp = async (req, res) => {
     user.status = "ACTIVE";
     user.otpCode = null;
     user.otpExpiry = null;
+    user.lastVerifiedAt = new Date(); // start the re-verification clock
     user.lastLogin = new Date(new Date().getTime() + 330 * 60000); // IST
     await user.save();
 
@@ -1143,9 +1186,10 @@ exports.authPassportCallback = async (req, res) => {
           return res.redirect(`${process.env.FRONTEND_URL}/login`);
         }
 
-        // updating last login
+        // Update last login + lastVerifiedAt (OAuth login counts as verification)
         const previousLogin = user.lastLogin;
         user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
+        user.lastVerifiedAt = new Date();
         await user.save();
 
         // Use CURRENT_JWT_SECRET so /api/users/userinfo (which verifies with CURRENT_JWT_SECRET) can decode it.
@@ -1413,9 +1457,11 @@ exports.verifyLoginOtp = async (req, res) => {
       return res.status(403).json({ message: "Your reviewer application is still pending admin approval." });
     }
 
-    // Clear OTP and update last login
+    // Clear OTP and update last login + re-verification clock
+    // (passwordless OTP login proves email ownership = re-verification)
     user.otpCode = null;
     user.otpExpiry = null;
+    user.lastVerifiedAt = new Date();
     user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
     await user.save();
 
@@ -1555,6 +1601,7 @@ exports.forgotPasswordReset = async (req, res) => {
     user.password = await bcrypt.hash(newPassword, 10);
     user.resetToken = null;
     user.resetTokenExpiration = null;
+    user.lastVerifiedAt = new Date(); // OTP-based reset proves email ownership
     await user.save();
 
     sendEmail(user.email, "Your BloggerSpace password has been changed", `
@@ -1570,5 +1617,145 @@ exports.forgotPasswordReset = async (req, res) => {
   } catch (error) {
     logger.error("forgotPasswordReset failed: " + error.message);
     res.status(500).json({ message: "Password reset failed.", error: error.message });
+  }
+};
+
+// ── Periodic re-verification OTP ─────────────────────────────────────────────
+
+// Send re-verification OTP (called when user is redirected to /reverify)
+exports.sendReverifyOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required." });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found." });
+    if (!user.isVerified || user.status === "INACTIVE") {
+      return res.status(403).json({ message: "Account is not eligible for re-verification." });
+    }
+
+    // Check lockout
+    if (user.reverifyLockedUntil && new Date() < new Date(user.reverifyLockedUntil)) {
+      return res.status(429).json({
+        message: "reverify_locked",
+        info: "Too many failed attempts. Please try again later.",
+        lockedUntil: user.reverifyLockedUntil,
+      });
+    }
+
+    const otp = generateOtp();
+    user.otpCode = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    const periodDays = await getReverificationPeriod();
+    sendEmail(user.email, "BloggerSpace — Account Re-verification Code", `
+      <div class="content">
+        <h2>Hi ${user.fullName},</h2>
+        <p>Enter the code below to re-verify your BloggerSpace account.</p>
+        <div class="otp-code">${otp}</div>
+        <div class="info-box">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</div>
+        <p class="text-muted">This is a routine security check required every ${periodDays} days.</p>
+      </div>
+    `).catch((err) => logger.error("Failed to send re-verification OTP: " + err));
+
+    logger.info("Re-verification OTP sent: " + email);
+    return res.status(200).json({ message: "otp_sent", info: "A re-verification code has been sent to your email." });
+  } catch (error) {
+    logger.error("sendReverifyOtp failed: " + error.message);
+    res.status(500).json({ message: "Failed to send OTP.", error: error.message });
+  }
+};
+
+// Verify re-verification OTP and issue JWT
+exports.verifyReverifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ message: "Email and OTP are required." });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found." });
+    if (!user.isVerified || user.status === "INACTIVE") {
+      return res.status(403).json({ message: "Account is not eligible for re-verification." });
+    }
+
+    // Check lockout
+    if (user.reverifyLockedUntil && new Date() < new Date(user.reverifyLockedUntil)) {
+      return res.status(429).json({
+        message: "reverify_locked",
+        info: "Too many failed attempts. Please try again later.",
+        lockedUntil: user.reverifyLockedUntil,
+      });
+    }
+
+    // Check OTP exists
+    if (!user.otpCode || !user.otpExpiry) {
+      return res.status(400).json({ message: "No OTP found. Please request a new one." });
+    }
+
+    // Check OTP expiry
+    if (new Date() > new Date(user.otpExpiry)) {
+      user.otpCode = null;
+      user.otpExpiry = null;
+      await user.save();
+      return res.status(400).json({ message: "OTP has expired. Please request a new one." });
+    }
+
+    // Check OTP value
+    if (user.otpCode !== otp.toString().trim()) {
+      user.reverifyAttempts = (user.reverifyAttempts || 0) + 1;
+      if (user.reverifyAttempts >= REVERIFY_MAX_ATTEMPTS) {
+        user.reverifyLockedUntil = new Date(Date.now() + REVERIFY_LOCKOUT_MS);
+        user.reverifyAttempts = 0;
+        user.otpCode = null;
+        user.otpExpiry = null;
+        await user.save();
+        logger.warn("Re-verification locked after max attempts: " + email);
+        return res.status(429).json({
+          message: "reverify_locked",
+          info: `Too many failed attempts. Account locked for 30 minutes.`,
+          lockedUntil: user.reverifyLockedUntil,
+        });
+      }
+      await user.save();
+      const attemptsLeft = REVERIFY_MAX_ATTEMPTS - user.reverifyAttempts;
+      return res.status(400).json({
+        message: "Incorrect OTP. Please try again.",
+        attemptsLeft,
+      });
+    }
+
+    // ✅ OTP correct — update verification timestamp and issue JWT
+    user.lastVerifiedAt = new Date();
+    user.reverifyAttempts = 0;
+    user.reverifyLockedUntil = null;
+    user.otpCode = null;
+    user.otpExpiry = null;
+    user.lastLogin = new Date(new Date().getTime() + 330 * 60000);
+    await user.save();
+
+    const token = jwt.sign(
+      { userId: user._id, currentuserId: user._id, role: user.role || "user" },
+      process.env.CURRENT_JWT_SECRET,
+      { expiresIn: "30d" }
+    );
+    const userDetails = {
+      _id: user._id,
+      fullName: user.fullName,
+      userName: user.userName,
+      email: user.email,
+      isVerified: user.isVerified,
+      profilePicture: user.profilePicture,
+      savedBlogs: user.savedBlogs,
+      role: user.role || "user",
+      reviewerStatus: user.reviewerStatus,
+      createdAt: user.createdAt,
+    };
+
+    logger.info("Re-verification successful: " + email);
+    return res.status(200).json({ message: "Re-verification successful", token, userDetails });
+  } catch (error) {
+    logger.error("verifyReverifyOtp failed: " + error.message);
+    res.status(500).json({ message: "Re-verification failed.", error: error.message });
   }
 };

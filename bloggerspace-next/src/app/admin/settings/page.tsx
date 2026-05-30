@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { Loader2, Save, Settings as SettingsIcon, Gem, Award, BookOpen, Coins, Gift } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Gem, Award, BookOpen, Coins, Gift, ShieldCheck } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminConfigApi, type AdminConfigDoc, type AdminConfigUpdatePayload } from "@/lib/api/admin";
 import { REDEMPTION_METHOD_LABELS, type RedemptionMethod } from "@/lib/api/user";
@@ -189,6 +189,16 @@ function SettingsForm({ adminId }: { adminId: string }) {
           </Field>
         </Section>
 
+        {/* Security / re-verification */}
+        <Section icon={<ShieldCheck className="size-4" />} title="Security & Re-verification">
+          <Field
+            label="Re-verification period (days)"
+            hint="Email/password users must re-verify via OTP after this many days. Google/GitHub users auto-refresh on login."
+          >
+            <Input type="number" min={1} value={form.reverificationPeriodDays ?? ""} onChange={setNum("reverificationPeriodDays")} />
+          </Field>
+        </Section>
+
         <Separator />
 
         {/* Save bar */}
@@ -251,6 +261,7 @@ function toForm(c: AdminConfigDoc): FormState {
     perBlogAuthorGemsCap: c.perBlogAuthorGemsCap,
     perBlogReviewerGemsCap: c.perBlogReviewerGemsCap,
     maxBlogScore: c.maxBlogScore,
+    reverificationPeriodDays: c.reverificationPeriodDays,
   };
 }
 
