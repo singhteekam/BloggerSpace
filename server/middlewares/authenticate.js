@@ -85,17 +85,11 @@ const authenticate = async (req, res, next) => {
     } catch (_) {}
   }
 
-  // OLD- Backward compat: check userId in query params (for old React client)
-  console.log("Useridd: ", req.query.userId);
-  if (req.query.userId) {
-    next();
-  } else {
-    logger.info("User is not logged in.. Redirecting to login page.");
-    req.logout((err) => {
-      if (err) { return next(err); }
-      res.redirect("/login");
-    });
-  }
+  // No valid Bearer token — reject. (The old React client's ?userId= query-param
+  // fallback was removed: it allowed bypassing auth entirely. The Next.js client
+  // always sends a Bearer JWT, and its axios interceptor handles 401 by redirecting.)
+  logger.info("Unauthenticated request rejected — no valid token.");
+  return res.status(401).json({ message: "Authentication required. Please sign in." });
 };
 
 module.exports = authenticate;

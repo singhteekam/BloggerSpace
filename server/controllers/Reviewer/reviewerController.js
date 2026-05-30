@@ -153,7 +153,7 @@ exports.reviewerLogin = async (req, res) => {
       const token = jwt.sign(
         { userId: userReviewer._id, currentuserId: userReviewer._id, role: "reviewer" },
         process.env.CURRENT_JWT_SECRET,
-        { expiresIn: "30d" }
+        { expiresIn: "3d" }
       );
       return res.status(200).json({
         message: "Login successful",

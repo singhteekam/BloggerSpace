@@ -109,7 +109,7 @@ exports.adminLogin = async (req, res) => {
     const token = jwt.sign(
       { userId: admin._id, currentuserId: admin._id, role: "Admin" },
       process.env.CURRENT_JWT_SECRET,
-      { expiresIn: "30d" }
+      { expiresIn: "3d" }
     );
     res.status(200).json({ message: "Login successful", token, adminDetails: buildAdminDetails(admin) });
   } catch (error) {
@@ -140,7 +140,7 @@ exports.adminVerifyLoginOtp = async (req, res) => {
     const token = jwt.sign(
       { userId: admin._id, currentuserId: admin._id, role: "Admin" },
       process.env.CURRENT_JWT_SECRET,
-      { expiresIn: "30d" }
+      { expiresIn: "3d" }
     );
 
     res.status(200).json({ message: "Login successful", token, adminDetails: buildAdminDetails(admin) });
