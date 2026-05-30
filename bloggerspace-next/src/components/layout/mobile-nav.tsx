@@ -10,15 +10,15 @@ export function MobileNav() {
   const pathname = usePathname();
   const { user } = useAuth();
   const role = user?.role?.toLowerCase();
-  // Reviewers retain full user writing privileges — only admin is excluded from /newblog
+  // Reviewers retain full user writing privileges — only admin is excluded from /bloggerspace/newblog
   const isRegularUser = !user || role !== "admin";
 
   // Write item is only shown to regular users — admins/reviewers use their own panels
   const navItems = [
     { href: "/", icon: Home, label: "Home" },
     { href: "/blogs", icon: Compass, label: "Browse" },
-    ...(isRegularUser ? [{ href: "/newblog", icon: Pencil, label: "Write" }] : []),
-    { href: role === "admin" ? "/admin/dashboard" : role === "reviewer" ? "/reviewer/dashboard" : "/myprofile", icon: User, label: role === "admin" ? "Admin" : role === "reviewer" ? "Panel" : "Profile" },
+    ...(isRegularUser ? [{ href: "/bloggerspace/newblog", icon: Pencil, label: "Write" }] : []),
+    { href: role === "admin" ? "/admin/dashboard" : role === "reviewer" ? "/reviewer/dashboard" : "/bloggerspace/profile", icon: User, label: role === "admin" ? "Admin" : role === "reviewer" ? "Panel" : "Profile" },
   ] as const;
 
   return (

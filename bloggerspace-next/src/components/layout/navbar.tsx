@@ -55,7 +55,7 @@ export function Navbar() {
     : "?";
 
   const normalizedRole = user?.role?.toLowerCase();
-  // Reviewers retain full user writing privileges — only admin is excluded from /newblog
+  // Reviewers retain full user writing privileges — only admin is excluded from /bloggerspace/newblog
   const isRegularUser = !user || normalizedRole !== "admin";
 
   const menuNav =
@@ -118,7 +118,7 @@ export function Navbar() {
                   {/* Write button only for regular users */}
                   {isRegularUser && (
                     <Button asChild size="sm" variant="ghost">
-                      <Link href="/newblog">
+                      <Link href="/bloggerspace/newblog">
                         <Pencil className="size-3.5" />
                         Write
                       </Link>
@@ -214,7 +214,7 @@ export function Navbar() {
               <nav className="mt-3 flex flex-1 flex-col gap-1 overflow-y-auto min-h-0" aria-label="Mobile navigation">
                 {/* Primary nav — hide Write for non-users */}
                 {primaryNav
-                  .filter((item) => isRegularUser || item.href !== "/newblog")
+                  .filter((item) => isRegularUser || item.href !== "/bloggerspace/newblog")
                   .map((item) => {
                     const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
                     return (

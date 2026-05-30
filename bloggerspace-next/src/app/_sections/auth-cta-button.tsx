@@ -21,7 +21,7 @@ export function AuthCtaButton({
   arrowClassName,
 }: AuthCtaButtonProps) {
   const { user } = useAuth();
-  const href = user ? "/newblog" : "/signup";
+  const href = user ? "/bloggerspace/newblog" : "/signup";
 
   return (
     <Button asChild size={size} variant={variant} className={className}>

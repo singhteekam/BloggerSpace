@@ -168,7 +168,7 @@ export function GemsSection() {
             arrowClassName="size-4 transition-transform group-hover:translate-x-0.5"
           />
           <Button asChild size="lg" variant="outline">
-            <Link href="/apply-reviewer">
+            <Link href="/bloggerspace/apply-reviewer">
               <ShieldCheck className="size-4" />
               Apply as reviewer
             </Link>

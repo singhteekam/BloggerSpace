@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { fetchBlogs } from "@/lib/api/blogs";
 import { siteConfig } from "@/lib/constants/site";
+import { PersonalIntroSection } from "./_sections/personal-intro-section";
 import { HeroSection } from "./_sections/hero-section";
 import { StatsSection } from "./_sections/stats-section";
 import { HowItWorksSection } from "./_sections/how-it-works-section";
@@ -13,7 +14,7 @@ import { DeveloperSection } from "./_sections/developer-section";
 import { ContactSection } from "./_sections/contact-section";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} — ${siteConfig.tagline}`,
+  title: `${siteConfig.fullName} — ${siteConfig.tagline}`,
   description: siteConfig.description,
   alternates: { canonical: "/" },
 };
@@ -32,6 +33,7 @@ export default async function Home() {
   return (
     <main className="relative isolate overflow-hidden bg-background">
       <HeroSection totalBlogs={totalBlogs} />
+      <PersonalIntroSection />
       <StatsSection totalBlogs={totalBlogs} />
       <HowItWorksSection />
       <WhatYouCanDoSection />

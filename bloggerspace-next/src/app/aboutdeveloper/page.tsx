@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Mail, ExternalLink } from "lucide-react";
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons/brand-icons";
@@ -58,10 +59,16 @@ export default function AboutDeveloperPage() {
           </p>
         </FadeIn>
 
-        {/* Avatar placeholder — replaced with real photo in Phase 13 */}
         <FadeIn delay={0.05}>
-          <div className="mx-auto mb-6 flex size-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary ring-2 ring-primary/20 sm:size-28">
-            TS
+          <div className="mx-auto mb-6 size-24 overflow-hidden rounded-full ring-2 ring-primary/20 sm:size-28">
+            <Image
+              src="/brand/dev.jpeg"
+              alt="Teekam Singh"
+              width={112}
+              height={112}
+              className="size-full object-cover"
+              priority
+            />
           </div>
         </FadeIn>
 
@@ -87,7 +94,7 @@ export default function AboutDeveloperPage() {
 
         <FadeIn delay={0.32}>
           <Button asChild className="mt-8" variant="outline">
-            <Link href={siteConfig.author.url} target="_blank" rel="noopener noreferrer">
+            <Link href={siteConfig.author.url} target="_blank" rel="noopener noreferrer" aria-label="Teekam Singh's portfolio">
               Personal website
               <ExternalLink className="size-3.5" />
             </Link>

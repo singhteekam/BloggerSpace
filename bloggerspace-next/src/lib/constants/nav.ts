@@ -30,23 +30,23 @@ export const primaryNav: NavItem[] = [
   { title: "Browse", href: "/blogs", icon: Compass, description: "Discover blogs from the community" },
   { title: "Admin Picks", href: "/adminblogs", icon: Shield, description: "Handpicked by the admin team" },
   { title: "Community", href: "/community", icon: Users, description: "Discussions & posts" },
-  { title: "Write", href: "/newblog", icon: Pencil, description: "Start a new blog", authRequired: true },
+  { title: "Write", href: "/bloggerspace/newblog", icon: Pencil, description: "Start a new blog", authRequired: true },
 ];
 
 /** Regular user dropdown items */
 export const userMenuNav: NavItem[] = [
-  { title: "My Profile", href: "/myprofile", icon: UserIcon },
-  { title: "My Blogs", href: "/myblogs", icon: BookOpen },
-  { title: "Saved Blogs", href: "/savedblogs", icon: Bookmark },
-  { title: "Settings", href: "/settings", icon: Settings },
-  { title: "Change Password", href: "/changepassword", icon: Lock },
+  { title: "My Profile", href: "/bloggerspace/profile", icon: UserIcon },
+  { title: "My Blogs", href: "/bloggerspace/myblogs", icon: BookOpen },
+  { title: "Saved Blogs", href: "/bloggerspace/saved", icon: Bookmark },
+  { title: "Settings", href: "/bloggerspace/settings", icon: Settings },
+  { title: "Change Password", href: "/bloggerspace/security", icon: Lock },
 ];
 
 /** Reviewer dropdown items */
 export const reviewerMenuNav: NavItem[] = [
   { title: "Dashboard", href: "/reviewer/dashboard", icon: LayoutDashboard },
-  { title: "My Profile", href: "/myprofile", icon: UserIcon },
-  { title: "My Blogs", href: "/myblogs", icon: BookOpen },
+  { title: "My Profile", href: "/bloggerspace/profile", icon: UserIcon },
+  { title: "My Blogs", href: "/bloggerspace/myblogs", icon: BookOpen },
   { title: "Settings", href: "/reviewer/settings", icon: Settings },
   { title: "Change Password", href: "/reviewer/changepassword", icon: Lock },
 ];

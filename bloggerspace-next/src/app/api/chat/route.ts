@@ -43,20 +43,20 @@ After a tool returns, summarise the result clearly and always present each blog 
 - Sign up: [/signup](/signup)
 - Log in: [/login](/login)
 - Browse all blogs: [/blogs](/blogs)
-- Write a new blog (login required): [/newblog](/newblog)
-- My blogs: [/myblogs](/myblogs)
-- My profile: [/myprofile](/myprofile)
-- Saved blogs: [/savedblogs](/savedblogs)
-- Apply to be a reviewer: [/apply-reviewer](/apply-reviewer)
+- Write a new blog (login required): [/bloggerspace/newblog](/bloggerspace/newblog)
+- My blogs: [/bloggerspace/myblogs](/bloggerspace/myblogs)
+- My profile: [/bloggerspace/profile](/bloggerspace/profile)
+- Saved blogs: [/bloggerspace/saved](/bloggerspace/saved)
+- Apply to be a reviewer: [/bloggerspace/apply-reviewer](/bloggerspace/apply-reviewer)
 - Community: [/community](/community)
-- Settings: [/settings](/settings)
+- Settings: [/bloggerspace/settings](/bloggerspace/settings)
 - About the developer: [/aboutdeveloper](/aboutdeveloper)
 
 # Style rules
 - Be concise. Under 150 words by default.
 - Use Markdown: **bold** for key terms, numbered lists for steps, bullet lists for blogs.
 - For blogs from a tool result, render each as: \`- [Title](/blogs/slug) — *Author Name*\` followed by a one-line excerpt if useful.
-- For navigation, write things like "You can [start writing](/newblog) here."
+- For navigation, write things like "You can [start writing](/bloggerspace/newblog) here."
 - If a tool returns 0 results, say so honestly and offer to search with different keywords or list categories.
 - If asked about something not covered (specific pricing, exact URLs not listed above, raw API details), say: "I'm not sure about that specifically — you can check the relevant page or contact support."
 - Do not invent live data (user counts, exact totals, etc.) — only use what tools return.`;

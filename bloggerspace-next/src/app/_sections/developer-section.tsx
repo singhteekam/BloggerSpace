@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollReveal } from "@/components/animated/scroll-reveal";
 import { GitHubIcon } from "@/components/icons/brand-icons";
+import { siteConfig } from "@/lib/constants/site";
 import { DEVELOPER_SOCIALS, DEVELOPER_PROJECTS } from "@/lib/constants/home";
 
 export function DeveloperSection() {
@@ -49,7 +50,7 @@ export function DeveloperSection() {
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   <Button asChild size="sm" variant="outline" className="gap-1.5">
-                    <Link href="https://www.singhteekam.in/" target="_blank" rel="noopener noreferrer">
+                    <Link href={siteConfig.author.url} target="_blank" rel="noopener noreferrer">
                       <Globe className="size-3.5" />
                       Portfolio
                     </Link>

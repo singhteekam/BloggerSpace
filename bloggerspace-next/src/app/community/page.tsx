@@ -58,7 +58,7 @@ export default function CommunityPage() {
         </div>
         {user ? (
           <Button asChild size="sm">
-            <Link href="/community/new">
+            <Link href="/bloggerspace/community/new">
               New post
               <ArrowRight className="size-3.5" />
             </Link>
@@ -89,7 +89,7 @@ export default function CommunityPage() {
           </p>
           {user && (
             <Button asChild>
-              <Link href="/community/new">Start a discussion</Link>
+              <Link href="/bloggerspace/community/new">Start a discussion</Link>
             </Button>
           )}
         </div>

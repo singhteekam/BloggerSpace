@@ -323,7 +323,7 @@ export default function LoginPage() {
             <div className="space-y-2 text-center text-xs text-muted-foreground">
               <p>
                 Want to become a reviewer?{" "}
-                <Link href="/apply-reviewer" className="text-primary hover:underline">Apply now</Link>
+                <Link href="/bloggerspace/apply-reviewer" className="text-primary hover:underline">Apply now</Link>
               </p>
               <p>
                 Are you an admin?{" "}

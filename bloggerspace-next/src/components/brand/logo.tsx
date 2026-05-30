@@ -24,8 +24,13 @@ export function Logo({ variant = "lockup", className, size = 32 }: LogoProps) {
         />
       )}
       {variant !== "mark" && (
-        <span className="font-serif text-[1.05em] font-semibold tracking-tight text-foreground">
-          {siteConfig.name}
+        <span className="flex flex-col leading-none">
+          <span className="font-serif text-[1.05em] font-semibold tracking-tight text-foreground">
+            {siteConfig.name}
+          </span>
+          <span className="text-[0.6em] font-normal tracking-wide text-muted-foreground">
+            by Teekam Singh
+          </span>
         </span>
       )}
     </span>
