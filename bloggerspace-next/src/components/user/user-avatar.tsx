@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils/cn";
 import { toProfilePicSrc } from "@/lib/utils/profile-pic";
 
