@@ -18,15 +18,13 @@ const adminMiddleware = async (req, res, next) => {
         return next();
       }
     } catch (err) {
-      // Token invalid or expired — fall through to legacy query param check
+      // Token invalid or expired — reject below.
     }
   }
 
-  // OLD- Backward compat: check userId and role in query params (for old React client)
-  if (req.query.userId && req.query.role === "Admin") {
-    return next();
-  }
-
+  // No valid admin Bearer token. (The old React client's ?userId=&role=Admin
+  // query-param fallback was removed — it allowed bypassing admin auth entirely.
+  // The Next.js admin client always sends a Bearer JWT.)
   res.status(401).json({ message: "Unauthorized" });
 };
 

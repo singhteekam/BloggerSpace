@@ -1,27 +1,539 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { BarChart2, Monitor, Smartphone, Tablet, RefreshCw, Link2, Clock, Eye, Users } from "lucide-react";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
+import { toast } from "sonner";
+import {
+  BarChart2, Monitor, Smartphone, Tablet, RefreshCw, Link2, Clock, Eye, Users,
+  Globe, Chrome, MonitorSmartphone, Search, X, ChevronLeft, ChevronRight, Trash2,
+  Loader2, MapPin, Activity, ListFilter,
+} from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
-import { analyticsApi, type AnalyticsData, type TimelinePoint } from "@/lib/api/analytics";
+import {
+  analyticsApi, DELETE_RETENTION_OPTIONS,
+  type AnalyticsData, type TimelinePoint, type VisitorRow, type VisitorLogRow,
+} from "@/lib/api/analytics";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const IST = "Asia/Kolkata";
+function fmtDateTime(ts?: string) {
+  if (!ts) return "—";
+  return new Date(ts).toLocaleString("en-IN", {
+    timeZone: IST, day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: true,
+  });
+}
+function fmtDate(ts?: string) {
+  if (!ts) return "—";
+  return new Date(ts).toLocaleDateString("en-IN", { timeZone: IST, day: "2-digit", month: "short", year: "numeric" });
+}
+function flag(cc?: string) {
+  if (!cc || cc.length !== 2) return "🌐";
+  try {
+    return String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
+  } catch {
+    return "🌐";
+  }
+}
+function shortId(id: string) {
+  return id.length > 16 ? `${id.slice(0, 14)}…` : id;
+}
 
 export default function AdminAnalyticsPage() {
   const { user, isLoading: authLoading } = useRequireAdmin();
   if (authLoading) return <AnalyticsSkeleton />;
   if (!user) return null;
-  return <AnalyticsDashboard userId={user._id} />;
+  return <AnalyticsRoot userId={user._id} />;
 }
 
-// ── SVG Bar Chart ─────────────────────────────────────────────────────────────
+function AnalyticsRoot({ userId }: { userId: string }) {
+  return (
+    <main className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mb-6 flex items-center gap-3">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <BarChart2 className="size-5" />
+        </div>
+        <div>
+          <h1 className="font-serif text-2xl font-semibold tracking-tight">Analytics</h1>
+          <p className="text-sm text-muted-foreground">Visitor insights, activity & traffic — all times in IST</p>
+        </div>
+      </div>
+
+      <Tabs defaultValue="overview">
+        <TabsList className="mb-6">
+          <TabsTrigger value="overview"><BarChart2 className="mr-1.5 size-3.5" />Overview</TabsTrigger>
+          <TabsTrigger value="visitors"><Users className="mr-1.5 size-3.5" />Visitors</TabsTrigger>
+          <TabsTrigger value="logs"><ListFilter className="mr-1.5 size-3.5" />Raw Logs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview"><OverviewTab userId={userId} /></TabsContent>
+        <TabsContent value="visitors"><VisitorsTab userId={userId} /></TabsContent>
+        <TabsContent value="logs"><LogsTab userId={userId} /></TabsContent>
+      </Tabs>
+    </main>
+  );
+}
+
+// ════════════════════════════ OVERVIEW TAB ════════════════════════════════════
+function OverviewTab({ userId }: { userId: string }) {
+  const qc = useQueryClient();
+  const [timelineMode, setTimelineMode] = useState<"views" | "visitors">("views");
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-analytics", userId],
+    queryFn: () => analyticsApi.getStats(userId).then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading || !data) return <OverviewSkeleton />;
+
+  const { summary, pages, devices, browsers, os, countries, referrers, hours, timeline } = data as AnalyticsData;
+  const totalViews   = summary.totalViews;
+  const totalDevices = devices.reduce((s, d) => s + d.count, 0) || 1;
+  const deviceMap = Object.fromEntries(devices.map((d) => [d.device, d.count]));
+  const peakHour = hours.reduce((best, h) => (h.count > best.count ? h : best), { hour: 0, count: 0 });
+
+  const summaryCards = [
+    { period: "Today",        views: summary.todayViews, unique: summary.todayUnique },
+    { period: "This Week",    views: summary.weekViews,  unique: summary.weekUnique },
+    { period: "This Month",   views: summary.monthViews, unique: summary.monthUnique },
+    { period: "Last 90 Days", views: summary.totalViews, unique: summary.totalUnique },
+  ];
+  const colors = ["text-sky-500", "text-emerald-500", "text-violet-500", "text-amber-500"];
+
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-end">
+        <Button variant="outline" size="sm" className="gap-1.5"
+          onClick={() => qc.invalidateQueries({ queryKey: ["admin-analytics"] })}>
+          <RefreshCw className="size-3.5" />Refresh
+        </Button>
+      </div>
+
+      {/* Summary cards */}
+      <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {summaryCards.map((s, i) => (
+          <div key={s.period} className="rounded-xl border border-border bg-card p-4 space-y-3">
+            <p className="text-xs font-medium text-muted-foreground">{s.period}</p>
+            <div className="flex items-end justify-between gap-2">
+              <div>
+                <p className={`text-xl font-bold ${colors[i]}`}>{s.views.toLocaleString()}</p>
+                <p className="mt-0.5 flex items-center gap-0.5 text-[10px] text-muted-foreground"><Eye className="size-2.5" />Views</p>
+              </div>
+              <div className="text-right">
+                <p className={`text-xl font-bold ${colors[i]}/70`}>{s.unique.toLocaleString()}</p>
+                <p className="mt-0.5 flex items-center justify-end gap-0.5 text-[10px] text-muted-foreground"><Users className="size-2.5" />Unique</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mb-8 text-[11px] text-muted-foreground">
+        A “view” = one page per visitor per 30-min session (reloads don’t inflate it). “Unique” = distinct visitors.
+        Totals are capped at 90 days (logs auto-expire).
+      </p>
+
+      {/* Timeline */}
+      <div className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-foreground">Last 30 Days</p>
+          <div className="flex items-center gap-1 rounded-lg border border-border p-0.5 text-xs">
+            {(["views", "visitors"] as const).map((m) => (
+              <button key={m} onClick={() => setTimelineMode(m)}
+                className={`rounded-md px-2.5 py-1 font-medium transition-colors ${timelineMode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                {m === "views" ? "Views" : "Unique"}
+              </button>
+            ))}
+          </div>
+        </div>
+        {timeline.some((d) => d.views > 0) ? <TimelineChart data={timeline} mode={timelineMode} /> :
+          <p className="py-8 text-center text-sm text-muted-foreground">No data yet.</p>}
+      </div>
+
+      {/* Hourly */}
+      <div className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2"><Clock className="size-4 text-emerald-500" /><p className="text-sm font-semibold">Traffic by Hour (IST)</p></div>
+          {peakHour.count > 0 && (
+            <p className="text-xs text-muted-foreground">Peak:{" "}
+              <span className="font-medium text-foreground">{String(peakHour.hour).padStart(2, "0")}:00–{String((peakHour.hour + 1) % 24).padStart(2, "0")}:00</span></p>
+          )}
+        </div>
+        {hours.some((h) => h.count > 0) ? <HourlyChart data={hours} /> :
+          <p className="py-6 text-center text-sm text-muted-foreground">No data yet.</p>}
+      </div>
+
+      {/* Top pages + referrers */}
+      <div className="mb-6 grid gap-6 lg:grid-cols-2">
+        <BreakdownCard icon={<BarChart2 className="size-4 text-violet-500" />} title="Top Pages" scope
+          items={pages.map((p) => ({ label: p.page, count: p.count }))} total={totalViews} />
+        <BreakdownCard icon={<Link2 className="size-4 text-sky-500" />} title="Top Referrers" scope
+          empty="No referrer data yet — direct/bookmark traffic has no referrer."
+          items={referrers.map((r) => ({ label: r.referrer, count: r.count }))} total={totalViews} />
+      </div>
+
+      {/* Countries + browsers + OS */}
+      <div className="mb-6 grid gap-6 lg:grid-cols-3">
+        <BreakdownCard icon={<MapPin className="size-4 text-rose-500" />} title="Top Countries" scope
+          empty="No country data yet."
+          items={countries.map((c) => ({ label: `${flag(c.country)} ${c.country}`, count: c.count }))} total={totalViews} />
+        <BreakdownCard icon={<Chrome className="size-4 text-amber-500" />} title="Browsers" scope
+          items={browsers.map((b) => ({ label: b.browser, count: b.count }))} total={totalViews} />
+        <BreakdownCard icon={<MonitorSmartphone className="size-4 text-teal-500" />} title="Operating Systems" scope
+          items={os.map((o) => ({ label: o.os, count: o.count }))} total={totalViews} />
+      </div>
+
+      {/* Devices */}
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <p className="mb-1 text-sm font-semibold">Devices</p>
+        <p className="mb-5 text-[11px] text-muted-foreground">Last 90 days</p>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          {[
+            { label: "Desktop", count: deviceMap["desktop"] ?? 0, Icon: Monitor, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+            { label: "Mobile", count: deviceMap["mobile"] ?? 0, Icon: Smartphone, color: "text-sky-500", bg: "bg-sky-500/10" },
+            { label: "Tablet", count: deviceMap["tablet"] ?? 0, Icon: Tablet, color: "text-violet-500", bg: "bg-violet-500/10" },
+          ].map(({ label, count, Icon, color, bg }) => (
+            <div key={label} className="flex flex-col items-center gap-2 rounded-xl border border-border p-4">
+              <div className={`flex size-10 items-center justify-center rounded-xl ${bg} ${color}`}><Icon className="size-5" /></div>
+              <p className={`text-xl font-bold ${color}`}>{count.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">{label}</p>
+              <p className="text-xs font-medium text-foreground">{Math.round((count / totalDevices) * 100)}%</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BreakdownCard({ icon, title, items, total, scope, empty }: {
+  icon: React.ReactNode; title: string; items: { label: string; count: number }[];
+  total: number; scope?: boolean; empty?: string;
+}) {
+  const top = items[0]?.count ?? 1;
+  return (
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-5">
+      <div className="mb-1 flex items-center gap-2">{icon}<p className="text-sm font-semibold text-foreground">{title}</p></div>
+      {scope && <p className="mb-4 text-[11px] text-muted-foreground">Last 90 days</p>}
+      {items.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{empty ?? "No data yet."}</p>
+      ) : (
+        <div className="space-y-3">
+          {items.map((it) => (
+            <div key={it.label}>
+              <div className="mb-1 flex min-w-0 items-center gap-2 text-xs">
+                <span className="min-w-0 flex-1 truncate font-medium text-foreground" title={it.label}>{it.label}</span>
+                <span className="shrink-0 text-muted-foreground">{it.count.toLocaleString()}
+                  <span className="ml-1 text-[10px]">({Math.round((it.count / (total || 1)) * 100)}%)</span></span>
+              </div>
+              <MiniBar pct={(it.count / top) * 100} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════ VISITORS TAB ════════════════════════════════════
+function VisitorsTab({ userId }: { userId: string }) {
+  const [search, setSearch] = useState("");
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
+  const [openVisitor, setOpenVisitor] = useState<string | null>(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-visitors", userId, q, page],
+    queryFn: () => analyticsApi.getVisitors(userId, { q, page, limit: 25 }).then((r) => r.data),
+    staleTime: 60 * 1000,
+  });
+
+  const submitSearch = () => { setQ(search.trim()); setPage(1); };
+
+  return (
+    <div>
+      <SearchBar value={search} onChange={setSearch} onSubmit={submitSearch}
+        onClear={() => { setSearch(""); setQ(""); setPage(1); }} placeholder="Search by visitor ID or country…" />
+
+      {isLoading ? <TableSkeleton /> : !data || data.visitors.length === 0 ? (
+        <EmptyBox msg={q ? `No visitors match “${q}”.` : "No visitor activity yet."} />
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-xl border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-xs text-muted-foreground">
+                <tr>
+                  <Th>Visitor</Th><Th>Visits</Th><Th>Pages</Th><Th>Country</Th>
+                  <Th>Device / Browser</Th><Th>First seen</Th><Th>Last seen</Th><Th></Th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {data.visitors.map((v: VisitorRow) => (
+                  <tr key={v.visitorId} className="hover:bg-muted/30">
+                    <Td><span className="font-mono text-xs" title={v.visitorId}>{shortId(v.visitorId)}</span></Td>
+                    <Td><Badge variant="secondary" className="text-xs">{v.visits}</Badge></Td>
+                    <Td>{v.pageCount}</Td>
+                    <Td><span title={v.country}>{flag(v.country)} {v.country || "—"}</span></Td>
+                    <Td className="text-xs text-muted-foreground">{v.device || "—"} · {v.browser || "—"}</Td>
+                    <Td className="text-xs text-muted-foreground">{fmtDate(v.firstSeen)}</Td>
+                    <Td className="text-xs text-muted-foreground">{fmtDateTime(v.lastSeen)}</Td>
+                    <Td>
+                      <Button size="sm" variant="ghost" className="h-7 gap-1 text-xs" onClick={() => setOpenVisitor(v.visitorId)}>
+                        <Activity className="size-3.5" />Journey
+                      </Button>
+                    </Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination page={data.page} pages={data.pages} total={data.total} onPrev={() => setPage((p) => p - 1)} onNext={() => setPage((p) => p + 1)} />
+        </>
+      )}
+
+      {openVisitor && <JourneyDialog userId={userId} visitorId={openVisitor} onClose={() => setOpenVisitor(null)} />}
+    </div>
+  );
+}
+
+function JourneyDialog({ userId, visitorId, onClose }: { userId: string; visitorId: string; onClose: () => void }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-visitor-journey", userId, visitorId],
+    queryFn: () => analyticsApi.getVisitorJourney(userId, visitorId).then((r) => r.data),
+  });
+
+  return (
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 font-mono text-sm">
+            <Activity className="size-4 text-primary" />{shortId(visitorId)}
+          </DialogTitle>
+          <DialogDescription>Full activity timeline for this visitor.</DialogDescription>
+        </DialogHeader>
+
+        {isLoading ? (
+          <div className="space-y-2 py-4">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-10 rounded-lg" />)}</div>
+        ) : !data || !data.summary ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">No activity found.</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <Stat label="Visits" value={String(data.summary.visits)} />
+              <Stat label="Country" value={`${flag(data.summary.country)} ${data.summary.country || "—"}`} />
+              <Stat label="Device" value={data.summary.device || "—"} />
+              <Stat label="Browser / OS" value={`${data.summary.browser || "—"} · ${data.summary.os || "—"}`} />
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              First seen {fmtDateTime(data.summary.firstSeen)} · Last seen {fmtDateTime(data.summary.lastSeen)}
+            </p>
+
+            <p className="mt-4 mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Journey ({data.journey.length} page views)
+            </p>
+            <ol className="relative space-y-1 border-l border-border pl-4">
+              {data.journey.map((j, i) => (
+                <li key={i} className="relative">
+                  <span className="absolute -left-[21px] top-1.5 size-2 rounded-full bg-primary/60" />
+                  <div className="flex items-baseline justify-between gap-2 rounded-md px-2 py-1 hover:bg-muted/40">
+                    <span className="min-w-0 flex-1 truncate text-sm" title={j.page}>{j.page}</span>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">{fmtDateTime(j.timestamp)}</span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ════════════════════════════ LOGS TAB ════════════════════════════════════════
+function LogsTab({ userId }: { userId: string }) {
+  const qc = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [q, setQ] = useState("");
+  const [device, setDevice] = useState("");
+  const [page, setPage] = useState(1);
+  const [retention, setRetention] = useState<number>(30);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-logs", userId, q, device, page],
+    queryFn: () => analyticsApi.getLogs(userId, { q, device, page, limit: 25 }).then((r) => r.data),
+    staleTime: 30 * 1000,
+  });
+
+  const delMutation = useMutation({
+    mutationFn: () => analyticsApi.deleteOldLogs(userId, retention),
+    onSuccess: (res) => {
+      toast.success(`Deleted ${res.data.deletedCount.toLocaleString()} logs older than ${retention} days.`);
+      qc.invalidateQueries({ queryKey: ["admin-logs"] });
+      qc.invalidateQueries({ queryKey: ["admin-analytics"] });
+      qc.invalidateQueries({ queryKey: ["admin-visitors"] });
+      setConfirmOpen(false);
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Delete failed.") : "Error."),
+  });
+
+  const submitSearch = () => { setQ(search.trim()); setPage(1); };
+
+  return (
+    <div>
+      {/* Filters + retention */}
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submitSearch()}
+            placeholder="Search page, referrer, visitor, country…" className="pl-9" />
+        </div>
+        <select value={device} onChange={(e) => { setDevice(e.target.value); setPage(1); }}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm">
+          <option value="">All devices</option>
+          <option value="desktop">Desktop</option>
+          <option value="mobile">Mobile</option>
+          <option value="tablet">Tablet</option>
+        </select>
+        <Button variant="outline" size="sm" onClick={submitSearch}>Search</Button>
+      </div>
+
+      {/* Retention delete bar */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-900/10">
+        <p className="text-xs text-muted-foreground">
+          <Trash2 className="mr-1 inline size-3.5 text-amber-600" />
+          Clean up old logs. (Logs also auto-expire after 90 days.)
+        </p>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Delete older than</span>
+          <select value={retention} onChange={(e) => setRetention(Number(e.target.value))}
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm">
+            {DELETE_RETENTION_OPTIONS.map((d) => <option key={d} value={d}>{d} days</option>)}
+          </select>
+          <Button size="sm" variant="destructive" className="h-8 gap-1.5" onClick={() => setConfirmOpen(true)}>
+            <Trash2 className="size-3.5" />Delete
+          </Button>
+        </div>
+      </div>
+
+      {isLoading ? <TableSkeleton /> : !data || data.logs.length === 0 ? (
+        <EmptyBox msg={q || device ? "No logs match your filters." : "No logs yet."} />
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-xl border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-xs text-muted-foreground">
+                <tr><Th>Time (IST)</Th><Th>Page</Th><Th>Visitor</Th><Th>Country</Th><Th>Device</Th><Th>Browser / OS</Th><Th>Referrer</Th></tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {data.logs.map((l: VisitorLogRow) => (
+                  <tr key={l._id} className="hover:bg-muted/30">
+                    <Td className="whitespace-nowrap text-xs text-muted-foreground">{fmtDateTime(l.timestamp)}</Td>
+                    <Td><span className="block max-w-[180px] truncate" title={l.page}>{l.page}</span></Td>
+                    <Td><span className="font-mono text-[11px]" title={l.visitorId}>{l.visitorId ? shortId(l.visitorId) : "—"}</span></Td>
+                    <Td><span title={l.country}>{flag(l.country)} {l.country || "—"}</span></Td>
+                    <Td className="text-xs">{l.device || "—"}</Td>
+                    <Td className="text-xs text-muted-foreground">{l.browser || "—"} · {l.os || "—"}</Td>
+                    <Td><span className="block max-w-[120px] truncate text-xs text-muted-foreground" title={l.referrer}>{l.referrer || "direct"}</span></Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination page={data.page} pages={data.pages} total={data.total} onPrev={() => setPage((p) => p - 1)} onNext={() => setPage((p) => p + 1)} />
+        </>
+      )}
+
+      {/* Confirm delete */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete logs older than {retention} days?</DialogTitle>
+            <DialogDescription>
+              This permanently removes all visitor logs older than {retention} days. Analytics for that period will be lost. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={delMutation.isPending}>Cancel</Button>
+            <Button variant="destructive" className="gap-1.5" onClick={() => delMutation.mutate()} disabled={delMutation.isPending}>
+              {delMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+              Delete logs
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// ── Shared bits ───────────────────────────────────────────────────────────────
+function Th({ children }: { children?: React.ReactNode }) {
+  return <th className="px-3 py-2.5 text-left font-medium">{children}</th>;
+}
+function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <td className={`px-3 py-2.5 ${className}`}>{children}</td>;
+}
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-muted/20 p-2.5">
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-0.5 truncate text-sm font-medium" title={value}>{value}</p>
+    </div>
+  );
+}
+function SearchBar({ value, onChange, onSubmit, onClear, placeholder }: {
+  value: string; onChange: (v: string) => void; onSubmit: () => void; onClear: () => void; placeholder: string;
+}) {
+  return (
+    <div className="mb-4 flex items-center gap-2">
+      <div className="relative min-w-0 flex-1">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input value={value} onChange={(e) => onChange(e.target.value)} onKeyDown={(e) => e.key === "Enter" && onSubmit()}
+          placeholder={placeholder} className="pl-9 pr-9" />
+        {value && <button onClick={onClear} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"><X className="size-3.5" /></button>}
+      </div>
+      <Button variant="outline" size="sm" onClick={onSubmit}>Search</Button>
+    </div>
+  );
+}
+function Pagination({ page, pages, total, onPrev, onNext }: { page: number; pages: number; total: number; onPrev: () => void; onNext: () => void }) {
+  if (pages <= 1) return <p className="mt-3 text-center text-xs text-muted-foreground">{total.toLocaleString()} total</p>;
+  return (
+    <div className="mt-4 flex items-center justify-between">
+      <Button variant="outline" size="sm" className="gap-1.5" disabled={page <= 1} onClick={onPrev}><ChevronLeft className="size-3.5" />Previous</Button>
+      <span className="text-xs text-muted-foreground">Page {page} of {pages} · {total.toLocaleString()} total</span>
+      <Button variant="outline" size="sm" className="gap-1.5" disabled={page >= pages} onClick={onNext}>Next<ChevronRight className="size-3.5" /></Button>
+    </div>
+  );
+}
+function EmptyBox({ msg }: { msg: string }) {
+  return (
+    <div className="flex flex-col items-center gap-3 rounded-xl border border-border py-16 text-center">
+      <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground"><Globe className="size-5" /></div>
+      <p className="text-sm text-muted-foreground">{msg}</p>
+    </div>
+  );
+}
+
+// ── Charts ────────────────────────────────────────────────────────────────────
 function TimelineChart({ data, mode }: { data: TimelinePoint[]; mode: "views" | "visitors" }) {
   const vals = data.map((d) => (mode === "views" ? d.views : d.visitors));
   const max = Math.max(...vals, 1);
-  const W = 700; const H = 100;
+  const W = 700, H = 100;
   const barW = Math.floor(W / data.length) - 1;
-
   return (
     <svg viewBox={`0 0 ${W} ${H + 20}`} className="w-full" aria-label="30-day timeline">
       {data.map((d, i) => {
@@ -37,23 +549,15 @@ function TimelineChart({ data, mode }: { data: TimelinePoint[]; mode: "views" | 
       })}
       {data.map((d, i) => {
         if (i % 7 !== 0 && i !== data.length - 1) return null;
-        return (
-          <text key={`lbl-${i}`} x={i * (barW + 1) + barW / 2} y={H + 16}
-            textAnchor="middle" fontSize={9} className="fill-muted-foreground">
-            {d.date.slice(5)}
-          </text>
-        );
+        return <text key={`lbl-${i}`} x={i * (barW + 1) + barW / 2} y={H + 16} textAnchor="middle" fontSize={9} className="fill-muted-foreground">{d.date.slice(5)}</text>;
       })}
     </svg>
   );
 }
-
-// ── SVG Hourly heatmap ────────────────────────────────────────────────────────
 function HourlyChart({ data }: { data: { hour: number; count: number }[] }) {
   const max = Math.max(...data.map((d) => d.count), 1);
-  const W = 700; const H = 60;
+  const W = 700, H = 60;
   const barW = Math.floor(W / 24) - 1;
-
   return (
     <svg viewBox={`0 0 ${W} ${H + 18}`} className="w-full" aria-label="Traffic by hour">
       {data.map((d) => {
@@ -67,254 +571,33 @@ function HourlyChart({ data }: { data: { hour: number; count: number }[] }) {
         );
       })}
       {[0, 6, 12, 18, 23].map((h) => (
-        <text key={h} x={h * (barW + 1) + barW / 2} y={H + 14}
-          textAnchor="middle" fontSize={9} className="fill-muted-foreground">
-          {`${String(h).padStart(2, "0")}h`}
-        </text>
+        <text key={h} x={h * (barW + 1) + barW / 2} y={H + 14} textAnchor="middle" fontSize={9} className="fill-muted-foreground">{`${String(h).padStart(2, "0")}h`}</text>
       ))}
     </svg>
   );
 }
-
 function MiniBar({ pct }: { pct: number }) {
+  return <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary/60" style={{ width: `${pct}%` }} /></div>;
+}
+
+// ── Skeletons ─────────────────────────────────────────────────────────────────
+function OverviewSkeleton() {
   return (
-    <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-      <div className="h-full rounded-full bg-primary/60" style={{ width: `${pct}%` }} />
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}</div>
+      <Skeleton className="h-36 rounded-2xl" /><Skeleton className="h-28 rounded-2xl" />
+      <div className="grid gap-6 lg:grid-cols-2"><Skeleton className="h-56 rounded-2xl" /><Skeleton className="h-56 rounded-2xl" /></div>
     </div>
   );
 }
-
-// ── Main dashboard ────────────────────────────────────────────────────────────
-function AnalyticsDashboard({ userId }: { userId: string }) {
-  const qc = useQueryClient();
-  const [timelineMode, setTimelineMode] = useState<"views" | "visitors">("views");
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-analytics", userId],
-    queryFn: () => analyticsApi.getStats(userId).then((r) => r.data),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  if (isLoading || !data) return <AnalyticsSkeleton />;
-
-  const { summary, pages, devices, referrers, hours, timeline } = data as AnalyticsData;
-  const totalViews    = summary.totalViews;
-  const topPageCount  = pages[0]?.count ?? 1;
-  const topRefCount   = referrers[0]?.count ?? 1;
-  const totalDevices  = devices.reduce((s, d) => s + d.count, 0) || 1;
-
-  const deviceMap = Object.fromEntries(devices.map((d) => [d.device, d.count]));
-  const desktop = deviceMap["desktop"] ?? 0;
-  const mobile  = deviceMap["mobile"]  ?? 0;
-  const tablet  = deviceMap["tablet"]  ?? 0;
-
-  const peakHour = hours.reduce((best, h) => (h.count > best.count ? h : best), { hour: 0, count: 0 });
-
-  const summaryCards = [
-    { period: "Today",      views: summary.todayViews,  unique: summary.todayUnique },
-    { period: "This Week",  views: summary.weekViews,   unique: summary.weekUnique },
-    { period: "This Month", views: summary.monthViews,  unique: summary.monthUnique },
-    { period: "All Time",   views: summary.totalViews,  unique: summary.totalUnique },
-  ];
-
-  const colors = ["text-sky-500", "text-emerald-500", "text-violet-500", "text-amber-500"];
-
-  return (
-    <main className="mx-auto max-w-5xl px-6 py-10">
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <BarChart2 className="size-5" />
-          </div>
-          <div>
-            <h1 className="font-serif text-2xl font-semibold tracking-tight">Analytics</h1>
-            <p className="text-sm text-muted-foreground">Visitor insights &amp; traffic overview</p>
-          </div>
-        </div>
-        <Button variant="outline" size="sm"
-          onClick={() => qc.invalidateQueries({ queryKey: ["admin-analytics"] })}
-          className="gap-1.5">
-          <RefreshCw className="size-3.5" />
-          Refresh
-        </Button>
-      </div>
-
-      {/* Summary cards — views + unique visitors side by side */}
-      <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {summaryCards.map((s, i) => (
-          <div key={s.period} className="rounded-xl border border-border bg-card p-4 space-y-3">
-            <p className="text-xs text-muted-foreground font-medium">{s.period}</p>
-            <div className="flex items-end justify-between gap-2">
-              <div>
-                <p className={`text-xl font-bold ${colors[i]}`}>{s.views.toLocaleString()}</p>
-                <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
-                  <Eye className="size-2.5" />Views
-                </p>
-              </div>
-              <div className="text-right">
-                <p className={`text-xl font-bold ${colors[i]}/70`}>{s.unique.toLocaleString()}</p>
-                <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5 justify-end">
-                  <Users className="size-2.5" />Unique
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 30-day timeline with toggle */}
-      <div className="mb-6 rounded-2xl border border-border bg-card p-5">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold text-foreground">Last 30 Days</p>
-          <div className="flex items-center gap-1 rounded-lg border border-border p-0.5 text-xs">
-            <button
-              onClick={() => setTimelineMode("views")}
-              className={`rounded-md px-2.5 py-1 font-medium transition-colors ${timelineMode === "views" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              Views
-            </button>
-            <button
-              onClick={() => setTimelineMode("visitors")}
-              className={`rounded-md px-2.5 py-1 font-medium transition-colors ${timelineMode === "visitors" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              Unique
-            </button>
-          </div>
-        </div>
-        {timeline.some((d) => d.views > 0) ? (
-          <TimelineChart data={timeline} mode={timelineMode} />
-        ) : (
-          <p className="py-8 text-center text-sm text-muted-foreground">No data yet.</p>
-        )}
-      </div>
-
-      {/* Hourly heatmap */}
-      <div className="mb-6 rounded-2xl border border-border bg-card p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Clock className="size-4 text-emerald-500" />
-            <p className="text-sm font-semibold text-foreground">Traffic by Hour</p>
-          </div>
-          {peakHour.count > 0 && (
-            <p className="text-xs text-muted-foreground">
-              Peak: <span className="font-medium text-foreground">
-                {String(peakHour.hour).padStart(2, "0")}:00–{String((peakHour.hour + 1) % 24).padStart(2, "0")}:00 UTC
-              </span>
-            </p>
-          )}
-        </div>
-        {hours.some((h) => h.count > 0) ? (
-          <HourlyChart data={hours} />
-        ) : (
-          <p className="py-6 text-center text-sm text-muted-foreground">No data yet.</p>
-        )}
-      </div>
-
-      {/* Top Pages + Top Referrers */}
-      <div className="mb-6 grid gap-6 lg:grid-cols-2">
-        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <BarChart2 className="size-4 text-violet-500" />
-            <p className="text-sm font-semibold text-foreground">Top Pages</p>
-          </div>
-          {pages.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No data yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {pages.map((p) => (
-                <div key={p.page}>
-                  <div className="mb-1 flex min-w-0 items-center gap-2 text-xs">
-                    <span className="flex-1 min-w-0 truncate font-medium text-foreground" title={p.page}>
-                      {p.page}
-                    </span>
-                    <span className="shrink-0 text-muted-foreground">
-                      {p.count.toLocaleString()}
-                      <span className="ml-1 text-[10px]">({Math.round((p.count / (totalViews || 1)) * 100)}%)</span>
-                    </span>
-                  </div>
-                  <MiniBar pct={(p.count / topPageCount) * 100} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <Link2 className="size-4 text-sky-500" />
-            <p className="text-sm font-semibold text-foreground">Top Referrers</p>
-          </div>
-          {referrers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No referrer data yet — direct/bookmark traffic has no referrer.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {referrers.map((r) => (
-                <div key={r.referrer}>
-                  <div className="mb-1 flex min-w-0 items-center gap-2 text-xs">
-                    <span className="flex-1 min-w-0 truncate font-medium text-foreground" title={r.referrer}>
-                      {r.referrer}
-                    </span>
-                    <span className="shrink-0 text-muted-foreground">
-                      {r.count.toLocaleString()}
-                      <span className="ml-1 text-[10px]">({Math.round((r.count / (totalViews || 1)) * 100)}%)</span>
-                    </span>
-                  </div>
-                  <MiniBar pct={(r.count / topRefCount) * 100} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Device Breakdown */}
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <p className="mb-5 text-sm font-semibold text-foreground">Devices</p>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          {[
-            { label: "Desktop", count: desktop, Icon: Monitor,    color: "text-emerald-500", bg: "bg-emerald-500/10" },
-            { label: "Mobile",  count: mobile,  Icon: Smartphone, color: "text-sky-500",     bg: "bg-sky-500/10" },
-            { label: "Tablet",  count: tablet,  Icon: Tablet,     color: "text-violet-500",  bg: "bg-violet-500/10" },
-          ].map(({ label, count, Icon, color, bg }) => (
-            <div key={label} className="flex flex-col items-center gap-2 rounded-xl border border-border p-4">
-              <div className={`flex size-10 items-center justify-center rounded-xl ${bg} ${color}`}>
-                <Icon className="size-5" />
-              </div>
-              <p className={`text-xl font-bold ${color}`}>{count.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="text-xs font-medium text-foreground">
-                {Math.round((count / totalDevices) * 100)}%
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {totalViews === 0 && (
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Analytics will populate as visitors browse the site.
-        </p>
-      )}
-    </main>
-  );
+function TableSkeleton() {
+  return <div className="space-y-2">{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-11 rounded-lg" />)}</div>;
 }
-
 function AnalyticsSkeleton() {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10 space-y-6">
-      <Skeleton className="h-12 w-64" />
-      <div className="grid grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
-      </div>
-      <Skeleton className="h-36 rounded-2xl" />
-      <Skeleton className="h-28 rounded-2xl" />
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Skeleton className="h-56 rounded-2xl" />
-        <Skeleton className="h-56 rounded-2xl" />
-      </div>
+    <div className="mx-auto max-w-5xl space-y-6 px-6 py-10">
+      <Skeleton className="h-12 w-64" /><Skeleton className="h-10 w-72 rounded-lg" />
+      <div className="grid grid-cols-4 gap-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}</div>
       <Skeleton className="h-36 rounded-2xl" />
     </div>
   );
