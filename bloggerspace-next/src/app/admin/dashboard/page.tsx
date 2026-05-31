@@ -32,26 +32,32 @@ function AdminOverview({ adminId }: { adminId: string }) {
   const { data: pending = [] } = useQuery({
     queryKey: ["admin-pending", adminId],
     queryFn: () => adminApi.getPendingBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: inReview = [] } = useQuery({
     queryKey: ["admin-inreview", adminId],
     queryFn: () => adminApi.getInReviewBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: underReview = [] } = useQuery({
     queryKey: ["admin-underreview", adminId],
     queryFn: () => adminApi.getUnderReviewBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: publishedData } = useQuery({
     queryKey: ["admin-published", adminId],
     queryFn: () => adminApi.getPublishedBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: pendingReviewers = [] } = useQuery({
     queryKey: ["admin-pending-reviewers", adminId],
     queryFn: () => adminApi.getPendingReviewers(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: awaitingAuthor = [] } = useQuery({
     queryKey: ["admin-awaiting", adminId],
     queryFn: () => adminApi.getAwaitingAuthorBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
 
   const publishedCount = publishedData?.totalCount ?? 0;

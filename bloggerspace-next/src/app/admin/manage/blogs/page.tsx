@@ -45,30 +45,37 @@ function BlogManagement({ adminId, adminEmail }: { adminId: string; adminEmail: 
   const { data: pending = [], isLoading: pendingLoading } = useQuery({
     queryKey: ["admin-pending", adminId],
     queryFn: () => adminApi.getPendingBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: underReview = [], isLoading: underReviewLoading } = useQuery({
     queryKey: ["admin-underreview", adminId],
     queryFn: () => adminApi.getUnderReviewBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: awaitingAuthor = [], isLoading: awaitingLoading } = useQuery({
     queryKey: ["admin-awaiting", adminId],
     queryFn: () => adminApi.getAwaitingAuthorBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: inReview = [], isLoading: inReviewLoading } = useQuery({
     queryKey: ["admin-inreview", adminId],
     queryFn: () => adminApi.getInReviewBlogs(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: publishedData, isLoading: publishedLoading } = useQuery({
     queryKey: ["admin-published", adminId, publishedPage, debouncedSearch],
     queryFn: () => adminApi.getPublishedBlogs(adminId, publishedPage, debouncedSearch).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: discardQueue = [], isLoading: discardLoading } = useQuery({
     queryKey: ["admin-discard", adminId],
     queryFn: () => adminApi.getDiscardQueue(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
   const { data: allReviewers = [] } = useQuery({
     queryKey: ["admin-all-reviewers", adminId],
     queryFn: () => adminApi.getAllReviewers(adminId).then((r) => r.data),
+    staleTime: 60_000,
   });
 
   const published = publishedData?.blogs ?? [];

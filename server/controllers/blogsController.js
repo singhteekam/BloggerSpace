@@ -107,18 +107,16 @@ exports.fetchAllBlogs = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-    const blogs = await Blog.find({
-      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
-    })
-      .skip(skip)
-      .limit(limit)
-      .sort({ lastUpdatedAt: -1 })
-      .populate("authorDetails")
-      .exec();
-
-    const total = await Blog.countDocuments({
-      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
-    });
+    const [blogs, total] = await Promise.all([
+      Blog.find({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } })
+        .skip(skip)
+        .limit(limit)
+        .sort({ lastUpdatedAt: -1 })
+        .populate("authorDetails", "userName profilePicture fullName")
+        .lean()
+        .exec(),
+      Blog.countDocuments({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } }),
+    ]);
 
     res.json({
       blogs,

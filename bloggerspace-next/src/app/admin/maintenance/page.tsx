@@ -26,7 +26,7 @@ function MaintenanceDashboard({ adminId }: { adminId: string }) {
   const { data: config, isLoading } = useQuery({
     queryKey: ["admin-config", adminId],
     queryFn: () => adminConfigApi.get(adminId).then((r) => r.data),
-    staleTime: 30_000,
+    staleTime: 2 * 60 * 1000,
   });
 
   const mutation = useMutation({

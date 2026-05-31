@@ -33,12 +33,14 @@ export default function ReviewerDashboardPage() {
     queryKey: ["reviewer-assigned", user?._id],
     queryFn: () => reviewerApi.getAssignedBlogs(user!._id, user!.email).then((r) => r.data),
     enabled: !!user,
+    staleTime: 60_000,
   });
 
   const { data: awaiting = [], isLoading: awaitingLoading } = useQuery({
     queryKey: ["reviewer-awaiting", user?._id],
     queryFn: () => reviewerApi.getAwaitingAuthorBlogs(user!._id, user!.email).then((r) => r.data),
     enabled: !!user,
+    staleTime: 60_000,
   });
 
   const { data: profile, isLoading: profileLoading } = useQuery({

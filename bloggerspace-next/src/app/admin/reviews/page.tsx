@@ -34,6 +34,7 @@ function ReviewsPanel() {
   const { data: pendingData } = useQuery({
     queryKey: ["admin-reviews-pending-count"],
     queryFn: () => adminReviewsApi.list("pending", 1).then((r) => r.data),
+    staleTime: 60_000,
   });
   const pendingCount = pendingData?.total ?? 0;
 
@@ -88,6 +89,7 @@ function ReviewList({ status, qc }: { status: Tab; qc: ReturnType<typeof useQuer
   const { data, isLoading } = useQuery({
     queryKey: ["admin-reviews", status],
     queryFn: () => adminReviewsApi.list(status, 1).then((r) => r.data),
+    staleTime: 60_000,
   });
 
   const invalidate = () => {

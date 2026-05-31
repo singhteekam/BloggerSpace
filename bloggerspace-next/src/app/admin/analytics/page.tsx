@@ -273,7 +273,7 @@ function VisitorsTab({ userId }: { userId: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-visitors', userId, filter],
     queryFn: () => analyticsApi.getVisitors(userId, filter).then((r) => r.data),
-    staleTime: 60 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 
   const apply = () => {
@@ -303,13 +303,13 @@ function VisitorsTab({ userId }: { userId: string }) {
         </div>
         <div className='flex items-center gap-1.5'>
           <label className='text-xs text-muted-foreground whitespace-nowrap'>From</label>
-          <Input type='date' value={from} max={to || undefined}
-            onChange={(e) => handleFromChange(e.target.value)} className='h-9 w-36 text-sm' />
+          <DateInput value={from} max={to || undefined}
+            onChange={handleFromChange} className='h-9 w-36 text-sm' />
         </div>
         <div className='flex items-center gap-1.5'>
           <label className='text-xs text-muted-foreground whitespace-nowrap'>To</label>
-          <Input type='date' value={to} min={from || undefined}
-            onChange={(e) => setTo(e.target.value)} className='h-9 w-36 text-sm' />
+          <DateInput value={to} min={from || undefined}
+            onChange={setTo} className='h-9 w-36 text-sm' />
         </div>
         <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}
           className='h-9 rounded-md border border-input bg-background px-3 text-sm'>
@@ -450,7 +450,7 @@ function LogsTab({ userId }: { userId: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-logs', userId, filter],
     queryFn: () => analyticsApi.getLogs(userId, filter).then((r) => r.data),
-    staleTime: 30 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 
   const delMutation = useMutation({
@@ -499,13 +499,13 @@ function LogsTab({ userId }: { userId: string }) {
         </select>
         <div className='flex items-center gap-1.5'>
           <label className='text-xs text-muted-foreground whitespace-nowrap'>From</label>
-          <Input type='date' value={from} max={to || undefined}
-            onChange={(e) => handleFromChange(e.target.value)} className='h-9 w-36 text-sm' />
+          <DateInput value={from} max={to || undefined}
+            onChange={handleFromChange} className='h-9 w-36 text-sm' />
         </div>
         <div className='flex items-center gap-1.5'>
           <label className='text-xs text-muted-foreground whitespace-nowrap'>To</label>
-          <Input type='date' value={to} min={from || undefined}
-            onChange={(e) => setTo(e.target.value)} className='h-9 w-36 text-sm' />
+          <DateInput value={to} min={from || undefined}
+            onChange={setTo} className='h-9 w-36 text-sm' />
         </div>
         <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}
           className='h-9 rounded-md border border-input bg-background px-3 text-sm'>
@@ -540,7 +540,7 @@ function LogsTab({ userId }: { userId: string }) {
           <div className='overflow-x-auto rounded-xl border border-border'>
             <table className='w-full text-sm'>
               <thead className='bg-muted/40 text-xs text-muted-foreground'>
-                <tr><Th>Time (IST)</Th><Th>Page</Th><Th>Visitor</Th><Th>Device</Th><Th>Browser / OS</Th><Th>Referrer</Th></tr>
+                <tr><Th>Time (IST)</Th><th className='px-3 py-2.5 text-left font-medium min-w-[280px]'>Page</th><Th>Visitor</Th><Th>Device</Th><Th>Browser / OS</Th><Th>Referrer</Th></tr>
               </thead>
               <tbody className='divide-y divide-border'>
                 {data.logs.map((l: VisitorLogRow) => (
@@ -584,6 +584,25 @@ function LogsTab({ userId }: { userId: string }) {
 }
 
 // ── Shared bits ───────────────────────────────────────────────────────────────
+function DateInput({ value, onChange, min, max, className }: {
+  value: string; onChange: (v: string) => void; min?: string; max?: string; className?: string;
+}) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <Input
+      type={focused || value ? 'date' : 'text'}
+      placeholder={!focused && !value ? 'dd/mm/yyyy' : undefined}
+      value={value}
+      min={min}
+      max={max}
+      className={className}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
 function Th({ children }: { children?: React.ReactNode }) {
   return <th className="px-3 py-2.5 text-left font-medium">{children}</th>;
 }
@@ -595,21 +614,6 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg border border-border bg-muted/20 p-2.5">
       <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
       <p className="mt-0.5 break-words text-sm font-medium">{value}</p>
-    </div>
-  );
-}
-function SearchBar({ value, onChange, onSubmit, onClear, placeholder }: {
-  value: string; onChange: (v: string) => void; onSubmit: () => void; onClear: () => void; placeholder: string;
-}) {
-  return (
-    <div className="mb-4 flex items-center gap-2">
-      <div className="relative min-w-0 flex-1">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input value={value} onChange={(e) => onChange(e.target.value)} onKeyDown={(e) => e.key === "Enter" && onSubmit()}
-          placeholder={placeholder} className="pl-9 pr-9" />
-        {value && <button onClick={onClear} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"><X className="size-3.5" /></button>}
-      </div>
-      <Button variant="outline" size="sm" onClick={onSubmit}>Search</Button>
     </div>
   );
 }

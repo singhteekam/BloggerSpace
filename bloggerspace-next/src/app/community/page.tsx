@@ -28,6 +28,7 @@ export default function CommunityPage() {
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.pages ? lastPage.page + 1 : undefined,
+    staleTime: 60_000,
   });
 
   const posts = data?.pages.flatMap((p) => p.posts) ?? [];
