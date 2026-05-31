@@ -39,9 +39,9 @@ export function BlogCard({ blog }: BlogCardProps) {
           {/* Tags */}
           {blog.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {blog.tags.slice(0, 2).map((tag) => (
+              {blog.tags.slice(0, 2).map((tag, i) => (
                 <span
-                  key={tag}
+                  key={`${tag}-${i}`}
                   className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
                 >
                   {tag}

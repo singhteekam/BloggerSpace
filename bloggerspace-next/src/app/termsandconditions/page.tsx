@@ -61,6 +61,15 @@ const SECTIONS = [
   },
 ] as const;
 
+function linkEmails(text: string) {
+  const parts = text.split(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/g);
+  return parts.map((part, i) =>
+    /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(part)
+      ? <a key={i} href={`mailto:${part}`} className="text-primary underline underline-offset-2 hover:opacity-80">{part}</a>
+      : part
+  );
+}
+
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
@@ -86,7 +95,7 @@ export default function TermsPage() {
         {SECTIONS.map(({ title, body }) => (
           <section key={title}>
             <h2 className="font-serif text-xl font-semibold tracking-tight">{title}</h2>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">{body}</p>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">{linkEmails(body)}</p>
           </section>
         ))}
       </div>

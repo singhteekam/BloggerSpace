@@ -1,30 +1,29 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 
-type PaginationProps = {
+type Props = {
   page: number;
   totalPages: number;
+  preservedParams?: string; // serialised query string of params to keep (q, category, tag)
 };
 
-export function Pagination({ page, totalPages }: PaginationProps) {
+export function Pagination({ page, totalPages, preservedParams = "" }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useSearchParams();
 
   if (totalPages <= 1) return null;
 
   const go = (p: number) => {
-    const next = new URLSearchParams(params.toString());
+    const next = new URLSearchParams(preservedParams);
     next.set("page", String(p));
     router.push(`${pathname}?${next.toString()}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Build page number array with ellipsis
   const pages: (number | "…")[] = [];
   for (let i = 1; i <= totalPages; i++) {
     if (i === 1 || i === totalPages || Math.abs(i - page) <= 1) {
@@ -53,7 +52,7 @@ export function Pagination({ page, totalPages }: PaginationProps) {
           </span>
         ) : (
           <Button
-            key={p}
+            key={`page-${p}`}
             variant={p === page ? "default" : "outline"}
             size="icon"
             onClick={() => go(p as number)}

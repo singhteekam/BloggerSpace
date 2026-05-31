@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import {
   BarChart2, Monitor, Smartphone, Tablet, RefreshCw, Link2, Clock, Eye, Users,
   Globe, MonitorSmartphone, Search, X, ChevronLeft, ChevronRight, Trash2,
-  Loader2, MapPin, Activity, ListFilter,
+  Loader2, Activity, ListFilter,
 } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import {
@@ -35,15 +35,8 @@ function fmtDate(ts?: string) {
   if (!ts) return "—";
   return new Date(ts).toLocaleDateString("en-IN", { timeZone: IST, day: "2-digit", month: "short", year: "numeric" });
 }
-function flag(cc?: string) {
-  if (!cc || cc.length !== 2) return "🌐";
-  try {
-    return String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
-  } catch {
-    return "🌐";
-  }
-}
-function shortId(id: string) {
+function shortId(id: string | null | undefined) {
+  if (!id) return "—";
   return id.length > 16 ? `${id.slice(0, 14)}…` : id;
 }
 
@@ -84,10 +77,9 @@ function AnalyticsRoot({ userId }: { userId: string }) {
 
 // ════════════════════════════ OVERVIEW TAB ════════════════════════════════════
 function OverviewTab({ userId }: { userId: string }) {
-  const qc = useQueryClient();
   const [timelineMode, setTimelineMode] = useState<"views" | "visitors">("views");
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["admin-analytics", userId],
     queryFn: () => analyticsApi.getStats(userId).then((r) => r.data),
     staleTime: 5 * 60 * 1000,
@@ -95,7 +87,7 @@ function OverviewTab({ userId }: { userId: string }) {
 
   if (isLoading || !data) return <OverviewSkeleton />;
 
-  const { summary, pages, devices, browsers, os, countries, referrers, hours, timeline } = data as AnalyticsData;
+  const { summary, pages, devices, browsers, os, referrers, hours, timeline } = data as AnalyticsData;
   const totalViews   = summary.totalViews;
   const totalDevices = devices.reduce((s, d) => s + d.count, 0) || 1;
   const deviceMap = Object.fromEntries(devices.map((d) => [d.device, d.count]));
@@ -111,33 +103,39 @@ function OverviewTab({ userId }: { userId: string }) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-end">
+      <div className="mb-5 flex items-center justify-end">
         <Button variant="outline" size="sm" className="gap-1.5"
-          onClick={() => qc.invalidateQueries({ queryKey: ["admin-analytics"] })}>
-          <RefreshCw className="size-3.5" />Refresh
+          onClick={() => refetch()} disabled={isFetching}>
+          <RefreshCw className={`size-3.5 ${isFetching ? "animate-spin" : ""}`} />
+          {isFetching ? "Refreshing…" : "Refresh"}
         </Button>
       </div>
 
-      {/* Summary cards */}
+      {/* Unique Visitors — actual people (highlighted) */}
+      <div className="mb-2 flex items-center gap-2">
+        <Users className="size-4 text-primary" />
+        <p className="text-sm font-semibold text-foreground">Unique Visitors</p>
+        <span className="text-xs text-muted-foreground">— distinct people who visited</span>
+      </div>
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {summaryCards.map((s, i) => (
+          <StatCard key={s.period} period={s.period} value={s.unique} color={colors[i]} highlight />
+        ))}
+      </div>
+
+      {/* Page Views */}
+      <div className="mb-2 flex items-center gap-2">
+        <Eye className="size-4 text-muted-foreground" />
+        <p className="text-sm font-semibold text-foreground">Page Views</p>
+        <span className="text-xs text-muted-foreground">— total pages opened</span>
+      </div>
       <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {summaryCards.map((s, i) => (
-          <div key={s.period} className="rounded-xl border border-border bg-card p-4 space-y-3">
-            <p className="text-xs font-medium text-muted-foreground">{s.period}</p>
-            <div className="flex items-end justify-between gap-2">
-              <div>
-                <p className={`text-xl font-bold ${colors[i]}`}>{s.views.toLocaleString()}</p>
-                <p className="mt-0.5 flex items-center gap-0.5 text-[10px] text-muted-foreground"><Eye className="size-2.5" />Views</p>
-              </div>
-              <div className="text-right">
-                <p className={`text-xl font-bold ${colors[i]}/70`}>{s.unique.toLocaleString()}</p>
-                <p className="mt-0.5 flex items-center justify-end gap-0.5 text-[10px] text-muted-foreground"><Users className="size-2.5" />Unique</p>
-              </div>
-            </div>
-          </div>
+          <StatCard key={s.period} period={s.period} value={s.views} color={colors[i]} />
         ))}
       </div>
       <p className="mb-8 text-[11px] text-muted-foreground">
-        A “view” = one page per visitor per 30-min session (reloads don’t inflate it). “Unique” = distinct visitors.
+        A “view” = one page per visitor per 30-min session (reloads don’t inflate it). A “unique visitor” = one distinct person.
         Totals are capped at 90 days (logs auto-expire).
       </p>
 
@@ -180,11 +178,8 @@ function OverviewTab({ userId }: { userId: string }) {
           items={referrers.map((r) => ({ label: r.referrer, count: r.count }))} total={totalViews} />
       </div>
 
-      {/* Countries + browsers + OS */}
-      <div className="mb-6 grid gap-6 lg:grid-cols-3">
-        <BreakdownCard icon={<MapPin className="size-4 text-rose-500" />} title="Top Countries" scope
-          empty="No country data yet."
-          items={countries.map((c) => ({ label: `${flag(c.country)} ${c.country}`, count: c.count }))} total={totalViews} />
+      {/* Browsers + OS */}
+      <div className="mb-6 grid gap-6 lg:grid-cols-2">
         <BreakdownCard icon={<Globe className="size-4 text-amber-500" />} title="Browsers" scope
           items={browsers.map((b) => ({ label: b.browser, count: b.count }))} total={totalViews} />
         <BreakdownCard icon={<MonitorSmartphone className="size-4 text-teal-500" />} title="Operating Systems" scope
@@ -210,6 +205,17 @@ function OverviewTab({ userId }: { userId: string }) {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatCard({ period, value, color, highlight }: {
+  period: string; value: number; color: string; highlight?: boolean;
+}) {
+  return (
+    <div className={`rounded-xl border p-4 ${highlight ? "border-primary/30 bg-primary/5" : "border-border bg-card"}`}>
+      <p className="text-xs font-medium text-muted-foreground">{period}</p>
+      <p className={`mt-2 text-2xl font-bold ${color}`}>{value.toLocaleString()}</p>
     </div>
   );
 }
@@ -271,17 +277,16 @@ function VisitorsTab({ userId }: { userId: string }) {
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs text-muted-foreground">
                 <tr>
-                  <Th>Visitor</Th><Th>Visits</Th><Th>Pages</Th><Th>Country</Th>
+                  <Th>Visitor</Th><Th>Visits</Th><Th>Pages</Th>
                   <Th>Device / Browser</Th><Th>First seen</Th><Th>Last seen</Th><Th></Th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {data.visitors.map((v: VisitorRow) => (
                   <tr key={v.visitorId} className="hover:bg-muted/30">
-                    <Td><span className="font-mono text-xs" title={v.visitorId}>{shortId(v.visitorId)}</span></Td>
+                    <Td><span className="font-mono text-xs" title={v.visitorId ?? ""}>{shortId(v.visitorId)}</span></Td>
                     <Td><Badge variant="secondary" className="text-xs">{v.visits}</Badge></Td>
                     <Td>{v.pageCount}</Td>
-                    <Td><span title={v.country}>{flag(v.country)} {v.country || "—"}</span></Td>
                     <Td className="text-xs text-muted-foreground">{v.device || "—"} · {v.browser || "—"}</Td>
                     <Td className="text-xs text-muted-foreground">{fmtDate(v.firstSeen)}</Td>
                     <Td className="text-xs text-muted-foreground">{fmtDateTime(v.lastSeen)}</Td>
@@ -312,10 +317,11 @@ function JourneyDialog({ userId, visitorId, onClose }: { userId: string; visitor
 
   return (
     <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto overflow-x-hidden">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-mono text-sm">
-            <Activity className="size-4 text-primary" />{shortId(visitorId)}
+          <DialogTitle className="flex items-start gap-2 text-sm">
+            <Activity className="mt-0.5 size-4 shrink-0 text-primary" />
+            <span className="min-w-0 break-all font-mono">{visitorId}</span>
           </DialogTitle>
           <DialogDescription>Full activity timeline for this visitor.</DialogDescription>
         </DialogHeader>
@@ -326,9 +332,8 @@ function JourneyDialog({ userId, visitorId, onClose }: { userId: string; visitor
           <p className="py-8 text-center text-sm text-muted-foreground">No activity found.</p>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-3 gap-3">
               <Stat label="Visits" value={String(data.summary.visits)} />
-              <Stat label="Country" value={`${flag(data.summary.country)} ${data.summary.country || "—"}`} />
               <Stat label="Device" value={data.summary.device || "—"} />
               <Stat label="Browser / OS" value={`${data.summary.browser || "—"} · ${data.summary.os || "—"}`} />
             </div>
@@ -343,9 +348,12 @@ function JourneyDialog({ userId, visitorId, onClose }: { userId: string; visitor
               {data.journey.map((j, i) => (
                 <li key={i} className="relative">
                   <span className="absolute -left-[21px] top-1.5 size-2 rounded-full bg-primary/60" />
-                  <div className="flex items-baseline justify-between gap-2 rounded-md px-2 py-1 hover:bg-muted/40">
-                    <span className="min-w-0 flex-1 truncate text-sm" title={j.page}>{j.page}</span>
-                    <span className="shrink-0 text-[11px] text-muted-foreground">{fmtDateTime(j.timestamp)}</span>
+                  <div className="rounded-md px-2 py-1 hover:bg-muted/40">
+                    <p className="break-all text-sm">{j.page}</p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      {fmtDateTime(j.timestamp)}
+                      {j.referrer ? ` · from ${j.referrer}` : ""}
+                    </p>
                   </div>
                 </li>
               ))}
@@ -436,7 +444,7 @@ function LogsTab({ userId }: { userId: string }) {
           <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs text-muted-foreground">
-                <tr><Th>Time (IST)</Th><Th>Page</Th><Th>Visitor</Th><Th>Country</Th><Th>Device</Th><Th>Browser / OS</Th><Th>Referrer</Th></tr>
+                <tr><Th>Time (IST)</Th><Th>Page</Th><Th>Visitor</Th><Th>Device</Th><Th>Browser / OS</Th><Th>Referrer</Th></tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {data.logs.map((l: VisitorLogRow) => (
@@ -444,7 +452,6 @@ function LogsTab({ userId }: { userId: string }) {
                     <Td className="whitespace-nowrap text-xs text-muted-foreground">{fmtDateTime(l.timestamp)}</Td>
                     <Td><span className="block max-w-[180px] truncate" title={l.page}>{l.page}</span></Td>
                     <Td><span className="font-mono text-[11px]" title={l.visitorId}>{l.visitorId ? shortId(l.visitorId) : "—"}</span></Td>
-                    <Td><span title={l.country}>{flag(l.country)} {l.country || "—"}</span></Td>
                     <Td className="text-xs">{l.device || "—"}</Td>
                     <Td className="text-xs text-muted-foreground">{l.browser || "—"} · {l.os || "—"}</Td>
                     <Td><span className="block max-w-[120px] truncate text-xs text-muted-foreground" title={l.referrer}>{l.referrer || "direct"}</span></Td>
@@ -490,7 +497,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-border bg-muted/20 p-2.5">
       <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-0.5 truncate text-sm font-medium" title={value}>{value}</p>
+      <p className="mt-0.5 break-words text-sm font-medium">{value}</p>
     </div>
   );
 }

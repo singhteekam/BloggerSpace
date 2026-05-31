@@ -1,30 +1,30 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export function BlogSearch() {
+type Props = {
+  initialValue?: string;
+  preservedParams?: string; // serialised query string of params to keep (category, tag)
+};
+
+export function BlogSearch({ initialValue = "", preservedParams = "" }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useSearchParams();
-  const [value, setValue] = useState(params.get("q") ?? "");
+  const [value, setValue] = useState(initialValue);
   const timer = useRef<ReturnType<typeof setTimeout>>(null);
 
-  // Sync with URL on external navigation
   useEffect(() => {
-    setValue(params.get("q") ?? "");
-  }, [params]);
+    setValue(initialValue);
+  }, [initialValue]);
 
   const push = (q: string) => {
-    const next = new URLSearchParams(params.toString());
-    if (q) {
-      next.set("q", q);
-    } else {
-      next.delete("q");
-    }
-    next.delete("page"); // reset pagination on new search
+    const next = new URLSearchParams(preservedParams);
+    next.delete("page");
+    if (q) next.set("q", q);
+    else next.delete("q");
     router.push(`${pathname}?${next.toString()}`);
   };
 

@@ -44,15 +44,17 @@ export async function fetchFilteredBlogs({
   page = 1,
 }: {
   search?: string;
-  tag?: string;
-  category?: string;
+  tag?: string | string[];
+  category?: string | string[];
   page?: number;
 }): Promise<BlogListResponse> {
   try {
     const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) });
     if (search) params.set("search", search.trim());
-    if (tag) { params.set("filterType", "tag"); params.set("filterValue", tag); }
-    else if (category) { params.set("filterType", "category"); params.set("filterValue", category); }
+    const tagValue = Array.isArray(tag) ? tag.join(",") : tag;
+    const catValue = Array.isArray(category) ? category.join(",") : category;
+    if (tagValue) params.set("tag", tagValue);
+    if (catValue) params.set("category", catValue);
     const res = await fetch(`${BASE}/api/blogs/fetchallblogs?${params}`, {
       cache: "no-store",
     });

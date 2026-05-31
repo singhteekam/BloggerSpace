@@ -140,8 +140,8 @@ exports.fetchAllBlogsFromDB = async (req, res) => {
     const limit = Math.max(parseInt(req.query.limit || "6", 10), 1);
 
     const search = (req.query.search || "").trim();
-    const filterType = req.query.filterType || "";
-    const filterValue = req.query.filterValue || "";
+    const categoryParam = req.query.category || "";
+    const tagParam = req.query.tag || "";
 
     // Build match object
     const match = {
@@ -152,13 +152,18 @@ exports.fetchAllBlogsFromDB = async (req, res) => {
       match.title = { $regex: search, $options: "i" };
     }
 
-    if (filterType === "category" && filterValue) {
-      match.category = filterValue;
-    }
+    const categoryValues = categoryParam ? categoryParam.split(",").map((v) => v.trim()).filter(Boolean) : [];
+    const tagValues = tagParam ? tagParam.split(",").map((v) => v.trim()).filter(Boolean) : [];
 
-    if (filterType === "tag" && filterValue) {
-      // adjust depending on your schema (string array or object)
-      match.tags = filterValue; // or: match.tags = { $in: [filterValue] }
+    if (categoryValues.length > 0 && tagValues.length > 0) {
+      match.$or = [
+        { category: { $in: categoryValues } },
+        { tags: { $in: tagValues } },
+      ];
+    } else if (categoryValues.length > 0) {
+      match.category = categoryValues.length === 1 ? categoryValues[0] : { $in: categoryValues };
+    } else if (tagValues.length > 0) {
+      match.tags = { $in: tagValues };
     }
 
     const skip = (page - 1) * limit;

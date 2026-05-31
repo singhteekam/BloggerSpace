@@ -8,12 +8,12 @@ export const metadata: Metadata = {
   description: `How ${siteConfig.name} collects, uses, and protects your personal data.`,
 };
 
-const LAST_UPDATED = "1 May 2025";
+const LAST_UPDATED = "31 May 2026";
 
 const SECTIONS = [
   {
     title: "1. Information we collect",
-    body: `When you create an account, we collect your name, email address, and a password (stored as a salted hash — we never see your plain-text password). When you write a post, we store the content, metadata (title, tags, category), and timestamps. We do not collect payment information; BloggerSpace is free to use. We also collect standard server logs (IP address, browser type, pages visited) for security and performance purposes. These logs are retained for 30 days.`,
+    body: `When you create an account, we collect your name, email address, and a password (stored as a salted hash — we never see your plain-text password). When you write a post, we store the content, metadata (title, tags, category), and timestamps. We do not collect payment information; BloggerSpace is free to use.\n\nWe also collect anonymous usage analytics for every page visit: the page URL, referrer, device type (desktop / mobile / tablet), browser name, operating system, and approximate country (derived from a request header — not precise location). A randomly generated visitor ID is stored in your browser's local storage to count visits without identifying you personally. We additionally store a one-way cryptographic hash of your IP address (not the IP itself) for deduplication only — your raw IP address is never persisted. All analytics data is automatically deleted after 90 days.`,
   },
   {
     title: "2. How we use your information",
@@ -21,7 +21,7 @@ const SECTIONS = [
   },
   {
     title: "3. Cookies",
-    body: `We use a single session cookie to keep you logged in across page loads. We also use Vercel Analytics (privacy-friendly, no fingerprinting) and Vercel Speed Insights to understand site performance. These tools do not use advertising cookies and do not track you across other websites. You can disable cookies in your browser settings; the site will still function but you will not stay logged in.`,
+    body: `We use a single session cookie to keep you logged in across page loads. You can disable cookies in your browser settings; the site will still function but you will not stay logged in.\n\nFor analytics, we store a randomly generated visitor ID in your browser's local storage (not a cookie). This ID is anonymous — it contains no personal information and is used only to avoid counting the same visit twice. It is not shared with any third party. You can clear it at any time by clearing your browser's local storage for this site.`,
   },
   {
     title: "4. Third-party services",
@@ -29,7 +29,7 @@ const SECTIONS = [
   },
   {
     title: "5. Data retention",
-    body: `Your account data is retained as long as your account is active. If you delete your account, your personal information (name, email, profile) is removed within 7 days. Published blog posts are anonymised rather than deleted so that the content record remains intact for readers who have linked to it. You can request full deletion by contacting us.`,
+    body: `Your account data is retained as long as your account is active. If you delete your account, your personal information (name, email, profile) is removed within 7 days. Published blog posts are anonymised rather than deleted so that the content record remains intact for readers who have linked to it. You can request full deletion by contacting us.\n\nAnonymous visitor analytics logs are automatically deleted after 90 days with no action required on your part.`,
   },
   {
     title: "6. Your rights",
@@ -49,6 +49,15 @@ const SECTIONS = [
   },
 ] as const;
 
+function linkEmails(text: string) {
+  const parts = text.split(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/g);
+  return parts.map((part, i) =>
+    /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(part)
+      ? <a key={i} href={`mailto:${part}`} className="text-primary underline underline-offset-2 hover:opacity-80">{part}</a>
+      : part
+  );
+}
+
 export default function PrivacyPolicyPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
@@ -62,7 +71,7 @@ export default function PrivacyPolicyPage() {
 
       <FadeIn delay={0.1}>
         <p className="mt-6 text-base leading-7 text-muted-foreground">
-          Your privacy matters to us. This policy explains what data {siteConfig.name} collects,
+          Your privacy matters to us. This policy explains what data {siteConfig.name} {" "} collects,
           why we collect it, and what we do with it. We&apos;ve written it in plain language — no
           legalese.
         </p>
@@ -74,7 +83,11 @@ export default function PrivacyPolicyPage() {
         {SECTIONS.map(({ title, body }) => (
           <section key={title}>
             <h2 className="font-serif text-xl font-semibold tracking-tight">{title}</h2>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">{body}</p>
+            <div className="mt-3 space-y-3">
+              {body.split("\n\n").map((para, i) => (
+                <p key={i} className="text-sm leading-7 text-muted-foreground">{linkEmails(para)}</p>
+              ))}
+            </div>
           </section>
         ))}
       </div>

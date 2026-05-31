@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { FileText, Search } from "lucide-react";
 import { BlogCard } from "@/components/blog/blog-card";
 import { BlogSearch } from "@/components/blog/blog-search";
 import { CategoryTabs } from "@/components/blog/category-tabs";
 import { Pagination } from "@/components/blog/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   fetchBlogs,
   fetchFilteredBlogs,
@@ -30,11 +28,14 @@ export default async function BlogsPage({ searchParams }: Props) {
   const { page: pageStr, category, tag, q } = await searchParams;
   const page = Math.max(1, Number(pageStr ?? 1));
 
+  const selectedCategories = category ? category.split(",").filter(Boolean) : [];
+  const selectedTags = tag ? tag.split(",").filter(Boolean) : [];
+
   const [categoriesResult, tagsResult, blogsResult] = await Promise.allSettled([
     fetchDistinctCategories(),
     fetchDistinctTags(),
-    q?.trim() || tag || category
-      ? fetchFilteredBlogs({ search: q?.trim(), tag, category, page })
+    q?.trim() || selectedTags.length || selectedCategories.length
+      ? fetchFilteredBlogs({ search: q?.trim(), tag: selectedTags.length ? selectedTags : undefined, category: selectedCategories.length ? selectedCategories : undefined, page })
       : fetchBlogs(page),
   ]);
 
@@ -57,12 +58,17 @@ export default async function BlogsPage({ searchParams }: Props) {
 
       {/* Filters */}
       <div className="mb-6 flex flex-col gap-4">
-        <Suspense fallback={<Skeleton className="h-11 w-full max-w-sm" />}>
-          <BlogSearch />
-        </Suspense>
-        <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-          <CategoryTabs categories={categories} tags={tags} />
-        </Suspense>
+        <BlogSearch
+          initialValue={q ?? ""}
+          preservedParams={new URLSearchParams({ ...(category && { category }), ...(tag && { tag }) }).toString()}
+        />
+        <CategoryTabs
+          categories={categories}
+          tags={tags}
+          defaultCategory={category ?? ""}
+          defaultTag={tag ?? ""}
+          currentSearch={q ?? ""}
+        />
       </div>
 
       {/* Active filter banner */}
@@ -81,22 +87,18 @@ export default async function BlogsPage({ searchParams }: Props) {
         </div>
       )}
 
-      {(category || tag) && (
+      {(selectedCategories.length > 0 || selectedTags.length > 0) && (
         <div className="mb-5">
           <p className="text-sm text-muted-foreground">
-            {category ? (
-              <>
-                Showing blogs in <span className="font-medium text-foreground">{category}</span>
-              </>
-            ) : (
-              <>
-                Showing blogs tagged{" "}
-                <span className="font-medium text-foreground">#{tag}</span>
-              </>
+            Showing blogs
+            {selectedCategories.length > 0 && (
+              <> in <span className="font-medium text-foreground">{selectedCategories.join(", ")}</span></>
             )}
-            {blogs.length > 0 && (
-              <> — {blogs.length} post{blogs.length !== 1 ? "s" : ""}</>
+            {selectedCategories.length > 0 && selectedTags.length > 0 && " · "}
+            {selectedTags.length > 0 && (
+              <>tagged <span className="font-medium text-foreground">{selectedTags.map((t) => `#${t}`).join(", ")}</span></>
             )}
+            {total > 0 && <> — {total} post{total !== 1 ? "s" : ""}</>}
           </p>
         </div>
       )}
@@ -106,20 +108,22 @@ export default async function BlogsPage({ searchParams }: Props) {
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {blogs.map((blog) => (
-              <BlogCard key={blog._id} blog={blog} />
+              <BlogCard key={String(blog._id)} blog={blog} />
             ))}
           </div>
 
           {totalPages > 1 && (
             <div className="mt-10">
-              <Suspense>
-                <Pagination page={page} totalPages={totalPages} />
-              </Suspense>
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                preservedParams={new URLSearchParams({ ...(q && { q }), ...(category && { category }), ...(tag && { tag }) }).toString()}
+              />
             </div>
           )}
         </>
       ) : (
-        <EmptyState query={q} category={category} tag={tag} />
+        <EmptyState query={q} categories={selectedCategories} tags={selectedTags} />
       )}
     </main>
   );
@@ -127,12 +131,12 @@ export default async function BlogsPage({ searchParams }: Props) {
 
 function EmptyState({
   query,
-  category,
-  tag,
+  categories,
+  tags,
 }: {
   query?: string;
-  category?: string;
-  tag?: string;
+  categories: string[];
+  tags: string[];
 }) {
   return (
     <div className="flex flex-col items-center gap-4 py-24 text-center">
@@ -143,10 +147,10 @@ function EmptyState({
       <p className="max-w-sm text-sm text-muted-foreground">
         {query
           ? `No results for "${query}". Try a different search term.`
-          : tag
-            ? `No published posts tagged "#${tag}" yet.`
-            : category
-              ? `No published posts in "${category}" yet.`
+          : tags.length
+            ? `No published posts tagged ${tags.map((t) => `"#${t}"`).join(", ")} yet.`
+            : categories.length
+              ? `No published posts in ${categories.map((c) => `"${c}"`).join(", ")} yet.`
               : "No published posts yet. Be the first to write one!"}
       </p>
     </div>

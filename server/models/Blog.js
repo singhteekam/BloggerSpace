@@ -96,6 +96,11 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model("Blog", blogSchema);
 
+// Compound indexes for the public blog listing + filter queries
+blogSchema.index({ status: 1, lastUpdatedAt: -1 });
+blogSchema.index({ status: 1, category: 1, lastUpdatedAt: -1 });
+blogSchema.index({ status: 1, tags: 1, lastUpdatedAt: -1 });
+
 Blog.syncIndexes();
 
 module.exports = Blog;
