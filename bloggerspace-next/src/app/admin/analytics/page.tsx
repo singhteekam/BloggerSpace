@@ -257,7 +257,7 @@ function VisitorsTab({ userId }: { userId: string }) {
   const [to, setTo] = useState('');
   const [sort, setSort] = useState<'lastSeen' | 'firstSeen' | 'visits' | 'pageCount'>('lastSeen');
   // Applied — drives the actual API call (only updated on Apply / Clear)
-  const [applied, setApplied] = useState({ q: '', from: '', to: '', sort: 'lastSeen' as const });
+  const [applied, setApplied] = useState<{ q: string; from: string; to: string; sort: 'lastSeen' | 'firstSeen' | 'visits' | 'pageCount' }>({ q: '', from: '', to: '', sort: 'lastSeen' });
   const [page, setPage] = useState(1);
   const [openVisitor, setOpenVisitor] = useState<string | null>(null);
 
@@ -432,7 +432,7 @@ function LogsTab({ userId }: { userId: string }) {
   const [to, setTo] = useState('');
   const [sort, setSort] = useState<'newest' | 'oldest'>('newest');
   // Applied — drives the API call
-  const [applied, setApplied] = useState({ q: '', device: '', from: '', to: '', sort: 'newest' as const });
+  const [applied, setApplied] = useState<{ q: string; device: string; from: string; to: string; sort: 'newest' | 'oldest' }>({ q: '', device: '', from: '', to: '', sort: 'newest' });
   const [page, setPage] = useState(1);
   const [retention, setRetention] = useState<number>(30);
   const [confirmOpen, setConfirmOpen] = useState(false);
