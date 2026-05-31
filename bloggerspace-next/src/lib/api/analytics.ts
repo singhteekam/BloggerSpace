@@ -61,6 +61,16 @@ export type LogsFilter = {
   visitorId?: string;
   from?: string;
   to?: string;
+  sort?: "newest" | "oldest";
+};
+
+export type VisitorFilter = {
+  page?: number;
+  limit?: number;
+  q?: string;
+  from?: string;
+  to?: string;
+  sort?: "lastSeen" | "firstSeen" | "visits" | "pageCount";
 };
 
 // ── Visitors ──────────────────────────────────────────────────────────────────
@@ -124,9 +134,9 @@ export const analyticsApi = {
       params: { userId, role: "Admin", ...filter },
     }),
 
-  getVisitors: (userId: string, params: { page?: number; limit?: number; q?: string } = {}) =>
+  getVisitors: (userId: string, filter: VisitorFilter = {}) =>
     api.get<VisitorsResponse>("/api/analytics/visitors", {
-      params: { userId, role: "Admin", ...params },
+      params: { userId, role: "Admin", ...filter },
     }),
 
   getVisitorJourney: (userId: string, visitorId: string) =>

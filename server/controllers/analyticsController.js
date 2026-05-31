@@ -250,7 +250,7 @@ exports.getLogs = async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 25));
-    const { q = "", device = "", country = "", visitorId = "", from = "", to = "" } = req.query;
+    const { q = "", device = "", country = "", visitorId = "", from = "", to = "", sort = "newest" } = req.query;
 
     const filter = {};
     if (device) filter.device = device;
@@ -259,15 +259,17 @@ exports.getLogs = async (req, res) => {
     if (from || to) {
       filter.timestamp = {};
       if (from) filter.timestamp.$gte = new Date(from);
-      if (to) filter.timestamp.$lte = new Date(to);
+      if (to)   filter.timestamp.$lte = new Date(to);
     }
     if (q) {
       const rx = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
       filter.$or = [{ page: rx }, { referrer: rx }, { visitorId: rx }, { country: rx }, { os: rx }, { browser: rx }];
     }
 
+    const sortOrder = sort === "oldest" ? 1 : -1;
+
     const [logs, total] = await Promise.all([
-      VisitorLog.find(filter).sort({ timestamp: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+      VisitorLog.find(filter).sort({ timestamp: sortOrder }).skip((page - 1) * limit).limit(limit).lean(),
       VisitorLog.countDocuments(filter),
     ]);
 
@@ -283,18 +285,31 @@ exports.getVisitors = async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 25));
-    const { q = "" } = req.query;
+    const { q = "", from = "", to = "", sort = "lastSeen" } = req.query;
 
     const match = { visitorId: { $ne: "" } };
+    if (from || to) {
+      match.timestamp = {};
+      if (from) match.timestamp.$gte = new Date(from);
+      if (to)   match.timestamp.$lte = new Date(to);
+    }
     if (q) {
       const rx = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
       match.$or = [{ visitorId: rx }, { country: rx }];
     }
 
+    const SORT_FIELDS = {
+      lastSeen:  { lastSeen: -1 },
+      firstSeen: { firstSeen: 1 },
+      visits:    { visits: -1 },
+      pageCount: { pageCount: -1 },
+    };
+    const sortStage = SORT_FIELDS[sort] || SORT_FIELDS.lastSeen;
+
     const [rows, totalArr] = await Promise.all([
       VisitorLog.aggregate([
         { $match: match },
-        { $sort: { timestamp: 1 } }, // so $last picks the most recent snapshot fields
+        { $sort: { timestamp: 1 } },
         {
           $group: {
             _id: "$visitorId",
@@ -309,10 +324,11 @@ exports.getVisitors = async (req, res) => {
             lastPage: { $last: "$page" },
           },
         },
-        { $sort: { lastSeen: -1 } },
+        { $addFields: { pageCount: { $size: "$pages" } } },
+        { $sort: sortStage },
         { $skip: (page - 1) * limit },
         { $limit: limit },
-        { $project: { _id: 0, visitorId: "$_id", visits: 1, pageCount: { $size: "$pages" }, firstSeen: 1, lastSeen: 1, country: 1, device: 1, browser: 1, os: 1, lastPage: 1 } },
+        { $project: { _id: 0, visitorId: "$_id", visits: 1, pageCount: 1, firstSeen: 1, lastSeen: 1, country: 1, device: 1, browser: 1, os: 1, lastPage: 1 } },
       ]),
       VisitorLog.aggregate([{ $match: match }, { $group: { _id: "$visitorId" } }, { $count: "n" }]),
     ]);

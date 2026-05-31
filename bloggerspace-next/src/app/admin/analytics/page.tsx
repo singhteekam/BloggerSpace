@@ -251,48 +251,101 @@ function BreakdownCard({ icon, title, items, total, scope, empty }: {
 
 // ════════════════════════════ VISITORS TAB ════════════════════════════════════
 function VisitorsTab({ userId }: { userId: string }) {
-  const [search, setSearch] = useState("");
-  const [q, setQ] = useState("");
+  // Pending — what the user is editing in the UI
+  const [search, setSearch] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [sort, setSort] = useState<'lastSeen' | 'firstSeen' | 'visits' | 'pageCount'>('lastSeen');
+  // Applied — drives the actual API call (only updated on Apply / Clear)
+  const [applied, setApplied] = useState({ q: '', from: '', to: '', sort: 'lastSeen' as const });
   const [page, setPage] = useState(1);
   const [openVisitor, setOpenVisitor] = useState<string | null>(null);
 
+  const filter = {
+    q: applied.q,
+    from: applied.from || undefined,
+    to: applied.to ? applied.to + 'T23:59:59.999Z' : undefined,
+    sort: applied.sort,
+    page,
+    limit: 25,
+  };
+
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-visitors", userId, q, page],
-    queryFn: () => analyticsApi.getVisitors(userId, { q, page, limit: 25 }).then((r) => r.data),
+    queryKey: ['admin-visitors', userId, filter],
+    queryFn: () => analyticsApi.getVisitors(userId, filter).then((r) => r.data),
     staleTime: 60 * 1000,
   });
 
-  const submitSearch = () => { setQ(search.trim()); setPage(1); };
+  const apply = () => {
+    setApplied({ q: search.trim(), from, to, sort });
+    setPage(1);
+  };
+  const clearAll = () => {
+    setSearch(''); setFrom(''); setTo(''); setSort('lastSeen');
+    setApplied({ q: '', from: '', to: '', sort: 'lastSeen' });
+    setPage(1);
+  };
+  const hasApplied = applied.q || applied.from || applied.to;
+
+  const handleFromChange = (val: string) => {
+    setFrom(val);
+    if (to && val > to) setTo('');
+  };
 
   return (
     <div>
-      <SearchBar value={search} onChange={setSearch} onSubmit={submitSearch}
-        onClear={() => { setSearch(""); setQ(""); setPage(1); }} placeholder="Search by visitor ID or country…" />
+      <div className='mb-4 flex flex-wrap items-end gap-2'>
+        <div className='relative min-w-48 flex-1'>
+          <Search className='pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground' />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && apply()}
+            placeholder='Search visitor ID or country...' className='pl-9' />
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <label className='text-xs text-muted-foreground whitespace-nowrap'>From</label>
+          <Input type='date' value={from} max={to || undefined}
+            onChange={(e) => handleFromChange(e.target.value)} className='h-9 w-36 text-sm' />
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <label className='text-xs text-muted-foreground whitespace-nowrap'>To</label>
+          <Input type='date' value={to} min={from || undefined}
+            onChange={(e) => setTo(e.target.value)} className='h-9 w-36 text-sm' />
+        </div>
+        <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}
+          className='h-9 rounded-md border border-input bg-background px-3 text-sm'>
+          <option value='lastSeen'>Last seen</option>
+          <option value='firstSeen'>First seen</option>
+          <option value='visits'>Most visits</option>
+          <option value='pageCount'>Most pages</option>
+        </select>
+        <Button variant='outline' size='sm' onClick={apply}>Apply</Button>
+        {(hasApplied || search || from || to) && <Button variant='ghost' size='sm' onClick={clearAll}><X className='size-3.5 mr-1' />Clear</Button>}
+      </div>
 
       {isLoading ? <TableSkeleton /> : !data || data.visitors.length === 0 ? (
-        <EmptyBox msg={q ? `No visitors match “${q}”.` : "No visitor activity yet."} />
+        <EmptyBox msg={hasApplied ? 'No visitors match your filters.' : 'No visitor activity yet.'} />
       ) : (
         <>
-          <div className="overflow-x-auto rounded-xl border border-border">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-xs text-muted-foreground">
+          <div className='overflow-x-auto rounded-xl border border-border'>
+            <table className='w-full text-sm'>
+              <thead className='bg-muted/40 text-xs text-muted-foreground'>
                 <tr>
                   <Th>Visitor</Th><Th>Visits</Th><Th>Pages</Th>
                   <Th>Device / Browser</Th><Th>First seen</Th><Th>Last seen</Th><Th></Th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className='divide-y divide-border'>
                 {data.visitors.map((v: VisitorRow) => (
-                  <tr key={v.visitorId} className="hover:bg-muted/30">
-                    <Td><span className="font-mono text-xs" title={v.visitorId ?? ""}>{shortId(v.visitorId)}</span></Td>
-                    <Td><Badge variant="secondary" className="text-xs">{v.visits}</Badge></Td>
+                  <tr key={v.visitorId} className='hover:bg-muted/30'>
+                    <Td><span className='font-mono text-xs' title={v.visitorId ?? ''}>{shortId(v.visitorId)}</span></Td>
+                    <Td><Badge variant='secondary' className='text-xs'>{v.visits}</Badge></Td>
                     <Td>{v.pageCount}</Td>
-                    <Td className="text-xs text-muted-foreground">{v.device || "—"} · {v.browser || "—"}</Td>
-                    <Td className="text-xs text-muted-foreground">{fmtDate(v.firstSeen)}</Td>
-                    <Td className="text-xs text-muted-foreground">{fmtDateTime(v.lastSeen)}</Td>
+                    <Td className='text-xs text-muted-foreground'>{v.device || '—'} · {v.browser || '—'}</Td>
+                    <Td className='text-xs text-muted-foreground'>{fmtDate(v.firstSeen)}</Td>
+                    <Td className='text-xs text-muted-foreground'>{fmtDateTime(v.lastSeen)}</Td>
                     <Td>
-                      <Button size="sm" variant="ghost" className="h-7 gap-1 text-xs" onClick={() => setOpenVisitor(v.visitorId)}>
-                        <Activity className="size-3.5" />Journey
+                      <Button size='sm' variant='ghost' className='h-7 gap-1 text-xs' onClick={() => setOpenVisitor(v.visitorId)}>
+                        <Activity className='size-3.5' />Journey
                       </Button>
                     </Td>
                   </tr>
@@ -372,16 +425,31 @@ function JourneyDialog({ userId, visitorId, onClose }: { userId: string; visitor
 // ════════════════════════════ LOGS TAB ════════════════════════════════════════
 function LogsTab({ userId }: { userId: string }) {
   const qc = useQueryClient();
-  const [search, setSearch] = useState("");
-  const [q, setQ] = useState("");
-  const [device, setDevice] = useState("");
+  // Pending — what the user is editing
+  const [search, setSearch] = useState('');
+  const [device, setDevice] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [sort, setSort] = useState<'newest' | 'oldest'>('newest');
+  // Applied — drives the API call
+  const [applied, setApplied] = useState({ q: '', device: '', from: '', to: '', sort: 'newest' as const });
   const [page, setPage] = useState(1);
   const [retention, setRetention] = useState<number>(30);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const filter = {
+    q: applied.q,
+    device: applied.device,
+    from: applied.from || undefined,
+    to: applied.to ? applied.to + 'T23:59:59.999Z' : undefined,
+    sort: applied.sort,
+    page,
+    limit: 25,
+  };
+
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-logs", userId, q, device, page],
-    queryFn: () => analyticsApi.getLogs(userId, { q, device, page, limit: 25 }).then((r) => r.data),
+    queryKey: ['admin-logs', userId, filter],
+    queryFn: () => analyticsApi.getLogs(userId, filter).then((r) => r.data),
     staleTime: 30 * 1000,
   });
 
@@ -389,72 +457,100 @@ function LogsTab({ userId }: { userId: string }) {
     mutationFn: () => analyticsApi.deleteOldLogs(userId, retention),
     onSuccess: (res) => {
       toast.success(`Deleted ${res.data.deletedCount.toLocaleString()} logs older than ${retention} days.`);
-      qc.invalidateQueries({ queryKey: ["admin-logs"] });
-      qc.invalidateQueries({ queryKey: ["admin-analytics"] });
-      qc.invalidateQueries({ queryKey: ["admin-visitors"] });
+      qc.invalidateQueries({ queryKey: ['admin-logs'] });
+      qc.invalidateQueries({ queryKey: ['admin-analytics'] });
+      qc.invalidateQueries({ queryKey: ['admin-visitors'] });
       setConfirmOpen(false);
     },
-    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Delete failed.") : "Error."),
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? 'Delete failed.') : 'Error.'),
   });
 
-  const submitSearch = () => { setQ(search.trim()); setPage(1); };
+  const apply = () => {
+    setApplied({ q: search.trim(), device, from, to, sort });
+    setPage(1);
+  };
+  const clearAll = () => {
+    setSearch(''); setDevice(''); setFrom(''); setTo(''); setSort('newest');
+    setApplied({ q: '', device: '', from: '', to: '', sort: 'newest' });
+    setPage(1);
+  };
+  const hasApplied = applied.q || applied.device || applied.from || applied.to;
+
+  const handleFromChange = (val: string) => {
+    setFrom(val);
+    if (to && val > to) setTo('');
+  };
 
   return (
     <div>
-      {/* Filters + retention */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <div className='mb-4 flex flex-wrap items-end gap-2'>
+        <div className='relative min-w-48 flex-1'>
+          <Search className='pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground' />
           <Input value={search} onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && submitSearch()}
-            placeholder="Search page, referrer, visitor, country…" className="pl-9" />
+            onKeyDown={(e) => e.key === 'Enter' && apply()}
+            placeholder='Search page, referrer, visitor, country...' className='pl-9' />
         </div>
-        <select value={device} onChange={(e) => { setDevice(e.target.value); setPage(1); }}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm">
-          <option value="">All devices</option>
-          <option value="desktop">Desktop</option>
-          <option value="mobile">Mobile</option>
-          <option value="tablet">Tablet</option>
+        <select value={device} onChange={(e) => setDevice(e.target.value)}
+          className='h-9 rounded-md border border-input bg-background px-3 text-sm'>
+          <option value=''>All devices</option>
+          <option value='desktop'>Desktop</option>
+          <option value='mobile'>Mobile</option>
+          <option value='tablet'>Tablet</option>
         </select>
-        <Button variant="outline" size="sm" onClick={submitSearch}>Search</Button>
+        <div className='flex items-center gap-1.5'>
+          <label className='text-xs text-muted-foreground whitespace-nowrap'>From</label>
+          <Input type='date' value={from} max={to || undefined}
+            onChange={(e) => handleFromChange(e.target.value)} className='h-9 w-36 text-sm' />
+        </div>
+        <div className='flex items-center gap-1.5'>
+          <label className='text-xs text-muted-foreground whitespace-nowrap'>To</label>
+          <Input type='date' value={to} min={from || undefined}
+            onChange={(e) => setTo(e.target.value)} className='h-9 w-36 text-sm' />
+        </div>
+        <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}
+          className='h-9 rounded-md border border-input bg-background px-3 text-sm'>
+          <option value='newest'>Newest first</option>
+          <option value='oldest'>Oldest first</option>
+        </select>
+        <Button variant='outline' size='sm' onClick={apply}>Apply</Button>
+        {(hasApplied || search || device || from || to) && <Button variant='ghost' size='sm' onClick={clearAll}><X className='size-3.5 mr-1' />Clear</Button>}
       </div>
 
-      {/* Retention delete bar */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-900/10">
-        <p className="text-xs text-muted-foreground">
-          <Trash2 className="mr-1 inline size-3.5 text-amber-600" />
+      <div className='mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-900/10'>
+        <p className='text-xs text-muted-foreground'>
+          <Trash2 className='mr-1 inline size-3.5 text-amber-600' />
           Clean up old logs. (Logs also auto-expire after 90 days.)
         </p>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Delete older than</span>
+        <div className='flex items-center gap-2'>
+          <span className='text-xs text-muted-foreground'>Delete older than</span>
           <select value={retention} onChange={(e) => setRetention(Number(e.target.value))}
-            className="h-8 rounded-md border border-input bg-background px-2 text-sm">
+            className='h-8 rounded-md border border-input bg-background px-2 text-sm'>
             {DELETE_RETENTION_OPTIONS.map((d) => <option key={d} value={d}>{d} days</option>)}
           </select>
-          <Button size="sm" variant="destructive" className="h-8 gap-1.5" onClick={() => setConfirmOpen(true)}>
-            <Trash2 className="size-3.5" />Delete
+          <Button size='sm' variant='destructive' className='h-8 gap-1.5' onClick={() => setConfirmOpen(true)}>
+            <Trash2 className='size-3.5' />Delete
           </Button>
         </div>
       </div>
 
       {isLoading ? <TableSkeleton /> : !data || data.logs.length === 0 ? (
-        <EmptyBox msg={q || device ? "No logs match your filters." : "No logs yet."} />
+        <EmptyBox msg={hasApplied ? 'No logs match your filters.' : 'No logs yet.'} />
       ) : (
         <>
-          <div className="overflow-x-auto rounded-xl border border-border">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-xs text-muted-foreground">
+          <div className='overflow-x-auto rounded-xl border border-border'>
+            <table className='w-full text-sm'>
+              <thead className='bg-muted/40 text-xs text-muted-foreground'>
                 <tr><Th>Time (IST)</Th><Th>Page</Th><Th>Visitor</Th><Th>Device</Th><Th>Browser / OS</Th><Th>Referrer</Th></tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className='divide-y divide-border'>
                 {data.logs.map((l: VisitorLogRow) => (
-                  <tr key={l._id} className="hover:bg-muted/30">
-                    <Td className="whitespace-nowrap text-xs text-muted-foreground">{fmtDateTime(l.timestamp)}</Td>
-                    <Td><span className="block max-w-[180px] truncate" title={l.page}>{l.page}</span></Td>
-                    <Td><span className="font-mono text-[11px]" title={l.visitorId}>{l.visitorId ? shortId(l.visitorId) : "—"}</span></Td>
-                    <Td className="text-xs">{l.device || "—"}</Td>
-                    <Td className="text-xs text-muted-foreground">{l.browser || "—"} · {l.os || "—"}</Td>
-                    <Td><span className="block max-w-[120px] truncate text-xs text-muted-foreground" title={l.referrer}>{l.referrer || "direct"}</span></Td>
+                  <tr key={l._id} className='hover:bg-muted/30'>
+                    <Td className='whitespace-nowrap text-xs text-muted-foreground'>{fmtDateTime(l.timestamp)}</Td>
+                    <Td><span className='block break-all text-xs'>{l.page}</span></Td>
+                    <Td><span className='font-mono text-[11px]' title={l.visitorId}>{l.visitorId ? shortId(l.visitorId) : '—'}</span></Td>
+                    <Td className='text-xs'>{l.device || '—'}</Td>
+                    <Td className='text-xs text-muted-foreground'>{l.browser || '—'} · {l.os || '—'}</Td>
+                    <Td><span className='block max-w-[120px] truncate text-xs text-muted-foreground' title={l.referrer}>{l.referrer || 'direct'}</span></Td>
                   </tr>
                 ))}
               </tbody>
@@ -479,6 +575,7 @@ function LogsTab({ userId }: { userId: string }) {
               {delMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
               Delete logs
             </Button>
+
           </DialogFooter>
         </DialogContent>
       </Dialog>
