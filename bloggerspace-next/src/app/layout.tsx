@@ -10,7 +10,6 @@ import { ChatWidget } from "@/components/chat/chat-widget";
 import { TrackPageView } from "@/components/analytics/track-pageview";
 import { siteConfig } from "@/lib/constants/site";
 import { websiteJsonLd } from "@/lib/utils/json-ld";
-import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -40,6 +39,9 @@ export const metadata: Metadata = {
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  other: {
+    "google-adsense-account": "ca-pub-2867880443810811",
+  },
   keywords: [...siteConfig.keywords],
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.url }],
   creator: siteConfig.author.name,
@@ -101,13 +103,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${crimsonPro.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background font-sans text-foreground">
-        <Script
-          async
-          strategy="afterInteractive"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2867880443810811"
-          crossOrigin="anonymous"
-        />
-
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
