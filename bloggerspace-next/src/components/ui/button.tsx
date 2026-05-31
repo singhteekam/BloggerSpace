@@ -9,13 +9,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-sm hover:opacity-95 hover:shadow-md active:scale-[0.98]",
+          "bg-primary text-primary-foreground shadow-sm hover:opacity-95 hover:shadow-md active:scale-[0.98] btn-shimmer",
         accent:
           "bg-accent text-accent-foreground shadow-sm hover:opacity-95 hover:shadow-md active:scale-[0.98]",
         secondary:
           "bg-muted text-foreground hover:bg-muted/80",
         outline:
-          "border border-border bg-card text-foreground hover:bg-muted",
+          "border border-transparent bg-card text-foreground hover:bg-muted btn-border-anim",
         ghost:
           "text-foreground hover:bg-muted",
         link:
