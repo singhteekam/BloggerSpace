@@ -131,6 +131,34 @@ a img, button img, [role="button"] img {
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+@property --outline-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes outline-spin {
+  to { --outline-angle: 360deg; }
+}
+
+/* Unlayered — overrides all @layer rules including Tailwind utilities */
+.btn-gradient-border {
+  border: 1.5px solid transparent;
+  background-image:
+    linear-gradient(var(--card), var(--card)),
+    conic-gradient(from var(--outline-angle), var(--primary), var(--success), var(--primary));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+  animation: outline-spin 3s linear infinite;
+}
+.btn-gradient-border:hover {
+  background-image:
+    linear-gradient(var(--muted), var(--muted)),
+    conic-gradient(from var(--outline-angle), var(--primary), var(--success), var(--primary));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+}
+
 @layer base {
   * {
     border-color: var(--border);
@@ -352,72 +380,6 @@ a img, button img, [role="button"] img {
   .blog-prose sup { vertical-align: super; font-size: 0.75em; }
 }
 
-/* ─── Button animations ──────────────────────────────────────────────────── */
-
-/* Enables CSS-property animation for the rotating border angle */
-@property --btn-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes btn-border-spin {
-  to { --btn-angle: 360deg; }
-}
-
-@keyframes btn-shine {
-  0%, 60%, 100% { left: -80%; opacity: 0; }
-  20%           { opacity: 1; }
-  50%           { left: 125%; opacity: 0; }
-}
-
-@layer components {
-  /* ── Shimmer sweep for filled (default) buttons ────────────────────────── */
-  .btn-shimmer {
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-shimmer::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -80%;
-    width: 45%;
-    height: 100%;
-    background: linear-gradient(
-      to right,
-      transparent,
-      color-mix(in oklab, white 28%, transparent),
-      transparent
-    );
-    transform: skewX(-18deg);
-    animation: btn-shine 3.5s ease-in-out infinite;
-    pointer-events: none;
-    border-radius: inherit;
-  }
-
-  /* ── Rotating gradient border for outline buttons ──────────────────────── */
-  .btn-border-anim {
-    position: relative;
-    isolation: isolate;
-  }
-  .btn-border-anim::before {
-    content: "";
-    position: absolute;
-    inset: -1.5px;
-    z-index: -1;
-    border-radius: inherit;
-    background: conic-gradient(
-      from var(--btn-angle),
-      var(--primary)  0%,
-      var(--accent)  40%,
-      var(--primary) 70%,
-      var(--primary) 100%
-    );
-    animation: btn-border-spin 4s linear infinite;
-    opacity: 0.85;
-  }
-}
 
 @layer utilities {
   /* Hide scrollbar while keeping scroll behaviour */
