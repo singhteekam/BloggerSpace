@@ -12,6 +12,7 @@ import { fetchApprovedReviews } from "@/lib/api/reviews";
 import { TechStackSection } from "./_sections/tech-stack-section";
 import { DeveloperSection } from "./_sections/developer-section";
 import { ContactSection } from "./_sections/contact-section";
+import { RecommendedSection } from "./_sections/recommended-section";
 
 export const metadata: Metadata = {
   title: `${siteConfig.fullName} — ${siteConfig.tagline}`,
@@ -35,6 +36,7 @@ export default async function Home() {
       <HeroSection totalBlogs={totalBlogs} />
       <PersonalIntroSection />
       <StatsSection totalBlogs={totalBlogs} />
+      <RecommendedSection />
       <HowItWorksSection />
       <WhatYouCanDoSection />
       <GemsSection />

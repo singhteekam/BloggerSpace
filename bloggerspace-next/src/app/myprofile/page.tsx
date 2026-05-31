@@ -9,8 +9,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Loader2, Pencil, Camera, CheckCircle2, BadgeCheck, CalendarDays,
   Gem, TrendingUp, TrendingDown, ChevronLeft, ChevronRight,
-  ShieldCheck, Clock, LayoutDashboard,
+  ShieldCheck, Clock, LayoutDashboard, Globe,
 } from "lucide-react";
+import { LinkedInIcon, GitHubIcon } from "@/components/icons/brand";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
@@ -18,14 +19,23 @@ import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAuth } from "@/contexts/auth-context";
 import { userApi, userGemsApi, type UserGemsTransaction } from "@/lib/api/user";
 import { RedemptionSection } from "@/components/user/redemption-section";
+import { ReadingHistorySection } from "@/components/user/reading-history-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { formatDate } from "@/lib/utils/html";
+
+const urlOrEmpty = z
+  .string()
+  .trim()
+  .max(200, "URL too long")
+  .refine((v) => v === "" || /^https?:\/\/.+/i.test(v), "Must start with http:// or https://")
+  .or(z.literal(""));
 
 const schema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -34,6 +44,10 @@ const schema = z.object({
     .min(3, "Minimum 3 characters")
     .max(20, "Maximum 20 characters")
     .regex(/^[a-z0-9_]+$/, "Lowercase letters, numbers, and underscores only"),
+  bio: z.string().max(280, "Bio must be 280 characters or fewer").optional(),
+  linkedin: urlOrEmpty,
+  github: urlOrEmpty,
+  website: urlOrEmpty,
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -81,7 +95,16 @@ export default function MyProfilePage() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    values: profile ? { fullName: profile.fullName, userName: profile.userName ?? "" } : undefined,
+    values: profile
+      ? {
+          fullName: profile.fullName,
+          userName: profile.userName ?? "",
+          bio: profile.bio ?? "",
+          linkedin: profile.socialLinks?.linkedin ?? "",
+          github: profile.socialLinks?.github ?? "",
+          website: profile.socialLinks?.website ?? "",
+        }
+      : undefined,
   });
 
   // Sync auth context when API returns fresher role/reviewerStatus (e.g. after admin approves)
@@ -104,7 +127,16 @@ export default function MyProfilePage() {
   const onSave = async (data: FormValues) => {
     if (!user) return;
     try {
-      const res = await userApi.updateProfile(user._id, data);
+      const res = await userApi.updateProfile(user._id, {
+        fullName: data.fullName,
+        userName: data.userName,
+        bio: data.bio ?? "",
+        socialLinks: {
+          linkedin: data.linkedin ?? "",
+          github: data.github ?? "",
+          website: data.website ?? "",
+        },
+      });
       login(localStorage.getItem("bs.token")!, res.data.user);
       qc.invalidateQueries({ queryKey: ["userinfo"] });
       toast.success("Profile updated.");
@@ -334,6 +366,11 @@ export default function MyProfilePage() {
         )}
       </div>
 
+      {/* Reading history */}
+      <div className="mt-4">
+        <ReadingHistorySection enabled={!!user} />
+      </div>
+
       <Separator className="my-8" />
 
       {/* Edit form */}
@@ -354,6 +391,34 @@ export default function MyProfilePage() {
             <p className="text-xs text-muted-foreground">
               Lowercase letters, numbers, and underscores. 3–20 characters.
             </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="bio">Bio</Label>
+            <Textarea id="bio" rows={3} placeholder="Tell readers a little about yourself…" {...register("bio")} />
+            {errors.bio && <p className="text-xs text-destructive">{errors.bio.message}</p>}
+            <p className="text-xs text-muted-foreground">Up to 280 characters. Shown on your public profile.</p>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Social links</Label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground"><LinkedInIcon className="size-4" /></span>
+                <Input placeholder="https://linkedin.com/in/username" {...register("linkedin")} />
+              </div>
+              {errors.linkedin && <p className="text-xs text-destructive">{errors.linkedin.message}</p>}
+              <div className="flex items-center gap-2">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground"><GitHubIcon className="size-4" /></span>
+                <Input placeholder="https://github.com/username" {...register("github")} />
+              </div>
+              {errors.github && <p className="text-xs text-destructive">{errors.github.message}</p>}
+              <div className="flex items-center gap-2">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground"><Globe className="size-4" /></span>
+                <Input placeholder="https://yourwebsite.com" {...register("website")} />
+              </div>
+              {errors.website && <p className="text-xs text-destructive">{errors.website.message}</p>}
+            </div>
           </div>
 
           <div className="flex gap-2">

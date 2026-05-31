@@ -16,6 +16,12 @@ export type PublicBlog = {
   blogScore?: number;
 };
 
+export type SocialLinks = {
+  linkedin: string;
+  github: string;
+  website: string;
+};
+
 export type PublicProfile = {
   _id: string;
   fullName: string;
@@ -23,6 +29,8 @@ export type PublicProfile = {
   email: string;
   profilePicture?: string;
   isVerified: boolean;
+  bio?: string;
+  socialLinks?: SocialLinks;
   followersCount: number;
   followingCount: number;
   isFollowing: boolean;
@@ -64,15 +72,38 @@ export type SavedBlog = {
   tags: string[];
 };
 
+export type ReadingHistoryItem = {
+  blogId?: number;
+  slug: string;
+  title: string;
+  category: string;
+  readAt: string;
+};
+
 export const userApi = {
   getInfo: () =>
     api.get<AuthUser>("/api/users/userinfo"),
 
-  updateProfile: (userId: string, data: { fullName: string; userName: string }) =>
+  updateProfile: (
+    userId: string,
+    data: { fullName: string; userName: string; bio?: string; socialLinks?: SocialLinks },
+  ) =>
     api.patch<{ message: string; user: AuthUser }>(
       `/api/users/updateusername?userId=${userId}`,
       data,
     ),
+
+  setNewsletterOptIn: (optIn: boolean) =>
+    api.patch<{ message: string; newsletterOptIn: boolean }>(
+      "/api/users/newsletter-optin",
+      { optIn },
+    ),
+
+  addReadingHistory: (data: { blogId?: number; slug: string; title: string; category: string }) =>
+    api.post<{ ok: boolean; deduped?: boolean }>("/api/users/reading-history", data),
+
+  getReadingHistory: () =>
+    api.get<{ history: ReadingHistoryItem[] }>("/api/users/reading-history"),
 
   uploadProfilePicture: (userId: string, file: File) => {
     const form = new FormData();

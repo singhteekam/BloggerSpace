@@ -28,7 +28,16 @@ export type AdminBlog = {
   blogScore?: number;
 };
 
-export type AdminBlogDetail = AdminBlog & { content: string };
+export type ReviewHistoryEntry = {
+  reviewerName: string;
+  role: string;
+  action: string;
+  rating: number | null;
+  remarks: string;
+  date: string | null;
+};
+
+export type AdminBlogDetail = AdminBlog & { content: string; reviewHistory?: ReviewHistoryEntry[] };
 
 export type ReviewerItem = {
   _id: string;
@@ -62,6 +71,7 @@ export type UserItem = {
   lastLogin?: string;
   lastVerifiedAt?: string | null;
   reverifyAttempts?: number;
+  newsletterOptIn?: boolean;
 };
 
 export type CommunityPost = {

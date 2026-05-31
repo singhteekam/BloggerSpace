@@ -100,6 +100,8 @@ const Blog = mongoose.model("Blog", blogSchema);
 blogSchema.index({ status: 1, lastUpdatedAt: -1 });
 blogSchema.index({ status: 1, category: 1, lastUpdatedAt: -1 });
 blogSchema.index({ status: 1, tags: 1, lastUpdatedAt: -1 });
+blogSchema.index({ status: 1, blogViews: -1 });
+blogSchema.index({ "blogLikes.userId": 1 });
 
 Blog.syncIndexes();
 

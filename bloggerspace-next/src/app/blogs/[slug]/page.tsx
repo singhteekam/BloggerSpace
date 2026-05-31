@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Eye, Calendar, BadgeCheck } from "lucide-react";
+import { Eye, Calendar, BadgeCheck, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BackToBlogs } from "@/components/blog/back-to-blogs";
 import { BlogActions } from "@/components/blog/blog-actions";
 import { CommentsSection } from "@/components/blog/comments-section";
 import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
+import { ShareButtons } from "@/components/blog/share-buttons";
+import { NewsletterCta } from "@/components/blog/newsletter-cta";
 import { BlogSidebar } from "@/components/blog/blog-sidebar";
 import { FollowButton } from "@/components/user/follow-button";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { fetchBlogBySlug, fetchRelatedBlogs, fetchTopBlogs, fetchBlogs } from "@/lib/api/blogs";
 import { fetchPublicProfile } from "@/lib/api/user";
-import { formatDate, htmlToText } from "@/lib/utils/html";
+import { formatDate, htmlToText, readingTime } from "@/lib/utils/html";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/utils/json-ld";
 import { siteConfig } from "@/lib/constants/site";
 
@@ -53,11 +55,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: [authorName],
       tags: blog.tags ?? [],
       siteName: siteConfig.name,
+      images: [{ url: "/brand/logo128x128.png", width: 128, height: 128, alt: blog.title }],
     },
     twitter: {
       card: "summary_large_image",
       title: blog.title,
       description,
+      images: ["/brand/logo128x128.png"],
     },
   };
 }
@@ -73,6 +77,7 @@ export default async function BlogDetailPage({ params }: Props) {
     ? "Admin"
     : (blog.authorDetails?.fullName ?? blog.authorDetails?.userName ?? "Anonymous");
   const date = formatDate(blog.createdAt || blog.lastUpdatedAt);
+  const shareUrl = `${siteConfig.url}/blogs/${blog.slug}`;
 
   const authorUserName = isAdminBlog ? undefined : blog.authorDetails?.userName;
 
@@ -91,7 +96,7 @@ export default async function BlogDetailPage({ params }: Props) {
 
   return (
     <main>
-      <BlogViewTracker slug={blog.slug} />
+      <BlogViewTracker slug={blog.slug} blogId={blog.blogId} title={blog.title} category={blog.category} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ldArticle) }}
@@ -134,6 +139,12 @@ export default async function BlogDetailPage({ params }: Props) {
                   <Eye className="size-3.5" />
                   {blog.blogViews ?? 0} views
                 </span>
+                {readingTime(blog.content) && (
+                  <span className="flex items-center gap-1">
+                    <Clock className="size-3.5" />
+                    {readingTime(blog.content)}
+                  </span>
+                )}
               </div>
 
               {/* Tags */}
@@ -162,7 +173,7 @@ export default async function BlogDetailPage({ params }: Props) {
             </article>
 
             {/* Like + Save actions */}
-            <div className="pb-8">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-8">
               <BlogActions
                 blogId={blog._id}
                 blogSlug={blog.slug}
@@ -171,6 +182,7 @@ export default async function BlogDetailPage({ params }: Props) {
                 blogTags={blog.tags ?? []}
                 initialLikes={blog.blogLikes ?? []}
               />
+              <ShareButtons url={shareUrl} title={blog.title} />
             </div>
 
             <Separator />
@@ -221,6 +233,9 @@ export default async function BlogDetailPage({ params }: Props) {
                 )}
               </div>
             </section>
+
+            {/* Newsletter CTA */}
+            <NewsletterCta />
 
             <Separator />
 

@@ -18,6 +18,9 @@ const {
   loggedInUserInfo,
   userProfile,
   updateUserPersonalDetails,
+  setNewsletterOptIn,
+  addReadingHistory,
+  getReadingHistory,
   incrementVisitCount,
   getVisitorCount,
   addBlogToSavedBlogs,
@@ -199,6 +202,13 @@ router.post("/checkusername", checkUserName);
 
 //Update username
 router.patch("/updateusername", authenticate, updateUserPersonalDetails);
+
+// Newsletter opt-in toggle
+router.patch("/newsletter-optin", authenticate, setNewsletterOptIn);
+
+// Reading history
+router.post("/reading-history", authenticate, addReadingHistory);
+router.get("/reading-history", authenticate, getReadingHistory);
 
 router.post("/discard/blog/:id", authenticate, discardBlogFromDB);
 

@@ -8,16 +8,16 @@ export const metadata: Metadata = {
   description: `How ${siteConfig.name} collects, uses, and protects your personal data.`,
 };
 
-const LAST_UPDATED = "31 May 2026";
+const LAST_UPDATED = "1 June 2026";
 
 const SECTIONS = [
   {
     title: "1. Information we collect",
-    body: `When you create an account, we collect your name, email address, and a password (stored as a salted hash — we never see your plain-text password). When you write a post, we store the content, metadata (title, tags, category), and timestamps. We do not collect payment information; BloggerSpace is free to use.\n\nWe also collect anonymous usage analytics for every page visit: the page URL, referrer, device type (desktop / mobile / tablet), browser name, operating system, and approximate country (derived from a request header — not precise location). A randomly generated visitor ID is stored in your browser's local storage to count visits without identifying you personally. We additionally store a one-way cryptographic hash of your IP address (not the IP itself) for deduplication only — your raw IP address is never persisted. All analytics data is automatically deleted after 90 days.`,
+    body: `When you create an account, we collect your name, email address, and a password (stored as a salted hash — we never see your plain-text password). When you write a post, we store the content, metadata (title, tags, category), and timestamps. We do not collect payment information; BloggerSpace is free to use.\n\nYou may optionally add profile information — a short bio and links to your LinkedIn, GitHub, or personal website. This information is entirely voluntary, is shown on your public profile, and can be edited or removed by you at any time from your profile settings.\n\nIf you are signed in, we keep a private reading history of the blog posts you open (title, category, and the time you read it), limited to your 50 most recent reads. This is visible only to you on your profile and is used to power personalised recommendations. It is never shown to other users. Reading history is only recorded while you are logged in.\n\nWe also collect anonymous usage analytics for every page visit: the page URL, referrer, device type (desktop / mobile / tablet), browser name, operating system, and approximate country (derived from a request header — not precise location). A randomly generated visitor ID is stored in your browser's local storage to count visits without identifying you personally. We additionally store a one-way cryptographic hash of your IP address (not the IP itself) for deduplication only — your raw IP address is never persisted. All analytics data is automatically deleted after 90 days.`,
   },
   {
     title: "2. How we use your information",
-    body: `Your email address is used to: send account notifications (review status updates, comment replies), deliver the newsletter if you opt in, and allow you to reset your password. We do not sell, rent, or share your personal information with third parties for marketing purposes. Server logs are used solely for security monitoring and infrastructure diagnosis.`,
+    body: `Your email address is used to: send account notifications (review status updates, comment replies) and allow you to reset your password. We use your reading history only to suggest other posts you may like, and never share it with anyone.\n\nThe newsletter is strictly opt-in: it is switched off by default, and we will only email you newsletter content if you actively turn it on under Settings → Email preferences. You can opt out again at any time from the same place, and we send newsletters only to users who are currently opted in. We do not sell, rent, or share your personal information with third parties for marketing purposes. Server logs are used solely for security monitoring and infrastructure diagnosis.`,
   },
   {
     title: "3. Cookies",

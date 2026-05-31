@@ -794,7 +794,7 @@ exports.fetchAllUsers= async(req, res)=>{
   try {
     // Return ACTIVE and INACTIVE users so admin can see and reactivate deactivated accounts
     const allUsers = await User.find({ status: { $in: ["ACTIVE", "INACTIVE"] } })
-      .select("fullName userName email status isVerified role reviewerStatus gems createdAt authType lastLogin lastVerifiedAt reverifyAttempts")
+      .select("fullName userName email status isVerified role reviewerStatus gems createdAt authType lastLogin lastVerifiedAt reverifyAttempts newsletterOptIn")
       .lean();
     res.json(allUsers);
   } catch (error) {
@@ -1148,6 +1148,26 @@ exports.adminBlogEdit = async (req, res) => {
         reviewerId: r.ReviewedBy.Id.toString(),
         reviewerName: nameMap.get(r.ReviewedBy.Id.toString()),
       }));
+
+    // Review history timeline — every action (incl. Admin), newest entries last
+    // as stored. Excludes the heavy `Revision` snapshot. Names resolved for all
+    // entries; Admin entries fall back to their email/role label.
+    const allHistoryIds = rawReviewedBy.filter((r) => r?.ReviewedBy?.Id).map((r) => r.ReviewedBy.Id);
+    const allHistoryUsers = allHistoryIds.length
+      ? await User.find({ _id: { $in: allHistoryIds } }, "fullName _id").lean()
+      : [];
+    const historyNameMap = new Map(allHistoryUsers.map((u) => [u._id.toString(), u.fullName]));
+    blogObj.reviewHistory = rawReviewedBy.map((r) => {
+      const id = r?.ReviewedBy?.Id?.toString();
+      return {
+        reviewerName: (id && historyNameMap.get(id)) || r?.ReviewedBy?.Email || "Unknown",
+        role: r?.ReviewedBy?.Role || "",
+        action: r?.statusTransition || "",
+        rating: typeof r?.Rating === "number" ? r.Rating : null,
+        remarks: r?.Remarks || "",
+        date: r?.LastUpdatedAt || null,
+      };
+    });
 
     console.debug("Blog opened in Edit mode. Blog title: " + blog.title);
     res.json(blogObj);

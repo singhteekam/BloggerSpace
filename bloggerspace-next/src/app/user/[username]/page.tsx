@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { BadgeCheck, BookOpen, Users, Calendar, Eye, Heart, Mail, Star, TrendingUp, MessageSquare } from "lucide-react";
+import { BadgeCheck, BookOpen, Users, Calendar, Eye, Heart, Mail, Star, TrendingUp, MessageSquare, Globe } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { LinkedInIcon, GitHubIcon } from "@/components/icons/brand";
 import { FollowButton } from "@/components/user/follow-button";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { fetchPublicProfile } from "@/lib/api/user";
@@ -66,6 +67,40 @@ export default async function PublicProfilePage({ params }: Props) {
               </span>
             )}
           </div>
+
+          {/* Bio */}
+          {profile.bio && (
+            <p className="mt-3 max-w-prose whitespace-pre-line text-sm leading-relaxed text-foreground/90">
+              {profile.bio}
+            </p>
+          )}
+
+          {/* Social links */}
+          {(profile.socialLinks?.linkedin || profile.socialLinks?.github || profile.socialLinks?.website) && (
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+              {profile.socialLinks?.linkedin && (
+                <a href={profile.socialLinks.linkedin} target="_blank" rel="noopener noreferrer nofollow"
+                  className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  aria-label="LinkedIn" title="LinkedIn">
+                  <LinkedInIcon className="size-4" />
+                </a>
+              )}
+              {profile.socialLinks?.github && (
+                <a href={profile.socialLinks.github} target="_blank" rel="noopener noreferrer nofollow"
+                  className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  aria-label="GitHub" title="GitHub">
+                  <GitHubIcon className="size-4" />
+                </a>
+              )}
+              {profile.socialLinks?.website && (
+                <a href={profile.socialLinks.website} target="_blank" rel="noopener noreferrer nofollow"
+                  className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  aria-label="Website" title="Website">
+                  <Globe className="size-4" />
+                </a>
+              )}
+            </div>
+          )}
 
           {/* Stats row */}
           <div className="mt-3 flex flex-wrap items-center justify-center gap-5 text-sm sm:justify-start">

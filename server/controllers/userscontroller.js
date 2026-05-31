@@ -814,6 +814,13 @@ exports.loggedInUserInfo = async (req, res) => {
       reviewerStatus: user.reviewerStatus ?? "none",
       gems: user.gems ?? 0,
       createdAt: user.createdAt,
+      bio: user.bio ?? "",
+      socialLinks: {
+        linkedin: user.socialLinks?.linkedin ?? "",
+        github:   user.socialLinks?.github ?? "",
+        website:  user.socialLinks?.website ?? "",
+      },
+      newsletterOptIn: user.newsletterOptIn ?? false,
     };
     // console.log("LoggedIn user details fetched");
     logger.debug("LoggedIn user details fetched. Name: " + user.fullName);
@@ -831,7 +838,7 @@ exports.userProfile = async (req, res) => {
     const viewerId = req.query.viewerId || null;
 
     const user = await User.findOne({ userName })
-      .select("fullName userName email profilePicture isVerified followers following createdAt creatorScore reviewerScoreAvg reviewerScoreCount reviewerScoreBest")
+      .select("fullName userName email profilePicture isVerified followers following createdAt creatorScore reviewerScoreAvg reviewerScoreCount reviewerScoreBest bio socialLinks")
       .lean()
       .exec();
 
@@ -873,6 +880,12 @@ exports.userProfile = async (req, res) => {
       email: maskedEmail,
       profilePicture: user.profilePicture,
       isVerified: user.isVerified,
+      bio: user.bio ?? "",
+      socialLinks: {
+        linkedin: user.socialLinks?.linkedin ?? "",
+        github:   user.socialLinks?.github ?? "",
+        website:  user.socialLinks?.website ?? "",
+      },
       followersCount: user.followers.length,
       followingCount: user.following.length,
       isFollowing,
@@ -914,7 +927,7 @@ exports.getFollowStatus = async (req, res) => {
 
 exports.updateUserPersonalDetails = async (req, res) => {
   try {
-    const { fullName, userName } = req.body;
+    const { fullName, userName, bio, socialLinks } = req.body;
     const validationError = validateUsername(userName);
     if (validationError) {
       logger.error(
@@ -928,15 +941,92 @@ exports.updateUserPersonalDetails = async (req, res) => {
     });
     updatedUser.fullName = fullName;
     updatedUser.userName = userName;
+
+    // Optional public-profile fields — only update when provided
+    if (typeof bio === "string") updatedUser.bio = bio.slice(0, 280);
+    if (socialLinks && typeof socialLinks === "object") {
+      updatedUser.socialLinks = {
+        linkedin: (socialLinks.linkedin || "").trim(),
+        github:   (socialLinks.github || "").trim(),
+        website:  (socialLinks.website || "").trim(),
+      };
+    }
     await updatedUser.save();
 
     logger.debug("Information updated succesfully for user: " + userName);
-    res.json({ message: "Username updated successfully", user: updatedUser });
+    res.json({ message: "Profile updated successfully", user: updatedUser });
   } catch (error) {
     logger.error("Error updating username:" + error);
     res
       .status(500)
       .json({ error: "An error occurred while updating the username" });
+  }
+};
+
+// Reading history — record a blog read (authenticated). Auto-dedups within 24h,
+// moves re-reads to the top, and caps the list at the 50 most-recent entries.
+const READING_HISTORY_CAP = 50;
+const READING_DEDUP_MS = 24 * 60 * 60 * 1000;
+
+exports.addReadingHistory = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    if (!userId) return res.status(401).json({ message: "Please login." });
+    const { blogId, slug, title, category } = req.body;
+    if (!slug) return res.status(400).json({ message: "slug required" });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const history = user.readingHistory || [];
+    const existing = history.find((h) => h.slug === slug);
+    // Skip a fresh re-read of the same blog within the dedup window
+    if (existing && existing.readAt && Date.now() - new Date(existing.readAt).getTime() < READING_DEDUP_MS) {
+      return res.status(200).json({ ok: true, deduped: true });
+    }
+
+    const filtered = history.filter((h) => h.slug !== slug);
+    filtered.unshift({ blogId, slug, title, category, readAt: new Date() });
+    user.readingHistory = filtered.slice(0, READING_HISTORY_CAP);
+    await user.save();
+
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    logger.error("Error adding reading history: " + error);
+    res.status(500).json({ error: "Failed to record reading history" });
+  }
+};
+
+exports.getReadingHistory = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    if (!userId) return res.status(401).json({ message: "Please login." });
+    const user = await User.findById(userId).select("readingHistory").lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ history: user.readingHistory || [] });
+  } catch (error) {
+    logger.error("Error fetching reading history: " + error);
+    res.status(500).json({ error: "Failed to fetch reading history" });
+  }
+};
+
+// Newsletter opt-in toggle (authenticated). Default is off; user controls it.
+exports.setNewsletterOptIn = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const { optIn } = req.body;
+    if (!userId) return res.status(401).json({ message: "Please login." });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.newsletterOptIn = !!optIn;
+    await user.save();
+
+    res.json({ message: optIn ? "Subscribed to newsletter." : "Unsubscribed from newsletter.", newsletterOptIn: user.newsletterOptIn });
+  } catch (error) {
+    logger.error("Error updating newsletter opt-in: " + error);
+    res.status(500).json({ error: "Failed to update newsletter preference" });
   }
 };
 

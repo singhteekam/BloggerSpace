@@ -12,6 +12,9 @@ export type AuthUser = {
   reviewerStatus?: "none" | "pending" | "approved" | "rejected";
   gems?: number;
   createdAt?: string;
+  bio?: string;
+  socialLinks?: { linkedin: string; github: string; website: string };
+  newsletterOptIn?: boolean;
 };
 
 /** Shape returned by POST /api/users/login */

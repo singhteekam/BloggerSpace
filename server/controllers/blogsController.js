@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
+const User = require("../models/User");
 const pako = require("pako");
 const sendEmail = require("../services/mailer");
 const { GoogleGenAI } = require("@google/genai");
@@ -253,6 +254,80 @@ exports.fetchTopViewedBlogs = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to fetch top viewed blogs" });
+  }
+};
+
+// Recommended blogs (personalized by the user's reading + liked categories/tags),
+// with a trending fallback (top viewed) for logged-out users or empty interests.
+exports.getRecommendedBlogs = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const LIMIT = 6;
+    const PUBLISHED = { status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } };
+    const SELECT = "title slug category tags content status blogViews blogLikes comments createdAt lastUpdatedAt blogScore authorDetails";
+
+    const trending = () =>
+      Blog.find(PUBLISHED)
+        .sort({ blogViews: -1 })
+        .limit(LIMIT)
+        .select(SELECT)
+        .populate("authorDetails", "fullName userName profilePicture")
+        .lean();
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.json({ personalized: false, blogs: await trending() });
+    }
+
+    const user = await User.findById(userId).select("readingHistory").lean();
+    if (!user) return res.json({ personalized: false, blogs: await trending() });
+
+    const readSlugs = (user.readingHistory || []).map((h) => h.slug).filter(Boolean);
+    const readCategories = (user.readingHistory || []).map((h) => h.category).filter(Boolean);
+
+    // Liked blogs → their categories + tags feed the interest model
+    const likedBlogs = await Blog.find({ ...PUBLISHED, "blogLikes.userId": userId })
+      .select("category tags slug")
+      .limit(50)
+      .lean();
+    const likedSlugs = likedBlogs.map((b) => b.slug);
+    const likedCategories = likedBlogs.map((b) => b.category).filter(Boolean);
+    const likedTags = likedBlogs.flatMap((b) => b.tags || []);
+
+    const categories = [...new Set([...readCategories, ...likedCategories])];
+    const tags = [...new Set(likedTags)];
+    const excludeSlugs = [...new Set([...readSlugs, ...likedSlugs])];
+
+    if (categories.length === 0 && tags.length === 0) {
+      return res.json({ personalized: false, blogs: await trending() });
+    }
+
+    const orConds = [];
+    if (categories.length) orConds.push({ category: { $in: categories } });
+    if (tags.length) orConds.push({ tags: { $in: tags } });
+
+    let blogs = await Blog.find({ ...PUBLISHED, slug: { $nin: excludeSlugs }, $or: orConds })
+      .sort({ blogScore: -1, blogViews: -1 })
+      .limit(LIMIT)
+      .select(SELECT)
+      .populate("authorDetails", "fullName userName profilePicture")
+      .lean();
+
+    // Top up with trending if interests didn't yield enough fresh blogs
+    if (blogs.length < LIMIT) {
+      const taken = new Set([...excludeSlugs, ...blogs.map((b) => b.slug)]);
+      const fillers = await Blog.find({ ...PUBLISHED, slug: { $nin: [...taken] } })
+        .sort({ blogViews: -1 })
+        .limit(LIMIT - blogs.length)
+        .select(SELECT)
+        .populate("authorDetails", "fullName userName profilePicture")
+        .lean();
+      blogs = [...blogs, ...fillers];
+    }
+
+    res.json({ personalized: blogs.length > 0, blogs });
+  } catch (err) {
+    console.error("Error fetching recommended blogs:", err);
+    res.status(500).json({ error: "Server error" });
   }
 };
 

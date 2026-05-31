@@ -1,6 +1,17 @@
 import type { Blog, BlogListResponse } from "@/types/blog";
+import { api } from "./client";
 
 const BASE = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
+
+export type RecommendedResponse = { personalized: boolean; blogs: Blog[] };
+
+/** Client-side: personalized recommendations (or trending fallback). */
+export async function fetchRecommendedBlogs(userId?: string): Promise<RecommendedResponse> {
+  const res = await api.get<RecommendedResponse>("/api/blogs/recommended", {
+    params: userId ? { userId } : {},
+  });
+  return res.data;
+}
 const LIMIT = 9;
 
 export async function fetchBlogs(page = 1): Promise<BlogListResponse> {

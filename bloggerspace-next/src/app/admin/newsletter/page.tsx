@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { Mail, Search, CheckSquare, Square, Loader2, Send, Users, History } from "lucide-react";
+import { Mail, Search, CheckSquare, Square, Loader2, Send, Users, History, BellRing } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi, type UserItem, type NewsletterRecord } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
@@ -53,22 +53,35 @@ function ComposeTab({ adminId }: { adminId: string }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [subscribedOnly, setSubscribedOnly] = useState(true);
+  const [preselected, setPreselected] = useState(false);
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["admin-users", adminId],
     queryFn: () => adminApi.getUsers(adminId).then((r) => r.data),
   });
 
+  const subscriberCount = useMemo(() => users.filter((u) => u.newsletterOptIn).length, [users]);
+
+  // Default the recipient list to subscribed users once, when data first loads.
+  useEffect(() => {
+    if (preselected || users.length === 0) return;
+    setSelected(new Set(users.filter((u) => u.newsletterOptIn).map((u) => u.email)));
+    setPreselected(true);
+  }, [users, preselected]);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    if (!q) return users;
-    return users.filter(
-      (u) =>
+    return users.filter((u) => {
+      if (subscribedOnly && !u.newsletterOptIn) return false;
+      if (!q) return true;
+      return (
         u.fullName?.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q) ||
-        u.userName?.toLowerCase().includes(q),
-    );
-  }, [users, search]);
+        u.userName?.toLowerCase().includes(q)
+      );
+    });
+  }, [users, search, subscribedOnly]);
 
   const allFilteredSelected =
     filtered.length > 0 && filtered.every((u) => selected.has(u.email));
@@ -157,6 +170,23 @@ function ComposeTab({ adminId }: { adminId: string }) {
               onChange={(e) => setSearch(e.target.value)}
               className="pl-8"
             />
+          </div>
+
+          {/* Subscribed-only filter */}
+          <div className="flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2">
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <BellRing className="size-3.5 text-primary" />
+              <span className="font-medium text-foreground">{subscriberCount}</span> subscribed
+            </span>
+            <label className="flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={subscribedOnly}
+                onChange={(e) => setSubscribedOnly(e.target.checked)}
+                className="size-3.5 accent-[var(--primary)]"
+              />
+              Show subscribed only
+            </label>
           </div>
 
           {/* User list */}
@@ -319,8 +349,14 @@ function UserRow({
         <Square className="size-4 shrink-0 text-muted-foreground" />
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">
+        <p className="flex items-center gap-1.5 truncate text-sm font-medium">
           {user.fullName ?? user.userName ?? "—"}
+          {user.newsletterOptIn && (
+            <Badge variant="secondary" className="gap-0.5 px-1.5 py-0 text-[10px] text-primary">
+              <BellRing className="size-2.5" />
+              Subscribed
+            </Badge>
+          )}
         </p>
         <p className="truncate text-xs text-muted-foreground">{user.email}</p>
       </div>

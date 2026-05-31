@@ -37,6 +37,7 @@ const {
   fetchBlogsForSitemap,
   toggleCommentLike,
   toggleReplyLike,
+  getRecommendedBlogs,
 } = require("../controllers/blogsController");
 const { downloadBlog } = require("../controllers/userscontroller");
 
@@ -59,6 +60,9 @@ router.get("/allblogs/category/:filterCategory", fetchBlogsByCategory);
 
 // Top Viewed blogs
 router.get("/topviewedblogs", fetchTopViewedBlogs);
+
+// Recommended (personalized) / Trending (fallback) blogs
+router.get("/recommended", getRecommendedBlogs);
 
 // Related Blogs
 router.get("/:blogId/related", fetchRelatedBlogs);

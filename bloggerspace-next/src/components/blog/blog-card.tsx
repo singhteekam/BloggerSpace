@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Eye, MessageSquare, Heart } from "lucide-react";
+import { Eye, MessageSquare, Heart, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { htmlToText, formatDate } from "@/lib/utils/html";
+import { htmlToText, formatDate, readingTime } from "@/lib/utils/html";
 import type { Blog } from "@/types/blog";
 
 type BlogCardProps = {
@@ -11,6 +11,7 @@ type BlogCardProps = {
 
 export function BlogCard({ blog }: BlogCardProps) {
   const excerpt = htmlToText(blog.content, 140);
+  const readTime = readingTime(blog.content);
   const date = formatDate(blog.createdAt || blog.lastUpdatedAt);
   const authorName = blog.status === "ADMIN_PUBLISHED"
     ? "Admin"
@@ -55,7 +56,16 @@ export function BlogCard({ blog }: BlogCardProps) {
         <div className="flex items-center justify-between border-t border-border px-5 py-3">
           <div className="flex min-w-0 flex-col">
             <span className="truncate text-xs font-medium text-foreground">{authorName}</span>
-            {date && <span className="text-[11px] text-muted-foreground">{date}</span>}
+            <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              {date}
+              {date && readTime && <span className="text-muted-foreground/50">·</span>}
+              {readTime && (
+                <span className="flex items-center gap-0.5">
+                  <Clock className="size-3" />
+                  {readTime}
+                </span>
+              )}
+            </span>
           </div>
           <div className="flex shrink-0 items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">

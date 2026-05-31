@@ -14,8 +14,9 @@ import * as Popover from "@radix-ui/react-popover";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { useAdminConfig } from "@/hooks/use-admin-config";
-import { adminApi, type GemsInfo } from "@/lib/api/admin";
+import { adminApi, type GemsInfo, type ReviewHistoryEntry } from "@/lib/api/admin";
 import { GemsDialog } from "@/components/admin/gems-dialog";
+import { ReviewHistoryTimeline } from "@/components/admin/review-history-timeline";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
   const [authorEmail, setAuthorEmail] = useState("");
   const [blogGems, setBlogGems] = useState<GemsInfo | null>(null);
   const [reviewedBy, setReviewedBy] = useState<{ reviewerId: string; reviewerName?: string }[]>([]);
+  const [reviewHistory, setReviewHistory] = useState<ReviewHistoryEntry[]>([]);
   const [authorDetails, setAuthorDetails] = useState<{ _id: string; fullName: string; email: string } | null>(null);
 
   // Gems dialog state
@@ -104,6 +106,7 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
         if (ad) setAuthorDetails({ _id: ad._id, fullName: ad.fullName, email: ad.email });
         if (b.gems) setBlogGems(b.gems);
         if (b.reviewedBy) setReviewedBy(b.reviewedBy);
+        if (b.reviewHistory) setReviewHistory(b.reviewHistory);
         setEditorKey((k) => k + 1);
       })
       .catch(() => toast.error("Failed to load blog."))
@@ -452,6 +455,9 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
             </div>
           )
         )}
+
+        {/* Review history timeline */}
+        <ReviewHistoryTimeline entries={reviewHistory} />
 
         <div className="space-y-6">
           {/* Title */}

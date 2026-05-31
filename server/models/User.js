@@ -80,6 +80,29 @@ const userSchema = new mongoose.Schema({
   reviewerScoreCount: { type: Number, default: 0, min: 0 },
   reviewerScoreBest:  { type: Number, default: 0, min: 0 },
 
+  // Public profile — short bio + social links (all optional, user-editable)
+  bio: { type: String, default: "", maxlength: 280 },
+  socialLinks: {
+    linkedin: { type: String, default: "" },
+    github:   { type: String, default: "" },
+    website:  { type: String, default: "" },
+  },
+
+  // Newsletter — opt-in (default off). Admin sends only to opted-in users.
+  newsletterOptIn: { type: Boolean, default: false },
+
+  // Reading history — auto-tracked, capped at 50 most-recent entries (newest first)
+  readingHistory: {
+    type: [{
+      blogId:   { type: Number },
+      slug:     { type: String },
+      title:    { type: String },
+      category: { type: String },
+      readAt:   { type: Date },
+    }],
+    default: [],
+  },
+
   resetToken: String,
   resetTokenExpiration: Date,
   // OTP-based email verification fields
