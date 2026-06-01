@@ -355,39 +355,55 @@ exports.getRecommendedBlogs = async (req, res) => {
 exports.fetchRelatedBlogs = async (req, res) => {
   try {
     const { blogId } = req.params;
-
-    // NEW- Fixed: blogId is a custom numeric field, not the MongoDB ObjectId (_id).
-    // Blog.findById() queries _id and throws a CastError on numeric strings.
-    const currentBlog = await Blog.findOne({ blogId: blogId });
+    // blogId is a custom NUMERIC field. The param arrives as a string, so coerce
+    // it — otherwise `$ne: "5"` never matches the numeric 5 and fails to exclude
+    // the current post (the previous bug).
+    const numericId = Number(blogId);
+    const currentBlog = await Blog.findOne({ blogId: numericId }).lean();
     if (!currentBlog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
-    // Extract keywords from the title
-    const keywords = currentBlog.title
+    const PUBLISHED = { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] };
+    const LIMIT = 6;
+    const SELECT = "title slug blogViews blogLikes category tags createdAt";
+
+    // Title keywords (escaped for safe regex; stop-words + short words dropped).
+    const STOP = new Set(["the", "a", "an", "and", "or", "in", "on", "of", "to", "for", "with", "is", "are", "how"]);
+    const keywords = (currentBlog.title || "")
       .toLowerCase()
       .split(/\s+/)
-      .filter(
-        (word) =>
-          !["the", "a", "an", "and", "or", "in", "on", "of", "to", "for", "with"].includes(word) &&
-          word.length > 2
-      );
+      .filter((w) => w.length > 2 && !STOP.has(w))
+      .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
-    // NEW- Fixed exclusion field: use blogId (custom numeric) not _id (ObjectId)
-    const relatedBlogs = await Blog.find({
-      blogId: { $ne: blogId },
-      $or: [
-        { category: currentBlog.category },
-        { title: { $regex: keywords.join("|"), $options: "i" } },
-      ],
-      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
-    })
-      .select("title slug blogViews blogLikes category tags")
-      .limit(6);
+    // Relevance: same category OR shared tags OR overlapping title keywords.
+    const or = [];
+    if (currentBlog.category) or.push({ category: currentBlog.category });
+    if (currentBlog.tags?.length) or.push({ tags: { $in: currentBlog.tags } });
+    if (keywords.length) or.push({ title: { $regex: keywords.join("|"), $options: "i" } });
 
-      // console.log(relatedBlogs)
+    let related = or.length
+      ? await Blog.find({ blogId: { $ne: numericId }, status: PUBLISHED, $or: or })
+          .sort({ blogViews: -1 })
+          .limit(LIMIT)
+          .select(SELECT)
+          .lean()
+      : [];
 
-    res.json({ blogs: relatedBlogs });
+    // Fallback: if too few genuine matches, top up with recent published posts so
+    // the "Related" section never looks empty/sparse.
+    if (related.length < LIMIT) {
+      const seen = new Set(related.map((b) => b.blogId));
+      seen.add(numericId);
+      const fillers = await Blog.find({ blogId: { $nin: [...seen] }, status: PUBLISHED })
+        .sort({ lastUpdatedAt: -1 })
+        .limit(LIMIT - related.length)
+        .select(SELECT)
+        .lean();
+      related = [...related, ...fillers];
+    }
+
+    res.json({ blogs: related });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to fetch related blogs" });

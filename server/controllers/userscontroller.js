@@ -14,6 +14,7 @@ const Visit = require("../models/Visitor");
 const logger = require("./../utils/Logging/logs");
 const passport = require("../services/passportAuth.js");
 const AdminConfig = require("../models/AdminConfig");
+const { revalidate } = require("../utils/revalidate");
 
 // ── Re-verification helpers ───────────────────────────────────────────────────
 const REVERIFY_MAX_ATTEMPTS = 5;
@@ -503,6 +504,20 @@ exports.deleteAccount = async (req, res) => {
     user.status = "DELETED";
     user.deletedAt = new Date();
     await user.save();
+
+    // Profile is now gone (404) AND this author's published posts must show as
+    // "Anonymous" immediately — purge the profile + every one of their live blog
+    // pages so the name disappears at once rather than within 24h.
+    const authoredSlugs = await Blogs.find({
+      authorDetails: userId,
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    })
+      .select("slug")
+      .lean();
+    revalidate({
+      username: user.userName,
+      paths: authoredSlugs.map((b) => `/blogs/${b.slug}`),
+    });
 
     const deletionDate = new Date(user.deletedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
     const purgeDate = new Date(user.deletedAt.getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -1005,6 +1020,9 @@ exports.updateUserPersonalDetails = async (req, res) => {
     }
     await updatedUser.save();
 
+    // Public profile is ISR-cached — refresh it so bio/social/name show at once.
+    revalidate({ username: updatedUser.userName });
+
     logger.debug("Information updated succesfully for user: " + userName);
     res.json({ message: "Profile updated successfully", user: updatedUser });
   } catch (error) {
@@ -1154,10 +1172,14 @@ exports.followUser = async (req, res) => {
     const userId = req.query.userId;
     if (targetId === userId) return res.status(400).json({ error: "Cannot follow yourself" });
 
-    await Promise.all([
-      User.findByIdAndUpdate(targetId, { $addToSet: { followers: userId } }),
-      User.findByIdAndUpdate(userId,   { $addToSet: { following: targetId } }),
+    const [target, me] = await Promise.all([
+      User.findByIdAndUpdate(targetId, { $addToSet: { followers: userId } }, { new: true }).select("userName"),
+      User.findByIdAndUpdate(userId,   { $addToSet: { following: targetId } }, { new: true }).select("userName"),
     ]);
+    // Both profiles' follower/following counts changed — refresh them.
+    revalidate({
+      paths: [target?.userName, me?.userName].filter(Boolean).map((u) => `/user/${u}`),
+    });
     return res.json({ message: "Followed" });
   } catch (error) {
     console.log(error);
@@ -1171,10 +1193,14 @@ exports.unfollowUser = async (req, res) => {
     const targetId = req.params.idToUnfollow;
     const userId = req.query.userId;
 
-    await Promise.all([
-      User.findByIdAndUpdate(targetId, { $pull: { followers: userId } }),
-      User.findByIdAndUpdate(userId,   { $pull: { following: targetId } }),
+    const [target, me] = await Promise.all([
+      User.findByIdAndUpdate(targetId, { $pull: { followers: userId } }, { new: true }).select("userName"),
+      User.findByIdAndUpdate(userId,   { $pull: { following: targetId } }, { new: true }).select("userName"),
     ]);
+    // Both profiles' follower/following counts changed — refresh them.
+    revalidate({
+      paths: [target?.userName, me?.userName].filter(Boolean).map((u) => `/user/${u}`),
+    });
     return res.json({ message: "Unfollowed" });
 
     // User.findByIdAndUpdate(
@@ -1217,16 +1243,20 @@ exports.getVisitorCount = async (req, res) => {
 
 exports.incrementVisitCount = async (req, res) => {
   try {
-    const visit = await Visit.findOne();
-    if (visit) {
-      visit.count++;
-      await visit.save();
-    } else {
-      await Visit.create({});
-    }
+    // Single atomic upsert: increments the counter (creating the doc on first
+    // hit) in one round trip, with no read-then-write race. Critically, it also
+    // ALWAYS sends a response — the previous version never called res.*, so the
+    // request hung until the 60s platform timeout (the 504s you saw).
+    const visit = await Visit.findOneAndUpdate(
+      {},
+      { $inc: { count: 1 } },
+      { upsert: true, new: true },
+    );
+    res.status(200).json({ count: visit.count });
   } catch (error) {
     logger.error("Error incrementing visit count: " + error);
     console.error("Error incrementing visit count:", error);
+    res.status(500).json({ error: "Error incrementing visit count." });
   }
 };
 

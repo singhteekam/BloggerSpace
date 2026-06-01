@@ -55,20 +55,21 @@ export const metadata: Metadata = {
     shortcut: "/brand/logo128x128.png",
     apple: { url: "/brand/logo128x128.png", sizes: "128x128" },
   },
+  // Note: og:image / twitter:image are supplied by the generated 1200×630 card
+  // in app/opengraph-image.tsx (and per-blog cards), so no static image here.
   openGraph: {
     type: "website",
     locale: siteConfig.locale,
     url: siteConfig.url,
-    title: siteConfig.name,
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
-    siteName: siteConfig.name,
-    images: [{ url: "/brand/logo128x128.png", width: 128, height: 128, alt: siteConfig.name }],
+    siteName: siteConfig.fullName,
   },
   twitter: {
-    card: "summary",
-    title: siteConfig.name,
+    card: "summary_large_image",
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
-    images: ["/brand/logo128x128.png"],
+    creator: "@" + siteConfig.author.name.replace(/\s+/g, ""),
   },
   robots: {
     index: true,

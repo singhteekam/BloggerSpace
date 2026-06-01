@@ -41,24 +41,26 @@ export function PushNotificationToggle() {
 
   const toggle = async () => {
     if (loading) return;
+    const next = !enabled;
+    setEnabled(next); // optimistic — flip instantly, revert below if it fails
     setLoading(true);
     try {
-      if (!enabled) {
+      if (next) {
         const t = token ?? (await requestPushToken());
         if (!t) {
+          setEnabled(false);
           toast.error("Notifications are blocked. Enable them in your browser settings.");
           return;
         }
         setToken(t);
         await userApi.registerPushToken(t, navigator.userAgent);
-        setEnabled(true);
         toast.success("Push notifications enabled.");
       } else {
         if (token) await userApi.unregisterPushToken(token);
-        setEnabled(false);
         toast.success("Push notifications disabled.");
       }
     } catch {
+      setEnabled(!next); // revert on failure
       toast.error("Couldn't update push notifications. Try again.");
     } finally {
       setLoading(false);
@@ -85,7 +87,7 @@ export function PushNotificationToggle() {
           type="button"
           role="switch"
           aria-checked={enabled}
-          disabled={loading || !available}
+          disabled={!available}
           onClick={toggle}
           className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${
             enabled ? "bg-primary" : "bg-muted-foreground/30"

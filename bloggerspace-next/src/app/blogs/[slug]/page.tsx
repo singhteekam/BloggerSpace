@@ -19,7 +19,10 @@ import { formatDate, htmlToText, readingTime } from "@/lib/utils/html";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/utils/json-ld";
 import { siteConfig } from "@/lib/constants/site";
 
-export const revalidate = 3600;
+// 24h ISR. Blogs rarely change after publish, and live data (likes/comments) is
+// fetched client-side anyway — so a long window keeps Vercel ISR writes + origin
+// transfer low without any user-visible staleness. Edits reflect within a day.
+export const revalidate = 86400;
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -54,14 +57,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       modifiedTime: blog.lastUpdatedAt,
       authors: [authorName],
       tags: blog.tags ?? [],
-      siteName: siteConfig.name,
-      images: [{ url: "/brand/logo128x128.png", width: 128, height: 128, alt: blog.title }],
+      siteName: siteConfig.fullName,
+      // og:image comes from the dynamic per-blog card in opengraph-image.tsx —
+      // do not set a static image here or it overrides that rich 1200×630 card.
     },
     twitter: {
       card: "summary_large_image",
       title: blog.title,
       description,
-      images: ["/brand/logo128x128.png"],
     },
   };
 }

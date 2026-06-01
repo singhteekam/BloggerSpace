@@ -38,7 +38,7 @@ export async function fetchApprovedReviews(
   try {
     const res = await fetch(
       `${BASE}/api/reviews/approved?page=${page}&limit=${limit}`,
-      { next: { revalidate: 300 } },
+      { next: { revalidate: 86400 } },
     );
     if (!res.ok) return { reviews: [], total: 0, pages: 0 };
     return await res.json();

@@ -17,7 +17,7 @@ const LIMIT = 9;
 export async function fetchBlogs(page = 1): Promise<BlogListResponse> {
   try {
     const res = await fetch(`${BASE}/api/blogs/allblogs?page=${page}&limit=${LIMIT}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return empty(page);
     return res.json();
@@ -34,7 +34,7 @@ export async function fetchBlogsByCategory(
     const encoded = encodeURIComponent(category);
     const res = await fetch(
       `${BASE}/api/blogs/allblogs/category/${encoded}?page=${page}&limit=${LIMIT}`,
-      { next: { revalidate: 3600 } },
+      { next: { revalidate: 86400 } },
     );
     if (!res.ok) return empty(page);
     return res.json();
@@ -87,7 +87,7 @@ export async function fetchBlogBySlug(
 ): Promise<{ blog: Blog; alreadyLiked: boolean } | null> {
   try {
     const res = await fetch(`${BASE}/api/blogs/${slug}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return null;
     return res.json();
@@ -99,7 +99,7 @@ export async function fetchBlogBySlug(
 export async function fetchRelatedBlogs(blogId: number): Promise<Blog[]> {
   try {
     const res = await fetch(`${BASE}/api/blogs/${blogId}/related`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -112,7 +112,7 @@ export async function fetchRelatedBlogs(blogId: number): Promise<Blog[]> {
 export async function fetchTopBlogs(): Promise<Blog[]> {
   try {
     const res = await fetch(`${BASE}/api/blogs/topviewedblogs`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -125,7 +125,7 @@ export async function fetchTopBlogs(): Promise<Blog[]> {
 export async function fetchAdminPublishedBlogs(page = 1): Promise<BlogListResponse> {
   try {
     const res = await fetch(`${BASE}/api/blogs/adminpublished?page=${page}&limit=${LIMIT}`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return empty(page);
     return res.json();

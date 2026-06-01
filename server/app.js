@@ -9,7 +9,16 @@ const MongoStore = require("connect-mongo")(session);
 const path = require("path");
 
 const app = express();
-app.use(helmet());
+// app.use(helmet());
+
+// Security headers. Allow cross-origin loading of static assets (the frontend
+// and email templates pull /assets/logo from this origin), while keeping all
+// other hardening defaults (HSTS, X-Content-Type-Options, frameguard, etc.).
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 
 // const functions = require("firebase-functions");
 
@@ -70,21 +79,53 @@ connectDB();
 app.use(express.json());
 // app.use(cors());
 
-app.use(
-  cors({
-    origin: [
-      process.env.FRONTEND_URL,
-      process.env.BLOGGERSPACE1,
-      process.env.BLOGGERSPACE2,
-      process.env.PANEL2BLOGGERSPACE1,
-    ],
-    // NEW- Added PATCH method and Authorization header so the Next.js client
-    // can send Bearer JWT tokens and use PATCH for saved-blogs endpoint
-    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
-    allowedHeaders: ["Content-Type", "Access-Control-Allow-Credentials", "Authorization"],
-    credentials: true, // mandoatory for google auths
-  })
-);
+// app.use(
+//   cors({
+//     origin: [
+//       process.env.FRONTEND_URL,
+//       process.env.BLOGGERSPACE1,
+//       process.env.BLOGGERSPACE2,
+//       process.env.PANEL2BLOGGERSPACE1,
+//     ],
+//     // NEW- Added PATCH method and Authorization header so the Next.js client
+//     // can send Bearer JWT tokens and use PATCH for saved-blogs endpoint
+//     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+//     allowedHeaders: ["Content-Type", "Access-Control-Allow-Credentials", "Authorization"],
+//     credentials: true, // mandoatory for google auths
+//   })
+// );
+
+
+// ── CORS — strict allow-list ──────────────────────────────────────────────────
+// Only the configured frontend origin(s) may make browser (cross-origin) calls.
+// Falsy env vars are dropped, so leaving the legacy panel vars unset means ONLY
+// FRONTEND_URL is permitted. To lock it down to just the main frontend, set only
+// FRONTEND_URL and leave the others empty.
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.BLOGGERSPACE1,
+  process.env.BLOGGERSPACE2,
+  process.env.PANEL2BLOGGERSPACE1,
+].filter(Boolean);
+
+const corsOptions = {
+  origin(origin, callback) {
+    // No Origin header → not a browser cross-origin request (Next.js SSR/ISR
+    // server-side data fetches, health checks, curl). These aren't subject to the
+    // browser same-origin policy and must be allowed, or server rendering breaks.
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  // Authorization → Bearer JWT; PATCH → saved-blogs / settings toggles.
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // required for the Google/GitHub OAuth cookie flow
+  maxAge: 86400, // cache preflight 24h → far fewer OPTIONS round-trips
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // answer preflight for every route
 
 // Assuming you have already connected to your MongoDB database using Mongoose
 // Get the default connection

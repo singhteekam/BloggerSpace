@@ -71,6 +71,7 @@ const {
   updateNotificationConfig,
   sendTestNotification,
   triggerNotificationRun,
+  getNotificationHistory,
 } = require("../../controllers/notificationController");
 
 router.post("/signup", adminSignup);
@@ -126,6 +127,7 @@ router.get("/notifications/config", adminMiddleware, getNotificationConfig);
 router.patch("/notifications/config", adminMiddleware, updateNotificationConfig);
 router.post("/notifications/test", adminMiddleware, sendTestNotification);
 router.post("/notifications/run", adminMiddleware, triggerNotificationRun);
+router.get("/notifications/history", adminMiddleware, getNotificationHistory);
 
 router.get("/community", adminMiddleware, getCommunityPosts);
 

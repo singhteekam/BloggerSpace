@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const pako = require("pako");
 const sendEmail = require("../../services/mailer");
 const generateSitemap = require('../../utils/generateSitemap');
+const { revalidate } = require("../../utils/revalidate");
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 const Newsletter = require("../../models/Newsletter");
@@ -327,6 +328,8 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     // Save the updated blog
     await blog.save();
     generateSitemap().catch((err) => console.error("Sitemap update failed:", err));
+    // On-demand ISR: make the now-live blog + author profile + home fresh now.
+    revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/"] });
 
     // Sending mail to author
     const receiver = blog.authorDetails.email;
@@ -729,6 +732,9 @@ exports.discardAnyBlog = async (req, res) => {
     blog.status = blog.status.startsWith("ADMIN_") ? "ADMIN_DISCARDED" : "DISCARD_QUEUE";
     blog.lastUpdatedAt = new Date(new Date().getTime() + IST_OFFSET * 60000);
     await blog.save();
+    // No longer public — purge its page (will 404 on next request) + listings + home.
+    await blog.populate("authorDetails", "userName");
+    revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/adminblogs", "/"] });
     res.json({ message: "Blog discarded successfully" });
   } catch (error) {
     console.error("Error discarding blog:", error);
@@ -745,7 +751,11 @@ exports.deleteBlogPermanently = async (req, res) => {
     if (!allowedStatuses.includes(blog.status)) {
       return res.status(400).json({ error: "Only discarded blogs can be permanently deleted." });
     }
+    await blog.populate("authorDetails", "userName");
+    const slug = blog.slug;
+    const username = blog.authorDetails?.userName;
     await Blog.findByIdAndDelete(id);
+    revalidate({ slug, username, paths: ["/adminblogs"] });
     res.json({ message: "Blog permanently deleted." });
   } catch (error) {
     console.error("Error deleting blog:", error);
@@ -769,6 +779,7 @@ exports.adminEditAnyBlog = async (req, res) => {
     if (tags) blog.tags = tags;
     blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
     await blog.save();
+    revalidate({ slug: blog.slug, paths: ["/adminblogs"] });
     res.json({ message: "Blog updated successfully" });
   } catch (error) {
     console.error("Error editing blog:", error);
@@ -1230,6 +1241,8 @@ exports.adminSaveEditedBlog = async (req, res) => {
     // Save the updated blog
     await blog.save();
     generateSitemap().catch((err) => console.error("Sitemap update failed:", err));
+    // On-demand ISR: refresh the edited/published admin blog + listing + home.
+    revalidate({ slug: blog.slug, paths: ["/adminblogs", "/"] });
     console.debug("Blog updated successfully. Title: "+ blog.title);
 
     res.json({ message: "blog updated successfully" });
@@ -1866,7 +1879,13 @@ exports.setBlogScore = async (req, res) => {
         { $group: { _id: null, sum: { $sum: { $ifNull: ["$blogScore", 0] } } } },
       ]);
       newCreatorScore = agg[0]?.sum ?? 0;
-      await User.findByIdAndUpdate(authorId, { creatorScore: newCreatorScore });
+      const author = await User.findByIdAndUpdate(
+        authorId,
+        { creatorScore: newCreatorScore },
+        { new: true },
+      ).select("userName");
+      // Author's public creator score + the blog's score changed — refresh both.
+      revalidate({ slug: blog.slug, username: author?.userName });
     }
 
     res.json({
@@ -1943,11 +1962,13 @@ exports.setReviewerScore = async (req, res) => {
     const avg   = count ? +(agg[0].sum / count).toFixed(1) : 0;
     const best  = agg[0]?.best ?? 0;
 
-    await User.findByIdAndUpdate(reviewerId, {
-      reviewerScoreAvg:   avg,
-      reviewerScoreCount: count,
-      reviewerScoreBest:  best,
-    });
+    const reviewer = await User.findByIdAndUpdate(
+      reviewerId,
+      { reviewerScoreAvg: avg, reviewerScoreCount: count, reviewerScoreBest: best },
+      { new: true },
+    ).select("userName");
+    // Reviewer's public reviewer-score stats changed — refresh their profile.
+    revalidate({ username: reviewer?.userName });
 
     res.json({
       message: "Reviewer score updated",

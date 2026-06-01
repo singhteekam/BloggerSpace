@@ -344,7 +344,7 @@ export default function MyProfilePage() {
                   )}
                 </div>
                 <Button asChild size="sm" variant="outline" className="shrink-0">
-                  <Link href="/apply-reviewer">Apply now</Link>
+                  <Link href="/bloggerspace/apply-reviewer">Apply now</Link>
                 </Button>
               </div>
             </div>

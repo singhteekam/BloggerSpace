@@ -5,6 +5,7 @@ const admin = require("firebase-admin");
 const Blog = require("../models/Blog");
 const FcmToken = require("../models/FcmToken");
 const AdminConfig = require("../models/AdminConfig");
+const NotificationLog = require("../models/NotificationLog");
 const logger = require("../utils/Logging/logs");
 
 const PUBLISHED = { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] };
@@ -93,7 +94,7 @@ async function pruneInvalidTokens(tokens) {
 
 // ── Core cycle ────────────────────────────────────────────────────────────────
 // Returns a summary object describing exactly what happened (for logs + admin UI).
-async function runNotificationCycle({ force = false } = {}) {
+async function runNotificationCycle({ force = false, trigger = "scheduled" } = {}) {
   const config = (await AdminConfig.findOne({})) || new AdminConfig();
 
   if (!config.notificationsEnabled) {
@@ -132,6 +133,20 @@ async function runNotificationCycle({ force = false } = {}) {
   );
   config.lastNotificationSentAt = new Date();
   await config.save();
+
+  // Audit trail: record exactly what was delivered, to whom, and when.
+  await NotificationLog.create({
+    title: message.notification.title,
+    body: message.notification.body,
+    link: message.data.link,
+    blogs: blogs.map((b) => ({ blogId: b._id, title: b.title, slug: b.slug })),
+    recipients: tokens.length,
+    success,
+    failure,
+    pruned,
+    trigger,
+    sentAt: new Date(),
+  });
 
   const summary = { ran: true, blogs: blogs.length, recipients: tokens.length, success, failure, pruned };
   logger.info("Trending notification sent: " + JSON.stringify(summary));

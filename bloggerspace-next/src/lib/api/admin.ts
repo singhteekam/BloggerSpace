@@ -93,6 +93,20 @@ export type NotificationConfig = {
   subscriberCount: number;
 };
 
+export type NotificationLogEntry = {
+  _id: string;
+  title: string;
+  body: string;
+  link: string;
+  blogs: { blogId?: string; title: string; slug: string }[];
+  recipients: number;
+  success: number;
+  failure: number;
+  pruned: number;
+  trigger: "scheduled" | "manual" | "test";
+  sentAt: string;
+};
+
 export type CommunityPost = {
   _id: string;
   communityPostId: string;
@@ -209,6 +223,12 @@ export const adminApi = {
       "/api/admin/notifications/run",
       {},
       { params: p(userId) },
+    ),
+
+  getNotificationHistory: (userId: string, page = 1) =>
+    api.get<{ logs: NotificationLogEntry[]; total: number; page: number; pages: number }>(
+      "/api/admin/notifications/history",
+      { params: { ...p(userId), page } },
     ),
 
   deleteUser: (targetUserId: string, userEmail: string, adminId: string) =>

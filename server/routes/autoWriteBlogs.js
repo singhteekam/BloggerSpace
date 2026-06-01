@@ -8,6 +8,7 @@ const fs = require("fs");
 const { google } = require("googleapis");
 const Blog = require("../models/Blog");
 const sendEmail = require("../services/mailer");
+const { revalidate } = require("../utils/revalidate");
 const credentials = JSON.parse(
   fs.readFileSync("./config/gsheets-service-account.json", "utf8")
 );
@@ -208,6 +209,9 @@ router.get("/autopublish", async (req, res) => {
       // blog.lastUpdatedAt = new Date(new Date().getTime() + 330 * 60000);
 
       await blog.save();
+
+      // Make the auto-published blog + author profile + home live immediately.
+      revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/"] });
 
       console.log(blog.authorDetails.email);
 

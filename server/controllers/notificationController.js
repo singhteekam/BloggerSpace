@@ -1,5 +1,6 @@
 const FcmToken = require("../models/FcmToken");
 const AdminConfig = require("../models/AdminConfig");
+const NotificationLog = require("../models/NotificationLog");
 const { runNotificationCycle, sendTestToTokens } = require("../services/notifications");
 const logger = require("../utils/Logging/logs");
 
@@ -134,10 +135,28 @@ exports.sendTestNotification = async (req, res) => {
 // ── Admin: manually trigger a digest run now (respects dedup; force-bypasses gate)
 exports.triggerNotificationRun = async (req, res) => {
   try {
-    const result = await runNotificationCycle({ force: true });
+    const result = await runNotificationCycle({ force: true, trigger: "manual" });
     res.json({ message: "Notification cycle executed.", ...result });
   } catch (error) {
     logger.error("triggerNotificationRun error: " + error);
     res.status(500).json({ error: "Failed to run notification cycle" });
+  }
+};
+
+// ── Admin: paginated history of sent notifications (what was delivered, when) ──
+exports.getNotificationHistory = async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+    const skip = (page - 1) * limit;
+
+    const [logs, total] = await Promise.all([
+      NotificationLog.find({}).sort({ sentAt: -1 }).skip(skip).limit(limit).lean(),
+      NotificationLog.countDocuments({}),
+    ]);
+    res.json({ logs, total, page, pages: Math.ceil(total / limit) || 1 });
+  } catch (error) {
+    logger.error("getNotificationHistory error: " + error);
+    res.status(500).json({ error: "Failed to fetch notification history" });
   }
 };

@@ -18,7 +18,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
 async function fetchAllBlogSlugs(): Promise<{ slug: string; lastModified?: Date }[]> {
   try {
     const res = await fetch(`${API}/api/blogs/sitemap`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return [];
     const blogs: { slug: string; lastUpdatedAt?: string }[] = await res.json();
@@ -34,7 +34,7 @@ async function fetchAllBlogSlugs(): Promise<{ slug: string; lastModified?: Date 
 async function fetchAllCommunityPostSlugs(): Promise<{ id: string; slug: string }[]> {
   try {
     const res = await fetch(`${API}/api/community/sitemap`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
     });
     if (!res.ok) return [];
     const posts: { communityPostId: string; communityPostSlug: string }[] = await res.json();

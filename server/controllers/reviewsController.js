@@ -1,5 +1,6 @@
 const Review = require("../models/Review");
 const User   = require("../models/User");
+const { revalidate } = require("../utils/revalidate");
 
 // ── Public ───────────────────────────────────────────────────────────────────
 
@@ -165,6 +166,8 @@ const approveReview = async (req, res) => {
       { new: true }
     );
     if (!review) return res.status(404).json({ message: "Review not found." });
+    // Approved reviews appear on the homepage + /reviews — refresh both.
+    revalidate({ paths: ["/reviews", "/"] });
     res.json({ message: "Review approved.", review });
   } catch (err) {
     console.error("approveReview:", err);
@@ -184,6 +187,8 @@ const rejectReview = async (req, res) => {
       { new: true }
     );
     if (!review) return res.status(404).json({ message: "Review not found." });
+    // A rejected review must drop off the homepage + /reviews if it was showing.
+    revalidate({ paths: ["/reviews", "/"] });
     res.json({ message: "Review rejected.", review });
   } catch (err) {
     console.error("rejectReview:", err);
