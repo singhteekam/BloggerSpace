@@ -35,8 +35,7 @@ const adminConfigSchema = new mongoose.Schema({
   // Days before an Email-auth user must re-verify. OAuth users auto-refresh on login.
   reverificationPeriodDays: { type: Number, default: 30, min: 1 },
 
-  // ── Maintenance mode ───────────────────────────────────────────
-  maintenanceMode: { type: Boolean, default: false },
+  // Maintenance mode moved to the MAINTENANCE_MODE env var (frontend middleware).
 
   // ── Push notifications (trending-blog digest via FCM) ───────────
   notificationsEnabled: { type: Boolean, default: false },

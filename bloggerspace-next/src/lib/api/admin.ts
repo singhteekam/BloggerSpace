@@ -619,8 +619,6 @@ export type AdminConfigDoc = {
   maxBlogScore: number;
   // Re-verification
   reverificationPeriodDays: number;
-  // Maintenance
-  maintenanceMode: boolean;
   // Audit
   updatedAt: string;
   updatedBy: string | null;

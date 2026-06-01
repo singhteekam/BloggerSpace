@@ -1,35 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Module-level cache — avoids calling the backend on every single request.
-// Refreshes every 30 seconds. Each Edge worker instance has its own cache,
-// which is fine — maintenance mode takes effect within ~30 s of being toggled.
-let cache: { value: boolean; expiresAt: number } | null = null;
-
-async function isMaintenanceMode(): Promise<boolean> {
-  if (cache && Date.now() < cache.expiresAt) return cache.value;
-
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/maintenance`,
-      { signal: AbortSignal.timeout(3000) },
-    );
-    const data = await res.json();
-    const value = Boolean(data.maintenanceMode);
-    cache = { value, expiresAt: Date.now() + 30_000 };
-    return value;
-  } catch {
-    // Backend unreachable — fail open (don't block the site)
-    return false;
-  }
+// Maintenance mode is controlled by the MAINTENANCE_MODE environment variable
+// (set it to "true" in your hosting/Vercel env to take the public site down).
+// This is read at the edge with zero network/DB calls — no more polling the
+// backend on every request.
+function isMaintenanceMode(): boolean {
+  return process.env.MAINTENANCE_MODE === "true";
 }
 
-export async function proxy(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const inMaintenance = isMaintenanceMode();
 
-  // Always allow admin panel, the maintenance page itself, and Next.js internals
+  // Admin panel + Next.js internals + API always pass (admins keep full access).
   if (
     pathname.startsWith("/admin") ||
-    pathname.startsWith("/maintenance") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname === "/favicon.ico"
@@ -37,7 +22,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const inMaintenance = await isMaintenanceMode();
+  // The /maintenance page is only reachable WHILE maintenance is on. When the
+  // site is live, hitting it directly redirects home (it must not be public).
+  if (pathname.startsWith("/maintenance")) {
+    return inMaintenance ? NextResponse.next() : NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Everything else is blocked during maintenance.
   if (inMaintenance) {
     return NextResponse.redirect(new URL("/maintenance", request.url));
   }

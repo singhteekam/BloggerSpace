@@ -14,10 +14,28 @@ import { DeveloperSection } from "./_sections/developer-section";
 import { ContactSection } from "./_sections/contact-section";
 import { RecommendedSection } from "./_sections/recommended-section";
 
+const shareTitle = `${siteConfig.fullName} — ${siteConfig.tagline}`;
+const shareDescription =
+  "A blogging platform where every post is reviewed by a real person before it goes live. Thoughtful writing on technology, careers, and ideas.";
+
 export const metadata: Metadata = {
-  title: `${siteConfig.fullName} — ${siteConfig.tagline}`,
-  description: siteConfig.description,
+  title: shareTitle,
+  description: shareDescription,
   alternates: { canonical: "/" },
+  // Explicit social tags so shared links (WhatsApp/X/LinkedIn) always show the
+  // site name + a short description + the generated card — not just a bare link.
+  openGraph: {
+    title: shareTitle,
+    description: shareDescription,
+    type: "website",
+    url: siteConfig.url,
+    siteName: siteConfig.fullName,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: shareTitle,
+    description: shareDescription,
+  },
 };
 
 export default async function Home() {

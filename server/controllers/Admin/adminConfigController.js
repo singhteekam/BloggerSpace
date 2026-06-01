@@ -22,8 +22,6 @@ const EDITABLE_FIELDS = [
   "maxBlogScore",
   // Re-verification
   "reverificationPeriodDays",
-  // Maintenance
-  "maintenanceMode",
 ];
 
 const VALID_REDEMPTION_METHODS = ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"];
@@ -61,11 +59,6 @@ exports.updateAdminConfig = async (req, res) => {
       return res.status(400).json({ message: "No editable fields provided" });
     }
 
-    // Boolean fields — coerce and validate separately.
-    const booleanFields = ["maintenanceMode"];
-    for (const f of booleanFields) {
-      if (updates[f] !== undefined) updates[f] = Boolean(updates[f]);
-    }
 
     // Number-field coercion (frontend may send strings from <input>).
     const numberFields = EDITABLE_FIELDS.filter(
