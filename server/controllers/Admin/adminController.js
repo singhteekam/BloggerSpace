@@ -803,6 +803,26 @@ exports.fetchAllUsers= async(req, res)=>{
   }
 }
 
+// Users who self-deleted their account (status DELETED). Includes deletedAt and a
+// computed purgeAt (deletedAt + 7 days) so the admin sees when auto-removal happens.
+exports.getDeletedUsers = async (req, res) => {
+  try {
+    const users = await User.find({ status: "DELETED" })
+      .select("fullName userName email role createdAt deletedAt")
+      .sort({ deletedAt: -1 })
+      .lean();
+
+    const withPurge = users.map((u) => ({
+      ...u,
+      purgeAt: u.deletedAt ? new Date(new Date(u.deletedAt).getTime() + 7 * 24 * 60 * 60 * 1000) : null,
+    }));
+    res.json(withPurge);
+  } catch (error) {
+    console.log("Error fetching deleted users", error);
+    res.status(500).json({ error: "Failed to fetch deleted users" });
+  }
+}
+
 exports.deleteUserAccount = async (req, res) => {
   const { id } = req.params;
   try {

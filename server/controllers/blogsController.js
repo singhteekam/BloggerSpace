@@ -2,6 +2,19 @@ const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
 const User = require("../models/User");
 const pako = require("pako");
+
+// Null out authorDetails for any blog whose author has deleted their account, so
+// the post stays live but the name/profile link is hidden ("Anonymous" on the UI).
+// Operates in-place on a lean blogs array; safe to call when authorDetails is unpopulated.
+function anonymiseDeletedAuthors(blogs) {
+  if (!Array.isArray(blogs)) return blogs;
+  for (const b of blogs) {
+    if (b && b.authorDetails && b.authorDetails.status === "DELETED") {
+      b.authorDetails = null;
+    }
+  }
+  return blogs;
+}
 const sendEmail = require("../services/mailer");
 const { GoogleGenAI } = require("@google/genai");
 const logger = require("./../utils/Logging/logs.js");
@@ -113,11 +126,13 @@ exports.fetchAllBlogs = async (req, res) => {
         .skip(skip)
         .limit(limit)
         .sort({ lastUpdatedAt: -1 })
-        .populate("authorDetails", "userName profilePicture fullName")
+        .populate("authorDetails", "userName profilePicture fullName status")
         .lean()
         .exec(),
       Blog.countDocuments({ status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } }),
     ]);
+
+    anonymiseDeletedAuthors(blogs);
 
     res.json({
       blogs,
@@ -173,12 +188,15 @@ exports.fetchAllBlogsFromDB = async (req, res) => {
         .sort({ lastUpdatedAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("authorDetails", "userName profilePicture") // minimal fields
+        .populate("authorDetails", "userName profilePicture status") // minimal fields
         // do NOT populate comments/likes here (heavy)
         .lean()
         .exec(),
       Blog.countDocuments(match),
     ]);
+
+    // Hide identity of authors who have deleted their account
+    anonymiseDeletedAuthors(blogs);
 
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -266,13 +284,15 @@ exports.getRecommendedBlogs = async (req, res) => {
     const PUBLISHED = { status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } };
     const SELECT = "title slug category tags content status blogViews blogLikes comments createdAt lastUpdatedAt blogScore authorDetails";
 
-    const trending = () =>
-      Blog.find(PUBLISHED)
-        .sort({ blogViews: -1 })
-        .limit(LIMIT)
-        .select(SELECT)
-        .populate("authorDetails", "fullName userName profilePicture")
-        .lean();
+    const trending = async () =>
+      anonymiseDeletedAuthors(
+        await Blog.find(PUBLISHED)
+          .sort({ blogViews: -1 })
+          .limit(LIMIT)
+          .select(SELECT)
+          .populate("authorDetails", "fullName userName profilePicture status")
+          .lean(),
+      );
 
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.json({ personalized: false, blogs: await trending() });
@@ -309,7 +329,7 @@ exports.getRecommendedBlogs = async (req, res) => {
       .sort({ blogScore: -1, blogViews: -1 })
       .limit(LIMIT)
       .select(SELECT)
-      .populate("authorDetails", "fullName userName profilePicture")
+      .populate("authorDetails", "fullName userName profilePicture status")
       .lean();
 
     // Top up with trending if interests didn't yield enough fresh blogs
@@ -319,11 +339,12 @@ exports.getRecommendedBlogs = async (req, res) => {
         .sort({ blogViews: -1 })
         .limit(LIMIT - blogs.length)
         .select(SELECT)
-        .populate("authorDetails", "fullName userName profilePicture")
+        .populate("authorDetails", "fullName userName profilePicture status")
         .lean();
       blogs = [...blogs, ...fillers];
     }
 
+    anonymiseDeletedAuthors(blogs);
     res.json({ personalized: blogs.length > 0, blogs });
   } catch (err) {
     console.error("Error fetching recommended blogs:", err);
@@ -530,6 +551,12 @@ exports.viewBlogRoute = async (req, res) => {
         .findIndex((like) => like._id.toString() === req.query.userId) !== -1
         ? true
         : false;
+
+    // Anonymise the author the moment they delete their account — the post stays
+    // live but the name/profile link is hidden (null author → "Anonymous" on the UI).
+    if (blog.authorDetails && blog.authorDetails.status === "DELETED") {
+      blog.authorDetails = null;
+    }
 
     // console.log("Liked? :"+ alreadyLiked);
     logger.debug("Inside viewBlogRoute function.");

@@ -6,12 +6,12 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
   Users, UserCheck, UserX, Loader2, Trash2, Clock, Ban, ShieldCheck, Search, X, Eye, Gem,
-  RotateCcw, AlertCircle, LogIn,
+  RotateCcw, AlertCircle, LogIn, AlertTriangle,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useMemo } from "react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
-import { adminApi, type ReviewerItem, type UserItem } from "@/lib/api/admin";
+import { adminApi, type ReviewerItem, type UserItem, type DeletedUserItem } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,6 +44,10 @@ function TeamManagement({ adminId }: { adminId: string }) {
     queryKey: ["admin-users", adminId],
     queryFn: () => adminApi.getUsers(adminId).then((r) => r.data),
   });
+  const { data: deletedUsers = [], isLoading: deletedLoading } = useQuery({
+    queryKey: ["admin-deleted-users", adminId],
+    queryFn: () => adminApi.getDeletedUsers(adminId).then((r) => r.data),
+  });
 
   const matchReviewer = (r: ReviewerItem) =>
     r.fullName.toLowerCase().includes(q) ||
@@ -58,6 +62,11 @@ function TeamManagement({ adminId }: { adminId: string }) {
   const fPending = useMemo(() => (q ? pendingReviewers.filter(matchReviewer) : pendingReviewers), [pendingReviewers, q]);
   const fVerified = useMemo(() => (q ? verifiedReviewers.filter(matchReviewer) : verifiedReviewers), [verifiedReviewers, q]);
   const fUsers = useMemo(() => (q ? users.filter(matchUser) : users), [users, q]);
+  const matchDeleted = (u: DeletedUserItem) =>
+    u.fullName.toLowerCase().includes(q) ||
+    (u.userName ?? "").toLowerCase().includes(q) ||
+    u.email.toLowerCase().includes(q);
+  const fDeleted = useMemo(() => (q ? deletedUsers.filter(matchDeleted) : deletedUsers), [deletedUsers, q]);
 
   const approveMutation = useMutation({
     mutationFn: (reviewerId: string) => adminApi.approveReviewer(reviewerId, adminId),
@@ -97,6 +106,16 @@ function TeamManagement({ adminId }: { adminId: string }) {
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
   });
 
+  const purgeUserMutation = useMutation({
+    mutationFn: ({ userId, email }: { userId: string; email: string }) =>
+      adminApi.deleteUser(userId, email, adminId),
+    onSuccess: () => {
+      toast.success("Account permanently removed from the database.");
+      qc.invalidateQueries({ queryKey: ["admin-deleted-users"] });
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
+  });
+
   const deactivateMutation = useMutation({
     mutationFn: (userId: string) => adminApi.deactivateUser(userId, adminId),
     onSuccess: () => {
@@ -119,6 +138,7 @@ function TeamManagement({ adminId }: { adminId: string }) {
     qc.invalidateQueries({ queryKey: ["admin-verified-reviewers", adminId] });
     qc.invalidateQueries({ queryKey: ["admin-pending-reviewers", adminId] });
     qc.invalidateQueries({ queryKey: ["admin-users", adminId] });
+    qc.invalidateQueries({ queryKey: ["admin-deleted-users", adminId] });
   };
 
   return (
@@ -141,6 +161,9 @@ function TeamManagement({ adminId }: { adminId: string }) {
               </TabsTrigger>
               <TabsTrigger value="users">
                 <Users className="size-3.5 mr-1.5" />Users ({fUsers.length}{q && users.length !== fUsers.length ? `/${users.length}` : ""})
+              </TabsTrigger>
+              <TabsTrigger value="deleted">
+                <Trash2 className="size-3.5 mr-1.5" />Deleted Users ({fDeleted.length}{q && deletedUsers.length !== fDeleted.length ? `/${deletedUsers.length}` : ""})
               </TabsTrigger>
             </TabsList>
           </div>
@@ -258,6 +281,36 @@ function TeamManagement({ adminId }: { adminId: string }) {
                       confirmVariant="destructive"
                     />
                   </UserCard>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* ── Deleted Users ────────────── */}
+          <TabsContent value="deleted">
+            <SectionHeader
+              title="Deleted Users"
+              desc="Accounts users have deleted themselves. Each is purged automatically 7 days after deletion — remove one sooner below if needed."
+            />
+            {deletedLoading ? <TabSkeleton /> : fDeleted.length === 0 ? (
+              <EmptyState icon={<Trash2 />} msg={q ? `No results for "${search}".` : "No deleted accounts."} />
+            ) : (
+              <div className="space-y-3">
+                {fDeleted.map((u) => (
+                  <DeletedUserCard key={u._id} user={u}>
+                    <ConfirmActionButton
+                      label="Delete now"
+                      icon={<Trash2 className="size-3.5" />}
+                      dialogTitle="Permanently remove now?"
+                      dialogDesc={`This immediately and permanently removes "${u.fullName}" (${u.email}) and all their data from the database, instead of waiting for the automatic 7-day purge. This cannot be undone.`}
+                      confirmLabel="Remove permanently"
+                      isPending={purgeUserMutation.isPending}
+                      onConfirm={() => purgeUserMutation.mutate({ userId: u._id, email: u.email })}
+                      triggerVariant="ghost"
+                      triggerClassName="text-destructive hover:text-destructive"
+                      confirmVariant="destructive"
+                    />
+                  </DeletedUserCard>
                 ))}
               </div>
             )}
@@ -405,6 +458,45 @@ function UserCard({ user, children }: { user: UserItem; children: React.ReactNod
         <Button asChild variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground">
           <Link href={`/admin/manage/team/${user._id}`}><Eye className="size-3.5" />View</Link>
         </Button>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function DeletedUserCard({ user, children }: { user: DeletedUserItem; children: React.ReactNode }) {
+  const daysLeft = user.purgeAt
+    ? Math.max(0, Math.ceil((new Date(user.purgeAt).getTime() - Date.now()) / 86_400_000))
+    : null;
+
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2 mb-0.5">
+          <span className="font-medium text-foreground">{user.fullName}</span>
+          <Badge variant="outline" className="text-xs h-5 px-1.5 text-destructive border-destructive/40">
+            <Trash2 className="size-3 mr-1" />Deleted
+          </Badge>
+          {user.role && user.role !== "user" && (
+            <Badge variant="secondary" className="text-xs h-5 px-1.5 capitalize">{user.role}</Badge>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {user.userName ? `@${user.userName} · ` : ""}{user.email}
+        </p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          <Clock className="size-3 inline mr-1" />Joined {formatDate(user.createdAt)}
+          {user.deletedAt && <> · <Trash2 className="size-3 inline mr-0.5" />Deleted {formatDate(user.deletedAt)}</>}
+        </p>
+        {user.purgeAt && (
+          <p className="text-xs text-destructive mt-0.5">
+            <AlertTriangle className="size-3 inline mr-1" />
+            Auto-purges {formatDate(user.purgeAt)}
+            {daysLeft !== null && <> ({daysLeft} day{daysLeft !== 1 ? "s" : ""} left)</>}
+          </p>
+        )}
+      </div>
+      <div className="shrink-0 flex items-center gap-2">
         {children}
       </div>
     </div>

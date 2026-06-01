@@ -173,8 +173,8 @@ router.get('/auth/login/failed', async(req, res) => {
 // Logout route
 router.post("/logout", logout);
 
-// Delete user account route
-router.delete("/delete", deleteAccount);
+// Delete user account route (soft-delete; auth ensures users delete only their own)
+router.delete("/delete", authenticate, deleteAccount);
 
 router.patch("/deactivate", authenticate, deactivateAccount);
 

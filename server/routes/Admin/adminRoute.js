@@ -22,6 +22,7 @@ const {
   rejectReviewerRequest,
   removeFromReviewerRole,
   fetchAllUsers,
+  getDeletedUsers,
   deleteUserAccount,
   deactivateUserAccount,
   reactivateUserAccount,
@@ -107,6 +108,8 @@ router.patch("/dashboard/rejectreviewer/:id", adminMiddleware, rejectReviewerReq
 router.patch("/dashboard/removefromreviewer/:id", adminMiddleware, removeFromReviewerRole);
 
 router.get("/dashboard/allusers", adminMiddleware, fetchAllUsers);
+
+router.get("/dashboard/deletedusers", adminMiddleware, getDeletedUsers);
 
 router.put("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
 router.patch("/dashboard/deactivateuser/:id", adminMiddleware, deactivateUserAccount);

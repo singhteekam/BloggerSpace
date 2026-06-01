@@ -489,17 +489,64 @@ exports.deactivateAccount = async (req, res) => {
 
 exports.deleteAccount = async (req, res) => {
   try {
-    // Get the userId from the session or request body, depending on your implementation
+    // userId is set from the auth token by the authenticate middleware
     const userId = req.query.userId || req.body.userId;
 
-    const user= await User.findById(userId);
-    user.status="DELETED";
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    if (user.status === "DELETED") {
+      return res.status(400).json({ error: "Account is already scheduled for deletion." });
+    }
+
+    // Soft-delete: mark DELETED and timestamp it. A TTL index permanently
+    // removes the document 7 days later unless an admin deletes it sooner.
+    user.status = "DELETED";
+    user.deletedAt = new Date();
     await user.save();
 
-    // Return a success message
+    const deletionDate = new Date(user.deletedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+    const purgeDate = new Date(user.deletedAt.getTime() + 7 * 24 * 60 * 60 * 1000)
+      .toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "long", year: "numeric" });
+
+    // Notify the user (best-effort — never block the deletion on email failure)
+    sendEmail(
+      user.email,
+      "Your BloggerSpace account has been deleted",
+      `
+        <div style="font-family:sans-serif;line-height:1.6;color:#0b0f19;">
+          <h2>Account deleted</h2>
+          <p>Hi ${user.fullName || "there"},</p>
+          <p>Your BloggerSpace account was deleted on <strong>${deletionDate}</strong> (IST).
+          You have been signed out and your account is no longer accessible.</p>
+          <p>This action is <strong>irreversible</strong>. Your account and personal data will be
+          permanently removed from our systems by <strong>${purgeDate}</strong>. If this was a mistake,
+          please contact us at ${process.env.EMAIL || "support"} as soon as possible.</p>
+          <p>— The BloggerSpace team</p>
+        </div>
+      `,
+    ).catch((e) => logger.error("Delete-account user email failed: " + e.message));
+
+    // Notify the admin so they can review / action it from the panel
+    if (process.env.EMAIL) {
+      sendEmail(
+        process.env.EMAIL,
+        `Account deletion: ${user.email}`,
+        `
+          <div style="font-family:sans-serif;line-height:1.6;">
+            <h3>A user deleted their account</h3>
+            <p><strong>Name:</strong> ${user.fullName || "—"}<br/>
+            <strong>Email:</strong> ${user.email}<br/>
+            <strong>Username:</strong> ${user.userName || "—"}<br/>
+            <strong>Deleted at:</strong> ${deletionDate} (IST)</p>
+            <p>The account is in the <strong>Deleted Users</strong> tab of the admin panel. It will be
+            permanently purged automatically on <strong>${purgeDate}</strong> unless you remove it sooner.</p>
+          </div>
+        `,
+      ).catch((e) => logger.error("Delete-account admin email failed: " + e.message));
+    }
+
     res.json({ message: "Account deleted successfully." });
   } catch (error) {
-    // Handle any errors
     console.error("Account deletion failed:", error);
     logger.error("Account deletion failed: " + error.message);
     res.status(500).json({ error: "Failed to delete the account" });
@@ -838,12 +885,17 @@ exports.userProfile = async (req, res) => {
     const viewerId = req.query.viewerId || null;
 
     const user = await User.findOne({ userName })
-      .select("fullName userName email profilePicture isVerified followers following createdAt creatorScore reviewerScoreAvg reviewerScoreCount reviewerScoreBest bio socialLinks")
+      .select("fullName userName email profilePicture isVerified followers following createdAt creatorScore reviewerScoreAvg reviewerScoreCount reviewerScoreBest bio socialLinks status")
       .lean()
       .exec();
 
     if (!user) {
       logger.error("The requested User not found of username: " + userName);
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Deleted accounts are anonymised — their public profile is no longer reachable
+    if (user.status === "DELETED") {
       return res.status(404).json({ message: "User not found" });
     }
 

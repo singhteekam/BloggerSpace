@@ -128,8 +128,10 @@ export const userApi = {
   deactivateAccount: (userId: string) =>
     api.patch<{ message: string }>(`/api/users/deactivate?userId=${userId}`),
 
-  deleteAccount: (userId: string) =>
-    api.delete<{ message: string }>(`/api/users/delete?userId=${userId}`),
+  // No userId param — the server derives the account from the auth token so a
+  // user can only ever delete their own account.
+  deleteAccount: () =>
+    api.delete<{ message: string }>("/api/users/delete"),
 
   follow: (targetId: string) =>
     api.patch<{ message: string }>(`/api/users/follow/${targetId}`),

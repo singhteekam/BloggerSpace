@@ -23,7 +23,11 @@ async function enforceUserGate(userId, res) {
   const user = await User.findById(userId)
     .select("status authType lastVerifiedAt")
     .lean();
-  if (!user || user.status === "INACTIVE") {
+  if (!user || user.status === "DELETED") {
+    res.status(401).json({ message: "Account deleted." });
+    return true;
+  }
+  if (user.status === "INACTIVE") {
     res.status(401).json({ message: "Account deactivated. Please contact support." });
     return true;
   }

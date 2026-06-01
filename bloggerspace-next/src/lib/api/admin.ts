@@ -74,6 +74,17 @@ export type UserItem = {
   newsletterOptIn?: boolean;
 };
 
+export type DeletedUserItem = {
+  _id: string;
+  fullName: string;
+  userName?: string;
+  email: string;
+  role?: string;
+  createdAt: string;
+  deletedAt: string | null;
+  purgeAt: string | null;
+};
+
 export type CommunityPost = {
   _id: string;
   communityPostId: string;
@@ -164,6 +175,9 @@ export const adminApi = {
   // ── User management ───────────────────────────────────────────────
   getUsers: (userId: string) =>
     api.get<UserItem[]>("/api/admin/dashboard/allusers", { params: p(userId) }),
+
+  getDeletedUsers: (userId: string) =>
+    api.get<DeletedUserItem[]>("/api/admin/dashboard/deletedusers", { params: p(userId) }),
 
   deleteUser: (targetUserId: string, userEmail: string, adminId: string) =>
     api.put<{ message: string }>(`/api/admin/dashboard/deleteuser/${targetUserId}`, {}, {

@@ -135,8 +135,20 @@ const userSchema = new mongoose.Schema({
   lastLogin:{
     type:Date,
     default:()=> new Date(new Date().getTime() + IST_OFFSET * 60000),
-  }
+  },
+  // Set when the user self-deletes their account (status → "DELETED"). The TTL
+  // index below auto-removes the document 7 days later if an admin takes no
+  // action. Null/absent for all other users, so they are never auto-expired.
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
 });
+
+// TTL: permanently remove soft-deleted accounts 7 days after deletedAt is set.
+// MongoDB TTL ignores docs whose deletedAt is null/missing, so only DELETED
+// users are affected.
+userSchema.index({ deletedAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 });
 
 userSchema.methods.generateVerificationToken = function () {
   const token = uuidv4(); // Generate a unique verification token using uuid

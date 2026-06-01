@@ -9,8 +9,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Loader2, Pencil, Camera, CheckCircle2, BadgeCheck, CalendarDays,
   Gem, TrendingUp, TrendingDown, ChevronLeft, ChevronRight,
-  ShieldCheck, Clock, LayoutDashboard,
+  ShieldCheck, Clock, LayoutDashboard, Globe,
 } from "lucide-react";
+import { LinkedInIcon, GitHubIcon } from "@/components/icons/brand";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
@@ -18,14 +19,23 @@ import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAuth } from "@/contexts/auth-context";
 import { userApi, userGemsApi, type UserGemsTransaction } from "@/lib/api/user";
 import { RedemptionSection } from "@/components/user/redemption-section";
+import { ReadingHistorySection } from "@/components/user/reading-history-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import { formatDate } from "@/lib/utils/html";
+
+const urlOrEmpty = z
+  .string()
+  .trim()
+  .max(200, "URL too long")
+  .refine((v) => v === "" || /^https?:\/\/.+/i.test(v), "Must start with http:// or https://")
+  .or(z.literal(""));
 
 const schema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -34,6 +44,10 @@ const schema = z.object({
     .min(3, "Minimum 3 characters")
     .max(20, "Maximum 20 characters")
     .regex(/^[a-z0-9_]+$/, "Lowercase letters, numbers, and underscores only"),
+  bio: z.string().max(280, "Bio must be 280 characters or fewer").optional(),
+  linkedin: urlOrEmpty,
+  github: urlOrEmpty,
+  website: urlOrEmpty,
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -81,9 +95,19 @@ export default function MyProfilePage() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    values: profile ? { fullName: profile.fullName, userName: profile.userName ?? "" } : undefined,
+    values: profile
+      ? {
+          fullName: profile.fullName,
+          userName: profile.userName ?? "",
+          bio: profile.bio ?? "",
+          linkedin: profile.socialLinks?.linkedin ?? "",
+          github: profile.socialLinks?.github ?? "",
+          website: profile.socialLinks?.website ?? "",
+        }
+      : undefined,
   });
 
+  // Sync auth context when API returns fresher role/reviewerStatus (e.g. after admin approves)
   useEffect(() => {
     if (!profile || !user || !token) return;
     if (profile.role !== user.role || profile.reviewerStatus !== user.reviewerStatus) {
@@ -103,7 +127,16 @@ export default function MyProfilePage() {
   const onSave = async (data: FormValues) => {
     if (!user) return;
     try {
-      const res = await userApi.updateProfile(user._id, data);
+      const res = await userApi.updateProfile(user._id, {
+        fullName: data.fullName,
+        userName: data.userName,
+        bio: data.bio ?? "",
+        socialLinks: {
+          linkedin: data.linkedin ?? "",
+          github: data.github ?? "",
+          website: data.website ?? "",
+        },
+      });
       login(localStorage.getItem("bs.token")!, res.data.user);
       qc.invalidateQueries({ queryKey: ["userinfo"] });
       toast.success("Profile updated.");
@@ -194,6 +227,100 @@ export default function MyProfilePage() {
         </div>
       </div>
 
+      {/* Bio + social links + edit profile */}
+      {editing ? (
+        <form onSubmit={handleSubmit(onSave)} className="mt-6 space-y-4 rounded-2xl border border-border bg-card p-5">
+          <h2 className="font-semibold">Edit profile</h2>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="fullName">Full name</Label>
+            <Input id="fullName" {...register("fullName")} />
+            {errors.fullName && <p className="text-xs text-destructive">{errors.fullName.message}</p>}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="userName">Username</Label>
+            <Input id="userName" {...register("userName")} />
+            {errors.userName && <p className="text-xs text-destructive">{errors.userName.message}</p>}
+            <p className="text-xs text-muted-foreground">
+              Lowercase letters, numbers, and underscores. 3–20 characters.
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="bio">Bio</Label>
+            <Textarea id="bio" rows={3} placeholder="Tell readers a little about yourself…" {...register("bio")} />
+            {errors.bio && <p className="text-xs text-destructive">{errors.bio.message}</p>}
+            <p className="text-xs text-muted-foreground">Up to 280 characters. Shown on your public profile.</p>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Social links</Label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground"><LinkedInIcon className="size-4" /></span>
+                <Input placeholder="https://linkedin.com/in/username" {...register("linkedin")} />
+              </div>
+              {errors.linkedin && <p className="text-xs text-destructive">{errors.linkedin.message}</p>}
+              <div className="flex items-center gap-2">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground"><GitHubIcon className="size-4" /></span>
+                <Input placeholder="https://github.com/username" {...register("github")} />
+              </div>
+              {errors.github && <p className="text-xs text-destructive">{errors.github.message}</p>}
+              <div className="flex items-center gap-2">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground"><Globe className="size-4" /></span>
+                <Input placeholder="https://yourwebsite.com" {...register("website")} />
+              </div>
+              {errors.website && <p className="text-xs text-destructive">{errors.website.message}</p>}
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
+              Save changes
+            </Button>
+            <Button type="button" variant="outline" onClick={() => { setEditing(false); reset(); }}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <div className="mt-5 space-y-3">
+          {profile?.bio && (
+            <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-foreground/90">
+              {profile.bio}
+            </p>
+          )}
+          {(profile?.socialLinks?.linkedin || profile?.socialLinks?.github || profile?.socialLinks?.website) && (
+            <div className="flex flex-wrap items-center gap-2">
+              {profile?.socialLinks?.linkedin && (
+                <a href={profile.socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
+                  className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label="LinkedIn" title="LinkedIn">
+                  <LinkedInIcon className="size-4" />
+                </a>
+              )}
+              {profile?.socialLinks?.github && (
+                <a href={profile.socialLinks.github} target="_blank" rel="noopener noreferrer"
+                  className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label="GitHub" title="GitHub">
+                  <GitHubIcon className="size-4" />
+                </a>
+              )}
+              {profile?.socialLinks?.website && (
+                <a href={profile.socialLinks.website} target="_blank" rel="noopener noreferrer"
+                  className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label="Website" title="Website">
+                  <Globe className="size-4" />
+                </a>
+              )}
+            </div>
+          )}
+          <Button variant="outline" onClick={() => setEditing(true)}>
+            <Pencil className="size-4" />
+            Edit profile
+          </Button>
+        </div>
+      )}
+
       <Separator className="my-8" />
 
       {/* Reviewer status CTA */}
@@ -217,7 +344,7 @@ export default function MyProfilePage() {
                   )}
                 </div>
                 <Button asChild size="sm" variant="outline" className="shrink-0">
-                  <Link href="/bloggerspace/apply-reviewer">Apply now</Link>
+                  <Link href="/apply-reviewer">Apply now</Link>
                 </Button>
               </div>
             </div>
@@ -274,6 +401,7 @@ export default function MyProfilePage() {
         </div>
       </div>
 
+      {/* Redemption (Phase 4) */}
       <div className="mt-4">
         <RedemptionSection gemsBalance={gems} />
       </div>
@@ -307,7 +435,9 @@ export default function MyProfilePage() {
             </div>
             <div className="flex items-center justify-between px-5 py-3 border-t border-border bg-muted/30">
               <Button
-                size="sm" variant="outline" className="gap-1"
+                size="sm"
+                variant="outline"
+                className="gap-1"
                 disabled={gemsPage <= 1}
                 onClick={() => setGemsPage((p) => p - 1)}
               >
@@ -317,7 +447,9 @@ export default function MyProfilePage() {
                 Page {gemsPage} of {totalGemsPages}
               </span>
               <Button
-                size="sm" variant="outline" className="gap-1"
+                size="sm"
+                variant="outline"
+                className="gap-1"
                 disabled={gemsPage >= totalGemsPages}
                 onClick={() => setGemsPage((p) => p + 1)}
               >
@@ -328,41 +460,10 @@ export default function MyProfilePage() {
         )}
       </div>
 
-      <Separator className="my-8" />
-
-      {/* Edit form */}
-      {editing ? (
-        <form onSubmit={handleSubmit(onSave)} className="space-y-4">
-          <h2 className="font-semibold">Edit profile</h2>
-          <div className="space-y-1.5">
-            <Label htmlFor="fullName">Full name</Label>
-            <Input id="fullName" {...register("fullName")} />
-            {errors.fullName && <p className="text-xs text-destructive">{errors.fullName.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="userName">Username</Label>
-            <Input id="userName" {...register("userName")} />
-            {errors.userName && <p className="text-xs text-destructive">{errors.userName.message}</p>}
-            <p className="text-xs text-muted-foreground">
-              Lowercase letters, numbers, and underscores. 3–20 characters.
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
-              Save changes
-            </Button>
-            <Button type="button" variant="outline" onClick={() => { setEditing(false); reset(); }}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      ) : (
-        <Button variant="outline" onClick={() => setEditing(true)}>
-          <Pencil className="size-4" />
-          Edit profile
-        </Button>
-      )}
+      {/* Reading history */}
+      <div className="mt-4">
+        <ReadingHistorySection enabled={!!user} />
+      </div>
     </main>
   );
 }
