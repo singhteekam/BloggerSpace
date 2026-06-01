@@ -3,7 +3,7 @@ const { SitemapStream, streamToPromise } = require("sitemap");
 const Blog = require("../models/Blog");
 const Community = require("../models/Community");
 
-const SITE_URL = process.env.BLOGGERSPACE1 || "https://bloggerspace.singhteekam.in";
+const SITE_URL = process.env.BLOGGERSPACE1 || "https://www.singhteekam.in";
 
 const STATIC_LINKS = [
   `${SITE_URL}/blogs`,

@@ -14,12 +14,13 @@ app.use(helmet());
 // const functions = require("firebase-functions");
 
 const { onRequest } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 
-// require("dotenv").config(); // Load environment variables from .env file - Production mode
-require("dotenv").config({ path: ".env.local" }); // development mode
+require("dotenv").config(); // Load environment variables from .env file - Production mode
+// require("dotenv").config({ path: ".env.local" }); // development mode
 
-const PORT = process.env.PORT || 5000; // For development
-// const PORT = 8191;  // For production
+// const PORT = process.env.PORT || 5000; // For development
+const PORT = 8191;  // For production
 
 const connectDB = require("./db/db");
 const blogs = require("./routes/blogs");
@@ -33,6 +34,7 @@ const autoWriteBlogs = require("./routes/autoWriteBlogs");
 const analyticsRoutes = require("./routes/analyticsRoute");
 
 const sitemapRouter = require("./routes/sitemap");
+const notificationRoutes = require("./routes/notifications");
 
 const passport = require("./services/passportAuth.js");
 
@@ -145,6 +147,9 @@ app.use("/api/autowrite", autoWriteBlogs);
 // Analytics
 app.use("/api/analytics", analyticsRoutes);
 
+// Push notifications — FCM token registration (logged-in users)
+app.use("/api/notifications", notificationRoutes);
+
 //For capturing logs
 const { uploadLogsToGitHub, fetchLogsFile } = require("./utils/uploadToGitHub");
 app.get("/api/logs", (req, res) => {
@@ -200,3 +205,20 @@ app.listen(
 
 exports.bloggerspacebackend2 = onRequest(app);
 // exports.bloggerspacebackend = functions.https.onRequest(app);
+
+// ── Scheduled trending-blog digest (FCM) ──────────────────────────────────────
+// Runs once daily at 09:00 IST. Cost-optimised: it exits almost immediately
+// unless a digest is actually due (per the admin-configured frequency) AND new
+// trending content exists. ~30 invocations/month. Requires the Blaze plan.
+const { runNotificationCycle } = require("./services/notifications");
+exports.dailyTrendingNotification = onSchedule(
+  { schedule: "every day 09:00", timeZone: "Asia/Kolkata", memory: "256MiB", timeoutSeconds: 120 },
+  async () => {
+    try {
+      const summary = await runNotificationCycle();
+      console.log("dailyTrendingNotification:", JSON.stringify(summary));
+    } catch (err) {
+      console.error("dailyTrendingNotification failed:", err);
+    }
+  },
+);

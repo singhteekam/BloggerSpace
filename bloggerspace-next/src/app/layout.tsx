@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/footer";
 import { ReadingProgress } from "@/components/layout/reading-progress";
 import { ChatWidget } from "@/components/chat/chat-widget";
 import { TrackPageView } from "@/components/analytics/track-pageview";
+import { PushListener } from "@/components/notifications/push-listener";
 import { siteConfig } from "@/lib/constants/site";
 import { websiteJsonLd } from "@/lib/utils/json-ld";
 import "./globals.css";
@@ -109,6 +110,7 @@ export default function RootLayout({
         />
         <Providers>
           <TrackPageView />
+          <PushListener />
           <ReadingProgress />
           <Navbar />
           {children}

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: `How ${siteConfig.name} collects, uses, and protects your personal data.`,
 };
 
-const LAST_UPDATED = "1 June 2026";
+const LAST_UPDATED = "2 June 2026";
 
 const SECTIONS = [
   {
@@ -17,7 +17,7 @@ const SECTIONS = [
   },
   {
     title: "2. How we use your information",
-    body: `Your email address is used to: send account notifications (review status updates, comment replies) and allow you to reset your password. We use your reading history only to suggest other posts you may like, and never share it with anyone.\n\nThe newsletter is strictly opt-in: it is switched off by default, and we will only email you newsletter content if you actively turn it on under Settings → Email preferences. You can opt out again at any time from the same place, and we send newsletters only to users who are currently opted in. We do not sell, rent, or share your personal information with third parties for marketing purposes. Server logs are used solely for security monitoring and infrastructure diagnosis.`,
+    body: `Your email address is used to: send account notifications (review status updates, comment replies) and allow you to reset your password. We use your reading history only to suggest other posts you may like, and never share it with anyone.\n\nThe newsletter is strictly opt-in: it is switched off by default, and we will only email you newsletter content if you actively turn it on under Settings → Notifications. You can opt out again at any time from the same place, and we send newsletters only to users who are currently opted in.\n\nBrowser push notifications are also strictly opt-in. If you enable them under Settings → Notifications, your browser generates an anonymous device messaging token (via Google Firebase Cloud Messaging) which we store to deliver occasional "trending blog" notifications. The token identifies a browser/device, not you personally, contains no message content, and is used only to send these notifications. You can turn push notifications off at any time, which removes the stored token; tokens that become invalid are also deleted automatically. We do not sell, rent, or share your personal information with third parties for marketing purposes. Server logs are used solely for security monitoring and infrastructure diagnosis.`,
   },
   {
     title: "3. Cookies",
@@ -25,7 +25,7 @@ const SECTIONS = [
   },
   {
     title: "4. Third-party services",
-    body: `BloggerSpace is hosted on Vercel. Blog images may be served through Cloudinary. We use Google Fonts to serve the Crimson Pro and Geist typefaces. Each of these providers has its own privacy policy. We do not embed third-party advertising, social tracking pixels, or any cross-site analytics scripts.`,
+    body: `BloggerSpace is hosted on Vercel. Blog images may be served through Cloudinary. We use Google Fonts to serve the Crimson Pro and Geist typefaces. If you opt in to push notifications, Google Firebase Cloud Messaging is used to deliver them. Each of these providers has its own privacy policy. We do not embed third-party advertising, social tracking pixels, or any cross-site analytics scripts.`,
   },
   {
     title: "5. Data retention",

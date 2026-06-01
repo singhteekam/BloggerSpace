@@ -38,6 +38,17 @@ const adminConfigSchema = new mongoose.Schema({
   // ── Maintenance mode ───────────────────────────────────────────
   maintenanceMode: { type: Boolean, default: false },
 
+  // ── Push notifications (trending-blog digest via FCM) ───────────
+  notificationsEnabled: { type: Boolean, default: false },
+  // Minimum days between digests. Admin picks 3, 7, or 14 (validated in controller).
+  notificationFrequencyDays: { type: Number, default: 7, min: 1 },
+  // How many trending blogs to include in each digest.
+  trendingBlogCount: { type: Number, default: 3, min: 1, max: 10 },
+  // "Recently published" window the trending query looks back over.
+  trendingWindowDays: { type: Number, default: 30, min: 1 },
+  // Timestamp of the last digest actually sent — drives the frequency gate.
+  lastNotificationSentAt: { type: Date, default: null },
+
   // ── Audit ───────────────────────────────────────────────────
   updatedAt: {
     type: Date,

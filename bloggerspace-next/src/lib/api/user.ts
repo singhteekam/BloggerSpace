@@ -105,6 +105,16 @@ export const userApi = {
   getReadingHistory: () =>
     api.get<{ history: ReadingHistoryItem[] }>("/api/users/reading-history"),
 
+  // ── Push notifications (FCM token) ──────────────────────────────────────────
+  registerPushToken: (token: string, userAgent = "") =>
+    api.post<{ ok: boolean; enabled: boolean }>("/api/notifications/register", { token, userAgent }),
+
+  unregisterPushToken: (token: string) =>
+    api.post<{ ok: boolean; enabled: boolean }>("/api/notifications/unregister", { token }),
+
+  getPushStatus: (token: string) =>
+    api.get<{ enabled: boolean }>("/api/notifications/status", { params: { token } }),
+
   uploadProfilePicture: (userId: string, file: File) => {
     const form = new FormData();
     form.append("profilePicture", file);

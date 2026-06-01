@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: `The terms of service that govern your use of ${siteConfig.name}.`,
 };
 
-const LAST_UPDATED = "1 May 2026";
+const LAST_UPDATED = "2 June 2026";
 
 const SECTIONS = [
   {
@@ -41,7 +41,7 @@ const SECTIONS = [
   },
   {
     title: "8. Disclaimers",
-    body: `The Service is provided "as is" without warranty of any kind. We do not guarantee uninterrupted access, error-free operation, or that published content is accurate. Opinions expressed in user-published posts are those of the authors and do not represent the views of ${siteConfig.name}.`,
+    body: `The Service is provided "as is" without warranty of any kind. We do not guarantee uninterrupted access, error-free operation, or that published content is accurate. Opinions expressed in user-published posts are those of the authors and do not represent the views of ${siteConfig.name}. Optional email and browser push notifications are provided on a best-effort basis; we do not guarantee their timely delivery, and you can disable them at any time from your settings.`,
   },
   {
     title: "9. Limitation of liability",

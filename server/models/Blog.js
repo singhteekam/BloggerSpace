@@ -92,6 +92,10 @@ const blogSchema = new mongoose.Schema({
   blogScore: { type: Number, default: 0, min: 0 },
   blogScoreUpdatedAt: { type: Date, default: null },
   blogScoreUpdatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "admins", default: null },
+
+  // Push-notification dedup: set when this blog is included in a sent trending
+  // digest, so it is never sent again. Null = eligible for the next digest.
+  digestNotifiedAt: { type: Date, default: null },
 });
 
 const Blog = mongoose.model("Blog", blogSchema);
@@ -102,6 +106,8 @@ blogSchema.index({ status: 1, category: 1, lastUpdatedAt: -1 });
 blogSchema.index({ status: 1, tags: 1, lastUpdatedAt: -1 });
 blogSchema.index({ status: 1, blogViews: -1 });
 blogSchema.index({ "blogLikes.userId": 1 });
+// Trending-digest query: published + not yet notified, sorted by views
+blogSchema.index({ status: 1, digestNotifiedAt: 1, blogViews: -1 });
 
 Blog.syncIndexes();
 

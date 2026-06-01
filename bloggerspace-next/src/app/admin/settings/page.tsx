@@ -8,6 +8,7 @@ import { Loader2, Save, Settings as SettingsIcon, Gem, Award, BookOpen, Coins, G
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminConfigApi, type AdminConfigDoc, type AdminConfigUpdatePayload } from "@/lib/api/admin";
 import { REDEMPTION_METHOD_LABELS, type RedemptionMethod } from "@/lib/api/user";
+import { NotificationSettings } from "@/components/admin/notification-settings";
 
 const ALL_REDEMPTION_METHODS: RedemptionMethod[] = ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"];
 import { Button } from "@/components/ui/button";
@@ -198,6 +199,9 @@ function SettingsForm({ adminId }: { adminId: string }) {
             <Input type="number" min={1} value={form.reverificationPeriodDays ?? ""} onChange={setNum("reverificationPeriodDays")} />
           </Field>
         </Section>
+
+        {/* Push notifications — self-contained (own API + save) */}
+        <NotificationSettings adminId={adminId} />
 
         <Separator />
 

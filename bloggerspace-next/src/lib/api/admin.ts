@@ -85,6 +85,14 @@ export type DeletedUserItem = {
   purgeAt: string | null;
 };
 
+export type NotificationConfig = {
+  notificationsEnabled: boolean;
+  notificationFrequencyDays: number;
+  trendingBlogCount: number;
+  lastNotificationSentAt: string | null;
+  subscriberCount: number;
+};
+
 export type CommunityPost = {
   _id: string;
   communityPostId: string;
@@ -178,6 +186,30 @@ export const adminApi = {
 
   getDeletedUsers: (userId: string) =>
     api.get<DeletedUserItem[]>("/api/admin/dashboard/deletedusers", { params: p(userId) }),
+
+  // ── Push notifications ────────────────────────────────────────────
+  getNotificationConfig: (userId: string) =>
+    api.get<NotificationConfig>("/api/admin/notifications/config", { params: p(userId) }),
+
+  updateNotificationConfig: (
+    userId: string,
+    body: Partial<Pick<NotificationConfig, "notificationsEnabled" | "notificationFrequencyDays" | "trendingBlogCount">>,
+  ) =>
+    api.patch<NotificationConfig & { message: string }>("/api/admin/notifications/config", body, { params: p(userId) }),
+
+  sendTestNotification: (userId: string, token: string) =>
+    api.post<{ message: string; ok: boolean; recipients: number }>(
+      "/api/admin/notifications/test",
+      { token },
+      { params: p(userId) },
+    ),
+
+  runNotificationCycle: (userId: string) =>
+    api.post<{ message: string; ran: boolean; reason?: string; blogs?: number; recipients?: number }>(
+      "/api/admin/notifications/run",
+      {},
+      { params: p(userId) },
+    ),
 
   deleteUser: (targetUserId: string, userEmail: string, adminId: string) =>
     api.put<{ message: string }>(`/api/admin/dashboard/deleteuser/${targetUserId}`, {}, {

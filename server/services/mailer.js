@@ -6,7 +6,7 @@
 const nodemailer = require("nodemailer");
 
 // ── Brand / URL constants ──────────────────────────────────────────────────
-const SITE_URL = process.env.FRONTEND_URL || "https://bloggerspace.singhteekam.in";
+const SITE_URL = process.env.FRONTEND_URL || "https://www.singhteekam.in";
 
 // Logo is served from the backend's /assets/ static route (app.js).
 // Add BACKEND_URL to your .env.local (e.g. https://api.yourdomain.com).
@@ -261,7 +261,7 @@ const emailTemplate = (content) => {
         <!-- Below-card domain link -->
         <p style="margin:18px 0 0; font-size:11px; color:#9ca3af; text-align:center;">
           <a href="${SITE_URL}" style="color:#9ca3af; text-decoration:none;">
-            bloggerspace.singhteekam.in
+            www.singhteekam.in
           </a>
         </p>
 

@@ -66,6 +66,12 @@ const {
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
+const {
+  getNotificationConfig,
+  updateNotificationConfig,
+  sendTestNotification,
+  triggerNotificationRun,
+} = require("../../controllers/notificationController");
 
 router.post("/signup", adminSignup);
 
@@ -114,6 +120,12 @@ router.get("/dashboard/deletedusers", adminMiddleware, getDeletedUsers);
 router.put("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
 router.patch("/dashboard/deactivateuser/:id", adminMiddleware, deactivateUserAccount);
 router.patch("/dashboard/reactivateuser/:id", adminMiddleware, reactivateUserAccount);
+
+// ── Push notification controls ──────────────────────────────────
+router.get("/notifications/config", adminMiddleware, getNotificationConfig);
+router.patch("/notifications/config", adminMiddleware, updateNotificationConfig);
+router.post("/notifications/test", adminMiddleware, sendTestNotification);
+router.post("/notifications/run", adminMiddleware, triggerNotificationRun);
 
 router.get("/community", adminMiddleware, getCommunityPosts);
 

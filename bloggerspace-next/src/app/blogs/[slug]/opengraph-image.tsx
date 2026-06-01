@@ -119,7 +119,7 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
           </div>
           <span style={{ color: "#a1a1aa" }}>{author}</span>
           <span style={{ color: "#52525b" }}>·</span>
-          <span style={{ color: "#52525b" }}>bloggerspace.singhteekam.in</span>
+          <span style={{ color: "#52525b" }}>www.singhteekam.in</span>
         </div>
       </div>
     ),

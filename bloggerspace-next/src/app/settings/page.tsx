@@ -23,6 +23,7 @@ import { userApi } from "@/lib/api/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { PushNotificationToggle } from "@/components/user/push-notification-toggle";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -161,41 +162,45 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* Email preferences */}
+      {/* Notifications */}
       <section className="mb-8">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-          Email preferences
+          Notifications
         </h2>
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                <Mail className="size-4" />
-              </span>
-              <div>
-                <p className="text-sm font-medium text-foreground">Newsletter</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  Get occasional emails about new posts and updates. You can opt out anytime.
-                </p>
+        <div className="space-y-3">
+          <div className="rounded-xl border border-border bg-card p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <Mail className="size-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Newsletter</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Get occasional emails about new posts and updates. You can opt out anytime.
+                  </p>
+                </div>
               </div>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={!!profile?.newsletterOptIn}
-              disabled={newsletterMutation.isPending}
-              onClick={() => newsletterMutation.mutate(!profile?.newsletterOptIn)}
-              className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${
-                profile?.newsletterOptIn ? "bg-primary" : "bg-muted-foreground/30"
-              }`}
-            >
-              <span
-                className={`inline-block size-4 transform rounded-full bg-white transition-transform ${
-                  profile?.newsletterOptIn ? "translate-x-6" : "translate-x-1"
+              <button
+                type="button"
+                role="switch"
+                aria-checked={!!profile?.newsletterOptIn}
+                disabled={newsletterMutation.isPending}
+                onClick={() => newsletterMutation.mutate(!profile?.newsletterOptIn)}
+                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${
+                  profile?.newsletterOptIn ? "bg-primary" : "bg-muted-foreground/30"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block size-4 transform rounded-full bg-white transition-transform ${
+                    profile?.newsletterOptIn ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
+
+          <PushNotificationToggle />
         </div>
       </section>
 
