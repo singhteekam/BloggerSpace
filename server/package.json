@@ -26,7 +26,7 @@
     "express-multipart-file-parser": "^0.1.2",
     "express-session": "^1.17.3",
     "firebase-admin": "^12.1.1",
-    "firebase-functions": "^5.0.1",
+    "firebase-functions": "^7.2.5",
     "googleapis": "^164.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.0",

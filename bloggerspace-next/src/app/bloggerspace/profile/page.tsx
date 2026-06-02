@@ -218,6 +218,17 @@ export default function MyProfilePage() {
           </div>
           <p className="text-sm text-muted-foreground wrap-break-word">@{profile?.userName ?? "—"}</p>
           <p className="text-sm text-muted-foreground break-all">{profile?.email ?? user.email}</p>
+          {/* Followers / following counts */}
+          <p className="flex items-center gap-3 pt-0.5 text-sm">
+            <Link href={profile?.userName ? `/user/${profile.userName}` : "#"} className="hover:text-primary transition-colors">
+              <span className="font-semibold text-foreground">{(profile?.followersCount ?? 0).toLocaleString()}</span>
+              <span className="text-muted-foreground"> followers</span>
+            </Link>
+            <Link href={profile?.userName ? `/user/${profile.userName}` : "#"} className="hover:text-primary transition-colors">
+              <span className="font-semibold text-foreground">{(profile?.followingCount ?? 0).toLocaleString()}</span>
+              <span className="text-muted-foreground"> following</span>
+            </Link>
+          </p>
           {joinedDate && (
             <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <CalendarDays className="size-3.5 shrink-0" />

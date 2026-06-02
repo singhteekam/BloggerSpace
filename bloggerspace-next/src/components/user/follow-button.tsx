@@ -20,15 +20,18 @@ export function FollowButton({ targetId, initialFollowing, onCountChange, classN
   const [loading, setLoading] = useState(false);
   const [resolved, setResolved] = useState(initialFollowing !== undefined);
 
-  // If no initial state was provided, fetch from server
+  // Always reconcile with the live DB status. The profile page is ISR-cached
+  // (revalidate 24h), so the SSR `initialFollowing` can be stale — e.g. after
+  // you follow then refresh. We paint with the SSR value first (if given) and
+  // then correct it from the server, mirroring the like button's behaviour.
   useEffect(() => {
-    if (initialFollowing !== undefined || !user) {
+    if (!user || user._id === targetId) {
       setResolved(true);
       return;
     }
     userApi.getFollowStatus(targetId, user._id)
       .then((r) => { setFollowing(r.data.isFollowing); setResolved(true); })
-      .catch(() => setResolved(true));
+      .catch(() => setResolved(true)); // keep SSR/last value on failure
   }, [targetId, user?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user || user._id === targetId) return null;

@@ -28,8 +28,9 @@ const { onSchedule } = require("firebase-functions/v2/scheduler");
 require("dotenv").config(); // Load environment variables from .env file - Production mode
 // require("dotenv").config({ path: ".env.local" }); // development mode
 
-// const PORT = process.env.PORT || 5000; // For development
-const PORT = 8191;  // For production
+// Honour an injected PORT (local tooling / emulators); fall back to 8191.
+// Only used when run directly for local dev — on Firebase, onRequest(app) serves.
+const PORT = process.env.PORT || 8191;
 
 const connectDB = require("./db/db");
 const blogs = require("./routes/blogs");
@@ -231,12 +232,22 @@ app.get("/api/viewlogs", async (req, res) => {
 // }
 // else{
 // }
-app.listen(
-  PORT,
-  console.log("Server started at " + PORT + " and pid: " + process.pid)
-);
+// Only start a standalone HTTP server when this file is run directly
+// (e.g. `node app.js` for local dev). On Firebase, the function is served by
+// `onRequest(app)` below — calling app.listen() at import time would start a
+// stray server that keeps the deploy-time code analysis from settling and
+// causes "Cannot determine backend specification. Timeout after 10000".
+if (require.main === module) {
+  app.listen(PORT, () =>
+    console.log("Server started at " + PORT + " and pid: " + process.pid)
+  );
+}
 
-exports.bloggerspacebackend2 = onRequest(app);
+// 512 MiB (up from the 256 MiB default): the Express app serves heavy blog
+// endpoints (full article content is decompressed in-memory) and gen2 functions
+// run many requests concurrently per instance — 256 MiB was being exceeded under
+// load, crashing the instance and 503-ing in-flight requests.
+exports.bloggerspacebackend2 = onRequest({ memory: "512MiB" }, app);
 // exports.bloggerspacebackend = functions.https.onRequest(app);
 
 // ── Scheduled trending-blog digest (FCM) ──────────────────────────────────────

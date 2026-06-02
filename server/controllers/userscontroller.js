@@ -883,6 +883,9 @@ exports.loggedInUserInfo = async (req, res) => {
         website:  user.socialLinks?.website ?? "",
       },
       newsletterOptIn: user.newsletterOptIn ?? false,
+      // Social counts so the logged-in user sees them on their own profile.
+      followersCount: user.followers?.length ?? 0,
+      followingCount: user.following?.length ?? 0,
     };
     // console.log("LoggedIn user details fetched");
     logger.debug("LoggedIn user details fetched. Name: " + user.fullName);
@@ -1192,14 +1195,15 @@ exports.removeBlogFromSavedBlogs = async (req, res) => {
   }
 };
 
-// Get Saved blogs — paginated + server-side search across ALL saved blogs.
+// Get Saved blogs.
+//   • No pagination params  → returns the FULL array (back-compat: the blog
+//     page's "is this saved?" check needs every saved slug, and other callers
+//     relied on the original array shape).
+//   • With page/limit/search → returns a paginated envelope for the saved page.
 const SAVED_BLOGS_PAGE_SIZE = 12;
 exports.getSavedBlogsOfUser = async (req, res) => {
   try {
     const userId = req.query.userId;
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || SAVED_BLOGS_PAGE_SIZE));
-    const search = (req.query.search || "").trim().toLowerCase();
 
     // Only pull the savedBlogs array (not the whole user doc) for efficiency.
     const user = await User.findById(userId).select("savedBlogs").lean();
@@ -1207,6 +1211,19 @@ exports.getSavedBlogsOfUser = async (req, res) => {
 
     // Newest-first (items are appended as they're saved).
     let items = (user.savedBlogs || []).slice().reverse();
+
+    // Back-compat: no pagination params → return the full array as before.
+    const wantsPaginated =
+      req.query.page !== undefined ||
+      req.query.limit !== undefined ||
+      req.query.search !== undefined;
+    if (!wantsPaginated) {
+      return res.json(items);
+    }
+
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || SAVED_BLOGS_PAGE_SIZE));
+    const search = (req.query.search || "").trim().toLowerCase();
 
     // Search filters across ALL saved blogs (title/category) before paginating.
     if (search) {

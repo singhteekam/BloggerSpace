@@ -15,6 +15,8 @@ export type AuthUser = {
   bio?: string;
   socialLinks?: { linkedin: string; github: string; website: string };
   newsletterOptIn?: boolean;
+  followersCount?: number;
+  followingCount?: number;
 };
 
 /** Shape returned by POST /api/users/login */
