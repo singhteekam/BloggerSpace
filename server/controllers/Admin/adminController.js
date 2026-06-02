@@ -208,7 +208,10 @@ exports.inReviewBlogs = async (req, res) => {
   try {
     // if (req.session.currentemail) {
     if (req.query.userId) {
+      // List view only — exclude the heavy compressed `content` + `comments`.
       const rawBlogs = await Blog.find({ status: "IN_REVIEW" })
+        .select("-content -comments")
+        .sort({ lastUpdatedAt: -1 })
         .populate("authorDetails", "fullName email userName _id")
         .lean();
 
@@ -491,10 +494,15 @@ exports.allPendingBlogsfromDB = async (req, res) => {
   try {
     if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
+      // List view only — drop heavy content/comments, trim author fields, sort.
       const allPendingBlogs = await Blog.find({
         status: "PENDING_REVIEW",
         currentReviewer: "",
-      }).populate("authorDetails").exec();
+      })
+        .select("-content -comments")
+        .sort({ lastUpdatedAt: -1 })
+        .populate("authorDetails", "fullName email userName _id")
+        .lean();
 
       res.json(allPendingBlogs);
     } else {
@@ -557,9 +565,14 @@ exports.allUnderReviewBlogsfromDB = async (req, res) => {
   try {
     if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
+      // List view only — drop heavy content/comments, trim author fields, sort.
       const allUnderReviewBlogs = await Blog.find({
         status: "UNDER_REVIEW",
-      }).populate("authorDetails").exec();
+      })
+        .select("-content -comments")
+        .sort({ lastUpdatedAt: -1 })
+        .populate("authorDetails", "fullName email userName _id")
+        .lean();
 
       res.json(allUnderReviewBlogs);
     } else {
@@ -576,9 +589,13 @@ exports.fetchDiscardQueueBlogsFromDB = async (req, res) => {
   try {
     if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
+      // List view only — drop heavy content/comments, sort newest-first.
       const allDiscardQueueBlogs = await Blog.find({
         status: "DISCARD_QUEUE",
-      });
+      })
+        .select("-content -comments")
+        .sort({ lastUpdatedAt: -1 })
+        .lean();
 
       res.json(allDiscardQueueBlogs);
     } else {
@@ -596,9 +613,14 @@ exports.fetchAwaitingAuthorFromDB = async (req, res) => {
   try {
     if (req.query.userId) {
       // Query the Blog model for pending blogs assigned to the reviewer
+      // List view only — drop heavy content/comments, trim author fields, sort.
       const allAwaitingAuthorBlogs = await Blog.find({
         status: "AWAITING_AUTHOR",
-      }).populate("authorDetails").exec();
+      })
+        .select("-content -comments")
+        .sort({ lastUpdatedAt: -1 })
+        .populate("authorDetails", "fullName email userName _id")
+        .lean();
 
       res.json(allAwaitingAuthorBlogs);
     } else {
@@ -800,19 +822,53 @@ exports.migrateReviewersToUsers = async (req, res) => {
   }
 };
 
-exports.fetchAllUsers= async(req, res)=>{
-
+// Team-management Users tab — paginated + server-side search across ALL users
+// (name/username/email). Returns one page so the table stays fast as users grow.
+exports.fetchAllUsers = async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+    const search = (req.query.search || "").trim();
+
     // Return ACTIVE and INACTIVE users so admin can see and reactivate deactivated accounts
-    const allUsers = await User.find({ status: { $in: ["ACTIVE", "INACTIVE"] } })
-      .select("fullName userName email status isVerified role reviewerStatus gems createdAt authType lastLogin lastVerifiedAt reverifyAttempts newsletterOptIn")
-      .lean();
-    res.json(allUsers);
+    const match = { status: { $in: ["ACTIVE", "INACTIVE"] } };
+    if (search) {
+      const rx = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      match.$or = [{ fullName: rx }, { userName: rx }, { email: rx }];
+    }
+
+    const [users, total] = await Promise.all([
+      User.find(match)
+        .select("fullName userName email status isVerified role reviewerStatus gems createdAt authType lastLogin lastVerifiedAt reverifyAttempts newsletterOptIn")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      User.countDocuments(match),
+    ]);
+
+    res.json({ users, total, page, pages: Math.ceil(total / limit) || 1 });
   } catch (error) {
-    console.log("Error fetching all users")
+    console.log("Error fetching all users", error);
     res.status(500).json({ error: "Failed to fetch all users" });
   }
-}
+};
+
+// Newsletter composer recipient list. The composer needs EVERY user (for
+// "select all" + subscriber preselect), so this returns all of them but with
+// only the minimal fields it uses — far lighter than the full user docs.
+exports.getNewsletterRecipients = async (req, res) => {
+  try {
+    const recipients = await User.find({ status: { $in: ["ACTIVE", "INACTIVE"] } })
+      .select("fullName userName email newsletterOptIn")
+      .sort({ fullName: 1 })
+      .lean();
+    res.json(recipients);
+  } catch (error) {
+    console.log("Error fetching newsletter recipients", error);
+    res.status(500).json({ error: "Failed to fetch newsletter recipients" });
+  }
+};
 
 // Users who self-deleted their account (status DELETED). Includes deletedAt and a
 // computed purgeAt (deletedAt + 7 days) so the admin sees when auto-removal happens.
@@ -1074,11 +1130,13 @@ exports.adminSaveAsDraftBlog= async (req, res)=>{
 
 exports.adminDraftBlogs = async (req, res) => {
   try {
-    // Perform the search query based on the provided search query
+    // List view only — drop heavy content/comments, sort newest-first.
     const blogs = await Blog.find({
       status: "ADMIN_DRAFT",
-    });
-    // console.log(blogs);
+    })
+      .select("-content -comments")
+      .sort({ lastUpdatedAt: -1 })
+      .lean();
 
     res.json(blogs);
   } catch (error) {
@@ -1092,11 +1150,13 @@ exports.adminDraftBlogs = async (req, res) => {
 // Admin Published
 exports.adminPublishedBlogs = async (req, res) => {
   try {
-    // Perform the search query based on the provided search query
+    // List view only — drop heavy content/comments, sort newest-first.
     const blogs = await Blog.find({
       status: "ADMIN_PUBLISHED",
-    });
-    // console.log(blogs);
+    })
+      .select("-content -comments")
+      .sort({ lastUpdatedAt: -1 })
+      .lean();
 
     res.json(blogs);
   } catch (error) {
@@ -1110,11 +1170,13 @@ exports.adminPublishedBlogs = async (req, res) => {
 // Admin Discarded
 exports.adminDiscardedBlogs = async (req, res) => {
   try {
-    // Perform the search query based on the provided search query
+    // List view only — drop heavy content/comments, sort newest-first.
     const blogs = await Blog.find({
       status: "ADMIN_DISCARDED",
-    });
-    // console.log(blogs);
+    })
+      .select("-content -comments")
+      .sort({ lastUpdatedAt: -1 })
+      .lean();
 
     res.json(blogs);
   } catch (error) {

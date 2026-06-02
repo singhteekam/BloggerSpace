@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollReveal } from "@/components/animated/scroll-reveal";
 import { FadeIn } from "@/components/animated/fade-in";
+import { pageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Writing Guidelines",
   description:
-    "Everything you need to know to write a great post on BloggerSpace — content, formatting, and community rules.",
-};
+    "Everything you need to write a great blog post on BloggerSpace — content quality, formatting, tone, and community rules for getting your article reviewed and published.",
+  path: "/guidelines",
+  keywords: ["writing guidelines", "blog writing tips", "how to write a blog", "content rules", "submission guidelines"],
+});
 
 const SECTIONS = [
   {

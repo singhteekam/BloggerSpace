@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
@@ -11,6 +11,7 @@ import {
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useMemo } from "react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
+import { useDebounce } from "@/hooks/use-debounce";
 import { adminApi, type ReviewerItem, type UserItem, type DeletedUserItem } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,8 @@ function TeamManagement({ adminId }: { adminId: string }) {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const q = search.trim().toLowerCase();
+  // Debounced query drives the SERVER-side users search (across all users in DB).
+  const dq = useDebounce(search.trim(), 400);
 
   const { data: verifiedReviewers = [], isLoading: verifiedLoading } = useQuery({
     queryKey: ["admin-verified-reviewers", adminId],
@@ -40,9 +43,18 @@ function TeamManagement({ adminId }: { adminId: string }) {
     queryKey: ["admin-pending-reviewers", adminId],
     queryFn: () => adminApi.getPendingReviewers(adminId).then((r) => r.data),
   });
-  const { data: users = [], isLoading: usersLoading } = useQuery({
-    queryKey: ["admin-users", adminId],
-    queryFn: () => adminApi.getUsers(adminId).then((r) => r.data),
+  // Users tab: server-side search + "load more" (the only unbounded list here).
+  const {
+    data: usersData,
+    isLoading: usersLoading,
+    fetchNextPage: fetchMoreUsers,
+    hasNextPage: hasMoreUsers,
+    isFetchingNextPage: fetchingMoreUsers,
+  } = useInfiniteQuery({
+    queryKey: ["admin-users", adminId, dq],
+    queryFn: ({ pageParam }) => adminApi.getUsers(adminId, pageParam, dq).then((r) => r.data),
+    initialPageParam: 1,
+    getNextPageParam: (last) => (last.page < last.pages ? last.page + 1 : undefined),
   });
   const { data: deletedUsers = [], isLoading: deletedLoading } = useQuery({
     queryKey: ["admin-deleted-users", adminId],
@@ -54,14 +66,11 @@ function TeamManagement({ adminId }: { adminId: string }) {
     r.userName.toLowerCase().includes(q) ||
     r.email.toLowerCase().includes(q);
 
-  const matchUser = (u: UserItem) =>
-    u.fullName.toLowerCase().includes(q) ||
-    u.userName.toLowerCase().includes(q) ||
-    u.email.toLowerCase().includes(q);
-
   const fPending = useMemo(() => (q ? pendingReviewers.filter(matchReviewer) : pendingReviewers), [pendingReviewers, q]);
   const fVerified = useMemo(() => (q ? verifiedReviewers.filter(matchReviewer) : verifiedReviewers), [verifiedReviewers, q]);
-  const fUsers = useMemo(() => (q ? users.filter(matchUser) : users), [users, q]);
+  // Users are already filtered + paged server-side; just flatten the pages.
+  const fUsers = usersData?.pages.flatMap((p) => p.users) ?? [];
+  const usersTotal = usersData?.pages[0]?.total ?? 0;
   const matchDeleted = (u: DeletedUserItem) =>
     u.fullName.toLowerCase().includes(q) ||
     (u.userName ?? "").toLowerCase().includes(q) ||
@@ -160,7 +169,7 @@ function TeamManagement({ adminId }: { adminId: string }) {
                 <Users className="size-3.5 mr-1.5" />Active Reviewers ({fVerified.length}{q && verifiedReviewers.length !== fVerified.length ? `/${verifiedReviewers.length}` : ""})
               </TabsTrigger>
               <TabsTrigger value="users">
-                <Users className="size-3.5 mr-1.5" />Users ({fUsers.length}{q && users.length !== fUsers.length ? `/${users.length}` : ""})
+                <Users className="size-3.5 mr-1.5" />Users ({usersTotal.toLocaleString()})
               </TabsTrigger>
               <TabsTrigger value="deleted">
                 <Trash2 className="size-3.5 mr-1.5" />Deleted Users ({fDeleted.length}{q && deletedUsers.length !== fDeleted.length ? `/${deletedUsers.length}` : ""})
@@ -237,7 +246,7 @@ function TeamManagement({ adminId }: { adminId: string }) {
           <TabsContent value="users">
             <SectionHeader title="Registered Users" desc="All user accounts on BloggerSpace, including inactive ones." />
             {usersLoading ? <TabSkeleton /> : fUsers.length === 0 ? (
-              <EmptyState icon={<Users />} msg={q ? `No results for "${search}".` : "No users found."} />
+              <EmptyState icon={<Users />} msg={dq ? `No results for "${search}".` : "No users found."} />
             ) : (
               <div className="space-y-3">
                 {fUsers.map((u) => (
@@ -282,6 +291,23 @@ function TeamManagement({ adminId }: { adminId: string }) {
                     />
                   </UserCard>
                 ))}
+                <div className="mt-2 flex flex-col items-center gap-2">
+                  {hasMoreUsers && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      disabled={fetchingMoreUsers}
+                      onClick={() => fetchMoreUsers()}
+                    >
+                      {fetchingMoreUsers && <Loader2 className="size-3.5 animate-spin" />}
+                      Load more ({(usersTotal - fUsers.length).toLocaleString()} more)
+                    </Button>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {fUsers.length} of {usersTotal.toLocaleString()}{dq && " matching"}
+                  </span>
+                </div>
               </div>
             )}
           </TabsContent>

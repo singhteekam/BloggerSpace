@@ -22,6 +22,7 @@ const {
   rejectReviewerRequest,
   removeFromReviewerRole,
   fetchAllUsers,
+  getNewsletterRecipients,
   getDeletedUsers,
   deleteUserAccount,
   deactivateUserAccount,
@@ -115,6 +116,9 @@ router.patch("/dashboard/rejectreviewer/:id", adminMiddleware, rejectReviewerReq
 router.patch("/dashboard/removefromreviewer/:id", adminMiddleware, removeFromReviewerRole);
 
 router.get("/dashboard/allusers", adminMiddleware, fetchAllUsers);
+
+// Lightweight full recipient list for the newsletter composer.
+router.get("/dashboard/newsletter-recipients", adminMiddleware, getNewsletterRecipients);
 
 router.get("/dashboard/deletedusers", adminMiddleware, getDeletedUsers);
 

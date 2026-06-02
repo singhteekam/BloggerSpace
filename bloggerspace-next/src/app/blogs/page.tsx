@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo/page-metadata";
 import { FileText, Search } from "lucide-react";
 import { BlogCard } from "@/components/blog/blog-card";
 import { BlogSearch } from "@/components/blog/blog-search";
@@ -15,10 +16,24 @@ import {
 // query/tag/category combination. SSR is cheaper and gives always-fresh results.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Browse Blogs",
-  description: "Discover reviewed, high-quality articles from the BloggerSpace community.",
-};
+  description:
+    "Browse reviewed, high-quality blogs on technology, programming, careers, and ideas from the BloggerSpace community by Teekam Singh. Every article is checked by a real reviewer before it's published.",
+  path: "/blogs",
+  keywords: [
+    "browse blogs",
+    "read blogs online",
+    "tech blogs",
+    "programming blogs",
+    "developer blogs",
+    "career blogs",
+    "latest blog posts",
+    "trending blogs",
+    "reviewed articles",
+    "free blogs to read",
+  ],
+});
 
 type Props = {
   searchParams: Promise<{ page?: string; category?: string; tag?: string; q?: string }>;

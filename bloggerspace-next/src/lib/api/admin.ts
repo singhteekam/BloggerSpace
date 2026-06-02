@@ -195,8 +195,19 @@ export const adminApi = {
     api.patch<{ message: string }>(`/api/admin/dashboard/removefromreviewer/${reviewerId}`, {}, { params: p(userId) }),
 
   // ── User management ───────────────────────────────────────────────
-  getUsers: (userId: string) =>
-    api.get<UserItem[]>("/api/admin/dashboard/allusers", { params: p(userId) }),
+  // Paginated + server-side search (name/username/email) across ALL users.
+  getUsers: (userId: string, page = 1, search = "") =>
+    api.get<{ users: UserItem[]; total: number; page: number; pages: number }>(
+      "/api/admin/dashboard/allusers",
+      { params: { ...p(userId), page, limit: 20, ...(search ? { search } : {}) } },
+    ),
+
+  // Lightweight full recipient list for the newsletter composer (needs everyone).
+  getNewsletterRecipients: (userId: string) =>
+    api.get<Pick<UserItem, "_id" | "fullName" | "userName" | "email" | "newsletterOptIn">[]>(
+      "/api/admin/dashboard/newsletter-recipients",
+      { params: p(userId) },
+    ),
 
   getDeletedUsers: (userId: string) =>
     api.get<DeletedUserItem[]>("/api/admin/dashboard/deletedusers", { params: p(userId) }),

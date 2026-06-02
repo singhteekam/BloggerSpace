@@ -35,6 +35,7 @@ const {
   toggleBlogLike,
   getBlogLikeStatus,
   fetchBlogsForSitemap,
+  fetchAuthorsForSitemap,
   toggleCommentLike,
   toggleReplyLike,
   getRecommendedBlogs,
@@ -46,6 +47,8 @@ router.get("/", blogsHomepage);
 router.get("/allblogs", fetchAllBlogs);
 
 router.get("/sitemap", fetchBlogsForSitemap);
+
+router.get("/authors/sitemap", fetchAuthorsForSitemap);
 
 router.get("/adminpublished", fetchAdminPublishedBlogs);
 

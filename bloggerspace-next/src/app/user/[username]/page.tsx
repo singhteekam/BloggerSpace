@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { BadgeCheck, BookOpen, Users, Calendar, Eye, Heart, Mail, Star, TrendingUp, MessageSquare, Globe } from "lucide-react";
+import { BadgeCheck, BookOpen, Users, Calendar, Mail, Star, TrendingUp, MessageSquare, Globe } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { LinkedInIcon, GitHubIcon } from "@/components/icons/brand";
+import { ProfileBlogsList } from "@/components/user/profile-blogs-list";
 import { FollowButton } from "@/components/user/follow-button";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { fetchPublicProfile } from "@/lib/api/user";
 import { formatDate } from "@/lib/utils/html";
+import { siteConfig } from "@/lib/constants/site";
 
 type Props = { params: Promise<{ username: string }> };
 
@@ -16,9 +16,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   const profile = await fetchPublicProfile(username);
   if (!profile) return { title: "User not found" };
+
+  const title = `${profile.fullName} (@${profile.userName})`;
+  const description = profile.bio
+    ? profile.bio
+    : `${profile.fullName} on BloggerSpace — ${profile.blogs.length} published blog${profile.blogs.length !== 1 ? "s" : ""} · ${profile.followersCount} follower${profile.followersCount !== 1 ? "s" : ""}.`;
+  const path = `/user/${profile.userName}`;
+
   return {
-    title: `${profile.fullName} (@${profile.userName}) · BloggerSpace`,
-    description: `${profile.blogs.length} published blog${profile.blogs.length !== 1 ? "s" : ""} · ${profile.followersCount} followers`,
+    title,
+    description,
+    keywords: [profile.fullName, `${profile.fullName} blogs`, `@${profile.userName}`, "BloggerSpace author"],
+    alternates: { canonical: path },
+    openGraph: {
+      title: `${title} · BloggerSpace`,
+      description,
+      url: path,
+      type: "profile",
+      siteName: siteConfig.fullName,
+    },
+    twitter: { card: "summary_large_image", title: `${title} · BloggerSpace`, description },
   };
 }
 
@@ -168,69 +185,23 @@ export default async function PublicProfilePage({ params }: Props) {
 
       <Separator className="my-8" />
 
-      {/* Published blogs */}
+      {/* Published blogs — first page is server-rendered (SEO); more load on demand */}
       <section>
         <h2 className="mb-5 font-serif text-xl font-semibold tracking-tight">
           Published blogs
+          {(profile.blogsTotal ?? profile.blogs.length) > 0 && (
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              ({(profile.blogsTotal ?? profile.blogs.length).toLocaleString()})
+            </span>
+          )}
         </h2>
 
-        {profile.blogs.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No published blogs yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {profile.blogs.map((blog) => (
-              <Link
-                key={blog._id}
-                href={`/blogs/${blog.slug}`}
-                className="group flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-muted/40"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <h3 className="font-medium leading-snug text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                    {blog.title}
-                  </h3>
-                  {blog.category && (
-                    <Badge variant="secondary" className="shrink-0 text-xs">
-                      {blog.category}
-                    </Badge>
-                  )}
-                </div>
-
-                {blog.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {blog.tags.slice(0, 4).map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Eye className="size-3" />
-                    {(blog.blogViews ?? 0).toLocaleString()} views
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Heart className="size-3" />
-                    {(blog.blogLikes?.length ?? 0).toLocaleString()} likes
-                  </span>
-                  {(blog.blogScore ?? 0) > 0 && (
-                    <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
-                      <Star className="size-3 fill-current" />
-                      {blog.blogScore}
-                    </span>
-                  )}
-                  {blog.lastUpdatedAt && (
-                    <span>{formatDate(blog.lastUpdatedAt)}</span>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
+        <ProfileBlogsList
+          username={profile.userName}
+          initialBlogs={profile.blogs}
+          total={profile.blogsTotal ?? profile.blogs.length}
+          pageSize={profile.blogsPageSize ?? 12}
+        />
       </section>
     </main>
   );

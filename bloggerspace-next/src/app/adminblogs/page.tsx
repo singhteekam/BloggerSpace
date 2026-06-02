@@ -3,11 +3,15 @@ import { Shield, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { InfiniteBlogGrid, adminPublishedUrl } from "@/components/blog/infinite-blog-grid";
 import { fetchAdminPublishedBlogs } from "@/lib/api/blogs";
+import { pageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
-  title: "Admin Picks | BloggerSpace",
-  description: "Handpicked and directly published blogs by the BloggerSpace admin team.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Admin Picks",
+  description:
+    "Handpicked, editorially curated blogs published directly by the BloggerSpace admin team — the best reads on technology, careers, and ideas.",
+  path: "/adminblogs",
+  keywords: ["admin picks", "editor's picks", "featured blogs", "curated articles", "best blog posts"],
+});
 
 export default async function AdminBlogsPage() {
   const { blogs, pages: totalPages } = await fetchAdminPublishedBlogs(1);

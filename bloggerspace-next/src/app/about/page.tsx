@@ -7,12 +7,15 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollReveal } from "@/components/animated/scroll-reveal";
 import { FadeIn } from "@/components/animated/fade-in";
 import { Logo } from "@/components/brand/logo";
+import { pageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
   description:
-    "Learn about BloggerSpace — why we built it, how it works, and what makes it different from every other blogging platform.",
-};
+    "Learn about BloggerSpace by Teekam Singh — why it was built, how the review-before-publish model works, and what makes it different from every other blogging platform.",
+  path: "/about",
+  keywords: ["about bloggerspace", "about teekam singh", "what is bloggerspace", "how bloggerspace works"],
+});
 
 const STEPS = [
   {

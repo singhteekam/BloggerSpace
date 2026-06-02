@@ -10,7 +10,8 @@ import { ChatWidget } from "@/components/chat/chat-widget";
 import { TrackPageView } from "@/components/analytics/track-pageview";
 import { PushListener } from "@/components/notifications/push-listener";
 import { siteConfig } from "@/lib/constants/site";
-import { websiteJsonLd } from "@/lib/utils/json-ld";
+import { websiteJsonLd, organizationJsonLd, personJsonLd } from "@/lib/utils/json-ld";
+import { BASE_KEYWORDS } from "@/lib/seo/page-metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
   other: {
     "google-adsense-account": "ca-pub-2867880443810811",
   },
-  keywords: [...siteConfig.keywords],
+  keywords: [...siteConfig.keywords, ...BASE_KEYWORDS],
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.url }],
   creator: siteConfig.author.name,
   applicationName: siteConfig.name,
@@ -60,7 +61,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: siteConfig.locale,
-    url: siteConfig.url,
+    // No `url` here on purpose — each page sets its own og:url/canonical via
+    // pageMetadata(), so a shared sub-page never inherits and impersonates "/".
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
     siteName: siteConfig.fullName,
@@ -108,6 +110,14 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}
         />
         <Providers>
           <TrackPageView />

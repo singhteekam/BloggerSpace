@@ -13,6 +13,7 @@ import { TechStackSection } from "./_sections/tech-stack-section";
 import { DeveloperSection } from "./_sections/developer-section";
 import { ContactSection } from "./_sections/contact-section";
 import { RecommendedSection } from "./_sections/recommended-section";
+import { PushCtaSection } from "./_sections/push-cta-section";
 
 const shareTitle = `${siteConfig.fullName} — ${siteConfig.tagline}`;
 const shareDescription =
@@ -62,6 +63,7 @@ export default async function Home() {
       <TechStackSection />
       <DeveloperSection />
       <ContactSection />
+      <PushCtaSection />
     </main>
   );
 }

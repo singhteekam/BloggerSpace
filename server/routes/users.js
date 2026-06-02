@@ -17,6 +17,7 @@ const {
   uploadProfilePicture,
   loggedInUserInfo,
   userProfile,
+  getUserProfileBlogs,
   updateUserPersonalDetails,
   setNewsletterOptIn,
   addReadingHistory,
@@ -196,6 +197,9 @@ router.get("/userinfo", loggedInUserInfo);
 
 // User Profile
 router.get("/profile/:username", userProfile);
+
+// Paginated "load more" for a profile's published blogs
+router.get("/profile/:username/blogs", getUserProfileBlogs);
 
 // Check username
 router.post("/checkusername", checkUserName);

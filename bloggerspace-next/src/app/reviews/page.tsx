@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo/page-metadata";
 import { Badge } from "@/components/ui/badge";
 import { WriteReviewButton } from "@/app/_sections/write-review-button";
 import { AllReviewsList } from "./_list";
 
-export const metadata: Metadata = {
-  title: "Reviews — BloggerSpace",
-  description: "Read what writers and reviewers say about their experience on BloggerSpace.",
-  alternates: { canonical: "/reviews" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Reviews",
+  description:
+    "Read what writers and reviewers say about their experience on BloggerSpace by Teekam Singh — honest reviews of the reviewed-blogging platform.",
+  path: "/reviews",
+  keywords: ["bloggerspace reviews", "platform reviews", "writer testimonials", "user reviews"],
+});
 
 export default function AllReviewsPage() {
   return (

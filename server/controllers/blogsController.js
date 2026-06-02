@@ -115,6 +115,28 @@ exports.fetchBlogsForSitemap = async (req, res) => {
   }
 };
 
+// Usernames of authors who have at least one published blog — i.e. profiles
+// with real content worth indexing. Excludes deleted/anonymised accounts and
+// admin-collection authors (they have no public /user profile).
+exports.fetchAuthorsForSitemap = async (req, res) => {
+  try {
+    const authorIds = await Blog.distinct("authorDetails", {
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    });
+    if (!authorIds.length) return res.json([]);
+    const users = await User.find({
+      _id: { $in: authorIds },
+      status: { $ne: "DELETED" },
+      userName: { $nin: [null, ""] },
+    })
+      .select("userName")
+      .lean();
+    res.json(users.map((u) => ({ userName: u.userName })));
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 exports.fetchAllBlogs = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 6;
@@ -1160,108 +1182,48 @@ exports.searchBlogsFromDB = async (req, res) => {
   }
 };
 
-exports.authorSavedDraftBlogs = async (req, res) => {
+// ── Author's own blogs (MyBlogs tabs) ─────────────────────────────────────────
+// Shared, paginated handler for every status tab. Server-side search (title /
+// category) runs across ALL the author's blogs of that status — not just the
+// loaded page. Trims payload: no heavy `content`, no redundant author populate
+// (it's always the requesting user), no likes/comments arrays the list ignores.
+const MYBLOGS_PAGE_SIZE = 10;
+const MYBLOGS_LIST_SELECT = "title slug category tags status blogViews createdAt lastUpdatedAt gems";
+
+async function fetchAuthorBlogsByStatus(req, res, status) {
   try {
-    // Perform the search query based on the provided search query
-    const blogs = await Blog.find({
-      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
-      status: "DRAFT",
-    })
-      .populate("authorDetails")
-      .exec();
-    // console.log(blogs);
+    const userId = req.query.userId;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || MYBLOGS_PAGE_SIZE));
+    const search = (req.query.search || "").trim();
 
-    res.json(blogs);
+    const match = { authorDetails: new mongoose.Types.ObjectId(userId), status };
+    if (search) {
+      const rx = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      match.$or = [{ title: rx }, { category: rx }];
+    }
+
+    const [blogs, total] = await Promise.all([
+      Blog.find(match)
+        .select(MYBLOGS_LIST_SELECT)
+        .sort({ lastUpdatedAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      Blog.countDocuments(match),
+    ]);
+    res.json({ blogs, total, page, pages: Math.ceil(total / limit) || 1 });
   } catch (error) {
-    console.error("Error searching published blogs:", error);
-    logger.error("Error searching published blogs: " + error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while searching published blogs." });
+    logger.error(`Error fetching author ${status} blogs: ` + error);
+    res.status(500).json({ error: "An error occurred while fetching blogs." });
   }
-};
-exports.authorPendingReviewBlogs = async (req, res) => {
-  try {
-    // Perform the search query based on the provided search query
-    const blogs = await Blog.find({
-      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
-      status: "PENDING_REVIEW",
-    })
-      .populate("authorDetails")
-      .exec();
-    // console.log(blogs);
+}
 
-    res.json(blogs);
-  } catch (error) {
-    console.error("Error searching pending review blogs:", error);
-    logger.error("Error searching pending review blogs: " + error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while searching published blogs." });
-  }
-};
-exports.authorUnderReviewBlogs = async (req, res) => {
-  try {
-    // Perform the search query based on the provided search query
-    const blogs = await Blog.find({
-      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
-      status: "UNDER_REVIEW",
-    })
-      .populate("authorDetails")
-      .exec();
-    // console.log(blogs);
-
-    res.json(blogs);
-  } catch (error) {
-    console.error("Error searching under review blogs:", error);
-    logger.error("Error searching under review blogs: " + error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while searching published blogs." });
-  }
-};
-
-//Awaiting author blogs
-exports.awaitingAuthorBlogs = async (req, res) => {
-  try {
-    // Perform the search query based on the provided search query
-    const blogs = await Blog.find({
-      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
-      status: "AWAITING_AUTHOR",
-    })
-      .populate("authorDetails")
-      .exec();
-    // console.log(blogs);
-
-    res.json(blogs);
-  } catch (error) {
-    console.error("Error searching awaiting author blogs:", error);
-    logger.error("Error searching awaiting author blogs: " + error);
-    res.status(500).json({ error: "An error occurred while searching blogs." });
-  }
-};
-
-//Awaiting author blogs
-exports.authorPublishedBlogs = async (req, res) => {
-  try {
-    // Perform the search query based on the provided search query
-    const blogs = await Blog.find({
-      authorDetails: new mongoose.Types.ObjectId(req.query.userId),
-      status: "PUBLISHED",
-    })
-      .populate("authorDetails", "fullName email userName _id")
-      .sort({ lastUpdatedAt: -1 })
-      .lean();
-
-    res.json(blogs);
-  } catch (error) {
-    console.error("Error searching published blogs:", error);
-    logger.error("Error searching published blogs:" + error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while searching published blogs." });
-  }
-};
+exports.authorSavedDraftBlogs   = (req, res) => fetchAuthorBlogsByStatus(req, res, "DRAFT");
+exports.authorPendingReviewBlogs = (req, res) => fetchAuthorBlogsByStatus(req, res, "PENDING_REVIEW");
+exports.authorUnderReviewBlogs  = (req, res) => fetchAuthorBlogsByStatus(req, res, "UNDER_REVIEW");
+exports.awaitingAuthorBlogs     = (req, res) => fetchAuthorBlogsByStatus(req, res, "AWAITING_AUTHOR");
+exports.authorPublishedBlogs    = (req, res) => fetchAuthorBlogsByStatus(req, res, "PUBLISHED");
 
 exports.blogLikes = async (req, res) => {
   let thumbColor = req.body.thumbColor;

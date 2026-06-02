@@ -34,7 +34,9 @@ export type PublicProfile = {
   followersCount: number;
   followingCount: number;
   isFollowing: boolean;
-  blogs: PublicBlog[];
+  blogs: PublicBlog[];        // first page only (rest load via fetchProfileBlogs)
+  blogsTotal?: number;        // total published blogs by this author
+  blogsPageSize?: number;     // server page size used for the first page
   createdAt: string;
   // Phase 5 — public creator stats
   creatorScore?: number;
@@ -65,12 +67,33 @@ export async function fetchPublicProfile(
   }
 }
 
+export type ProfileBlogsResponse = { blogs: PublicBlog[]; total: number; page: number; pages: number };
+
+// Client-side "load more" for a profile's published blogs (page 2+).
+export async function fetchProfileBlogs(username: string, page: number): Promise<ProfileBlogsResponse> {
+  const res = await api.get<ProfileBlogsResponse>(
+    `/api/users/profile/${encodeURIComponent(username)}/blogs`,
+    { params: { page, limit: 12 } },
+  );
+  return res.data;
+}
+
 export type SavedBlog = {
   title: string;
   slug: string;
   category: string;
   tags: string[];
 };
+
+// Paginated saved-blogs response. Server-side `search` filters across ALL the
+// user's saved blogs (title/category), then returns one page.
+export type SavedBlogsResponse = {
+  blogs: SavedBlog[];
+  total: number;
+  page: number;
+  pages: number;
+};
+export type SavedBlogsParams = { page?: number; limit?: number; search?: string };
 
 export type ReadingHistoryItem = {
   blogId?: number;
@@ -126,8 +149,8 @@ export const userApi = {
   checkUsername: (userName: string) =>
     api.post("/api/users/checkusername", { userName }),
 
-  getSavedBlogs: (userId: string) =>
-    api.get<SavedBlog[]>(`/api/users/savedblogs?userId=${userId}`),
+  getSavedBlogs: (userId: string, params: SavedBlogsParams = {}) =>
+    api.get<SavedBlogsResponse>("/api/users/savedblogs", { params: { userId, ...params } }),
 
   addToSaved: (userId: string, data: SavedBlog) =>
     api.patch(`/api/users/addtosavedblogs?userId=${userId}`, data),
@@ -234,21 +257,31 @@ export const redemptionApi = {
     }),
 };
 
+// Paginated MyBlogs response. Server-side `search` filters across ALL the
+// author's blogs of that status (title/category), then returns one page.
+export type MyBlogsResponse = {
+  blogs: import("@/types/blog").Blog[];
+  total: number;
+  page: number;
+  pages: number;
+};
+export type MyBlogsParams = { page?: number; limit?: number; search?: string };
+
 export const myBlogsApi = {
-  getDrafts: (userId: string) =>
-    api.get<import("@/types/blog").Blog[]>(`/api/blogs/myblogs/saveddraft?userId=${userId}`),
+  getDrafts: (userId: string, params: MyBlogsParams = {}) =>
+    api.get<MyBlogsResponse>("/api/blogs/myblogs/saveddraft", { params: { userId, ...params } }),
 
-  getPending: (userId: string) =>
-    api.get<import("@/types/blog").Blog[]>(`/api/blogs/myblogs/pendingreview?userId=${userId}`),
+  getPending: (userId: string, params: MyBlogsParams = {}) =>
+    api.get<MyBlogsResponse>("/api/blogs/myblogs/pendingreview", { params: { userId, ...params } }),
 
-  getUnderReview: (userId: string) =>
-    api.get<import("@/types/blog").Blog[]>(`/api/blogs/myblogs/underreview?userId=${userId}`),
+  getUnderReview: (userId: string, params: MyBlogsParams = {}) =>
+    api.get<MyBlogsResponse>("/api/blogs/myblogs/underreview", { params: { userId, ...params } }),
 
-  getAwaitingAuthor: (userId: string) =>
-    api.get<import("@/types/blog").Blog[]>(`/api/blogs/myblogs/awaitingauthorblogs?userId=${userId}`),
+  getAwaitingAuthor: (userId: string, params: MyBlogsParams = {}) =>
+    api.get<MyBlogsResponse>("/api/blogs/myblogs/awaitingauthorblogs", { params: { userId, ...params } }),
 
-  getPublished: (userId: string) =>
-    api.get<import("@/types/blog").Blog[]>(`/api/blogs/myblogs/authorpublishedblogs?userId=${userId}`),
+  getPublished: (userId: string, params: MyBlogsParams = {}) =>
+    api.get<MyBlogsResponse>("/api/blogs/myblogs/authorpublishedblogs", { params: { userId, ...params } }),
 
   discard: (blogId: string, userId: string, data: { authorEmail: string; slug: string }) =>
     api.post(`/api/users/discard/blog/${blogId}?userId=${userId}`, data),

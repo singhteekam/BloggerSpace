@@ -1,23 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Eye, Pencil, Trash2, Loader2, FileText, Search, X, ChevronLeft, ChevronRight, Gem } from "lucide-react";
+import { useState } from "react";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Eye, Pencil, Trash2, Loader2, FileText, Search, X, Gem } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { useRequireAuth } from "@/hooks/use-require-auth";
-import { myBlogsApi } from "@/lib/api/user";
+import { useDebounce } from "@/hooks/use-debounce";
+import { myBlogsApi, type MyBlogsResponse, type MyBlogsParams } from "@/lib/api/user";
 import { RefreshButton } from "@/components/ui/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils/html";
-import type { Blog } from "@/types/blog";
-
-const PAGE_SIZE = 10;
 
 const STATUS_BADGE: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
   DRAFT:            { label: "Draft",           variant: "outline" },
@@ -103,38 +101,27 @@ function BlogTab({
   userEmail: string;
   tabKey: string;
   activeTab: string;
-  fetcher: (userId: string) => Promise<{ data: Blog[] }>;
+  fetcher: (userId: string, params: MyBlogsParams) => Promise<{ data: MyBlogsResponse }>;
   showEdit: boolean;
   showView: boolean;
   showDiscard: boolean;
 }) {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const q = search.trim().toLowerCase();
+  const q = useDebounce(search.trim(), 400);
 
-  const { data: blogs = [], isLoading } = useQuery({
-    queryKey: ["myblogs", tabKey, userId],
-    queryFn: () => fetcher(userId).then((r) => r.data),
+  // Server-side search + "load more": filters across ALL the author's blogs of
+  // this status (not just the loaded page), then loads pages on demand.
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ["myblogs", tabKey, userId, q],
+    queryFn: ({ pageParam }) => fetcher(userId, { page: pageParam, search: q }).then((r) => r.data),
+    initialPageParam: 1,
+    getNextPageParam: (last) => (last.page < last.pages ? last.page + 1 : undefined),
     enabled: activeTab === tabKey,
   });
 
-  const filtered = useMemo(() => {
-    if (!q) return blogs;
-    return blogs.filter(
-      (b) =>
-        b.title?.toLowerCase().includes(q) ||
-        (b.category?.toLowerCase() ?? "").includes(q),
-    );
-  }, [blogs, q]);
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const handleSearch = (v: string) => {
-    setSearch(v);
-    setPage(1);
-  };
+  const blogs = data?.pages.flatMap((p) => p.blogs) ?? [];
+  const total = data?.pages[0]?.total ?? 0;
 
   const discard = useMutation({
     mutationFn: ({ blogId, slug }: { blogId: string; slug: string }) =>
@@ -157,38 +144,40 @@ function BlogTab({
     );
   }
 
+  const showSearch = blogs.length > 0 || q.length > 0;
+
   return (
     <div className="pt-4">
-      {blogs.length > 0 && (
+      {showSearch && (
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
           <input
             value={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title or category…"
             className="w-full rounded-lg border border-border bg-card pl-9 pr-9 py-2 text-sm outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground"
           />
           {search && (
-            <button onClick={() => handleSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               <X className="size-3.5" />
             </button>
           )}
         </div>
       )}
 
-      {filtered.length === 0 ? (
+      {blogs.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-20 text-center">
           <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <FileText className="size-5" />
           </div>
           <p className="text-sm text-muted-foreground">
-            {q ? `No results for "${search}".` : "No blogs here yet."}
+            {q ? `No results for "${q}".` : "No blogs here yet."}
           </p>
         </div>
       ) : (
         <>
           <div className="space-y-3">
-            {paginated.map((blog) => {
+            {blogs.map((blog) => {
               const badge = STATUS_BADGE[blog.status] ?? { label: blog.status, variant: "outline" as const };
               return (
                 <div
@@ -246,28 +235,24 @@ function BlogTab({
             })}
           </div>
 
-          {totalPages > 1 && (
-            <div className="mt-5 flex items-center justify-between">
+          <div className="mt-5 flex flex-col items-center gap-2">
+            {hasNextPage && (
               <Button
-                variant="outline" size="sm" className="gap-1.5"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                disabled={isFetchingNextPage}
+                onClick={() => fetchNextPage()}
               >
-                <ChevronLeft className="size-3.5" />Previous
+                {isFetchingNextPage && <Loader2 className="size-3.5 animate-spin" />}
+                Load more ({(total - blogs.length).toLocaleString()} more)
               </Button>
-              <span className="text-sm text-muted-foreground">
-                Page {page} of {totalPages}
-                {q && ` (${filtered.length} results)`}
-              </span>
-              <Button
-                variant="outline" size="sm" className="gap-1.5"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next<ChevronRight className="size-3.5" />
-              </Button>
-            </div>
-          )}
+            )}
+            <span className="text-xs text-muted-foreground">
+              {blogs.length} of {total.toLocaleString()}
+              {q && " matching"}
+            </span>
+          </div>
         </>
       )}
     </div>

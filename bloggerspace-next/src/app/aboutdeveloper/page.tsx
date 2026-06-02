@@ -9,11 +9,21 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollReveal } from "@/components/animated/scroll-reveal";
 import { FadeIn } from "@/components/animated/fade-in";
 import { siteConfig } from "@/lib/constants/site";
+import { pageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
-  title: "About the Developer",
-  description: `Meet ${siteConfig.author.name}, the developer behind BloggerSpace.`,
-};
+export const metadata: Metadata = pageMetadata({
+  title: "About the Developer — Teekam Singh",
+  description: `Meet ${siteConfig.author.name}, the full-stack developer behind BloggerSpace. Background, skills, projects, and how to get in touch.`,
+  path: "/aboutdeveloper",
+  keywords: [
+    "Teekam Singh developer",
+    "Teekam Singh full stack developer",
+    "Teekam Singh software engineer",
+    "Teekam Singh projects",
+    "Teekam Singh contact",
+    "about the developer",
+  ],
+});
 
 const TECH_STACK = [
   "MongoDB", "Express.js", "React", "Node.js",

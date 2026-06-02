@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { Separator } from "@/components/ui/separator";
 import { FadeIn } from "@/components/animated/fade-in";
 import { siteConfig } from "@/lib/constants/site";
+import { pageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
-  description: `How ${siteConfig.name} collects, uses, and protects your personal data.`,
-};
+  description: `How ${siteConfig.name} by Teekam Singh collects, uses, and protects your personal data — analytics, reading history, push notifications, and your rights.`,
+  path: "/privacypolicy",
+  keywords: ["privacy policy", "data protection", "user privacy"],
+});
 
 const LAST_UPDATED = "2 June 2026";
 

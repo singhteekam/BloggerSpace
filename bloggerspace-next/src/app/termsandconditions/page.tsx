@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { Separator } from "@/components/ui/separator";
 import { FadeIn } from "@/components/animated/fade-in";
 import { siteConfig } from "@/lib/constants/site";
+import { pageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Terms & Conditions",
-  description: `The terms of service that govern your use of ${siteConfig.name}.`,
-};
+  description: `The terms of service that govern your use of ${siteConfig.name} by Teekam Singh — accounts, content ownership, conduct, and more.`,
+  path: "/termsandconditions",
+  keywords: ["terms and conditions", "terms of service", "user agreement"],
+});
 
 const LAST_UPDATED = "2 June 2026";
 

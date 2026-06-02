@@ -7,6 +7,9 @@ import { toast } from "sonner";
 import { Mail, Search, CheckSquare, Square, Loader2, Send, Users, History, BellRing } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi, type UserItem, type NewsletterRecord } from "@/lib/api/admin";
+
+// The composer only needs these fields per recipient (lightweight endpoint).
+type NewsletterRecipient = Pick<UserItem, "_id" | "fullName" | "userName" | "email" | "newsletterOptIn">;
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,9 +59,12 @@ function ComposeTab({ adminId }: { adminId: string }) {
   const [subscribedOnly, setSubscribedOnly] = useState(true);
   const [preselected, setPreselected] = useState(false);
 
+  // Composer needs the full recipient list (for select-all + subscriber
+  // preselect), so use the lightweight all-recipients endpoint, not the
+  // paginated team-users list.
   const { data: users = [], isLoading } = useQuery({
-    queryKey: ["admin-users", adminId],
-    queryFn: () => adminApi.getUsers(adminId).then((r) => r.data),
+    queryKey: ["newsletter-recipients", adminId],
+    queryFn: () => adminApi.getNewsletterRecipients(adminId).then((r) => r.data),
   });
 
   const subscriberCount = useMemo(() => users.filter((u) => u.newsletterOptIn).length, [users]);
@@ -334,7 +340,7 @@ function UserRow({
   checked,
   onToggle,
 }: {
-  user: UserItem;
+  user: NewsletterRecipient;
   checked: boolean;
   onToggle: () => void;
 }) {

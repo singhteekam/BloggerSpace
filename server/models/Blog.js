@@ -108,6 +108,9 @@ blogSchema.index({ status: 1, blogViews: -1 });
 blogSchema.index({ "blogLikes.userId": 1 });
 // Trending-digest query: published + not yet notified, sorted by views
 blogSchema.index({ status: 1, digestNotifiedAt: 1, blogViews: -1 });
+// Author dashboards (MyBlogs tabs + public profile): filter by author+status,
+// sort by lastUpdatedAt. Without this, paging 2000+ blogs scans + sorts in memory.
+blogSchema.index({ authorDetails: 1, status: 1, lastUpdatedAt: -1 });
 
 Blog.syncIndexes();
 

@@ -894,6 +894,8 @@ exports.loggedInUserInfo = async (req, res) => {
   }
 };
 
+const PROFILE_BLOGS_PAGE_SIZE = 12;
+
 exports.userProfile = async (req, res) => {
   try {
     const userName = req.params.username;
@@ -918,22 +920,30 @@ exports.userProfile = async (req, res) => {
     const [local, domain] = user.email.split("@");
     const maskedEmail = `${local[0]}${"*".repeat(Math.min(local.length - 1, 5))}@${domain}`;
 
-    // Fetch published blogs with stats (incl. blogScore — Phase 5)
-    const blogs = await Blogs.find({
+    // First page of published blogs only (the rest load on demand via
+    // /profile/:username/blogs). Creator stats are computed by aggregation so
+    // they stay correct even though we no longer load every blog here.
+    const publishedMatch = {
       authorDetails: user._id,
       status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
-    })
-      .select("title slug blogViews blogLikes category tags createdAt lastUpdatedAt blogScore")
-      .sort({ lastUpdatedAt: -1 })
-      .lean();
+    };
+    const [blogs, blogsTotal, statsAgg] = await Promise.all([
+      Blogs.find(publishedMatch)
+        .select("title slug blogViews blogLikes category tags createdAt lastUpdatedAt blogScore")
+        .sort({ lastUpdatedAt: -1 })
+        .limit(PROFILE_BLOGS_PAGE_SIZE)
+        .lean(),
+      Blogs.countDocuments(publishedMatch),
+      Blogs.aggregate([
+        { $match: { ...publishedMatch, blogScore: { $gt: 0 } } },
+        { $group: { _id: null, count: { $sum: 1 }, sum: { $sum: "$blogScore" }, best: { $max: "$blogScore" } } },
+      ]),
+    ]);
 
-    // Derived creator-stats: total contribution + avg + best. The UI shows
-    // these next to the sum so 100 mediocre blogs vs 5 excellent ones look
-    // visually distinct.
-    const scoredBlogs = blogs.filter((b) => (b.blogScore ?? 0) > 0);
-    const scoreSum = scoredBlogs.reduce((acc, b) => acc + (b.blogScore ?? 0), 0);
-    const scoreAvg = scoredBlogs.length ? +(scoreSum / scoredBlogs.length).toFixed(1) : 0;
-    const scoreBest = scoredBlogs.reduce((m, b) => Math.max(m, b.blogScore ?? 0), 0);
+    const stat = statsAgg[0] || { count: 0, sum: 0, best: 0 };
+    const scoreSum = stat.sum;
+    const scoreAvg = stat.count ? +(stat.sum / stat.count).toFixed(1) : 0;
+    const scoreBest = stat.best;
 
     const isFollowing = viewerId
       ? user.followers.some((id) => id.toString() === viewerId)
@@ -957,11 +967,13 @@ exports.userProfile = async (req, res) => {
       followingCount: user.following.length,
       isFollowing,
       blogs,
+      blogsTotal,
+      blogsPageSize: PROFILE_BLOGS_PAGE_SIZE,
       createdAt: user.createdAt,
       // Phase 5 — public creator stats
       creatorScore: user.creatorScore ?? scoreSum, // fall back to live sum if cache is stale
       creatorStats: {
-        scoredBlogCount: scoredBlogs.length,
+        scoredBlogCount: stat.count,
         avg: scoreAvg,
         best: scoreBest,
       },
@@ -972,6 +984,35 @@ exports.userProfile = async (req, res) => {
     });
   } catch (error) {
     logger.error("Error fetching user profile: " + error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Paginated "load more" for a public profile's published blogs.
+exports.getUserProfileBlogs = async (req, res) => {
+  try {
+    const userName = req.params.username;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || PROFILE_BLOGS_PAGE_SIZE));
+
+    const user = await User.findOne({ userName }).select("_id status").lean();
+    if (!user || user.status === "DELETED") {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const match = { authorDetails: user._id, status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } };
+    const [blogs, total] = await Promise.all([
+      Blogs.find(match)
+        .select("title slug blogViews blogLikes category tags createdAt lastUpdatedAt blogScore")
+        .sort({ lastUpdatedAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      Blogs.countDocuments(match),
+    ]);
+    res.json({ blogs, total, page, pages: Math.ceil(total / limit) || 1 });
+  } catch (error) {
+    logger.error("getUserProfileBlogs error: " + error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -1151,13 +1192,36 @@ exports.removeBlogFromSavedBlogs = async (req, res) => {
   }
 };
 
-// Get Saved blogs
+// Get Saved blogs — paginated + server-side search across ALL saved blogs.
+const SAVED_BLOGS_PAGE_SIZE = 12;
 exports.getSavedBlogsOfUser = async (req, res) => {
   try {
     const userId = req.query.userId;
-    const user = await User.findById(userId);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || SAVED_BLOGS_PAGE_SIZE));
+    const search = (req.query.search || "").trim().toLowerCase();
 
-    res.json(user.savedBlogs);
+    // Only pull the savedBlogs array (not the whole user doc) for efficiency.
+    const user = await User.findById(userId).select("savedBlogs").lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Newest-first (items are appended as they're saved).
+    let items = (user.savedBlogs || []).slice().reverse();
+
+    // Search filters across ALL saved blogs (title/category) before paginating.
+    if (search) {
+      items = items.filter(
+        (b) =>
+          (b.title || "").toLowerCase().includes(search) ||
+          (b.category || "").toLowerCase().includes(search)
+      );
+    }
+
+    const total = items.length;
+    const start = (page - 1) * limit;
+    const blogs = items.slice(start, start + limit);
+
+    res.json({ blogs, total, page, pages: Math.ceil(total / limit) || 1 });
   } catch (error) {
     logger.error("Error getting saved blogs: " + error.message);
     res.status(500).json({ error: "Error getting saved blogs" });
