@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const mongoose = require("mongoose");
 const VisitorLog = require("../models/VisitorLog");
 
 // India Standard Time has no DST, so a fixed +5:30 offset is exact.
@@ -389,6 +390,35 @@ exports.getVisitorJourney = async (req, res) => {
   } catch (err) {
     console.error("getVisitorJourney error:", err);
     res.status(500).json({ message: "Failed to fetch visitor journey" });
+  }
+};
+
+// ── Admin: delete a single raw log entry by id ────────────────────────────────
+exports.deleteLog = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid log id" });
+    }
+    const result = await VisitorLog.findByIdAndDelete(id);
+    if (!result) return res.status(404).json({ message: "Log entry not found" });
+    res.json({ message: "Log entry deleted", deletedId: id });
+  } catch (err) {
+    console.error("deleteLog error:", err);
+    res.status(500).json({ message: "Failed to delete log entry" });
+  }
+};
+
+// ── Admin: delete ALL logs for one visitor (removes the visitor row) ───────────
+exports.deleteVisitor = async (req, res) => {
+  try {
+    const { visitorId } = req.params;
+    if (!visitorId) return res.status(400).json({ message: "visitorId required" });
+    const result = await VisitorLog.deleteMany({ visitorId });
+    res.json({ message: "Visitor logs deleted", deletedCount: result.deletedCount ?? 0, visitorId });
+  } catch (err) {
+    console.error("deleteVisitor error:", err);
+    res.status(500).json({ message: "Failed to delete visitor" });
   }
 };
 

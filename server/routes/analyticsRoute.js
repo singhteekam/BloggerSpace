@@ -7,6 +7,8 @@ const {
   getVisitors,
   getVisitorJourney,
   deleteOldLogs,
+  deleteLog,
+  deleteVisitor,
 } = require("../controllers/analyticsController");
 const adminMiddleware = require("../middlewares/adminMiddleware");
 
@@ -19,5 +21,7 @@ router.get("/logs", adminMiddleware, getLogs);
 router.get("/visitors", adminMiddleware, getVisitors);
 router.get("/visitor/:visitorId", adminMiddleware, getVisitorJourney);
 router.delete("/logs", adminMiddleware, deleteOldLogs);
+router.delete("/logs/:id", adminMiddleware, deleteLog);
+router.delete("/visitor/:visitorId", adminMiddleware, deleteVisitor);
 
 module.exports = router;

@@ -251,6 +251,7 @@ function BreakdownCard({ icon, title, items, total, scope, empty }: {
 
 // ════════════════════════════ VISITORS TAB ════════════════════════════════════
 function VisitorsTab({ userId }: { userId: string }) {
+  const qc = useQueryClient();
   // Pending — what the user is editing in the UI
   const [search, setSearch] = useState('');
   const [from, setFrom] = useState('');
@@ -260,6 +261,21 @@ function VisitorsTab({ userId }: { userId: string }) {
   const [applied, setApplied] = useState<{ q: string; from: string; to: string; sort: 'lastSeen' | 'firstSeen' | 'visits' | 'pageCount' }>({ q: '', from: '', to: '', sort: 'lastSeen' });
   const [page, setPage] = useState(1);
   const [openVisitor, setOpenVisitor] = useState<string | null>(null);
+  const [delVisitor, setDelVisitor] = useState<string | null>(null);
+
+  // Deletes ALL logs for one visitor (removes the row entirely).
+  const deleteVisitorMutation = useMutation({
+    mutationFn: (visitorId: string) => analyticsApi.deleteVisitor(userId, visitorId),
+    onSuccess: (res) => {
+      const n = res.data.deletedCount;
+      toast.success(`Visitor deleted (${n.toLocaleString()} log${n !== 1 ? 's' : ''} removed).`);
+      qc.invalidateQueries({ queryKey: ['admin-visitors'] });
+      qc.invalidateQueries({ queryKey: ['admin-logs'] });
+      qc.invalidateQueries({ queryKey: ['admin-analytics'] });
+      setDelVisitor(null);
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? 'Delete failed.') : 'Error.'),
+  });
 
   const filter = {
     q: applied.q,
@@ -344,9 +360,15 @@ function VisitorsTab({ userId }: { userId: string }) {
                     <Td className='text-xs text-muted-foreground'>{fmtDate(v.firstSeen)}</Td>
                     <Td className='text-xs text-muted-foreground'>{fmtDateTime(v.lastSeen)}</Td>
                     <Td>
-                      <Button size='sm' variant='ghost' className='h-7 gap-1 text-xs' onClick={() => setOpenVisitor(v.visitorId)}>
-                        <Activity className='size-3.5' />Journey
-                      </Button>
+                      <div className='flex items-center justify-end gap-1'>
+                        <Button size='sm' variant='ghost' className='h-7 gap-1 text-xs' onClick={() => setOpenVisitor(v.visitorId)}>
+                          <Activity className='size-3.5' />Journey
+                        </Button>
+                        <Button size='sm' variant='ghost' className='h-7 w-7 p-0 text-destructive hover:text-destructive'
+                          onClick={() => setDelVisitor(v.visitorId)} aria-label='Delete visitor'>
+                          <Trash2 className='size-3.5' />
+                        </Button>
+                      </div>
                     </Td>
                   </tr>
                 ))}
@@ -358,6 +380,29 @@ function VisitorsTab({ userId }: { userId: string }) {
       )}
 
       {openVisitor && <JourneyDialog userId={userId} visitorId={openVisitor} onClose={() => setOpenVisitor(null)} />}
+
+      {/* Confirm delete visitor */}
+      <Dialog open={!!delVisitor} onOpenChange={(o) => { if (!o) setDelVisitor(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete this visitor?</DialogTitle>
+            <DialogDescription>
+              This permanently removes <strong>all</strong> log entries for visitor{' '}
+              <span className='break-all font-mono text-xs'>{delVisitor}</span>. Their views will be removed
+              from analytics totals. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setDelVisitor(null)} disabled={deleteVisitorMutation.isPending}>Cancel</Button>
+            <Button variant='destructive' className='gap-1.5'
+              onClick={() => delVisitor && deleteVisitorMutation.mutate(delVisitor)}
+              disabled={deleteVisitorMutation.isPending}>
+              {deleteVisitorMutation.isPending ? <Loader2 className='size-4 animate-spin' /> : <Trash2 className='size-4' />}
+              Delete visitor
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -436,6 +481,7 @@ function LogsTab({ userId }: { userId: string }) {
   const [page, setPage] = useState(1);
   const [retention, setRetention] = useState<number>(30);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [delLog, setDelLog] = useState<VisitorLogRow | null>(null);
 
   const filter = {
     q: applied.q,
@@ -461,6 +507,19 @@ function LogsTab({ userId }: { userId: string }) {
       qc.invalidateQueries({ queryKey: ['admin-analytics'] });
       qc.invalidateQueries({ queryKey: ['admin-visitors'] });
       setConfirmOpen(false);
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? 'Delete failed.') : 'Error.'),
+  });
+
+  // Deletes a single raw log entry by id.
+  const deleteLogMutation = useMutation({
+    mutationFn: (id: string) => analyticsApi.deleteLog(userId, id),
+    onSuccess: () => {
+      toast.success('Log entry deleted.');
+      qc.invalidateQueries({ queryKey: ['admin-logs'] });
+      qc.invalidateQueries({ queryKey: ['admin-analytics'] });
+      qc.invalidateQueries({ queryKey: ['admin-visitors'] });
+      setDelLog(null);
     },
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.message ?? 'Delete failed.') : 'Error.'),
   });
@@ -540,7 +599,7 @@ function LogsTab({ userId }: { userId: string }) {
           <div className='overflow-x-auto rounded-xl border border-border'>
             <table className='w-full text-sm'>
               <thead className='bg-muted/40 text-xs text-muted-foreground'>
-                <tr><Th>Time (IST)</Th><th className='px-3 py-2.5 text-left font-medium min-w-[280px]'>Page</th><Th>Visitor</Th><Th>Device</Th><Th>Browser / OS</Th><Th>Referrer</Th></tr>
+                <tr><Th>Time (IST)</Th><th className='px-3 py-2.5 text-left font-medium min-w-[280px]'>Page</th><Th>Visitor</Th><Th>Device</Th><Th>Browser / OS</Th><Th>Referrer</Th><Th></Th></tr>
               </thead>
               <tbody className='divide-y divide-border'>
                 {data.logs.map((l: VisitorLogRow) => (
@@ -551,6 +610,12 @@ function LogsTab({ userId }: { userId: string }) {
                     <Td className='text-xs'>{l.device || '—'}</Td>
                     <Td className='text-xs text-muted-foreground'>{l.browser || '—'} · {l.os || '—'}</Td>
                     <Td><span className='block max-w-[120px] truncate text-xs text-muted-foreground' title={l.referrer}>{l.referrer || 'direct'}</span></Td>
+                    <Td>
+                      <Button size='sm' variant='ghost' className='h-7 w-7 p-0 text-destructive hover:text-destructive'
+                        onClick={() => setDelLog(l)} aria-label='Delete log entry'>
+                        <Trash2 className='size-3.5' />
+                      </Button>
+                    </Td>
                   </tr>
                 ))}
               </tbody>
@@ -576,6 +641,29 @@ function LogsTab({ userId }: { userId: string }) {
               Delete logs
             </Button>
 
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm delete single log entry */}
+      <Dialog open={!!delLog} onOpenChange={(o) => { if (!o) setDelLog(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete this log entry?</DialogTitle>
+            <DialogDescription>
+              This permanently removes the log for{' '}
+              <span className='break-all font-mono text-xs'>{delLog?.page}</span> recorded at{' '}
+              {fmtDateTime(delLog?.timestamp)}. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setDelLog(null)} disabled={deleteLogMutation.isPending}>Cancel</Button>
+            <Button variant='destructive' className='gap-1.5'
+              onClick={() => delLog && deleteLogMutation.mutate(delLog._id)}
+              disabled={deleteLogMutation.isPending}>
+              {deleteLogMutation.isPending ? <Loader2 className='size-4 animate-spin' /> : <Trash2 className='size-4' />}
+              Delete entry
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

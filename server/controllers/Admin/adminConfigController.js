@@ -26,6 +26,10 @@ const EDITABLE_FIELDS = [
 
 const VALID_REDEMPTION_METHODS = ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"];
 
+// Editable fields that are booleans (skipped by the numeric coercion below).
+// None today, but referenced by the coercion filter — keep it defined.
+const booleanFields = [];
+
 /**
  * GET /api/admin/config
  * Returns the singleton config document. Creates one with defaults if none exists.

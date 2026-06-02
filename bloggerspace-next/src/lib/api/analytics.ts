@@ -148,4 +148,18 @@ export const analyticsApi = {
     api.delete<{ deletedCount: number; days: number }>("/api/analytics/logs", {
       params: { userId, role: "Admin", olderThanDays },
     }),
+
+  // Delete one raw log entry by id.
+  deleteLog: (userId: string, id: string) =>
+    api.delete<{ message: string; deletedId: string }>(
+      `/api/analytics/logs/${encodeURIComponent(id)}`,
+      { params: { userId, role: "Admin" } },
+    ),
+
+  // Delete ALL logs for a visitor (removes that visitor row entirely).
+  deleteVisitor: (userId: string, visitorId: string) =>
+    api.delete<{ message: string; deletedCount: number; visitorId: string }>(
+      `/api/analytics/visitor/${encodeURIComponent(visitorId)}`,
+      { params: { userId, role: "Admin" } },
+    ),
 };

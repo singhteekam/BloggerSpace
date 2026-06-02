@@ -5,4 +5,6 @@
 [2025-07-21T11:25:26.662Z] [LOG] [ERROR] - Error fetching user information: TokenExpiredError: jwt expired[2025-11-04T22:11:20.740Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: ABC
 [2026-05-17T12:25:23.723Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
 [2026-05-17T12:26:45.022Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
-[2026-05-17T12:35:50.054Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb
+[2026-05-17T12:35:50.054Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: grrsb[2026-06-02T22:05:48.119Z] [LOG] [DEBUG] - LoggedIn user details fetched. Name: T S
+[2026-06-02T23:03:18.872Z] [LOG] [INFO] - Returning from user profile route with data.
+[2026-06-02T23:03:18.872Z] [LOG] [INFO] - Returning from user profile route with data.
