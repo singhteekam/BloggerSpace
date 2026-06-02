@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { userApi, userGemsApi, type UserGemsTransaction } from "@/lib/api/user";
 import { RedemptionSection } from "@/components/user/redemption-section";
 import { ReadingHistorySection } from "@/components/user/reading-history-section";
+import { FollowListDialog } from "@/components/user/follow-list-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -75,6 +76,7 @@ export default function MyProfilePage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState(false);
   const [gemsPage, setGemsPage] = useState(1);
+  const [followDialog, setFollowDialog] = useState<"followers" | "following" | null>(null);
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["userinfo"],
@@ -218,16 +220,16 @@ export default function MyProfilePage() {
           </div>
           <p className="text-sm text-muted-foreground wrap-break-word">@{profile?.userName ?? "—"}</p>
           <p className="text-sm text-muted-foreground break-all">{profile?.email ?? user.email}</p>
-          {/* Followers / following counts */}
+          {/* Followers / following counts — click to see the lists */}
           <p className="flex items-center gap-3 pt-0.5 text-sm">
-            <Link href={profile?.userName ? `/user/${profile.userName}` : "#"} className="hover:text-primary transition-colors">
+            <button type="button" onClick={() => setFollowDialog("followers")} className="hover:text-primary transition-colors">
               <span className="font-semibold text-foreground">{(profile?.followersCount ?? 0).toLocaleString()}</span>
               <span className="text-muted-foreground"> followers</span>
-            </Link>
-            <Link href={profile?.userName ? `/user/${profile.userName}` : "#"} className="hover:text-primary transition-colors">
+            </button>
+            <button type="button" onClick={() => setFollowDialog("following")} className="hover:text-primary transition-colors">
               <span className="font-semibold text-foreground">{(profile?.followingCount ?? 0).toLocaleString()}</span>
               <span className="text-muted-foreground"> following</span>
-            </Link>
+            </button>
           </p>
           {joinedDate && (
             <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -475,6 +477,16 @@ export default function MyProfilePage() {
       <div className="mt-4">
         <ReadingHistorySection enabled={!!user} />
       </div>
+
+      {/* Followers / following list modal */}
+      {user && (
+        <FollowListDialog
+          userId={user._id}
+          type={followDialog ?? "followers"}
+          open={followDialog !== null}
+          onOpenChange={(o) => !o && setFollowDialog(null)}
+        />
+      )}
     </main>
   );
 }

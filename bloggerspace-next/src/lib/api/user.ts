@@ -176,6 +176,20 @@ export const userApi = {
     api.get<{ isFollowing: boolean }>(`/api/users/followstatus/${targetId}`, {
       params: viewerId ? { viewerId } : {},
     }),
+
+  // List the users in someone's followers / following set.
+  getFollowList: (userId: string, type: "followers" | "following") =>
+    api.get<{ users: FollowListUser[] }>(`/api/users/follow-list/${userId}`, {
+      params: { type },
+    }),
+};
+
+export type FollowListUser = {
+  _id: string;
+  userName: string;
+  fullName: string;
+  profilePicture?: string;
+  isVerified?: boolean;
 };
 
 export type UserGemsTransaction = {

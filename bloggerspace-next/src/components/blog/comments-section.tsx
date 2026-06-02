@@ -182,6 +182,13 @@ function CommentCard({
   );
   const [liking, setLiking] = useState(false);
 
+  // Re-seed when auth resolves (userId arrives after mount) or comments reload,
+  // so a comment the user already liked shows as liked even on a fresh load.
+  useEffect(() => {
+    setLiked(userId ? (comment.commentLikes ?? []).includes(userId) : false);
+    setLikeCount(comment.commentLikes?.length ?? 0);
+  }, [userId, comment.commentLikes]);
+
   const displayName = comment.isAdmin
     ? "Admin"
     : comment.userName ?? comment.userEmail ?? "Unknown";
@@ -310,6 +317,12 @@ function ReplyCard({
     userId ? (reply.commentLikes ?? []).includes(userId) : false,
   );
   const [liking, setLiking] = useState(false);
+
+  // Re-seed when auth resolves or comments reload (same race as CommentCard).
+  useEffect(() => {
+    setLiked(userId ? (reply.commentLikes ?? []).includes(userId) : false);
+    setLikeCount(reply.commentLikes?.length ?? 0);
+  }, [userId, reply.commentLikes]);
 
   const displayName = reply.replyCommentUser.userName ?? reply.replyCommentUser.email ?? "Unknown";
 

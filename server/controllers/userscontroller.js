@@ -1036,6 +1036,31 @@ exports.getFollowStatus = async (req, res) => {
   }
 };
 
+// List the users in someone's followers / following set (for the profile
+// "Followers"/"Following" view). Public info — anyone can view a profile's lists.
+exports.getFollowList = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const type = req.query.type === "following" ? "following" : "followers";
+
+    const owner = await User.findById(userId).select(type).lean();
+    if (!owner) return res.status(404).json({ message: "User not found" });
+
+    const ids = owner[type] || [];
+    if (!ids.length) return res.json({ users: [] });
+
+    // Exclude deleted/anonymised accounts; only the minimal fields the list needs.
+    const users = await User.find({ _id: { $in: ids }, status: { $ne: "DELETED" } })
+      .select("userName fullName profilePicture isVerified")
+      .lean();
+
+    res.json({ users });
+  } catch (error) {
+    logger.error("Error fetching follow list: " + error.message);
+    res.status(500).json({ error: "Failed to fetch follow list" });
+  }
+};
+
 exports.updateUserPersonalDetails = async (req, res) => {
   try {
     const { fullName, userName, bio, socialLinks } = req.body;

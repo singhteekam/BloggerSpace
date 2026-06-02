@@ -5,6 +5,7 @@ import { Bell } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import { userApi } from "@/lib/api/user";
+import { interactionCache } from "@/lib/api/interaction-cache";
 import { isPushConfigured, requestPushToken } from "@/lib/firebase/messaging";
 
 export function PushNotificationToggle() {
@@ -14,8 +15,9 @@ export function PushNotificationToggle() {
   const [token, setToken] = useState<string | null>(null);
   const [available, setAvailable] = useState(true);
 
-  // On mount, if the browser already granted permission, sync the toggle from
-  // the backend (so it reflects the real subscription state of this device).
+  // On mount: seed the toggle INSTANTLY from the last-known state for this
+  // device (localStorage, no flash), then reconcile with the live backend
+  // status so it reflects the real subscription state.
   useEffect(() => {
     if (!user) return;
     const supported =
@@ -23,16 +25,25 @@ export function PushNotificationToggle() {
     setAvailable(supported);
     if (!supported) return;
 
+    const cached = interactionCache.getPushEnabled(user._id);
+    if (cached !== undefined) setEnabled(cached);
+
     (async () => {
-      if (Notification.permission !== "granted") return;
+      // No browser permission → this device cannot be subscribed.
+      if (Notification.permission !== "granted") {
+        setEnabled(false);
+        interactionCache.setPushEnabled(user._id, false);
+        return;
+      }
       const t = await requestPushToken();
       if (!t) return;
       setToken(t);
       try {
         const res = await userApi.getPushStatus(t);
         setEnabled(res.data.enabled);
+        interactionCache.setPushEnabled(user._id, res.data.enabled);
       } catch {
-        /* ignore */
+        /* keep the cached value on failure */
       }
     })();
   }, [user]);
@@ -59,6 +70,7 @@ export function PushNotificationToggle() {
         if (token) await userApi.unregisterPushToken(token);
         toast.success("Push notifications disabled.");
       }
+      interactionCache.setPushEnabled(user._id, next); // persist new state
     } catch {
       setEnabled(!next); // revert on failure
       toast.error("Couldn't update push notifications. Try again.");

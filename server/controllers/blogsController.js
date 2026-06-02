@@ -982,6 +982,21 @@ exports.postNewBlogComment = async (req, res) => {
         commentReplies: [],
       }));
     res.json(comments);
+
+    // Notify admin of the new comment (non-blocking — never delays the response).
+    const newC = blog.comments[blog.comments.length - 1];
+    const commenter = isAdmin
+      ? "Admin"
+      : (newC?.user?.userName || newC?.user?.email || "A user");
+    const adminCommentHtml = `
+      <div class="content">
+        <h2>New comment on a blog</h2>
+        <p><strong>${commenter}</strong> commented on <span class="teal-green">${blog.title}</span>.</p>
+        <div class="info-box">${content}</div>
+        <p><a class="btn" href="${process.env.FRONTEND_URL}/blogs/${blog.slug}">View blog</a></p>
+      </div>`;
+    sendEmail(process.env.EMAIL, "New comment on a blog — BloggerSpace", adminCommentHtml)
+      .catch((e) => logger.error("Admin comment email failed: " + e));
   } catch (error) {
     console.error("Error adding comment:", error);
     logger.error("Error adding comment: " + error);
@@ -1039,6 +1054,21 @@ exports.postNewBlogReplyComment = async (req, res) => {
           })),
       }));
     res.json(comments);
+
+    // Notify admin of the new reply (non-blocking).
+    const parent = blog.comments[commentIdx];
+    const newReply = parent.commentReplies[parent.commentReplies.length - 1];
+    const replier =
+      newReply?.replyCommentUser?.userName || newReply?.replyCommentUser?.email || "A user";
+    const adminReplyHtml = `
+      <div class="content">
+        <h2>New reply on a blog comment</h2>
+        <p><strong>${replier}</strong> replied on a comment on <span class="teal-green">${blog.title}</span>.</p>
+        <div class="info-box">${replyCommentContent}</div>
+        <p><a class="btn" href="${process.env.FRONTEND_URL}/blogs/${blog.slug}">View blog</a></p>
+      </div>`;
+    sendEmail(process.env.EMAIL, "New reply on a blog comment — BloggerSpace", adminReplyHtml)
+      .catch((e) => logger.error("Admin reply email failed: " + e));
   } catch (error) {
     console.error("Error adding reply:", error);
     logger.error("Error adding reply: " + error);

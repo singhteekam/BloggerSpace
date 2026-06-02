@@ -30,6 +30,7 @@ const {
   followUser,
   unfollowUser,
   getFollowStatus,
+  getFollowList,
   contactUs,
   oauthGoogleCallback,
   authGithubCallback,
@@ -229,6 +230,8 @@ router.get("/savedblogs", authenticate, getSavedBlogsOfUser);
 router.patch("/follow/:idToFollow", authenticate, followUser);
 router.patch("/unfollow/:idToUnfollow", authenticate, unfollowUser);
 router.get("/followstatus/:targetId", getFollowStatus);
+// Followers / following user lists (public)
+router.get("/follow-list/:userId", getFollowList);
 
 // Contact us
 router.post("/contactus",contactUs);

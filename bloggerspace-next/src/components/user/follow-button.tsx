@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserPlus, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import { userApi } from "@/lib/api/user";
+import { interactionCache } from "@/lib/api/interaction-cache";
 import { cn } from "@/lib/utils/cn";
 
 type Props = {
@@ -16,32 +17,40 @@ type Props = {
 
 export function FollowButton({ targetId, initialFollowing, onCountChange, className }: Props) {
   const { user } = useAuth();
-  const [following, setFollowing] = useState(initialFollowing ?? false);
-  const [loading, setLoading] = useState(false);
-  const [resolved, setResolved] = useState(initialFollowing !== undefined);
+  const qc = useQueryClient();
+  const uid = user?._id;
 
-  // Always reconcile with the live DB status. The profile page is ISR-cached
-  // (revalidate 24h), so the SSR `initialFollowing` can be stale — e.g. after
-  // you follow then refresh. We paint with the SSR value first (if given) and
-  // then correct it from the server, mirroring the like button's behaviour.
-  useEffect(() => {
-    if (!user || user._id === targetId) {
-      setResolved(true);
-      return;
-    }
-    userApi.getFollowStatus(targetId, user._id)
-      .then((r) => { setFollowing(r.data.isFollowing); setResolved(true); })
-      .catch(() => setResolved(true)); // keep SSR/last value on failure
-  }, [targetId, user?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Seed instantly from SSR (`initialFollowing`) or localStorage, then React
+  // Query reconciles with the live DB value (the profile page is ISR-cached, so
+  // the SSR value can be stale) and caches it across navigation.
+  const seeded =
+    initialFollowing ??
+    interactionCache.isFollowing(uid, targetId) ??
+    false;
+  const followKey = ["followStatus", targetId, uid] as const;
+
+  const { data: following = seeded, isFetched } = useQuery({
+    queryKey: followKey,
+    queryFn: () =>
+      userApi.getFollowStatus(targetId, uid).then((r) => {
+        interactionCache.setFollowing(uid, targetId, r.data.isFollowing);
+        return r.data.isFollowing;
+      }),
+    enabled: !!user && user._id !== targetId,
+    placeholderData: seeded,
+    staleTime: 30 * 1000,
+  });
 
   if (!user || user._id === targetId) return null;
-  if (!resolved) return null;
+  // Avoid a wrong-state flash only when we have nothing to seed with.
+  if (initialFollowing === undefined && interactionCache.isFollowing(uid, targetId) === undefined && !isFetched) {
+    return null;
+  }
 
   const handleToggle = async () => {
-    if (loading) return;
-    setLoading(true);
     const wasFollowing = following;
-    setFollowing(!wasFollowing);
+    qc.setQueryData(followKey, !wasFollowing);
+    interactionCache.setFollowing(uid, targetId, !wasFollowing);
     onCountChange?.(wasFollowing ? -1 : 1);
     try {
       if (wasFollowing) {
@@ -52,18 +61,16 @@ export function FollowButton({ targetId, initialFollowing, onCountChange, classN
         toast.success("Following!");
       }
     } catch {
-      setFollowing(wasFollowing);
+      qc.setQueryData(followKey, wasFollowing); // revert
+      interactionCache.setFollowing(uid, targetId, wasFollowing);
       onCountChange?.(wasFollowing ? 1 : -1);
       toast.error("Failed. Try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <button
       onClick={handleToggle}
-      disabled={loading}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all disabled:opacity-60",
         following

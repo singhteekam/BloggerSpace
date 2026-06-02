@@ -18,9 +18,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!profile) return { title: "User not found" };
 
   const title = `${profile.fullName} (@${profile.userName})`;
+  // Use the true total — `profile.blogs` is only the first page after pagination.
+  const blogCount = profile.blogsTotal ?? profile.blogs.length;
   const description = profile.bio
     ? profile.bio
-    : `${profile.fullName} on BloggerSpace — ${profile.blogs.length} published blog${profile.blogs.length !== 1 ? "s" : ""} · ${profile.followersCount} follower${profile.followersCount !== 1 ? "s" : ""}.`;
+    : `${profile.fullName} on BloggerSpace — ${blogCount} published blog${blogCount !== 1 ? "s" : ""} · ${profile.followersCount} follower${profile.followersCount !== 1 ? "s" : ""}.`;
   const path = `/user/${profile.userName}`;
 
   return {
@@ -123,8 +125,8 @@ export default async function PublicProfilePage({ params }: Props) {
           <div className="mt-3 flex flex-wrap items-center justify-center gap-5 text-sm sm:justify-start">
             <span className="flex items-center gap-1.5">
               <BookOpen className="size-3.5 text-muted-foreground" />
-              <strong>{profile.blogs.length}</strong>
-              <span className="text-muted-foreground">blog{profile.blogs.length !== 1 ? "s" : ""}</span>
+              <strong>{(profile.blogsTotal ?? profile.blogs.length).toLocaleString()}</strong>
+              <span className="text-muted-foreground">blog{(profile.blogsTotal ?? profile.blogs.length) !== 1 ? "s" : ""}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <Users className="size-3.5 text-muted-foreground" />
