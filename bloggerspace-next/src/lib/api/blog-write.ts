@@ -38,6 +38,10 @@ export const blogWriteApi = {
   checkTitle: (title: string, excludeId?: string) =>
     api.post<{ message: string }>("/api/blogs/isuniquetitle", { title, excludeId }),
 
+  // Slug is the authoritative uniqueness check (/blogs/:slug must be unique).
+  checkSlug: (slug: string, excludeId?: string) =>
+    api.post<{ message: string }>("/api/blogs/isuniqueslug", { slug, excludeId }),
+
   generateAI: (title: string) =>
     api.post<{ html: string }>("/api/blogs/generateblog", { title }),
 

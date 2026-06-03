@@ -132,16 +132,18 @@ function NewBlogForm() {
     setSlug(toSlug(titleValue));
   }, [titleValue]);
 
-  // Title uniqueness check (debounced 600 ms)
+  // Slug uniqueness check (debounced 600 ms). The slug is the unique key, so we
+  // validate the slug derived from the title — two titles can map to one slug.
   useEffect(() => {
-    if (!titleValue || titleValue.length < 3) {
+    const s = toSlug(titleValue || "");
+    if (s.length < 3) {
       setTitleStatus("idle");
       return;
     }
     setTitleStatus("checking");
     const timer = setTimeout(async () => {
       try {
-        const res = await blogWriteApi.checkTitle(titleValue, editId ?? undefined);
+        const res = await blogWriteApi.checkSlug(s, editId ?? undefined);
         setTitleStatus(res.data.message === "Available" ? "available" : "taken");
       } catch {
         setTitleStatus("idle");

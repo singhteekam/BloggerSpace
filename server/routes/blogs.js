@@ -20,6 +20,7 @@ const {
   blogLikes,
   blogCommentLikes,
   isUniqueTitle,
+  isUniqueSlug,
   addBlogViewsCounter,
   postNewBlogReplyComment,
   fetchAllBlogs,
@@ -84,6 +85,7 @@ router.post("/newblog", authenticate, createNewBlog);
 router.post("/generateblog", authenticate, createNewAIBlog);
 
 router.post("/isuniquetitle", isUniqueTitle);
+router.post("/isuniqueslug", isUniqueSlug);
 
 router.get("/editblog/:id", authenticate, editBlog);
 

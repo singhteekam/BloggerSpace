@@ -19,7 +19,7 @@ import { GemsDialog } from "@/components/admin/gems-dialog";
 import { ReviewHistoryTimeline } from "@/components/admin/review-history-timeline";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
-import { TitleAvailability } from "@/components/blog/title-availability";
+import { SlugAvailability } from "@/components/blog/title-availability";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -479,7 +479,7 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
               ) : (
                 <span />
               )}
-              <TitleAvailability title={title} excludeId={blogId} />
+              <SlugAvailability slug={slug} excludeId={blogId} />
             </div>
           </div>
 

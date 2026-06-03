@@ -695,6 +695,22 @@ exports.isUniqueTitle = async (req, res) => {
   }
 };
 
+// Slug uniqueness — the authoritative check, since /blogs/:slug must resolve to a
+// single post. Two different titles can collapse to the same slug (e.g. "Foo" vs
+// "Foo."), so the slug — not the title — is what must be unique.
+exports.isUniqueSlug = async (req, res) => {
+  try {
+    const { slug, excludeId } = req.body;
+    if (!slug) return res.json({ message: "Available" });
+    const query = excludeId ? { slug, _id: { $ne: excludeId } } : { slug };
+    const blog = await Blog.findOne(query).select("_id").lean();
+    return res.json({ message: blog ? "Already exists" : "Available" });
+  } catch (error) {
+    logger.error("Error checking isuniqueslug: " + error);
+    res.status(500).json({ error: "An error occurred while checking isuniqueslug" });
+  }
+};
+
 exports.createNewBlog = async (req, res) => {
   try {
     const { slug, title, content, category, tags, userId, authorEmail } =

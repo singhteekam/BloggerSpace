@@ -4,29 +4,30 @@ import { useEffect, useState } from "react";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { blogWriteApi } from "@/lib/api/blog-write";
 
-// Live title-availability indicator (debounced) — mirrors the new-blog editor.
-// Pass `excludeId` (the blog being edited) so the blog's OWN unchanged title
-// reads as "Available" rather than "Already taken".
-export function TitleAvailability({ title, excludeId }: { title: string; excludeId?: string }) {
+// Live SLUG-availability indicator (debounced). The slug — not the title — is the
+// unique key (/blogs/:slug), and two different titles can collapse to the same
+// slug (e.g. "Foo" vs "Foo."), so we validate the slug. Pass `excludeId` (the blog
+// being edited) so the blog's OWN slug reads as available rather than "taken".
+export function SlugAvailability({ slug, excludeId }: { slug: string; excludeId?: string }) {
   const [status, setStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
 
   useEffect(() => {
-    const t = (title ?? "").trim();
-    if (t.length < 3) {
+    const s = (slug ?? "").trim();
+    if (s.length < 3) {
       setStatus("idle");
       return;
     }
     setStatus("checking");
     const timer = setTimeout(async () => {
       try {
-        const res = await blogWriteApi.checkTitle(t, excludeId);
+        const res = await blogWriteApi.checkSlug(s, excludeId);
         setStatus(res.data.message === "Available" ? "available" : "taken");
       } catch {
         setStatus("idle");
       }
     }, 600);
     return () => clearTimeout(timer);
-  }, [title, excludeId]);
+  }, [slug, excludeId]);
 
   if (status === "idle") return null;
   if (status === "checking")
