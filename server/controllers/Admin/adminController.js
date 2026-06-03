@@ -308,7 +308,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     }
 
     // Guard against duplicate publication: title AND slug must be unique.
-    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id, original: blog });
     if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     // Compress the content before saving it
@@ -835,7 +835,7 @@ exports.adminEditAnyBlog = async (req, res) => {
     if (!blog) return res.status(404).json({ error: "Blog not found" });
 
     // Reject duplicate title/slug (excluding this blog).
-    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id, original: blog });
     if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     if (title) blog.title = title;
@@ -1144,8 +1144,9 @@ exports.adminSaveAsDraftBlog= async (req, res)=>{
       ? await Blog.findById({ _id: new mongoose.Types.ObjectId(req.body.id) })
       : null;
 
-    // Reject duplicate title/slug (excluding the draft being updated).
-    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog?._id });
+    // Reject duplicate title/slug — only validate changed fields for an existing
+    // draft; validate both for a brand-new draft (no original).
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog?._id, original: blog });
     if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     if(blog){
@@ -1342,7 +1343,7 @@ exports.adminSaveEditedBlog = async (req, res) => {
     }
 
     // Reject duplicate title/slug (excluding this blog).
-    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id, original: blog });
     if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     // Compress the content before saving it

@@ -634,8 +634,9 @@ exports.saveAsDraftBlog = async (req, res) => {
       ? await Blog.findById({ _id: new mongoose.Types.ObjectId(req.body.id) })
       : null;
 
-    // Reject duplicate title/slug (excluding the draft being updated).
-    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog?._id });
+    // Reject duplicate title/slug — for an existing draft, only validate fields
+    // that changed; for a brand-new draft (no original), validate both.
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog?._id, original: blog });
     if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     if (blog) {
@@ -879,8 +880,9 @@ exports.saveEditedBlog = async (req, res) => {
       return res.status(404).json({ error: "blog not found" });
     }
 
-    // Reject duplicate title/slug (excluding this blog).
-    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    // Reject duplicate title/slug — but only validate a field if it CHANGED from
+    // the original (editing content with an unchanged title must not be blocked).
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id, original: blog });
     if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     // Compress the content before saving it

@@ -16,6 +16,7 @@ import { useRequireReviewer } from "@/hooks/use-require-reviewer";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { reviewerApi, type ReviewerBlogDetail, type FeedbackEntry } from "@/lib/api/reviewer";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
+import { TitleAvailability } from "@/components/blog/title-availability";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -218,11 +219,16 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
               placeholder="Blog title…"
               className="text-base font-medium"
             />
-            {slug && (
-              <p className="text-xs text-muted-foreground">
-                /blogs/<span className="font-medium text-foreground">{slug}</span>
-              </p>
-            )}
+            <div className="flex items-center justify-between gap-2">
+              {slug ? (
+                <p className="text-xs text-muted-foreground truncate">
+                  /blogs/<span className="font-medium text-foreground">{slug}</span>
+                </p>
+              ) : (
+                <span />
+              )}
+              <TitleAvailability title={title} excludeId={blogId} />
+            </div>
           </div>
 
           {/* Category + Tags */}

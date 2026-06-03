@@ -266,8 +266,10 @@ exports.saveEditedPendingBlog = async (req, res) => {
       return res.status(404).json({ error: "blog not found" });
     }
 
-    // Guard against a duplicate title/slug before the blog advances toward publication.
-    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    // Guard against a duplicate title/slug — but only validate a field if the
+    // reviewer actually CHANGED it from the original (an unchanged title must not
+    // be re-checked, so a legacy duplicate can't block the review).
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id, original: blog });
     if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     const compressedContentBuffer = pako.deflate(content, { to: "string" });

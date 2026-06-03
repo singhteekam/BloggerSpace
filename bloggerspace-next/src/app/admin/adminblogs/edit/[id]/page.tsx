@@ -15,6 +15,7 @@ import { useAutoSave } from "@/hooks/use-autosave";
 import { adminApi, type AdminBlogDetail } from "@/lib/api/admin";
 import { blogWriteApi } from "@/lib/api/blog-write";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
+import { TitleAvailability } from "@/components/blog/title-availability";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -248,6 +249,9 @@ function EditBlogEditor({ blogId, adminId }: { blogId: string; adminId: string }
               value={title}
               onChange={(e) => { setTitle(e.target.value); setSlug(toSlug(e.target.value.trim())); }}
             />
+            <div className="flex justify-end">
+              <TitleAvailability title={title} excludeId={blogId} />
+            </div>
           </div>
 
           {/* Slug */}

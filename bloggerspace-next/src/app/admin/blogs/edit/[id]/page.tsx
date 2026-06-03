@@ -19,6 +19,7 @@ import { GemsDialog } from "@/components/admin/gems-dialog";
 import { ReviewHistoryTimeline } from "@/components/admin/review-history-timeline";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
+import { TitleAvailability } from "@/components/blog/title-availability";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -470,11 +471,16 @@ export default function AdminBlogEditPage({ params }: { params: Promise<{ id: st
               placeholder="Blog title…"
               className="text-lg"
             />
-            {slug && (
-              <p className="text-xs text-muted-foreground">
-                /blogs/<span className="font-medium text-foreground">{slug}</span>
-              </p>
-            )}
+            <div className="flex items-center justify-between gap-2">
+              {slug ? (
+                <p className="text-xs text-muted-foreground truncate">
+                  /blogs/<span className="font-medium text-foreground">{slug}</span>
+                </p>
+              ) : (
+                <span />
+              )}
+              <TitleAvailability title={title} excludeId={blogId} />
+            </div>
           </div>
 
           {/* Category + Tags */}
