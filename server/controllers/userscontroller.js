@@ -883,6 +883,7 @@ exports.loggedInUserInfo = async (req, res) => {
         website:  user.socialLinks?.website ?? "",
       },
       newsletterOptIn: user.newsletterOptIn ?? false,
+      readingHistoryEnabled: user.readingHistoryEnabled !== false,
       // Social counts so the logged-in user sees them on their own profile.
       followersCount: user.followers?.length ?? 0,
       followingCount: user.following?.length ?? 0,
@@ -1123,6 +1124,11 @@ exports.addReadingHistory = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Respect the user's opt-out — don't record anything when tracking is off.
+    if (user.readingHistoryEnabled === false) {
+      return res.status(200).json({ ok: true, disabled: true });
+    }
+
     const history = user.readingHistory || [];
     const existing = history.find((h) => h.slug === slug);
     // Skip a fresh re-read of the same blog within the dedup window
@@ -1146,12 +1152,40 @@ exports.getReadingHistory = async (req, res) => {
   try {
     const userId = req.query.userId;
     if (!userId) return res.status(401).json({ message: "Please login." });
-    const user = await User.findById(userId).select("readingHistory").lean();
+    const user = await User.findById(userId).select("readingHistory readingHistoryEnabled").lean();
     if (!user) return res.status(404).json({ message: "User not found" });
-    res.json({ history: user.readingHistory || [] });
+    res.json({
+      history: user.readingHistory || [],
+      enabled: user.readingHistoryEnabled !== false,
+    });
   } catch (error) {
     logger.error("Error fetching reading history: " + error);
     res.status(500).json({ error: "Failed to fetch reading history" });
+  }
+};
+
+// Toggle reading-history tracking. Turning it OFF also clears the existing
+// history so nothing is retained once the user opts out.
+exports.setReadingHistoryEnabled = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const { enabled } = req.body;
+    if (!userId) return res.status(401).json({ message: "Please login." });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.readingHistoryEnabled = !!enabled;
+    if (!enabled) user.readingHistory = []; // clear retained history on opt-out
+    await user.save();
+
+    res.json({
+      message: enabled ? "Reading history enabled." : "Reading history turned off and cleared.",
+      enabled: user.readingHistoryEnabled,
+    });
+  } catch (error) {
+    logger.error("Error updating reading history setting: " + error);
+    res.status(500).json({ error: "Failed to update reading history setting" });
   }
 };
 
@@ -1785,8 +1819,9 @@ exports.forgotPasswordRequestOtp = async (req, res) => {
     if (!email) return res.status(400).json({ message: "Email is required." });
 
     const user = await User.findOne({ email });
+    // Verify the email actually belongs to an account before issuing an OTP.
     if (!user) {
-      return res.status(200).json({ message: "otp_sent", info: "If that email is registered, a reset code has been sent." });
+      return res.status(404).json({ message: "No account found with this email address." });
     }
 
     if (!user.isVerified) {

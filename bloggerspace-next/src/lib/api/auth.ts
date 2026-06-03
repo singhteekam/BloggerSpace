@@ -15,6 +15,7 @@ export type AuthUser = {
   bio?: string;
   socialLinks?: { linkedin: string; github: string; website: string };
   newsletterOptIn?: boolean;
+  readingHistoryEnabled?: boolean;
   followersCount?: number;
   followingCount?: number;
 };

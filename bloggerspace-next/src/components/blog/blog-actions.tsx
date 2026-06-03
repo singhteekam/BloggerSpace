@@ -63,7 +63,7 @@ export function BlogActions({ blogId, blogSlug, blogTitle, blogCategory, blogTag
   // One shared query holds ALL the user's saved slugs (seeded from localStorage
   // for an instant first paint). Disabled until it has loaded + during the toggle.
   const savedKey = ["savedSlugs", uid, isAdmin] as const;
-  const { data: savedSlugs, isFetched: savedFetched } = useQuery({
+  const { data: savedSlugs } = useQuery({
     queryKey: savedKey,
     queryFn: async () => {
       const r = isAdmin
@@ -75,6 +75,9 @@ export function BlogActions({ blogId, blogSlug, blogTitle, blogCategory, blogTag
     },
     enabled: !!uid,
     initialData: () => interactionCache.getSavedSlugs(uid),
+    // Treat the localStorage seed as stale so a background fetch still confirms
+    // it — otherwise the query never refetches and the button would never settle.
+    initialDataUpdatedAt: 0,
     staleTime: 60 * 1000,
   });
   const saved = (savedSlugs ?? []).includes(blogSlug);
@@ -103,8 +106,9 @@ export function BlogActions({ blogId, blogSlug, blogTitle, blogCategory, blogTag
     },
     onSuccess: (_d, wasSaved) => toast.success(wasSaved ? "Removed from saved." : "Saved!"),
   });
-  // Only gate on the saved query for logged-in users (it's disabled otherwise).
-  const saveBusy = (!!uid && !savedFetched) || saveMutation.isPending;
+  // Disabled only while we genuinely don't know the saved state yet (no seed and
+  // not yet loaded) or mid-toggle — NOT gated on isFetched (the seed skips it).
+  const saveBusy = (!!uid && savedSlugs === undefined) || saveMutation.isPending;
 
   const onLike = () => {
     if (!user) { toast.error("Sign in to like posts."); return; }

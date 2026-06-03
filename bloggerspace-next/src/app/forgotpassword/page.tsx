@@ -57,11 +57,11 @@ export default function ForgotPasswordPage() {
           toast.error(err.response.data?.message ?? "Cannot reset password.");
           return;
         }
+        // Email not registered — stay on this step and tell the user.
+        toast.error(err.response?.data?.message ?? "No account found with this email address.");
+        return;
       }
-      // For 404 or generic errors, show neutral message to prevent email enumeration
-      setEmail(data.email);
-      setStep("otp");
-      toast.success("If that email is registered, a reset code has been sent.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 

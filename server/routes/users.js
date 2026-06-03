@@ -22,6 +22,7 @@ const {
   setNewsletterOptIn,
   addReadingHistory,
   getReadingHistory,
+  setReadingHistoryEnabled,
   incrementVisitCount,
   getVisitorCount,
   addBlogToSavedBlogs,
@@ -214,6 +215,7 @@ router.patch("/newsletter-optin", authenticate, setNewsletterOptIn);
 // Reading history
 router.post("/reading-history", authenticate, addReadingHistory);
 router.get("/reading-history", authenticate, getReadingHistory);
+router.patch("/reading-history/settings", authenticate, setReadingHistoryEnabled);
 
 router.post("/discard/blog/:id", authenticate, discardBlogFromDB);
 

@@ -14,6 +14,7 @@ import {
   BadgeCheck,
   Mail,
   Trash2,
+  BookOpen,
 } from "lucide-react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
@@ -57,6 +58,16 @@ export default function SettingsPage() {
     onSuccess: (res) => {
       toast.success(res.data.message);
       qc.invalidateQueries({ queryKey: ["userinfo"] });
+    },
+    onError: () => toast.error("Couldn't update preference. Try again."),
+  });
+
+  const readingHistoryMutation = useMutation({
+    mutationFn: (enabled: boolean) => userApi.setReadingHistoryEnabled(enabled),
+    onSuccess: (res) => {
+      toast.success(res.data.message);
+      qc.invalidateQueries({ queryKey: ["userinfo"] });
+      qc.invalidateQueries({ queryKey: ["reading-history"] });
     },
     onError: () => toast.error("Couldn't update preference. Try again."),
   });
@@ -201,6 +212,45 @@ export default function SettingsPage() {
           </div>
 
           <PushNotificationToggle />
+        </div>
+      </section>
+
+      {/* Privacy */}
+      <section className="mb-8">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          Privacy
+        </h2>
+        <div className="rounded-xl border border-border bg-card p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                <BookOpen className="size-4" />
+              </span>
+              <div>
+                <p className="text-sm font-medium text-foreground">Reading history</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Track the blogs you read so you can revisit them on your profile. Turning this off
+                  stops tracking and clears your existing history.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={profile?.readingHistoryEnabled !== false}
+              disabled={readingHistoryMutation.isPending}
+              onClick={() => readingHistoryMutation.mutate(!(profile?.readingHistoryEnabled !== false))}
+              className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${
+                profile?.readingHistoryEnabled !== false ? "bg-primary" : "bg-muted-foreground/30"
+              }`}
+            >
+              <span
+                className={`inline-block size-4 transform rounded-full bg-white transition-transform ${
+                  profile?.readingHistoryEnabled !== false ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
         </div>
       </section>
 

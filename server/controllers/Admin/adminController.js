@@ -295,6 +295,12 @@ exports.saveEditedInReviewBlog = async (req, res) => {
       return res.status(404).json({ error: "blog not found" });
     }
 
+    // Guard against duplicate publication: no other blog may share this title.
+    const dupTitle = await Blog.findOne({ title, _id: { $ne: blog._id } }).select("_id").lean();
+    if (dupTitle) {
+      return res.status(409).json({ error: "A blog with this title already exists. Please use a unique title before publishing." });
+    }
+
     // Compress the content before saving it
     const compressedContentBuffer = pako.deflate(content, { to: "string" });
     const compressedContent = Buffer.from(compressedContentBuffer).toString(
@@ -755,9 +761,35 @@ exports.discardAnyBlog = async (req, res) => {
     blog.lastUpdatedAt = new Date(new Date().getTime() + IST_OFFSET * 60000);
     await blog.save();
     // No longer public — purge its page (will 404 on next request) + listings + home.
-    await blog.populate("authorDetails", "userName");
+    await blog.populate("authorDetails", "userName fullName email");
     revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/adminblogs", "/"] });
     res.json({ message: "Blog discarded successfully" });
+
+    // Notify the author + admin that the blog was discarded (non-blocking).
+    const author = blog.authorDetails;
+    if (author?.email) {
+      const authorHtml = `
+        <div class="content">
+          <h2>Hi ${author.fullName || "there"},</h2>
+          <p>Your blog has been <strong>discarded</strong> by an admin and is no longer published.</p>
+          <div class="info-box"><strong>Title:</strong> ${blog.title}</div>
+          <p>If you believe this was a mistake or have questions, reach us at
+            <a href="mailto:${process.env.EMAIL}">${process.env.EMAIL}</a>.</p>
+        </div>`;
+      sendEmail(author.email, "Your blog was discarded — BloggerSpace", authorHtml)
+        .catch((e) => console.error("Discard email (author) failed:", e));
+    }
+    const adminHtml = `
+      <div class="content">
+        <h2>Blog discarded</h2>
+        <p>A blog has been discarded.</p>
+        <div class="info-box">
+          <strong>Title:</strong> ${blog.title}<br>
+          <strong>Author:</strong> ${author?.fullName || author?.email || "Unknown"}
+        </div>
+      </div>`;
+    sendEmail(process.env.EMAIL, "Blog discarded — BloggerSpace", adminHtml)
+      .catch((e) => console.error("Discard email (admin) failed:", e));
   } catch (error) {
     console.error("Error discarding blog:", error);
     res.status(500).json({ error: "Failed to discard blog" });

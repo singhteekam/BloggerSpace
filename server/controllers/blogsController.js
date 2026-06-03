@@ -875,12 +875,18 @@ exports.saveEditedBlog = async (req, res) => {
       "base64"
     );
 
+    // Only a revision sent back from the reviewer (AWAITING_AUTHOR) is a true
+    // RE-submission; a draft going to review for the first time is a submission.
+    const isResubmission = blog.status === "AWAITING_AUTHOR";
+    const verb = isResubmission ? "resubmitted" : "submitted";
+    const Verb = isResubmission ? "Resubmitted" : "Submitted";
+
     // Update the blog fields
     blog.slug = slug;
     blog.title = title;
     blog.content = compressedContent;
     blog.category = category;
-    if (blog.status === "AWAITING_AUTHOR") blog.status = "UNDER_REVIEW";
+    if (isResubmission) blog.status = "UNDER_REVIEW";
     else blog.status = "PENDING_REVIEW";
 
     // Save the updated blog
@@ -889,11 +895,11 @@ exports.saveEditedBlog = async (req, res) => {
 
     // Sending mail to author
     const receiver = blog.authorDetails.email;
-    const subject = "Blog resubmitted for review — BloggerSpace";
+    const subject = `Blog ${verb} for review — BloggerSpace`;
     const html = `
       <div class="content">
-        <h2>Blog resubmitted!</h2>
-        <p>Hi ${blog.authorDetails.fullName}, your updated blog has been resubmitted and is now pending review.</p>
+        <h2>Blog ${verb}!</h2>
+        <p>Hi ${blog.authorDetails.fullName}, your blog has been ${verb} and is now pending review.</p>
         <div class="info-box">
           <strong>Title:</strong> ${title}<br>
           <strong>Category:</strong> ${category}
@@ -916,11 +922,11 @@ exports.saveEditedBlog = async (req, res) => {
     // Sending mail to admin
     const blogLink = `${process.env.REVIEWER_PANEL_URL}/${slug}`;
     const receiver2 = process.env.EMAIL;
-    const subject2 = "Blog resubmitted — BloggerSpace";
+    const subject2 = `Blog ${verb} — BloggerSpace`;
     const html2 = `
       <div class="content">
-        <h2>Blog resubmitted</h2>
-        <p>An author has resubmitted their revised blog for review.</p>
+        <h2>Blog ${Verb}</h2>
+        <p>An author has ${verb} their blog for review.</p>
         <div class="info-box"><strong>Title:</strong> ${title}</div>
         <p><a class="btn" href="${blogLink}">View in Admin Panel</a></p>
       </div>

@@ -91,6 +91,9 @@ const userSchema = new mongoose.Schema({
   // Newsletter — opt-in (default off). Admin sends only to opted-in users.
   newsletterOptIn: { type: Boolean, default: false },
 
+  // When false, reading history is NOT tracked (user opted out in settings).
+  readingHistoryEnabled: { type: Boolean, default: true },
+
   // Reading history — auto-tracked, capped at 50 most-recent entries (newest first)
   readingHistory: {
     type: [{

@@ -265,6 +265,12 @@ exports.saveEditedPendingBlog = async (req, res) => {
       return res.status(404).json({ error: "blog not found" });
     }
 
+    // Guard against a duplicate title before the blog advances toward publication.
+    const dupTitle = await Blog.findOne({ title, _id: { $ne: blog._id } }).select("_id").lean();
+    if (dupTitle) {
+      return res.status(409).json({ error: "A blog with this title already exists. Please use a unique title before submitting." });
+    }
+
     const compressedContentBuffer = pako.deflate(content, { to: "string" });
     const compressedContent = Buffer.from(compressedContentBuffer).toString("base64");
 

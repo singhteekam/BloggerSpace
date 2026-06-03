@@ -593,24 +593,48 @@ function DropPortal({
   children: React.ReactNode;
   className?: string;
 }) {
-  const [style, setStyle] = useState<React.CSSProperties>({});
+  const ref = useRef<HTMLDivElement>(null);
+  // Hidden until measured/positioned so it never flashes at the wrong spot.
+  const [style, setStyle] = useState<React.CSSProperties>({
+    position: "fixed",
+    top: 0,
+    left: 0,
+    visibility: "hidden",
+  });
 
   useEffect(() => {
-    if (!open || !triggerRef.current) return;
+    if (!open || !triggerRef.current || !ref.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
-    // Right-anchor if button is in the right half of the screen
-    const isRightHalf = rect.left > window.innerWidth / 2;
-    setStyle(
-      isRightHalf
-        ? { position: "fixed", top: rect.bottom + 4, right: window.innerWidth - rect.right, zIndex: 9999 }
-        : { position: "fixed", top: rect.bottom + 4, left: rect.left, zIndex: 9999 }
-    );
+    const margin = 8;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const dropW = ref.current.offsetWidth;
+
+    // Right-align the menu to the trigger by default; fall back to left-align;
+    // then clamp fully inside the viewport so it can't be cut off on small screens.
+    let left = rect.right - dropW;
+    if (left < margin) left = rect.left;
+    left = Math.max(margin, Math.min(left, vw - dropW - margin));
+
+    const top = rect.bottom + 4;
+    setStyle({
+      position: "fixed",
+      top,
+      left,
+      // Never exceed the viewport — width wraps, height scrolls if needed.
+      maxWidth: vw - margin * 2,
+      maxHeight: vh - top - margin,
+      overflowY: "auto",
+      zIndex: 9999,
+      visibility: "visible",
+    });
   }, [open, triggerRef]);
 
   if (!open || typeof document === "undefined") return null;
 
   return ReactDOM.createPortal(
     <div
+      ref={ref}
       data-toolbar-portal=""
       style={style}
       className={cn("w-max min-w-40 rounded-xl border border-border bg-card py-1 shadow-xl", className)}

@@ -131,23 +131,13 @@ export default async function BlogDetailPage({ params }: Props) {
 
               {/* Meta row */}
               <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                <span className="flex items-center gap-2">
-                  {authorUserName ? (
-                    <Link href={`/user/${authorUserName}`} className="font-medium text-foreground hover:text-primary transition-colors">
-                      {authorName}
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-foreground">{authorName}</span>
-                  )}
-                  {/* Follow the author — hidden for admin posts / own posts / logged-out */}
-                  {authorProfile && (
-                    <FollowButton
-                      targetId={authorProfile._id}
-                      initialFollowing={authorProfile.isFollowing}
-                      className="px-3 py-0.5 text-xs"
-                    />
-                  )}
-                </span>
+                {authorUserName ? (
+                  <Link href={`/user/${authorUserName}`} className="font-medium text-foreground hover:text-primary transition-colors">
+                    {authorName}
+                  </Link>
+                ) : (
+                  <span className="font-medium text-foreground">{authorName}</span>
+                )}
                 {date && (
                   <span className="flex items-center gap-1">
                     <Calendar className="size-3.5" />
@@ -208,46 +198,48 @@ export default async function BlogDetailPage({ params }: Props) {
 
             {/* Author card */}
             <section className="py-8">
-              <div className="flex items-start gap-4 rounded-2xl border border-border bg-muted/30 p-5">
-                {/* Avatar */}
-                <UserAvatar
-                  src={authorProfile?.profilePicture}
-                  name={authorName}
-                  size="md"
-                />
+              <div className="rounded-2xl border border-border bg-muted/30 p-5">
+                <div className="flex items-start gap-4">
+                  {/* Avatar */}
+                  <UserAvatar
+                    src={authorProfile?.profilePicture}
+                    name={authorName}
+                    size="md"
+                  />
 
-                <div className="flex-1 min-w-0">
-                  {/* Name — link to public profile */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    {authorUserName ? (
-                      <Link
-                        href={`/user/${authorUserName}`}
-                        className="font-semibold text-foreground hover:text-primary transition-colors"
-                      >
-                        {authorName}
-                      </Link>
-                    ) : (
-                      <span className="font-semibold text-foreground">{authorName}</span>
-                    )}
-                    {authorProfile?.isVerified && (
-                      <BadgeCheck className="size-4 text-primary" />
-                    )}
+                  <div className="flex-1 min-w-0">
+                    {/* Name — link to public profile */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {authorUserName ? (
+                        <Link
+                          href={`/user/${authorUserName}`}
+                          className="font-semibold text-foreground hover:text-primary transition-colors"
+                        >
+                          {authorName}
+                        </Link>
+                      ) : (
+                        <span className="font-semibold text-foreground">{authorName}</span>
+                      )}
+                      {authorProfile?.isVerified && (
+                        <BadgeCheck className="size-4 text-primary" />
+                      )}
+                    </div>
+
+                    <p className="text-sm text-muted-foreground">
+                      BloggerSpace author
+                      {authorProfile && (
+                        <> · {authorProfile.followersCount} follower{authorProfile.followersCount !== 1 ? "s" : ""}</>
+                      )}
+                    </p>
                   </div>
-
-                  <p className="text-sm text-muted-foreground">
-                    BloggerSpace author
-                    {authorProfile && (
-                      <> · {authorProfile.followersCount} follower{authorProfile.followersCount !== 1 ? "s" : ""}</>
-                    )}
-                  </p>
                 </div>
 
-                {/* Follow button */}
+                {/* Follow button — below the author details; full-width on mobile */}
                 {authorProfile && (
                   <FollowButton
                     targetId={authorProfile._id}
                     initialFollowing={authorProfile.isFollowing}
-                    className="shrink-0"
+                    className="mt-4 w-full justify-center sm:w-auto"
                   />
                 )}
               </div>

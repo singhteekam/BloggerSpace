@@ -75,7 +75,18 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 // Logo accessible at: <BACKEND_URL>/assets/logo128x128.png
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
-connectDB();
+// Connect to MongoDB only in the actual function runtime (or local dev / the
+// emulator) — NOT during `firebase deploy` source analysis. During deploy the
+// code is imported just to read the function signatures; connecting then (and
+// the index sync it triggers) is slow global-scope work that blows the 10s
+// discovery budget → "Cannot determine backend specification. Timeout after 10000".
+const inCloudRuntime = !!(
+  process.env.K_SERVICE ||        // gen2 Cloud Run runtime (set only at runtime, not during CLI discovery)
+  process.env.FUNCTIONS_EMULATOR  // local emulator
+);
+if (inCloudRuntime || require.main === module) {
+  connectDB();
+}
 
 app.use(express.json());
 // app.use(cors());

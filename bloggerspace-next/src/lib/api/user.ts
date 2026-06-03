@@ -131,7 +131,13 @@ export const userApi = {
     api.post<{ ok: boolean; deduped?: boolean }>("/api/users/reading-history", data),
 
   getReadingHistory: () =>
-    api.get<{ history: ReadingHistoryItem[] }>("/api/users/reading-history"),
+    api.get<{ history: ReadingHistoryItem[]; enabled: boolean }>("/api/users/reading-history"),
+
+  setReadingHistoryEnabled: (enabled: boolean) =>
+    api.patch<{ message: string; enabled: boolean }>(
+      "/api/users/reading-history/settings",
+      { enabled },
+    ),
 
   // ── Push notifications (FCM token) ──────────────────────────────────────────
   registerPushToken: (token: string, userAgent = "") =>
