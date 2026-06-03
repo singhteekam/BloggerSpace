@@ -386,6 +386,19 @@ export const adminApi = {
   deleteComment: (postId: string, commentId: string, userId: string) =>
     api.delete<{ message: string }>(`/api/admin/community/${postId}/comment/${commentId}`, { params: p(userId) }),
 
+  // ── Blog comment moderation (inline on the blog page) ──────────────────────
+  deleteBlogComment: (userId: string, slug: string, commentId: string) =>
+    api.delete<{ message: string }>(
+      `/api/admin/blogs/${encodeURIComponent(slug)}/comment/${commentId}`,
+      { params: p(userId) },
+    ),
+
+  deleteBlogReply: (userId: string, slug: string, commentId: string, replyId: string) =>
+    api.delete<{ message: string }>(
+      `/api/admin/blogs/${encodeURIComponent(slug)}/comment/${commentId}/reply/${replyId}`,
+      { params: p(userId) },
+    ),
+
   // ── Gems ──────────────────────────────────────────────────────────────────
   awardGems: (
     userId: string,

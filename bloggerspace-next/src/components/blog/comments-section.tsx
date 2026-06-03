@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { MessageSquare, Send, CornerDownRight, Loader2, Heart, ChevronDown, ChevronUp } from "lucide-react";
+import { MessageSquare, Send, CornerDownRight, Loader2, Heart, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils/html";
 import { useAuth } from "@/contexts/auth-context";
 import { interactionsApi, type CommentItem, type CommentReply } from "@/lib/api/interactions";
+import { adminApi } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
@@ -19,6 +20,7 @@ type Props = { slug: string; initialCount: number };
 
 export function CommentsSection({ slug, initialCount }: Props) {
   const { user } = useAuth();
+  const isAdmin = user?.role === "Admin";
   const [comments, setComments] = useState<CommentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
@@ -70,6 +72,39 @@ export function CommentsSection({ slug, initialCount }: Props) {
   const closeReply = () => {
     setReplyingTo(null);
     setReplyText("");
+  };
+
+  // Admin-only inline moderation (optimistic remove, revert on failure).
+  const deleteComment = async (commentId: string) => {
+    if (!window.confirm("Delete this comment? This cannot be undone.")) return;
+    const prev = comments;
+    setComments((cs) => cs.filter((c) => c._id !== commentId));
+    try {
+      await adminApi.deleteBlogComment(user!._id, slug, commentId);
+      toast.success("Comment deleted.");
+    } catch {
+      setComments(prev);
+      toast.error("Failed to delete comment.");
+    }
+  };
+
+  const deleteReply = async (commentId: string, replyId: string) => {
+    if (!window.confirm("Delete this reply? This cannot be undone.")) return;
+    const prev = comments;
+    setComments((cs) =>
+      cs.map((c) =>
+        c._id === commentId
+          ? { ...c, commentReplies: c.commentReplies.filter((r) => r._id !== replyId) }
+          : c,
+      ),
+    );
+    try {
+      await adminApi.deleteBlogReply(user!._id, slug, commentId, replyId);
+      toast.success("Reply deleted.");
+    } catch {
+      setComments(prev);
+      toast.error("Failed to delete reply.");
+    }
   };
 
   const submitReply = async () => {
@@ -140,6 +175,7 @@ export function CommentsSection({ slug, initialCount }: Props) {
               comment={comment}
               slug={slug}
               userId={user?._id}
+              isAdmin={isAdmin}
               replyingTo={replyingTo}
               replyText={replyText}
               replyRef={replyRef}
@@ -148,6 +184,8 @@ export function CommentsSection({ slug, initialCount }: Props) {
               onCloseReply={closeReply}
               onReplyChange={setReplyText}
               onReplySubmit={submitReply}
+              onDeleteComment={deleteComment}
+              onDeleteReply={deleteReply}
             />
           ))}
         </div>
@@ -158,13 +196,15 @@ export function CommentsSection({ slug, initialCount }: Props) {
 
 /* ─── CommentCard ──────────────────────────────────────────────────── */
 function CommentCard({
-  comment, slug, userId,
+  comment, slug, userId, isAdmin,
   replyingTo, replyText, replyRef, replySubmitting,
   onOpenReply, onCloseReply, onReplyChange, onReplySubmit,
+  onDeleteComment, onDeleteReply,
 }: {
   comment: CommentItem;
   slug: string;
   userId?: string;
+  isAdmin?: boolean;
   replyingTo: { commentId: string; displayName: string } | null;
   replyText: string;
   replyRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -173,6 +213,8 @@ function CommentCard({
   onCloseReply: () => void;
   onReplyChange: (v: string) => void;
   onReplySubmit: () => void;
+  onDeleteComment: (commentId: string) => void;
+  onDeleteReply: (commentId: string, replyId: string) => void;
 }) {
   const isReplying = replyingTo?.commentId === comment._id;
   const [showReplies, setShowReplies] = useState(true);
@@ -260,6 +302,18 @@ function CommentCard({
               {replyCount} {replyCount === 1 ? "reply" : "replies"}
             </button>
           )}
+
+          {isAdmin && (
+            <button
+              onClick={() => onDeleteComment(comment._id)}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+              aria-label="Delete comment (admin)"
+              title="Delete comment"
+            >
+              <Trash2 className="size-3" />
+              Delete
+            </button>
+          )}
         </div>
 
         {/* Reply input */}
@@ -294,7 +348,15 @@ function CommentCard({
         {showReplies && replyCount > 0 && (
           <div className="mt-4 space-y-3 border-l-2 border-border pl-4">
             {comment.commentReplies.map((reply) => (
-              <ReplyCard key={reply._id} reply={reply} slug={slug} commentId={comment._id} userId={userId} />
+              <ReplyCard
+                key={reply._id}
+                reply={reply}
+                slug={slug}
+                commentId={comment._id}
+                userId={userId}
+                isAdmin={isAdmin}
+                onDelete={onDeleteReply}
+              />
             ))}
           </div>
         )}
@@ -305,12 +367,14 @@ function CommentCard({
 
 /* ─── ReplyCard ────────────────────────────────────────────────────── */
 function ReplyCard({
-  reply, slug, commentId, userId,
+  reply, slug, commentId, userId, isAdmin, onDelete,
 }: {
   reply: CommentReply;
   slug: string;
   commentId: string;
   userId?: string;
+  isAdmin?: boolean;
+  onDelete: (commentId: string, replyId: string) => void;
 }) {
   const [likeCount, setLikeCount] = useState(reply.commentLikes?.length ?? 0);
   const [liked, setLiked] = useState(() =>
@@ -368,6 +432,17 @@ function ReplyCard({
           <Heart className={cn("size-3", liked && "fill-rose-500")} />
           {likeCount > 0 && <span>{likeCount}</span>}
         </button>
+        {isAdmin && (
+          <button
+            onClick={() => onDelete(commentId, reply._id)}
+            className="ml-3 mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+            aria-label="Delete reply (admin)"
+            title="Delete reply"
+          >
+            <Trash2 className="size-3" />
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );

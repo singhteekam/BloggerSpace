@@ -2064,6 +2064,43 @@ exports.deleteCommentFromPost = async (req, res) => {
   }
 };
 
+// ─── Blog comment moderation (admin) ──────────────────────────────────────────
+// Delete a top-level comment (and its nested replies) from a blog.
+exports.deleteBlogComment = async (req, res) => {
+  const { slug, commentId } = req.params;
+  try {
+    const blog = await Blog.findOne({ slug });
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    const comment = blog.comments.id(commentId);
+    if (!comment) return res.status(404).json({ error: "Comment not found" });
+    blog.comments.pull(commentId);
+    await blog.save();
+    res.json({ message: "Comment deleted" });
+  } catch (error) {
+    console.error("Error deleting blog comment:", error);
+    res.status(500).json({ error: "Failed to delete comment" });
+  }
+};
+
+// Delete a single reply under a blog comment.
+exports.deleteBlogReply = async (req, res) => {
+  const { slug, commentId, replyId } = req.params;
+  try {
+    const blog = await Blog.findOne({ slug });
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+    const comment = blog.comments.id(commentId);
+    if (!comment) return res.status(404).json({ error: "Comment not found" });
+    const reply = comment.commentReplies.id(replyId);
+    if (!reply) return res.status(404).json({ error: "Reply not found" });
+    comment.commentReplies.pull(replyId);
+    await blog.save();
+    res.json({ message: "Reply deleted" });
+  } catch (error) {
+    console.error("Error deleting blog reply:", error);
+    res.status(500).json({ error: "Failed to delete reply" });
+  }
+};
+
 // ─── User content view ────────────────────────────────────────────────────────
 exports.getUserContent = async (req, res) => {
   const { userId } = req.params;

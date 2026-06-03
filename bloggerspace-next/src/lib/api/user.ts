@@ -69,11 +69,16 @@ export async function fetchPublicProfile(
 
 export type ProfileBlogsResponse = { blogs: PublicBlog[]; total: number; page: number; pages: number };
 
-// Client-side "load more" for a profile's published blogs (page 2+).
-export async function fetchProfileBlogs(username: string, page: number): Promise<ProfileBlogsResponse> {
+// Client-side "load more" + server-side search for a profile's published blogs.
+// `search` filters across ALL the author's published blogs (title/category/tags).
+export async function fetchProfileBlogs(
+  username: string,
+  page: number,
+  search = "",
+): Promise<ProfileBlogsResponse> {
   const res = await api.get<ProfileBlogsResponse>(
     `/api/users/profile/${encodeURIComponent(username)}/blogs`,
-    { params: { page, limit: 12 } },
+    { params: { page, limit: 12, ...(search ? { search } : {}) } },
   );
   return res.data;
 }

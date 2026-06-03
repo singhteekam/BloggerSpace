@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   ShieldCheck, FileText, Users, MessageSquare, Settings,
   ArrowRight, BookOpen, Globe, Clock3,
-  MessageCircleWarning, Bot, Loader2, Sparkles, Send, Map, RefreshCw,
+  MessageCircleWarning, Bot, Loader2, Sparkles, Send, Map, RefreshCw, Gem,
 } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { adminApi } from "@/lib/api/admin";
@@ -99,6 +99,14 @@ function AdminOverview({ adminId }: { adminId: string }) {
       title: "Community",
       desc: "Moderate community discussions, questions, and posts.",
       accent: "bg-emerald-500/10 text-emerald-500",
+      badges: [],
+    },
+    {
+      href: "/admin/gems",
+      icon: <Gem className="size-5" />,
+      title: "Gems Transactions",
+      desc: "Browse the full history of gem awards, grants, deductions, and redemptions.",
+      accent: "bg-amber-500/10 text-amber-500",
       badges: [],
     },
     {

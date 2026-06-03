@@ -1,7 +1,7 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { UserPlus, UserCheck } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { UserPlus, UserCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import { userApi } from "@/lib/api/user";
@@ -20,9 +20,9 @@ export function FollowButton({ targetId, initialFollowing, onCountChange, classN
   const qc = useQueryClient();
   const uid = user?._id;
 
-  // Seed instantly from SSR (`initialFollowing`) or localStorage, then React
-  // Query reconciles with the live DB value (the profile page is ISR-cached, so
-  // the SSR value can be stale) and caches it across navigation.
+  // Seed instantly from SSR / localStorage, reconcile with the live DB value.
+  // The button is DISABLED until that live status settles (so the user never
+  // toggles from an unconfirmed state) and during the follow/unfollow request.
   const seeded =
     initialFollowing ??
     interactionCache.isFollowing(uid, targetId) ??
@@ -41,45 +41,45 @@ export function FollowButton({ targetId, initialFollowing, onCountChange, classN
     staleTime: 30 * 1000,
   });
 
-  if (!user || user._id === targetId) return null;
-  // Avoid a wrong-state flash only when we have nothing to seed with.
-  if (initialFollowing === undefined && interactionCache.isFollowing(uid, targetId) === undefined && !isFetched) {
-    return null;
-  }
-
-  const handleToggle = async () => {
-    const wasFollowing = following;
-    qc.setQueryData(followKey, !wasFollowing);
-    interactionCache.setFollowing(uid, targetId, !wasFollowing);
-    onCountChange?.(wasFollowing ? -1 : 1);
-    try {
-      if (wasFollowing) {
-        await userApi.unfollow(targetId);
-        toast.success("Unfollowed.");
-      } else {
-        await userApi.follow(targetId);
-        toast.success("Following!");
-      }
-    } catch {
-      qc.setQueryData(followKey, wasFollowing); // revert
+  const mutation = useMutation({
+    mutationFn: (wasFollowing: boolean) =>
+      wasFollowing ? userApi.unfollow(targetId) : userApi.follow(targetId),
+    onMutate: (wasFollowing: boolean) => {
+      qc.setQueryData(followKey, !wasFollowing);
+      interactionCache.setFollowing(uid, targetId, !wasFollowing);
+      onCountChange?.(wasFollowing ? -1 : 1);
+      return { wasFollowing };
+    },
+    onError: (_e, wasFollowing) => {
+      qc.setQueryData(followKey, wasFollowing);
       interactionCache.setFollowing(uid, targetId, wasFollowing);
       onCountChange?.(wasFollowing ? 1 : -1);
       toast.error("Failed. Try again.");
-    }
-  };
+    },
+    onSuccess: (_d, wasFollowing) => toast.success(wasFollowing ? "Unfollowed." : "Following!"),
+  });
+
+  if (!user || user._id === targetId) return null;
+
+  // Disabled until the live status has confirmed at least once, and during the toggle.
+  const busy = !isFetched || mutation.isPending;
 
   return (
     <button
-      onClick={handleToggle}
+      onClick={() => !busy && mutation.mutate(following)}
+      disabled={busy}
+      aria-busy={busy}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all disabled:opacity-60",
+        "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-60",
         following
           ? "border border-border bg-muted text-foreground hover:border-destructive hover:text-destructive"
           : "bg-primary text-primary-foreground hover:bg-primary/90",
         className,
       )}
     >
-      {following ? (
+      {mutation.isPending ? (
+        <><Loader2 className="size-3.5 animate-spin" />{following ? "Following" : "Follow"}</>
+      ) : following ? (
         <><UserCheck className="size-3.5" />Following</>
       ) : (
         <><UserPlus className="size-3.5" />Follow</>

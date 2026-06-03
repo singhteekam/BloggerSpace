@@ -131,7 +131,23 @@ export default async function BlogDetailPage({ params }: Props) {
 
               {/* Meta row */}
               <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{authorName}</span>
+                <span className="flex items-center gap-2">
+                  {authorUserName ? (
+                    <Link href={`/user/${authorUserName}`} className="font-medium text-foreground hover:text-primary transition-colors">
+                      {authorName}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-foreground">{authorName}</span>
+                  )}
+                  {/* Follow the author — hidden for admin posts / own posts / logged-out */}
+                  {authorProfile && (
+                    <FollowButton
+                      targetId={authorProfile._id}
+                      initialFollowing={authorProfile.isFollowing}
+                      className="px-3 py-0.5 text-xs"
+                    />
+                  )}
+                </span>
                 {date && (
                   <span className="flex items-center gap-1">
                     <Calendar className="size-3.5" />

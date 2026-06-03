@@ -997,6 +997,7 @@ exports.getUserProfileBlogs = async (req, res) => {
     const userName = req.params.username;
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || PROFILE_BLOGS_PAGE_SIZE));
+    const search = (req.query.search || "").trim();
 
     const user = await User.findOne({ userName }).select("_id status").lean();
     if (!user || user.status === "DELETED") {
@@ -1004,6 +1005,11 @@ exports.getUserProfileBlogs = async (req, res) => {
     }
 
     const match = { authorDetails: user._id, status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } };
+    // Server-side search across ALL the author's published blogs (title/category/tags).
+    if (search) {
+      const rx = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      match.$or = [{ title: rx }, { category: rx }, { tags: rx }];
+    }
     const [blogs, total] = await Promise.all([
       Blogs.find(match)
         .select("title slug blogViews blogLikes category tags createdAt lastUpdatedAt blogScore")

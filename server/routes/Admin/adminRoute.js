@@ -64,6 +64,8 @@ const {
   getUserContent,
   adminForceDeleteBlog,
   getPostComments,
+  deleteBlogComment,
+  deleteBlogReply,
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -175,6 +177,10 @@ router.delete("/savedblogs/remove/:blogSlug", adminMiddleware, removeBlogFromAdm
 // Community comment management
 router.get("/community/:postId/comments", adminMiddleware, getPostComments);
 router.delete("/community/:postId/comment/:commentId", adminMiddleware, deleteCommentFromPost);
+
+// Blog comment moderation (admin) — delete a comment or a reply inline
+router.delete("/blogs/:slug/comment/:commentId/reply/:replyId", adminMiddleware, deleteBlogReply);
+router.delete("/blogs/:slug/comment/:commentId", adminMiddleware, deleteBlogComment);
 
 // Gems
 router.post("/gems/award/:blogId", adminMiddleware, awardGems);

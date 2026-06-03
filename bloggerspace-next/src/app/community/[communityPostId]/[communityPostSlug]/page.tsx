@@ -5,9 +5,10 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { MessageSquare, Clock, Send, Loader2, ArrowLeft } from "lucide-react";
+import { MessageSquare, Clock, Send, Loader2, ArrowLeft, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { communityApi, type CommunityPost, type CommunityReply } from "@/lib/api/community";
+import { adminApi } from "@/lib/api/admin";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ export default function CommunityPostPage() {
     communityPostSlug: string;
   }>();
   const { user } = useAuth();
+  const isAdmin = user?.role === "Admin";
   const [post, setPost] = useState<CommunityPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [replyText, setReplyText] = useState("");
@@ -66,6 +68,24 @@ export default function CommunityPostPage() {
       );
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Admin-only inline reply moderation (optimistic remove, revert on failure).
+  const deleteReply = async (replyId: string) => {
+    if (!post || !user) return;
+    if (!window.confirm("Delete this reply? This cannot be undone.")) return;
+    const prev = post;
+    setPost({
+      ...post,
+      communityPostComments: post.communityPostComments.filter((r) => r._id !== replyId),
+    });
+    try {
+      await adminApi.deleteComment(post._id, replyId, user._id);
+      toast.success("Reply deleted.");
+    } catch {
+      setPost(prev);
+      toast.error("Failed to delete reply.");
     }
   };
 
@@ -159,7 +179,7 @@ export default function CommunityPostPage() {
         ) : (
           <div className="space-y-6">
             {post.communityPostComments.map((reply) => (
-              <ReplyCard key={reply._id} reply={reply} />
+              <ReplyCard key={reply._id} reply={reply} isAdmin={isAdmin} onDelete={deleteReply} />
             ))}
           </div>
         )}
@@ -207,7 +227,15 @@ export default function CommunityPostPage() {
   );
 }
 
-function ReplyCard({ reply }: { reply: CommunityReply }) {
+function ReplyCard({
+  reply,
+  isAdmin,
+  onDelete,
+}: {
+  reply: CommunityReply;
+  isAdmin?: boolean;
+  onDelete?: (replyId: string) => void;
+}) {
   const authorName =
     reply.replyCommunityPostAuthor?.fullName ??
     reply.replyCommunityPostAuthor?.userName ??
@@ -231,6 +259,17 @@ function ReplyCard({ reply }: { reply: CommunityReply }) {
             <span className="text-xs text-muted-foreground">
               {formatDate(reply.createdAt)}
             </span>
+          )}
+          {isAdmin && onDelete && (
+            <button
+              onClick={() => onDelete(reply._id)}
+              className="ml-auto inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition-colors"
+              aria-label="Delete reply (admin)"
+              title="Delete reply"
+            >
+              <Trash2 className="size-3" />
+              Delete
+            </button>
           )}
         </div>
         <div

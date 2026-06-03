@@ -1,7 +1,7 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, Bookmark } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Heart, Bookmark, Loader2 } from "lucide-react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils/cn";
@@ -26,12 +26,12 @@ export function BlogActions({ blogId, blogSlug, blogTitle, blogCategory, blogTag
   const uid = user?._id;
 
   // ── Like state ──────────────────────────────────────────────────────────────
-  // Seed instantly from SSR (the blog HTML already carries `initialLikes`) so the
-  // correct state paints immediately, then React Query reconciles with the live
-  // DB value (bypasses the 24h ISR cache) and caches it across navigation.
+  // Seed instantly from SSR, then reconcile with the live DB value. The button
+  // stays DISABLED until that first live fetch settles (so the user never acts
+  // on an unconfirmed state) and during the toggle itself (no double-clicks).
   const seededLiked = uid ? initialLikes.some((l) => l.userId === uid) : false;
   const likeKey = ["likeStatus", blogId, uid] as const;
-  const { data: likeData } = useQuery({
+  const { data: likeData, isFetched: likeFetched } = useQuery({
     queryKey: likeKey,
     queryFn: () => interactionsApi.getLikeStatus(blogId, uid).then((r) => r.data),
     enabled: !!blogId,
@@ -41,20 +41,36 @@ export function BlogActions({ blogId, blogSlug, blogTitle, blogCategory, blogTag
   const liked = likeData?.liked ?? seededLiked;
   const likeCount = likeData?.likeCount ?? initialLikes.length;
 
+  const likeMutation = useMutation({
+    mutationFn: () => interactionsApi.toggleLike(blogId, uid!).then((r) => r.data),
+    onMutate: () => {
+      const prev = qc.getQueryData(likeKey);
+      qc.setQueryData(likeKey, { liked: !liked, likeCount: liked ? likeCount - 1 : likeCount + 1 });
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(likeKey, ctx.prev);
+      toast.error("Failed to update like.");
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(likeKey, data);
+      toast.success(data.liked ? "Added to your likes." : "Removed your like.");
+    },
+  });
+  const likeBusy = !likeFetched || likeMutation.isPending;
+
   // ── Saved state ─────────────────────────────────────────────────────────────
-  // One shared query holds ALL of the user's saved slugs, so every blog page
-  // reads the save state from the same cache (instant after the first load).
-  // `initialData` seeds it from localStorage so it's correct even on a hard
-  // refresh before the network responds.
+  // One shared query holds ALL the user's saved slugs (seeded from localStorage
+  // for an instant first paint). Disabled until it has loaded + during the toggle.
   const savedKey = ["savedSlugs", uid, isAdmin] as const;
-  const { data: savedSlugs } = useQuery({
+  const { data: savedSlugs, isFetched: savedFetched } = useQuery({
     queryKey: savedKey,
     queryFn: async () => {
       const r = isAdmin
         ? await adminApi.getAdminSavedBlogs(uid!)
         : await interactionsApi.getSavedSlugs(uid!);
       const slugs = r.data.map((s) => s.slug);
-      interactionCache.setSavedSlugs(uid, slugs); // persist for the next refresh
+      interactionCache.setSavedSlugs(uid, slugs);
       return slugs;
     },
     enabled: !!uid,
@@ -63,74 +79,83 @@ export function BlogActions({ blogId, blogSlug, blogTitle, blogCategory, blogTag
   });
   const saved = (savedSlugs ?? []).includes(blogSlug);
 
-  const handleLike = async () => {
-    if (!user) { toast.error("Sign in to like posts."); return; }
-    const prev = { liked, likeCount };
-    // Optimistic: flip immediately in the cache.
-    qc.setQueryData(likeKey, { liked: !liked, likeCount: liked ? likeCount - 1 : likeCount + 1 });
-    try {
-      const r = await interactionsApi.toggleLike(blogId, user._id);
-      qc.setQueryData(likeKey, r.data);
-    } catch {
-      qc.setQueryData(likeKey, prev); // revert
-      toast.error("Failed to update like.");
-    }
-  };
-
-  const handleSave = async () => {
-    if (!user) { toast.error("Sign in to save posts."); return; }
-    const wasSaved = saved;
-    // Optimistic: update the shared saved-slugs cache + localStorage now.
-    const next = wasSaved
-      ? (savedSlugs ?? []).filter((s) => s !== blogSlug)
-      : [...(savedSlugs ?? []), blogSlug];
-    qc.setQueryData(savedKey, next);
-    interactionCache.setSavedSlugs(uid, next);
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async (wasSaved: boolean) => {
       if (wasSaved) {
-        if (isAdmin) await adminApi.removeAdminSavedBlog(user._id, blogSlug);
-        else await interactionsApi.unsaveBlog(user._id, blogSlug);
-        toast.success("Removed from saved.");
+        if (isAdmin) await adminApi.removeAdminSavedBlog(uid!, blogSlug);
+        else await interactionsApi.unsaveBlog(uid!, blogSlug);
       } else {
         const payload = { title: blogTitle, slug: blogSlug, category: blogCategory, tags: blogTags };
-        if (isAdmin) await adminApi.addAdminSavedBlog(user._id, payload);
-        else await interactionsApi.saveBlog(user._id, payload);
-        toast.success("Saved!");
+        if (isAdmin) await adminApi.addAdminSavedBlog(uid!, payload);
+        else await interactionsApi.saveBlog(uid!, payload);
       }
-    } catch (err) {
-      qc.setQueryData(savedKey, savedSlugs ?? []); // revert
-      interactionCache.setSavedSlugs(uid, savedSlugs ?? []);
+    },
+    onMutate: (wasSaved: boolean) => {
+      const prev = savedSlugs ?? [];
+      const next = wasSaved ? prev.filter((s) => s !== blogSlug) : [...prev, blogSlug];
+      qc.setQueryData(savedKey, next);
+      interactionCache.setSavedSlugs(uid, next);
+      return { prev };
+    },
+    onError: (err, _v, ctx) => {
+      if (ctx?.prev) { qc.setQueryData(savedKey, ctx.prev); interactionCache.setSavedSlugs(uid, ctx.prev); }
       toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error.");
-    }
+    },
+    onSuccess: (_d, wasSaved) => toast.success(wasSaved ? "Removed from saved." : "Saved!"),
+  });
+  // Only gate on the saved query for logged-in users (it's disabled otherwise).
+  const saveBusy = (!!uid && !savedFetched) || saveMutation.isPending;
+
+  const onLike = () => {
+    if (!user) { toast.error("Sign in to like posts."); return; }
+    if (likeBusy) return;
+    likeMutation.mutate();
+  };
+  const onSave = () => {
+    if (!user) { toast.error("Sign in to save posts."); return; }
+    if (saveBusy) return;
+    saveMutation.mutate(saved);
   };
 
   return (
     <div className="flex items-center gap-3">
       <button
-        onClick={handleLike}
+        onClick={onLike}
+        disabled={likeBusy}
         className={cn(
-          "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all",
+          "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-60",
           liked
             ? "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
             : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
         )}
         aria-label={liked ? "Unlike" : "Like"}
+        aria-busy={likeBusy}
       >
-        <Heart className={cn("size-4 transition-transform", liked && "fill-rose-500 scale-110")} />
+        {likeMutation.isPending ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Heart className={cn("size-4 transition-transform", liked && "fill-rose-500 scale-110")} />
+        )}
         <span>{likeCount}</span>
       </button>
 
       <button
-        onClick={handleSave}
+        onClick={onSave}
+        disabled={saveBusy}
         className={cn(
-          "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all",
+          "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-60",
           saved
             ? "bg-primary/10 text-primary hover:bg-primary/20"
             : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
         )}
         aria-label={saved ? "Unsave" : "Save"}
+        aria-busy={saveBusy}
       >
-        <Bookmark className={cn("size-4 transition-transform", saved && "fill-primary scale-110")} />
+        {saveMutation.isPending ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Bookmark className={cn("size-4 transition-transform", saved && "fill-primary scale-110")} />
+        )}
         <span>{saved ? "Saved" : "Save"}</span>
       </button>
     </div>
