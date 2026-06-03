@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   // other: {
-  //   "google-adsense-account": "ca-pub-2867880443810811",
+  //   "google-adsense-account": "ca-pub-XXXXXXXXXXXXXXXX",
   // },
   keywords: [...siteConfig.keywords, ...BASE_KEYWORDS],
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.url }],
