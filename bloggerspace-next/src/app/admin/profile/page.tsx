@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Pencil, Camera, CheckCircle2, BadgeCheck, CalendarDays, ShieldCheck } from "lucide-react";
+import { Loader2, Pencil, Camera, CheckCircle2, BadgeCheck, CalendarDays, ShieldCheck, KeyRound } from "lucide-react";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
@@ -205,6 +205,106 @@ export default function AdminProfilePage() {
           Edit profile
         </Button>
       )}
+
+      <Separator className="my-8" />
+
+      {/* Login security key */}
+      <SecurityKeySection
+        adminId={user._id}
+        hasKey={!!profile?.hasSecurityKey}
+        onChanged={() => qc.invalidateQueries({ queryKey: ["admin-profile-info"] })}
+      />
     </main>
+  );
+}
+
+function SecurityKeySection({
+  adminId,
+  hasKey,
+  onChanged,
+}: {
+  adminId: string;
+  hasKey: boolean;
+  onChanged: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newKey, setNewKey] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: () => adminApi.updateSecurityKey(adminId, { currentPassword, newKey }),
+    onSuccess: (res) => {
+      toast.success(res.data.message);
+      setOpen(false);
+      setCurrentPassword("");
+      setNewKey("");
+      onChanged();
+    },
+    onError: (err) =>
+      toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed.") : "Error."),
+  });
+
+  // Allow an empty key only when one already exists (to remove it).
+  const keyValid = newKey === "" ? hasKey : /^\d{6}$/.test(newKey);
+  const canSubmit = currentPassword.length > 0 && keyValid;
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <KeyRound className="size-4" />
+          </span>
+          <div>
+            <p className="flex items-center gap-2 text-sm font-medium text-foreground">
+              Login security key
+              {hasKey && (
+                <Badge variant="secondary" className="gap-1 px-1.5 py-0 text-[10px] text-primary">
+                  <ShieldCheck className="size-3" />Active
+                </Badge>
+              )}
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {hasKey
+                ? "A 6-digit key is required alongside your password at login."
+                : "Add a 6-digit key required at login for an extra layer of security."}
+            </p>
+          </div>
+        </div>
+        {!open && (
+          <Button variant="outline" size="sm" className="shrink-0" onClick={() => setOpen(true)}>
+            {hasKey ? "Change" : "Set up"}
+          </Button>
+        )}
+      </div>
+
+      {open && (
+        <div className="mt-4 space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="curpw">Current password</Label>
+            <Input id="curpw" type="password" autoComplete="current-password"
+              value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="newkey">New 6-digit key</Label>
+            <Input id="newkey" inputMode="numeric" maxLength={6} placeholder="e.g. 123456"
+              value={newKey} onChange={(e) => setNewKey(e.target.value.replace(/\D/g, ""))} />
+            <p className="text-xs text-muted-foreground">
+              {hasKey ? "Leave blank to remove the security key." : "Must be exactly 6 digits."}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" disabled={!canSubmit || mutation.isPending} onClick={() => mutation.mutate()}>
+              {mutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
+              Save
+            </Button>
+            <Button size="sm" variant="outline"
+              onClick={() => { setOpen(false); setCurrentPassword(""); setNewKey(""); }}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

@@ -34,6 +34,18 @@ export function readingMinutes(html: string): number {
   return Math.max(1, Math.round(words / 238));
 }
 
+/**
+ * Wrap every <table> in published blog/community HTML with a horizontal-scroll
+ * container so wide multi-column tables scroll within the content width instead
+ * of overflowing the page. Pairs with the `.blog-table-scroll` CSS.
+ */
+export function wrapTables(html: string): string {
+  if (!html || !html.includes("<table")) return html;
+  return html
+    .replace(/<table(?=[\s>])/gi, '<div class="blog-table-scroll"><table')
+    .replace(/<\/table>/gi, "</table></div>");
+}
+
 /** Format a byte count to human-readable document size (KB / MB) */
 export function formatDocSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;

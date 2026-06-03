@@ -17,6 +17,7 @@ const GemsTransaction = require("../../models/GemsTransaction");
 const AdminConfig = require("../../models/AdminConfig");
 const ReviewScore = require("../../models/ReviewScore");
 const { uploadImageToGitHub } = require("../../utils/uploadImageToGitHub");
+const { checkBlogDuplicate } = require("../../utils/checkBlogDuplicate");
 const IST_OFFSET = 330;
 
 // Default caps if no AdminConfig doc exists yet (defensive — Phase 1 lazily
@@ -80,7 +81,7 @@ const buildAdminDetails = (admin) => ({
 
 exports.adminLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, securityKey } = req.body;
 
     const admin = await Admin.findOne({ email });
     if (!admin) return res.status(404).json({ message: "Admin not found" });
@@ -88,6 +89,17 @@ exports.adminLogin = async (req, res) => {
 
     const isPasswordValid = await bcrypt.compare(password, admin.password);
     if (!isPasswordValid) return res.status(401).json({ message: "Invalid password" });
+
+    // Once a 6-digit security key is configured, it's required alongside the
+    // password. Admins who haven't set one yet can still log in (legacy).
+    if (admin.securityKey) {
+      if (!securityKey) {
+        return res.status(401).json({ message: "security_key_required", info: "Enter your 6-digit security key." });
+      }
+      if (String(securityKey) !== admin.securityKey) {
+        return res.status(401).json({ message: "Invalid security key" });
+      }
+    }
 
     // OTP FLOW TEMPORARILY DISABLED — direct JWT login
     // To re-enable: uncomment the block below and remove the direct-login block
@@ -295,11 +307,9 @@ exports.saveEditedInReviewBlog = async (req, res) => {
       return res.status(404).json({ error: "blog not found" });
     }
 
-    // Guard against duplicate publication: no other blog may share this title.
-    const dupTitle = await Blog.findOne({ title, _id: { $ne: blog._id } }).select("_id").lean();
-    if (dupTitle) {
-      return res.status(409).json({ error: "A blog with this title already exists. Please use a unique title before publishing." });
-    }
+    // Guard against duplicate publication: title AND slug must be unique.
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     // Compress the content before saving it
     const compressedContentBuffer = pako.deflate(content, { to: "string" });
@@ -823,6 +833,11 @@ exports.adminEditAnyBlog = async (req, res) => {
     const { title, slug, content, category, tags } = req.body;
     const blog = await Blog.findById(id);
     if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    // Reject duplicate title/slug (excluding this blog).
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
+
     if (title) blog.title = title;
     if (slug) blog.slug = slug;
     if (content) {
@@ -1057,6 +1072,10 @@ exports.adminNewBlog = async (req, res) => {
   try {
     const { slug, title, content, category, tags } = req.body;
 
+    // Reject duplicate title/slug before publishing.
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug });
+    if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
+
     // Compress the content before saving it
     const compressedContentBuffer = pako.deflate(content, { to: "string" });
     const compressedContent = Buffer.from(compressedContentBuffer).toString(
@@ -1121,9 +1140,14 @@ exports.adminSaveAsDraftBlog= async (req, res)=>{
       " KB"
     );
 
-    const blog = await Blog.findById({
-    _id: new mongoose.Types.ObjectId(req.body.id),
-  });
+    const blog = req.body.id
+      ? await Blog.findById({ _id: new mongoose.Types.ObjectId(req.body.id) })
+      : null;
+
+    // Reject duplicate title/slug (excluding the draft being updated).
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog?._id });
+    if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
+
     if(blog){
         blog.slug= slug;
         blog.title=title;
@@ -1316,6 +1340,10 @@ exports.adminSaveEditedBlog = async (req, res) => {
       console.error("The blog: "+title+ " is not saved because it doesn't exist.")
       return res.status(404).json({ error: "blog not found" });
     }
+
+    // Reject duplicate title/slug (excluding this blog).
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     // Compress the content before saving it
     const compressedContentBuffer = pako.deflate(content, { to: "string" });
@@ -1530,9 +1558,39 @@ exports.adminGetInfo = async (req, res) => {
       isVerified: admin.isVerified,
       role: admin.role,
       createdAt: admin.createdAt,
+      hasSecurityKey: !!admin.securityKey, // never expose the key itself
     });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch admin info" });
+  }
+};
+
+// Set / change / remove the admin's 6-digit login security key. Requires the
+// current password for safety. An empty newKey removes the requirement.
+exports.updateAdminSecurityKey = async (req, res) => {
+  try {
+    const adminId = req.query.userId;
+    const { currentPassword, newKey } = req.body;
+
+    const admin = await Admin.findById(adminId);
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
+
+    const ok = await bcrypt.compare(currentPassword || "", admin.password);
+    if (!ok) return res.status(401).json({ message: "Current password is incorrect." });
+
+    const key = String(newKey ?? "").trim();
+    if (key && !/^\d{6}$/.test(key)) {
+      return res.status(400).json({ message: "Security key must be exactly 6 digits." });
+    }
+
+    admin.securityKey = key; // "" removes the requirement
+    await admin.save();
+    res.json({
+      message: key ? "Security key updated." : "Security key removed.",
+      hasSecurityKey: !!key,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update security key" });
   }
 };
 

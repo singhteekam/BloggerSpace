@@ -37,6 +37,10 @@ const adminSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  // Optional 6-digit security key required at login (in addition to the
+  // password) once set. Empty string = not configured yet (legacy admins can
+  // still log in until they set one from the Admin Panel).
+  securityKey: { type: String, default: "" },
   resetToken: String,
   resetTokenExpiration: Date,
   otpCode: { type: String, default: null },

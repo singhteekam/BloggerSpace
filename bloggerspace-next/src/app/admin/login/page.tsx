@@ -22,6 +22,8 @@ type Step = "credentials" | "otp";
 const credSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
+  // Optional here — required by the server only if the account has one configured.
+  securityKey: z.string().regex(/^\d{6}$/, "Must be 6 digits").or(z.literal("")).optional(),
 });
 const otpSchema = z.object({
   otp: z.string().length(6, "Code must be 6 digits").regex(/^\d+$/, "Digits only"),
@@ -51,12 +53,21 @@ export default function AdminLoginPage() {
       setStep("otp");
       toast.success("Verification code sent to your email.");
       */
-      const res = await adminApi.login(data);
+      const res = await adminApi.login({
+        email: data.email,
+        password: data.password,
+        securityKey: data.securityKey || undefined,
+      });
       login(res.data.token, res.data.adminDetails);
       toast.success("Welcome, Admin!");
       router.push("/admin/dashboard");
     } catch (err) {
-      toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Login failed.") : "Something went wrong.");
+      const msg = isAxiosError(err) ? (err.response?.data?.message ?? "") : "";
+      if (msg === "security_key_required") {
+        toast.error("This account requires a 6-digit security key. Please enter it.");
+        return;
+      }
+      toast.error(msg || "Login failed.");
     }
   };
 
@@ -129,6 +140,16 @@ export default function AdminLoginPage() {
                   {credForm.formState.errors.password && (
                     <p className="text-xs text-destructive">{credForm.formState.errors.password.message}</p>
                   )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="securityKey">Security key</Label>
+                  <Input id="securityKey" inputMode="numeric" maxLength={6} placeholder="6-digit key (if set)"
+                    autoComplete="off" {...credForm.register("securityKey")} />
+                  {credForm.formState.errors.securityKey && (
+                    <p className="text-xs text-destructive">{credForm.formState.errors.securityKey.message}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">Required only if you’ve set one in the Admin Panel.</p>
                 </div>
 
                 <Button type="submit" className="w-full" disabled={credForm.formState.isSubmitting}>

@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/utils/html";
+import { formatDate, wrapTables } from "@/lib/utils/html";
 
 export default function CommunityPostPage() {
   const { communityPostId, communityPostSlug } = useParams<{
@@ -157,7 +157,7 @@ export default function CommunityPostPage() {
       {/* Post content */}
       <article
         className="prose prose-sm max-w-none dark:prose-invert mb-10"
-        dangerouslySetInnerHTML={{ __html: post.communityPostContent ?? "" }}
+        dangerouslySetInnerHTML={{ __html: wrapTables(post.communityPostContent ?? "") }}
       />
 
       <Separator className="mb-10" />

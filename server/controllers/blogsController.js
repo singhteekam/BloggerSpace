@@ -16,6 +16,7 @@ function anonymiseDeletedAuthors(blogs) {
   return blogs;
 }
 const sendEmail = require("../services/mailer");
+const { checkBlogDuplicate } = require("../utils/checkBlogDuplicate");
 const { GoogleGenAI } = require("@google/genai");
 const logger = require("./../utils/Logging/logs.js");
 
@@ -629,9 +630,14 @@ exports.saveAsDraftBlog = async (req, res) => {
       " KB"
     );
 
-    const blog = await Blog.findById({
-      _id: new mongoose.Types.ObjectId(req.body.id),
-    });
+    const blog = req.body.id
+      ? await Blog.findById({ _id: new mongoose.Types.ObjectId(req.body.id) })
+      : null;
+
+    // Reject duplicate title/slug (excluding the draft being updated).
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog?._id });
+    if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
+
     if (blog) {
       blog.slug = slug;
       blog.title = title;
@@ -692,6 +698,10 @@ exports.createNewBlog = async (req, res) => {
   try {
     const { slug, title, content, category, tags, userId, authorEmail } =
       req.body;
+
+    // Reject duplicate title/slug before creating the blog.
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug });
+    if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     // Compress the content before saving it
     const compressedContentBuffer = pako.deflate(content, { to: "string" });
@@ -868,6 +878,10 @@ exports.saveEditedBlog = async (req, res) => {
       );
       return res.status(404).json({ error: "blog not found" });
     }
+
+    // Reject duplicate title/slug (excluding this blog).
+    const dupMsg = await checkBlogDuplicate(Blog, { title, slug, excludeId: blog._id });
+    if (dupMsg) return res.status(409).json({ error: dupMsg, message: dupMsg });
 
     // Compress the content before saving it
     const compressedContentBuffer = pako.deflate(content, { to: "string" });

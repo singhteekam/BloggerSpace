@@ -15,7 +15,7 @@ import { FollowButton } from "@/components/user/follow-button";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { fetchBlogBySlug, fetchRelatedBlogs, fetchTopBlogs, fetchBlogs } from "@/lib/api/blogs";
 import { fetchPublicProfile } from "@/lib/api/user";
-import { formatDate, htmlToText, readingTime } from "@/lib/utils/html";
+import { formatDate, htmlToText, readingTime, wrapTables } from "@/lib/utils/html";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/utils/json-ld";
 import { siteConfig } from "@/lib/constants/site";
 
@@ -177,7 +177,7 @@ export default async function BlogDetailPage({ params }: Props) {
             <article className="py-10">
               <div
                 className="blog-prose"
-                dangerouslySetInnerHTML={{ __html: blog.content }}
+                dangerouslySetInnerHTML={{ __html: wrapTables(blog.content) }}
               />
             </article>
 

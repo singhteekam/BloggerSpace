@@ -292,24 +292,26 @@ a img, button img, [role="button"] img {
 
 /* ─── TipTap table ───────────────────────────────────────────────────────── */
 @layer components {
-  /* Published view: the serialized HTML has a bare <table> (no editor wrapper),
-     so make the table itself scroll horizontally within the content container —
-     wide multi-column tables scroll instead of overflowing the page. */
   .blog-prose table {
-    display: block;
-    width: max-content;
-    max-width: 100%;
-    overflow-x: auto;
     border-collapse: collapse;
+    width: 100%;
+    margin: 1.5em 0;
+    overflow: hidden;
+    border-radius: 0.5rem;
+  }
+  /* Published view: tables are wrapped (see wrapTables) in a horizontal-scroll
+     container so wide multi-column tables scroll within the content width
+     instead of overflowing the page — like code blocks do. Global (not scoped to
+     .blog-prose) so it also applies to community posts which use .prose. */
+  .blog-table-scroll {
+    overflow-x: auto;
+    max-width: 100%;
     margin: 1.5em 0;
     border-radius: 0.5rem;
   }
-  /* Inside the editor, ProseMirror's .tableWrapper already handles scrolling, so
-     keep the table a normal full-width table (column resize/editing stays intact). */
-  .blog-prose .tableWrapper table {
-    display: table;
-    width: 100%;
-    overflow: visible;
+  .blog-table-scroll > table {
+    margin: 0;
+    min-width: max-content; /* take natural width → triggers scroll when wider than the container */
   }
   .blog-prose table td,
   .blog-prose table th {

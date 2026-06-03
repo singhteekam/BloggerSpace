@@ -66,6 +66,7 @@ const {
   getPostComments,
   deleteBlogComment,
   deleteBlogReply,
+  updateAdminSecurityKey,
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
@@ -168,6 +169,7 @@ router.delete("/blogs/delete/:id", adminMiddleware, deleteBlogPermanently);
 
 router.get("/profile", adminMiddleware, adminGetInfo);
 router.patch("/profile/update", adminMiddleware, adminUpdateProfile);
+router.patch("/profile/security-key", adminMiddleware, updateAdminSecurityKey);
 router.post("/profile/uploadpicture", adminMiddleware, adminUploadProfilePicture);
 
 router.get("/savedblogs", adminMiddleware, getAdminSavedBlogs);

@@ -18,6 +18,7 @@ export type AuthUser = {
   readingHistoryEnabled?: boolean;
   followersCount?: number;
   followingCount?: number;
+  hasSecurityKey?: boolean; // admin only — whether a login security key is set
 };
 
 /** Shape returned by POST /api/users/login */

@@ -141,8 +141,16 @@ export type PublishPayload = {
 const p = (userId: string) => ({ userId, role: "Admin" });
 
 export const adminApi = {
-  login: (data: { email: string; password: string }) =>
+  login: (data: { email: string; password: string; securityKey?: string }) =>
     api.post<AdminAuthResponse>("/api/admin/login", data),
+
+  // Set / change / remove the 6-digit login security key (requires current password).
+  updateSecurityKey: (userId: string, payload: { currentPassword: string; newKey: string }) =>
+    api.patch<{ message: string; hasSecurityKey: boolean }>(
+      "/api/admin/profile/security-key",
+      payload,
+      { params: p(userId) },
+    ),
 
   verifyLoginOtp: (email: string, otp: string) =>
     api.post<AdminAuthResponse>("/api/admin/login/verify-otp", { email, otp }),
