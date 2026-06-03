@@ -10,8 +10,8 @@ const pako = require("pako");
 const sendEmail = require("../../services/mailer");
 const generateSitemap = require('../../utils/generateSitemap');
 const { revalidate } = require("../../utils/revalidate");
-const ExcelJS = require('exceljs');
-const PDFDocument = require('pdfkit');
+// exceljs + pdfkit are heavy and only used by the report endpoints — require them
+// lazily (inside those handlers) so they don't slow Firebase's deploy-time analysis.
 const Newsletter = require("../../models/Newsletter");
 const GemsTransaction = require("../../models/GemsTransaction");
 const AdminConfig = require("../../models/AdminConfig");
@@ -1430,6 +1430,7 @@ exports.updateSitemapXML = async (req, res) => {
 
 
 exports.downloadExcelReport = async (req,res)=>{
+  const ExcelJS = require('exceljs'); // lazy — keep out of module load
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Report');
 
@@ -1490,6 +1491,7 @@ exports.downloadExcelReport = async (req,res)=>{
 }
 
 exports.downloadPDFReport= async (req, res)=>{
+  const PDFDocument = require('pdfkit'); // lazy — keep out of module load
   const doc = new PDFDocument();
 
   // res.setHeader('Content-Type', 'application/pdf');

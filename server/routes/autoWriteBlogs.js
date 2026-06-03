@@ -2,27 +2,34 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const pako = require("pako");
-const { GoogleGenAI } = require("@google/genai");
-
 const fs = require("fs");
-const { google } = require("googleapis");
 const Blog = require("../models/Blog");
 const sendEmail = require("../services/mailer");
 const { revalidate } = require("../utils/revalidate");
-const credentials = JSON.parse(
-  fs.readFileSync("./config/gsheets-service-account.json", "utf8")
-);
 
-const auth = new google.auth.GoogleAuth({
-  credentials,
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
-
-const sheets = google.sheets({ version: "v4", auth });
+// Lazily build the Google Sheets client on first use. `googleapis` is a very
+// heavy require and reading the service-account file happens synchronously — doing
+// either at module load slows down Firebase's deploy-time code analysis enough to
+// blow its 10s budget ("Cannot determine backend specification"). Defer both until
+// an auto-write route actually needs Sheets.
+let _sheets = null;
+function getSheets() {
+  if (_sheets) return _sheets;
+  const { google } = require("googleapis");
+  const credentials = JSON.parse(
+    fs.readFileSync("./config/gsheets-service-account.json", "utf8")
+  );
+  const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+  _sheets = google.sheets({ version: "v4", auth });
+  return _sheets;
+}
 
 const fetchNextRowFromSheet = async () => {
   try {
-    const dataGsheet = await sheets.spreadsheets.values.get({
+    const dataGsheet = await getSheets().spreadsheets.values.get({
       spreadsheetId: process.env.SHEET_ID,
       range: "Sheet1!2:2",
     });
@@ -44,6 +51,7 @@ const slugify = (title) => {
 
 const createNewAIContent = async (title) => {
   try {
+    const { GoogleGenAI } = require("@google/genai"); // lazy — keep it out of module load
     const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
 
     // const prompt = `Write a blog in HTML format for the title: "${title}".
@@ -87,13 +95,13 @@ const deleteRowFromSheet = async () => {
     const rowNumber = 2; // delete row 2
 
     // get sheetId (required for batchUpdate)
-    const sheetMeta = await sheets.spreadsheets.get({ spreadsheetId });
+    const sheetMeta = await getSheets().spreadsheets.get({ spreadsheetId });
     const sheet = sheetMeta.data.sheets.find(
       (s) => s.properties.title === sheetName
     );
     const sheetId = sheet.properties.sheetId;
 
-    sheets.spreadsheets.batchUpdate({
+    getSheets().spreadsheets.batchUpdate({
       spreadsheetId,
       resource: {
         requests: [

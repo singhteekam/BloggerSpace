@@ -112,6 +112,19 @@ blogSchema.index({ status: 1, digestNotifiedAt: 1, blogViews: -1 });
 // sort by lastUpdatedAt. Without this, paging 2000+ blogs scans + sorts in memory.
 blogSchema.index({ authorDetails: 1, status: 1, lastUpdatedAt: -1 });
 
-Blog.syncIndexes();
+// Sync indexes only once a DB connection is actually open. Calling syncIndexes()
+// at module load with no connection buffers its index commands and hits Mongoose's
+// 10s bufferTimeoutMS — during Firebase's deploy-time code analysis (which loads
+// the code but never connects) that lingering 10s operation is exactly what causes
+// "Cannot determine backend specification. Timeout after 10000". Tying it to the
+// connection means it runs at runtime/emulator/local-dev, never during discovery.
+function syncBlogIndexes() {
+  Blog.syncIndexes().catch((err) => console.error("Blog.syncIndexes failed:", err));
+}
+if (mongoose.connection.readyState === 1) {
+  syncBlogIndexes();
+} else {
+  mongoose.connection.once("connected", syncBlogIndexes);
+}
 
 module.exports = Blog;

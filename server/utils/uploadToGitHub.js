@@ -14,9 +14,6 @@ const accessToken = process.env.GITHUBACCESSTOKEN;
 const filePath = path.join(__dirname, "/Logging/", "logs.log");
 // const filePath = "./utils/Logging/logs.log";
 
-// Read the file content
-const fileContent = fs.readFileSync(filePath, "utf8");
-
 const currentDate = new Date(new Date().getTime() + 330 * 60000).toISOString();
 const fileName= `./LOGS/${currentDate.slice(0,7)}/logs${currentDate.slice(8,10)}.log`;
 
@@ -31,6 +28,16 @@ const headers = {
 
 // Create or update the file on GitHub
 const uploadLogsToGitHub=async ()=> {
+  // Read the log file lazily (and safely) — never at module load, so a large or
+  // missing logs.log can't slow down or break startup / deploy-time analysis.
+  let fileContent = "";
+  try {
+    fileContent = fs.readFileSync(filePath, "utf8");
+  } catch {
+    console.log("No local log file to upload. Skipping.");
+    return;
+  }
+
   // Check if the file content is empty
   if (fileContent.trim() === "") {
     console.log("File content is empty. Skipping upload to GitHub.");
