@@ -41,9 +41,9 @@ export const metadata: Metadata = {
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  other: {
-    "google-adsense-account": "ca-pub-2867880443810811",
-  },
+  // other: {
+  //   "google-adsense-account": "ca-pub-2867880443810811",
+  // },
   keywords: [...siteConfig.keywords, ...BASE_KEYWORDS],
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.url }],
   creator: siteConfig.author.name,
