@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/constants/site";
+import { REVALIDATE } from "@/lib/constants/revalidate";
 
 const BASE = siteConfig.url;
 const API = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
@@ -27,7 +28,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
 async function fetchAllBlogSlugs(): Promise<{ slug: string; lastModified?: Date }[]> {
   try {
     const res = await fetch(`${API}/api/blogs/sitemap`, {
-      next: { revalidate: 86400 },
+      next: { revalidate: REVALIDATE.SITEMAP },
     });
     if (!res.ok) return [];
     const blogs: { slug: string; lastUpdatedAt?: string }[] = await res.json();
@@ -43,7 +44,7 @@ async function fetchAllBlogSlugs(): Promise<{ slug: string; lastModified?: Date 
 async function fetchAllAuthorUsernames(): Promise<string[]> {
   try {
     const res = await fetch(`${API}/api/blogs/authors/sitemap`, {
-      next: { revalidate: 86400 },
+      next: { revalidate: REVALIDATE.SITEMAP },
     });
     if (!res.ok) return [];
     const authors: { userName: string }[] = await res.json();
@@ -56,7 +57,7 @@ async function fetchAllAuthorUsernames(): Promise<string[]> {
 async function fetchAllCommunityPostSlugs(): Promise<{ id: string; slug: string }[]> {
   try {
     const res = await fetch(`${API}/api/community/sitemap`, {
-      next: { revalidate: 86400 },
+      next: { revalidate: REVALIDATE.SITEMAP },
     });
     if (!res.ok) return [];
     const posts: { communityPostId: string; communityPostSlug: string }[] = await res.json();

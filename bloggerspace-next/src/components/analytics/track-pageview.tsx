@@ -22,6 +22,8 @@ function getOrCreateVisitorId(): string {
 export function TrackPageView() {
   const pathname = usePathname();
   const lastTracked = useRef("");
+  // null = not yet resolved; cached for the session after the first check.
+  const enabledRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     if (!pathname) return;
@@ -31,7 +33,22 @@ export function TrackPageView() {
 
     const visitorId = getOrCreateVisitorId();
     const referrer = typeof document !== "undefined" ? document.referrer : "";
-    analyticsApi.track(pathname, referrer, visitorId).catch(() => {});
+
+    (async () => {
+      // Resolve the admin master switch once per session, then cache it. When
+      // analytics is off we skip the request entirely. (The backend also guards,
+      // so even cached sessions stop being recorded within ~30s of a toggle.)
+      if (enabledRef.current === null) {
+        try {
+          const res = await analyticsApi.getConfig();
+          enabledRef.current = res.data.enabled;
+        } catch {
+          enabledRef.current = true; // default to tracking if the check fails
+        }
+      }
+      if (!enabledRef.current) return;
+      analyticsApi.track(pathname, referrer, visitorId).catch(() => {});
+    })();
   }, [pathname]);
 
   return null;

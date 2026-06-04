@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   trackVisit,
+  getAnalyticsConfig,
   getAnalytics,
   getLogs,
   getVisitors,
@@ -14,6 +15,8 @@ const adminMiddleware = require("../middlewares/adminMiddleware");
 
 // Public — frontend calls this on each page load
 router.post("/track", trackVisit);
+// Public — frontend reads this to skip tracking entirely when analytics is off
+router.get("/config", getAnalyticsConfig);
 
 // Admin-only
 router.get("/stats", adminMiddleware, getAnalytics);

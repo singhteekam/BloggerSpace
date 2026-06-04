@@ -346,9 +346,9 @@ exports.saveEditedInReviewBlog = async (req, res) => {
 
     // Save the updated blog
     await blog.save();
-    generateSitemap().catch((err) => console.error("Sitemap update failed:", err));
-    // On-demand ISR: make the now-live blog + author profile + home fresh now.
-    revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/"] });
+    // Sitemap auto-regenerates daily via the Next.js /sitemap.xml route, and home
+    // refreshes on its own ISR timer — so we only purge the live blog + author profile.
+    revalidate({ slug: blog.slug, username: blog.authorDetails?.userName });
 
     // Sending mail to author
     const receiver = blog.authorDetails.email;
@@ -770,9 +770,10 @@ exports.discardAnyBlog = async (req, res) => {
     blog.status = blog.status.startsWith("ADMIN_") ? "ADMIN_DISCARDED" : "DISCARD_QUEUE";
     blog.lastUpdatedAt = new Date(new Date().getTime() + IST_OFFSET * 60000);
     await blog.save();
-    // No longer public — purge its page (will 404 on next request) + listings + home.
+    // No longer public — purge its page (will 404 next request) + the admin listing.
+    // Home is on its own ISR timer, so we don't churn it per discard.
     await blog.populate("authorDetails", "userName fullName email");
-    revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/adminblogs", "/"] });
+    revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/adminblogs"] });
     res.json({ message: "Blog discarded successfully" });
 
     // Notify the author + admin that the blog was discarded (non-blocking).
@@ -1107,7 +1108,7 @@ exports.adminNewBlog = async (req, res) => {
       status: "ADMIN_PUBLISHED"
     });
     const savedBlog = await newPost.save();
-    generateSitemap().catch((err) => console.error("Sitemap update failed:", err));
+    // Sitemap auto-regenerates daily via the Next.js /sitemap.xml route — no per-publish gen.
 
     res.json(savedBlog);
   } catch (error) {
@@ -1363,9 +1364,9 @@ exports.adminSaveEditedBlog = async (req, res) => {
 
     // Save the updated blog
     await blog.save();
-    generateSitemap().catch((err) => console.error("Sitemap update failed:", err));
-    // On-demand ISR: refresh the edited/published admin blog + listing + home.
-    revalidate({ slug: blog.slug, paths: ["/adminblogs", "/"] });
+    // Sitemap auto-regenerates daily (Next /sitemap.xml); home is on its own ISR
+    // timer — so we only purge the edited blog + the admin listing.
+    revalidate({ slug: blog.slug, paths: ["/adminblogs"] });
     console.debug("Blog updated successfully. Title: "+ blog.title);
 
     res.json({ message: "blog updated successfully" });

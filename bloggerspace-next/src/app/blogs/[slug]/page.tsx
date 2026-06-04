@@ -19,10 +19,12 @@ import { formatDate, htmlToText, readingTime, wrapTables } from "@/lib/utils/htm
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/utils/json-ld";
 import { siteConfig } from "@/lib/constants/site";
 
-// 24h ISR. Blogs rarely change after publish, and live data (likes/comments) is
-// fetched client-side anyway — so a long window keeps Vercel ISR writes + origin
-// transfer low without any user-visible staleness. Edits reflect within a day.
-export const revalidate = 86400;
+// ISR window for blog pages = 7 days (604800s).
+// NOTE: Next 16 requires this route-segment value to be a LITERAL, so it can't be
+// imported. Keep it in sync with REVALIDATE.BLOG_DETAIL in lib/constants/revalidate.ts
+// (the reference table). Edits/publishes reflect instantly via on-demand
+// revalidation; this long window only governs untouched pages → low ISR writes.
+export const revalidate = 604800;
 
 type Props = { params: Promise<{ slug: string }> };
 

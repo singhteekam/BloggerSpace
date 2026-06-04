@@ -1,5 +1,6 @@
 import { api } from "./client";
 import type { AuthUser } from "./auth";
+import { REVALIDATE } from "@/lib/constants/revalidate";
 
 const BASE = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:5000";
 
@@ -59,7 +60,7 @@ export async function fetchPublicProfile(
     const url = viewerId
       ? `${BASE}/api/users/profile/${username}?viewerId=${viewerId}`
       : `${BASE}/api/users/profile/${username}`;
-    const res = await fetch(url, { next: { revalidate: 86400 } });
+    const res = await fetch(url, { next: { revalidate: REVALIDATE.PROFILE } });
     if (!res.ok) return null;
     return res.json();
   } catch {

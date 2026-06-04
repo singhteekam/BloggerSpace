@@ -651,6 +651,8 @@ export type AdminConfigDoc = {
   maxBlogScore: number;
   // Re-verification
   reverificationPeriodDays: number;
+  // Analytics — master switch for visitor tracking
+  analyticsEnabled: boolean;
   // Audit
   updatedAt: string;
   updatedBy: string | null;

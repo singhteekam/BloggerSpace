@@ -22,13 +22,14 @@ const EDITABLE_FIELDS = [
   "maxBlogScore",
   // Re-verification
   "reverificationPeriodDays",
+  // Analytics
+  "analyticsEnabled",
 ];
 
 const VALID_REDEMPTION_METHODS = ["AMAZON_GIFT_CARD", "FLIPKART_GIFT_CARD"];
 
 // Editable fields that are booleans (skipped by the numeric coercion below).
-// None today, but referenced by the coercion filter — keep it defined.
-const booleanFields = [];
+const booleanFields = ["analyticsEnabled"];
 
 /**
  * GET /api/admin/config

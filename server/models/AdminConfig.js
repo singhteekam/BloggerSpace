@@ -37,6 +37,11 @@ const adminConfigSchema = new mongoose.Schema({
 
   // Maintenance mode moved to the MAINTENANCE_MODE env var (frontend middleware).
 
+  // ── Visitor analytics ───────────────────────────────────────────
+  // Master switch for visitor tracking (VisitorLog). When false, no page views
+  // are recorded (saves Firebase function invocations + Mongo writes). Default on.
+  analyticsEnabled: { type: Boolean, default: true },
+
   // ── Push notifications (trending-blog digest via FCM) ───────────
   notificationsEnabled: { type: Boolean, default: false },
   // Minimum days between digests. Admin picks 3, 7, or 14 (validated in controller).

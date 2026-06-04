@@ -1,11 +1,29 @@
 const crypto = require("crypto");
 const mongoose = require("mongoose");
 const VisitorLog = require("../models/VisitorLog");
+const AdminConfig = require("../models/AdminConfig");
 
 // India Standard Time has no DST, so a fixed +5:30 offset is exact.
 const IST_MS = 330 * 60000;
 const TZ = "Asia/Kolkata";
 const DELETE_OPTIONS = [7, 15, 30, 60, 90];
+
+// Cache the analytics on/off flag for 30s so the high-frequency /track endpoint
+// doesn't read AdminConfig on every page view. A toggle takes effect within 30s.
+let _analyticsEnabled = true;
+let _analyticsCheckedAt = 0;
+async function analyticsEnabled() {
+  const now = Date.now();
+  if (now - _analyticsCheckedAt < 30000) return _analyticsEnabled;
+  _analyticsCheckedAt = now;
+  try {
+    const cfg = await AdminConfig.findOne({}).select("analyticsEnabled").lean();
+    _analyticsEnabled = cfg?.analyticsEnabled !== false; // default ON
+  } catch {
+    /* keep last known value on error */
+  }
+  return _analyticsEnabled;
+}
 
 // A repeat view of the same page by the same visitor within this window is NOT
 // logged again — so refreshing/re-opening a page doesn't inflate view counts.
@@ -99,9 +117,17 @@ function istDaysAgoStart(n, d = new Date()) {
   return new Date(istTodayStart(d).getTime() - n * 86400000);
 }
 
+// ── Public: is visitor tracking currently enabled? (frontend reads this to skip) ──
+exports.getAnalyticsConfig = async (req, res) => {
+  res.json({ enabled: await analyticsEnabled() });
+};
+
 // ── Public: track a page view ─────────────────────────────────────────────────
 exports.trackVisit = async (req, res) => {
   try {
+    // Master switch — when an admin turns analytics off, record nothing.
+    if (!(await analyticsEnabled())) return res.status(200).json({ ok: true, disabled: true });
+
     const { page = "/", referrer = "", visitorId = "" } = req.body;
     if (!page || page.startsWith("/admin") || page.startsWith("/api")) {
       return res.status(200).json({ ok: true });

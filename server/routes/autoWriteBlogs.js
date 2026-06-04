@@ -218,8 +218,9 @@ router.get("/autopublish", async (req, res) => {
 
       await blog.save();
 
-      // Make the auto-published blog + author profile + home live immediately.
-      revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/"] });
+      // Make the auto-published blog + author profile live immediately. Home is on
+      // its own ISR timer (no per-publish churn — key for bulk auto-publish runs).
+      revalidate({ slug: blog.slug, username: blog.authorDetails?.userName });
 
       console.log(blog.authorDetails.email);
 

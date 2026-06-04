@@ -166,8 +166,9 @@ const approveReview = async (req, res) => {
       { new: true }
     );
     if (!review) return res.status(404).json({ message: "Review not found." });
-    // Approved reviews appear on the homepage + /reviews — refresh both.
-    revalidate({ paths: ["/reviews", "/"] });
+    // Home shows reviews via a client-side fetch + its own ISR timer, so only
+    // purge /reviews here (avoids regenerating the homepage on every review action).
+    revalidate({ paths: ["/reviews"] });
     res.json({ message: "Review approved.", review });
   } catch (err) {
     console.error("approveReview:", err);
@@ -187,8 +188,8 @@ const rejectReview = async (req, res) => {
       { new: true }
     );
     if (!review) return res.status(404).json({ message: "Review not found." });
-    // A rejected review must drop off the homepage + /reviews if it was showing.
-    revalidate({ paths: ["/reviews", "/"] });
+    // Only purge /reviews — home is on its own ISR timer (no per-action churn).
+    revalidate({ paths: ["/reviews"] });
     res.json({ message: "Review rejected.", review });
   } catch (err) {
     console.error("rejectReview:", err);

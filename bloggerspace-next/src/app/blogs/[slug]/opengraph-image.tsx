@@ -2,7 +2,13 @@ import { ImageResponse } from "next/og";
 import { fetchBlogBySlug } from "@/lib/api/blogs";
 import { siteConfig } from "@/lib/constants/site";
 
-export const runtime = "edge";
+// Cache the generated card for 7 days (604800s). Without this, the uncached blog
+// fetch makes the image DYNAMIC → it regenerates on every social/crawler fetch,
+// burning Fast Origin Transfer. Editing a blog purges its route (incl. this image)
+// on-demand, so shared cards stay correct.
+// NOTE: Next 16 needs this to be a LITERAL — keep in sync with REVALIDATE.OG_IMAGE
+// in lib/constants/revalidate.ts (reference table).
+export const revalidate = 604800;
 export const alt = "BloggerSpace blog post";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

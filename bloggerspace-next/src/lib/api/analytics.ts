@@ -124,6 +124,9 @@ export const analyticsApi = {
   track: (page: string, referrer = "", visitorId = "") =>
     api.post("/api/analytics/track", { page, referrer, visitorId }),
 
+  // Public — whether visitor tracking is currently enabled (admin master switch).
+  getConfig: () => api.get<{ enabled: boolean }>("/api/analytics/config"),
+
   getStats: (userId: string) =>
     api.get<AnalyticsData>("/api/analytics/stats", {
       params: { userId, role: "Admin" },

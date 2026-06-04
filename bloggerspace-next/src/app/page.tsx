@@ -15,6 +15,13 @@ import { ContactSection } from "./_sections/contact-section";
 import { RecommendedSection } from "./_sections/recommended-section";
 import { PushCtaSection } from "./_sections/push-cta-section";
 
+// Home shell ISR window = 7 days (604800s). Only the blog count is server-cached
+// here — the per-user profile card + recommended blogs are client-rendered, so they
+// stay live. We no longer purge "/" on content actions.
+// NOTE: Next 16 needs this to be a LITERAL — keep in sync with REVALIDATE.HOME in
+// lib/constants/revalidate.ts (reference table).
+export const revalidate = 604800;
+
 const shareTitle = `${siteConfig.fullName} — ${siteConfig.tagline}`;
 const shareDescription =
   "A blogging platform where every post is reviewed by a real person before it goes live. Thoughtful writing on technology, careers, and ideas.";
