@@ -20,6 +20,8 @@ const {
   getUserProfileBlogs,
   updateUserPersonalDetails,
   setNewsletterOptIn,
+  newsletterUnsubscribe,
+  newsletterResubscribe,
   addReadingHistory,
   getReadingHistory,
   setReadingHistoryEnabled,
@@ -49,6 +51,7 @@ const {
 } = require("../controllers/userscontroller");
 
 const authenticate = require("../middlewares/authenticate");
+const { otpLimiter, authLimiter } = require("../middlewares/rateLimit");
 const multer = require("multer");
 const { checkUserName } = require("../utils/checkUsername");
 const { discardBlogFromDB } = require("../utils/discardBlog");
@@ -72,27 +75,33 @@ router.get("/verification-success", (req, res) => {
 });
 
 // Signup route
-router.post("/signup", signup);
+router.post("/signup", authLimiter, signup);
 
 // Login route
-router.post("/login", login);
+router.post("/login", authLimiter, login);
 
 // OTP verification routes (used after signup and for unverified accounts on login)
-router.post("/verify-otp", verifyOtp);
-router.post("/resend-otp", resendOtp);
+router.post("/verify-otp", authLimiter, verifyOtp);
+router.post("/resend-otp", otpLimiter, resendOtp);
 
 // Passwordless OTP login
-router.post("/login-otp/request", requestLoginOtp);
-router.post("/login-otp/verify", verifyLoginOtp);
+router.post("/login-otp/request", otpLimiter, requestLoginOtp);
+router.post("/login-otp/verify", authLimiter, verifyLoginOtp);
 
 // Forgot password via OTP (replaces email-link flow)
-router.post("/forgot-password/request-otp", forgotPasswordRequestOtp);
-router.post("/forgot-password/verify-otp", forgotPasswordVerifyOtp);
+router.post("/forgot-password/request-otp", otpLimiter, forgotPasswordRequestOtp);
+router.post("/forgot-password/verify-otp", authLimiter, forgotPasswordVerifyOtp);
 
 // Periodic re-verification (Email-auth users only)
-router.post("/reverify-otp/send", sendReverifyOtp);
-router.post("/reverify-otp/verify", verifyReverifyOtp);
-router.post("/forgot-password/reset", forgotPasswordReset);
+router.post("/reverify-otp/send", otpLimiter, sendReverifyOtp);
+router.post("/reverify-otp/verify", authLimiter, verifyReverifyOtp);
+router.post("/forgot-password/reset", authLimiter, forgotPasswordReset);
+
+// Public newsletter unsubscribe / resubscribe (token-signed link from email footers).
+// GET = clicked link (shows a page); POST = Gmail/Apple List-Unsubscribe one-click.
+router.get("/newsletter/unsubscribe", newsletterUnsubscribe);
+router.post("/newsletter/unsubscribe", newsletterUnsubscribe);
+router.get("/newsletter/resubscribe", newsletterResubscribe);
 
 // Login with Google
 router.get('/auth/google',

@@ -19,6 +19,7 @@ const ReviewScore = require("../../models/ReviewScore");
 const { uploadImageToGitHub } = require("../../utils/uploadImageToGitHub");
 const { checkBlogDuplicate } = require("../../utils/checkBlogDuplicate");
 const { notifyEmail } = require("../../utils/notify");
+const { unsubscribeUrl } = require("../../utils/unsubscribe");
 const IST_OFFSET = 330;
 
 // Default caps if no AdminConfig doc exists yet (defensive — Phase 1 lazily
@@ -1473,9 +1474,26 @@ exports.sendNewsletter = async (req, res) => {
     const { selectedUsers, subject, message } = req.body;
     const adminId = req.query.userId;
 
+    // Inbox-preview snippet from the message body (tags stripped).
+    const preheader = String(message || "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 110);
+
     selectedUsers.forEach(async (receiver) => {
-      await sendEmail(receiver.value, subject, `<div class="content">${message}</div>`);
+      const unsubUrl = unsubscribeUrl(receiver.value);
+      await sendEmail(receiver.value, subject, `<div class="content">${message}</div>`, [], {
+        unsubscribeUrl: unsubUrl, // footer "Unsubscribe" link (newsletter only)
+        preheader,
+        headers: {
+          // Native "Unsubscribe" button in Gmail/Apple Mail (one-click).
+          "List-Unsubscribe": `<${unsubUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      });
     });
+    // Admin's own copy — no unsubscribe footer/header.
     await sendEmail(process.env.EMAIL, subject, message);
 
     // Persist newsletter for history tracking

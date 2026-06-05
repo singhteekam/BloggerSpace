@@ -9,6 +9,19 @@ A full-stack blogging platform where every post is reviewed by a real human befo
 
 ---
 
+## 📚 Documentation
+
+| Doc | What's in it |
+|---|---|
+| **[ARCHITECTURE.md](ARCHITECTURE.md)** | The full code guide — repo layout, backend & frontend structure, **data models**, end-to-end flows, and the non-obvious **conventions** (IST dates, content compression, deleted-author handling, caching). Start here to understand the codebase. |
+| **[ROUTES.md](ROUTES.md)** | Every **frontend page ↔ backend endpoint** mapping, the API-client layer, and the Vercel caching/cost reference. |
+| **[AGENTS.md](AGENTS.md)** | A 2-minute onboarding map (for humans or AI agents) — where things live + the rules that'll bite you. |
+| **[bloggerspace-next/DEPLOYMENT.md](bloggerspace-next/DEPLOYMENT.md)** | Hosting and how to migrate off Vercel. |
+
+> New to the code? Read **AGENTS.md** (2 min) → **ARCHITECTURE.md** (deep) → **ROUTES.md** (lookup).
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -18,13 +31,14 @@ A full-stack blogging platform where every post is reviewed by a real human befo
 | Editor | TipTap (ProseMirror) with rich extensions |
 | AI | Google Gemini via Vercel AI SDK |
 | State / Data | TanStack React Query, React Context |
-| Backend | Node.js, Express.js |
+| Backend | Node.js, Express.js on **Firebase Functions** (gen 2 / Cloud Run) |
 | Database | MongoDB + Mongoose |
-| Auth | JWT (access + refresh tokens), Firebase Auth (Google OAuth), Email OTP |
+| Auth | JWT · Google/GitHub OAuth (Passport) · Email OTP · periodic re-verification |
 | Email | Nodemailer |
+| Push | Firebase Cloud Messaging (web push, data-only) |
 | Storage | GitHub raw CDN for user-uploaded images |
-| Deployment | Vercel (frontend), self-hosted VPS (backend) |
-| Analytics | Vercel Analytics + Speed Insights |
+| Deployment | **Vercel** (frontend) · **Firebase Functions** (backend) |
+| Analytics | Vercel Analytics + Speed Insights · self-hosted visitor analytics |
 
 ---
 
@@ -159,7 +173,7 @@ MyBlogWebsite/
 ## Getting Started (Local Development)
 
 ### Prerequisites
-- Node.js ≥ 20
+- Node.js ≥ 22
 - MongoDB (local or Atlas)
 
 ### 1 — Clone
@@ -174,25 +188,24 @@ cd BloggerSpace
 ```bash
 cd server
 npm install
-npm run dev        # starts on http://localhost:5000
+npm start           # runs the Express app directly on http://localhost:8191
 ```
 
-Create `server/.env`:
+> On Firebase the app is served by `onRequest(app)` (no `app.listen`); `npm start` is the local path.
+
+Create `server/.env` (key vars — see [ARCHITECTURE.md §7](ARCHITECTURE.md) for the full list):
 
 ```env
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/bloggerspace
+PORT=8191
+MONGODB_URI=mongodb://localhost:27017/bloggerspace
 
-JWT_SECRET=your_jwt_secret
-JWT_REFRESH_SECRET=your_refresh_secret
+CURRENT_JWT_SECRET=your_jwt_secret      # JWT_SECRET = legacy fallback
 
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
+EMAIL=your_email@gmail.com              # + mailer credentials
+FRONTEND_URL=http://localhost:3000
+REVALIDATE_SECRET=shared_with_frontend  # for on-demand ISR purge
 
-# Firebase Admin SDK (Google OAuth)
-FIREBASE_PROJECT_ID=...
-FIREBASE_CLIENT_EMAIL=...
-FIREBASE_PRIVATE_KEY=...
+# OAuth (Passport) + Google GenAI + GitHub image-upload token, etc.
 ```
 
 ### 3 — Start the frontend
@@ -200,14 +213,21 @@ FIREBASE_PRIVATE_KEY=...
 ```bash
 cd bloggerspace-next
 npm install
-npm run dev        # starts on http://localhost:3000
+npm run dev         # starts on http://localhost:3000
 ```
 
-Create `bloggerspace-next/.env.local`:
+Create `bloggerspace-next/.env`:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
-NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8191
+REVALIDATE_SECRET=shared_with_backend
+
+# Web push (Firebase Cloud Messaging)
+NEXT_PUBLIC_FIREBASE_API_KEY=...
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+NEXT_PUBLIC_FIREBASE_APP_ID=...
+NEXT_PUBLIC_FIREBASE_VAPID_KEY=...
 
 # Google Gemini (AI chatbot — BlogMate)
 GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key
@@ -220,11 +240,16 @@ GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key
 ### Frontend → Vercel
 1. Push to GitHub.
 2. Import `bloggerspace-next/` as the root directory in [vercel.com/new](https://vercel.com/new).
-3. Set `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_FRONTEND_URL`, and `GOOGLE_GENERATIVE_AI_API_KEY` in Vercel environment variables.
-4. Deploy — auto-deploys on every push to `main`.
+3. Set `NEXT_PUBLIC_BACKEND_URL`, `REVALIDATE_SECRET`, `NEXT_PUBLIC_FIREBASE_*`, and
+   `GOOGLE_GENERATIVE_AI_API_KEY` in Vercel environment variables.
+4. Deploy — auto-deploys on every push to `main`. (Off-Vercel options: [DEPLOYMENT.md](bloggerspace-next/DEPLOYMENT.md).)
 
-### Backend → VPS / Railway / Render
-Deploy the `server/` directory to any Node.js host with the `.env` variables above.
+### Backend → Firebase Functions
+```bash
+cd server
+npm run deploy      # deploys bloggerspacebackend2 + dailyTrendingNotification
+```
+Set the backend env vars in your Firebase Functions config / `.env`.
 
 ---
 

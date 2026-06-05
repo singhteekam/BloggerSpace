@@ -17,6 +17,7 @@ const {
   discardQueueBlog,
 } = require("../../controllers/Reviewer/reviewerController");
 const reviewerMiddleware = require("../../middlewares/reviewerMiddleware");
+const { authLimiter } = require("../../middlewares/rateLimit");
 const { changeAccountPassword } = require("../../utils/changeAccountPassword");
 const { forgotPassword } = require("../../utils/forgotPassword");
 const { resetPassword } = require("../../utils/resetPassword");
@@ -27,7 +28,7 @@ const { resetPassword } = require("../../utils/resetPassword");
 const authenticate = require("../../middlewares/authenticate");
 router.post("/apply", authenticate, reviewerApply);
 
-router.post("/login", reviewerLogin);
+router.post("/login", authLimiter, reviewerLogin);
 
 //Currently logged in user details
 router.get("/userdetails", userDetails);

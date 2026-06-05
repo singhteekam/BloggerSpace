@@ -16,8 +16,13 @@ const LOGO_URL = process.env.BACKEND_URL
   : `${SITE_URL}/brand/logo128x128.png`;
 
 // ── HTML email template ────────────────────────────────────────────────────
-const emailTemplate = (content) => {
+// opts (all optional):
+//   preheader      — hidden inbox-preview text (the snippet Gmail shows in the list)
+//   unsubscribeUrl — when set, a footer "Unsubscribe" link is shown (newsletter only)
+const emailTemplate = (content, opts = {}) => {
   const year = new Date().getFullYear();
+  const preheader = opts.preheader || "";
+  const unsubscribeUrl = opts.unsubscribeUrl || "";
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -145,6 +150,10 @@ const emailTemplate = (content) => {
 </head>
 <body>
 
+  <!-- ── Preheader (hidden inbox-preview text) ────────────────────────── -->
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;
+              height:0; width:0; mso-hide:all;">${preheader}</div>
+
   <!-- ── Outer wrapper ────────────────────────────────────────────────── -->
   <table cellpadding="0" cellspacing="0" border="0" width="100%"
     class="email-wrapper"
@@ -156,7 +165,13 @@ const emailTemplate = (content) => {
         <table cellpadding="0" cellspacing="0" border="0" width="600"
           class="email-card"
           style="max-width:600px; width:100%; background-color:#ffffff;
-                 border-radius:14px; overflow:hidden; border:1px solid #e0e7e7;">
+                 border-radius:14px; overflow:hidden; border:1px solid #e0e7e7;
+                 box-shadow:0 6px 24px rgba(15,23,42,0.06);">
+
+          <!-- ── Top accent strip ──────────────────────────────────── -->
+          <tr>
+            <td style="background-color:#167d7f; height:5px; line-height:5px; font-size:0;">&nbsp;</td>
+          </tr>
 
           <!-- ── Header ────────────────────────────────────────────── -->
           <tr>
@@ -246,6 +261,14 @@ const emailTemplate = (content) => {
                 <a href="${SITE_URL}"
                   style="color:#167d7f; text-decoration:none;">BloggerSpace</a>.
               </p>
+              ${
+                unsubscribeUrl
+                  ? `<p style="margin:0 0 6px; font-size:12px; color:#6b7280; line-height:1.6;">
+                Don't want the newsletter?
+                <a href="${unsubscribeUrl}" style="color:#167d7f; text-decoration:underline;">Unsubscribe here</a>.
+              </p>`
+                  : ""
+              }
               <p style="margin:0; font-size:11px; color:#9ca3af;">
                 &copy; ${year} BloggerSpace &nbsp;&middot;&nbsp; Built by
                 <a href="https://singhteekam.in"
@@ -290,13 +313,16 @@ const transporter = nodemailer.createTransport({
 // @param {string}   subject     — Email subject line
 // @param {string}   html        — Inner HTML content (will be wrapped in emailTemplate)
 // @param {Array}    attachments — Optional nodemailer attachment objects
-const sendEmail = (receiver, subject, html, attachments = []) => {
+// @param {Object}   opts        — Optional: { preheader, unsubscribeUrl, headers }
+//                                 (unsubscribeUrl → footer link; headers → e.g. List-Unsubscribe)
+const sendEmail = (receiver, subject, html, attachments = [], opts = {}) => {
   const mailOptions = {
     from: `BloggerSpace <${process.env.EMAIL}>`,
     to: receiver,
     subject: subject,
-    html: emailTemplate(html),
+    html: emailTemplate(html, opts),
     attachments,
+    ...(opts.headers ? { headers: opts.headers } : {}),
   };
 
   return new Promise((resolve, reject) => {

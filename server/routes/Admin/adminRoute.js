@@ -71,6 +71,7 @@ const {
   updateAdminSecurityKey,
 } = require("../../controllers/Admin/adminController");
 const adminMiddleware = require("../../middlewares/adminMiddleware");
+const { otpLimiter, authLimiter } = require("../../middlewares/rateLimit");
 const { discardBlogFromDB } = require("../../utils/discardBlog");
 const {
   getNotificationConfig,
@@ -82,9 +83,9 @@ const {
 
 router.post("/signup", adminSignup);
 
-router.post("/login", adminLogin);
-router.post("/login/verify-otp", adminVerifyLoginOtp);
-router.post("/login/resend-otp", adminResendLoginOtp);
+router.post("/login", authLimiter, adminLogin);
+router.post("/login/verify-otp", authLimiter, adminVerifyLoginOtp);
+router.post("/login/resend-otp", otpLimiter, adminResendLoginOtp);
 
 router.get("/adminblogs", fetchAdminBlogs);
 

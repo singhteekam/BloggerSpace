@@ -1213,6 +1213,57 @@ exports.setNewsletterOptIn = async (req, res) => {
   }
 };
 
+// ── Public one-click newsletter unsubscribe / resubscribe ───────────────────
+// Linked from the footer of newsletter emails (and the List-Unsubscribe header).
+// No login required — the request is trusted via the HMAC token on the email.
+// GET (link click) → returns a branded confirmation page.
+// POST (Gmail/Apple one-click) → flips the flag and returns 200.
+const unsub = require("../utils/unsubscribe");
+
+async function setNewsletterByToken(req, res, optIn) {
+  const email = (req.query.e || "").toString();
+  const t = (req.query.t || "").toString();
+  if (!unsub.verify(email, t)) {
+    if (req.method === "POST") return res.status(400).send("Invalid link");
+    return res
+      .status(400)
+      .type("html")
+      .send(
+        unsub.confirmationPage({
+          ok: false,
+          title: "Invalid link",
+          body: "This link is invalid or has expired. Please manage your preferences from your account settings.",
+          actionLabel: "Go to BloggerSpace",
+          actionUrl: unsub.SITE_URL(),
+        }),
+      );
+  }
+  try {
+    await User.updateOne({ email }, { $set: { newsletterOptIn: optIn } });
+  } catch (e) {
+    logger.error("newsletter token update failed: " + e);
+  }
+  if (req.method === "POST") return res.status(200).send("OK");
+
+  const page = optIn
+    ? {
+        title: "You're resubscribed 🎉",
+        body: `<b>${unsub.escapeHtml(email)}</b> will receive the BloggerSpace newsletter again. Welcome back!`,
+        actionLabel: "Go to BloggerSpace",
+        actionUrl: unsub.SITE_URL(),
+      }
+    : {
+        title: "You're unsubscribed",
+        body: `<b>${unsub.escapeHtml(email)}</b> won't receive the BloggerSpace newsletter anymore. Changed your mind?`,
+        actionLabel: "Resubscribe",
+        actionUrl: unsub.resubscribeUrl(email),
+      };
+  return res.status(200).type("html").send(unsub.confirmationPage({ ok: true, ...page }));
+}
+
+exports.newsletterUnsubscribe = (req, res) => setNewsletterByToken(req, res, false);
+exports.newsletterResubscribe = (req, res) => setNewsletterByToken(req, res, true);
+
 // Add to SavedBlogs
 exports.addBlogToSavedBlogs = async (req, res) => {
   try {

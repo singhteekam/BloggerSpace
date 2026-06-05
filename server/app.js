@@ -9,6 +9,10 @@ const MongoStore = require("connect-mongo")(session);
 const path = require("path");
 
 const app = express();
+// Behind Firebase/Cloud Run's proxy — trust X-Forwarded-For so req.ip is the real
+// client IP (used by the rate limiter), not the proxy's.
+app.set("trust proxy", true);
+const adminMiddleware = require("./middlewares/adminMiddleware");
 // app.use(helmet());
 
 // Security headers. Allow cross-origin loading of static assets (the frontend
@@ -139,6 +143,50 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // answer preflight for every route
 
+// ── IMPORTANT: CORS is NOT a security boundary ───────────────────────────────
+// The allow-list above only stops a *browser* on another website from reading our
+// responses. It does NOT stop anyone from CALLING these endpoints — curl, Postman,
+// scripts and server-to-server requests send no Origin header (and are allowed above
+// for SSR), so they bypass CORS entirely and can hit any route with any method.
+// What actually protects the API is the JWT auth middleware (authenticate /
+// adminMiddleware / reviewerMiddleware) on each route + the guards below.
+
+// ── NoSQL-injection sanitiser (dependency-free) ──────────────────────────────
+// Strips keys starting with "$" or containing "." from bodies & query objects so a
+// client can't smuggle Mongo operators (e.g. {"email":{"$ne":null}}) into a query.
+function sanitizeMongo(obj, depth = 0) {
+  if (!obj || typeof obj !== "object" || depth > 8) return;
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith("$") || key.includes(".")) {
+      delete obj[key];
+      continue;
+    }
+    const val = obj[key];
+    if (val && typeof val === "object") sanitizeMongo(val, depth + 1);
+  }
+}
+app.use((req, _res, next) => {
+  sanitizeMongo(req.body);
+  sanitizeMongo(req.query);
+  next();
+});
+
+// Shared secret guard for internal/expensive endpoints (logs, auto-write). Accepts
+// the secret via ?secret= or the x-internal-secret header.
+function requireSecret(envName, { failClosed = true } = {}) {
+  return (req, res, next) => {
+    const expected = process.env[envName];
+    if (!expected) {
+      if (failClosed) return res.status(403).json({ error: "Forbidden" });
+      console.warn(`[security] ${envName} not set — this endpoint is UNPROTECTED.`);
+      return next();
+    }
+    const got = req.query.secret || req.headers["x-internal-secret"];
+    if (got !== expected) return res.status(403).json({ error: "Forbidden" });
+    next();
+  };
+}
+
 // Assuming you have already connected to your MongoDB database using Mongoose
 // Get the default connection
 const dbConnection = mongoose.connection;
@@ -151,10 +199,12 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      // Secure (HTTPS-only) in the Cloud runtime; false for local http dev.
+      secure: !!process.env.K_SERVICE,
+      httpOnly: true,        // not readable by client-side JS (XSS hardening)
+      sameSite: "lax",       // sent on top-level OAuth redirects, blocked on cross-site POSTs
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days — keeps OAuth sessions alive across tab/browser restarts
-    }, // Adjust this based on your deployment configuration (e.g., true for HTTPS)
-    // cookie: { secure: true }, // Adjust this based on your deployment configuration (e.g., true for HTTPS)
+    },
   })
 );
 
@@ -186,8 +236,10 @@ app.use("/api/community", communityRoutes);
 // Reviews (public + user-submitted + admin moderation)
 app.use("/api/reviews", reviewsRoutes);
 
-//Auto Writing Blogs
-app.use("/api/autowrite", autoWriteBlogs);
+//Auto Writing Blogs — AI generation + auto-publish is triggered ONLY from the admin
+// dashboard ("Write next AI blog"), so it's locked behind admin auth. The admin client
+// sends its Bearer token, which adminMiddleware verifies.
+app.use("/api/autowrite", adminMiddleware, autoWriteBlogs);
 
 // Analytics
 app.use("/api/analytics", analyticsRoutes);
@@ -195,22 +247,16 @@ app.use("/api/analytics", analyticsRoutes);
 // Push notifications — FCM token registration (logged-in users)
 app.use("/api/notifications", notificationRoutes);
 
-//For capturing logs
-const { uploadLogsToGitHub, fetchLogsFile } = require("./utils/uploadToGitHub");
-app.get("/api/logs", (req, res) => {
-  uploadLogsToGitHub();
-  res.json(
-    "Logs uploaded to GitHub: " +
-      new Date(new Date().getTime() + 330 * 60000).toISOString()
-  );
-});
-
-app.get("/api/viewlogs", async (req, res) => {
-  const viewLogFile = await fetchLogsFile();
-  res.header("Content-Type", "application/json");
-  res.send(viewLogFile);
-  // res.sendFile(path.join(__dirname, "/utils/Logging/", "logs.log"));
-});
+// Log-capture endpoint disabled (not needed). It exposed internal logs (PII/errors),
+// so it stays off. To re-enable: uncomment + keep it behind requireSecret("LOGS_SECRET").
+// const { uploadLogsToGitHub } = require("./utils/uploadToGitHub");
+// app.get("/api/logs", requireSecret("LOGS_SECRET"), (req, res) => {
+//   uploadLogsToGitHub();
+//   res.json(
+//     "Logs uploaded to GitHub: " +
+//       new Date(new Date().getTime() + 330 * 60000).toISOString()
+//   );
+// });
 
 // Running update queries
 // const {addFollowersFields, addFollowingFields}= require("./utils/dbQueries");
@@ -243,6 +289,18 @@ app.get("/api/viewlogs", async (req, res) => {
 // }
 // else{
 // }
+// ── Central error handler (last middleware) ──────────────────────────────────
+// Maps CORS rejections to a clean 403 and prevents stack traces / internal details
+// from leaking to clients. Must be defined after all routes.
+app.use((err, req, res, next) => {
+  if (err && err.message === "Not allowed by CORS") {
+    return res.status(403).json({ error: "Origin not allowed by CORS" });
+  }
+  console.error("Unhandled error:", err && err.stack ? err.stack : err);
+  if (res.headersSent) return next(err);
+  res.status(err && err.status ? err.status : 500).json({ error: "Internal server error" });
+});
+
 // Only start a standalone HTTP server when this file is run directly
 // (e.g. `node app.js` for local dev). On Firebase, the function is served by
 // `onRequest(app)` below — calling app.listen() at import time would start a
