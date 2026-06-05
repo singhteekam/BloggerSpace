@@ -1005,6 +1005,64 @@ exports.reactivateUserAccount = async (req, res) => {
   }
 };
 
+// Admin manual account controls (from the user profile page). A single PATCH that
+// applies whichever of these are present in the body:
+//   reverifyNow : true  -> sets lastVerifiedAt to "now" (IST), clears the re-verify
+//                          lockout/attempt counters (same effect as the user
+//                          completing a periodic re-verification).
+//   isVerified  : bool  -> sets the email-verified flag directly.
+//   status      : "ACTIVE" | "INACTIVE" -> sets the account status directly.
+// Dates follow the app-wide IST convention (now + IST_OFFSET baked into a UTC instant).
+exports.updateUserAccountByAdmin = async (req, res) => {
+  const { id } = req.params;
+  const { reverifyNow, isVerified, status } = req.body || {};
+  try {
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const changes = [];
+
+    if (reverifyNow === true) {
+      user.lastVerifiedAt = new Date(new Date().getTime() + IST_OFFSET * 60000);
+      user.reverifyAttempts = 0;
+      user.reverifyLockedUntil = null;
+      changes.push("re-verified");
+    }
+
+    if (typeof isVerified === "boolean") {
+      user.isVerified = isVerified;
+      changes.push(isVerified ? "marked verified" : "marked unverified");
+    }
+
+    if (typeof status === "string") {
+      const next = status.toUpperCase();
+      if (!["ACTIVE", "INACTIVE"].includes(next)) {
+        return res.status(400).json({ error: "Invalid status. Use ACTIVE or INACTIVE." });
+      }
+      user.status = next;
+      changes.push(`status → ${next}`);
+    }
+
+    if (changes.length === 0) {
+      return res.status(400).json({ error: "Nothing to update." });
+    }
+
+    await user.save();
+    res.json({
+      message: `User account updated (${changes.join(", ")}).`,
+      user: {
+        isVerified: user.isVerified,
+        status: user.status,
+        lastVerifiedAt: user.lastVerifiedAt,
+        reverifyAttempts: user.reverifyAttempts,
+      },
+    });
+  } catch (error) {
+    console.log("Error updating user account by admin", error);
+    res.status(500).json({ error: "Failed to update user account" });
+  }
+};
+
 // Community
 exports.getCommunityPosts = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -2200,7 +2258,7 @@ exports.getUserContent = async (req, res) => {
   const { userId } = req.params;
   try {
     const [user, rawBlogs, communityPosts] = await Promise.all([
-      User.findById(userId).select("fullName userName email profilePicture gems createdAt role isVerified reviewedBlogs").lean(),
+      User.findById(userId).select("fullName userName email profilePicture gems createdAt role isVerified status authType lastVerifiedAt reverifyAttempts lastLogin reviewedBlogs").lean(),
       Blog.find({ authorDetails: userId })
         .select("title slug status category createdAt lastUpdatedAt gems reviewedBy")
         .sort({ createdAt: -1 }).lean(),

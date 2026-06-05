@@ -13,9 +13,6 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
-  X,
-  ChevronsUpDown,
-  Check,
   Pencil,
   Send,
   Eye,
@@ -32,7 +29,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import * as Popover from "@radix-ui/react-popover";
 import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { blogWriteApi } from "@/lib/api/blog-write";
@@ -40,12 +36,12 @@ import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BLOG_CATEGORIES, BLOG_TAGS } from "@/lib/utils/blogCategories";
+import { CategoryCombobox } from "@/components/blog/category-combobox";
+import { TagsInput } from "@/components/blog/tags-input";
+import { BLOG_CATEGORIES } from "@/lib/utils/blogCategories";
 
 const categories = BLOG_CATEGORIES;
-const ALL_TAGS = BLOG_TAGS;
 
 function toSlug(title: string) {
   return title
@@ -80,7 +76,6 @@ function NewBlogForm() {
   const [content, setContent] = useState("");
   const [editorKey, setEditorKey] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
   const [slug, setSlug] = useState("");
   const [titleStatus, setTitleStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
   const [loadingEdit, setLoadingEdit] = useState(false);
@@ -91,10 +86,6 @@ function NewBlogForm() {
   const [editAuthorName, setEditAuthorName] = useState<string | null>(null);
 
   const [otherCategory, setOtherCategory] = useState("");
-
-  // Category combobox state
-  const [catOpen, setCatOpen] = useState(false);
-  const [catSearch, setCatSearch] = useState("");
 
   const {
     register,
@@ -181,17 +172,6 @@ function NewBlogForm() {
       .finally(() => setLoadingEdit(false));
   }, [editId, user, setValue]);
 
-  // Tag input
-  const addTag = useCallback(() => {
-    const tag = tagInput.trim();
-    if (tag && !tags.includes(tag) && tags.length < 10) {
-      setTags((prev) => [...prev, tag]);
-    }
-    setTagInput("");
-  }, [tagInput, tags]);
-
-  const removeTag = (tag: string) => setTags((prev) => prev.filter((t) => t !== tag));
-
   const generateWithAI = async () => {
     if (!titleValue || titleValue.trim().length < 3) {
       toast.error("Enter a title (at least 3 characters) before generating.");
@@ -210,19 +190,6 @@ function NewBlogForm() {
     }
   };
 
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addTag();
-    }
-    if (e.key === "Backspace" && !tagInput && tags.length) {
-      setTags((prev) => prev.slice(0, -1));
-    }
-  };
-
-  const filteredCategories = catSearch
-    ? categories.filter((c) => c.toLowerCase().includes(catSearch.toLowerCase()))
-    : categories;
 
   const buildPayload = (data: FormValues) => ({
     slug,
@@ -357,59 +324,10 @@ function NewBlogForm() {
           {/* Category combobox */}
           <div className="space-y-1.5">
             <Label>Category</Label>
-            <Popover.Root open={catOpen} onOpenChange={setCatOpen}>
-              <Popover.Trigger asChild>
-                <button
-                  type="button"
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <span className={categoryValue ? "text-foreground" : "text-muted-foreground"}>
-                    {categoryValue || "Select category…"}
-                  </span>
-                  <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
-                </button>
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  className="z-50 w-(--radix-popover-trigger-width) overflow-hidden rounded-md border border-border bg-popover shadow-md"
-                  sideOffset={4}
-                  align="start"
-                >
-                  <div className="border-b border-border p-2">
-                    <Input
-                      placeholder="Search categories…"
-                      value={catSearch}
-                      onChange={(e) => setCatSearch(e.target.value)}
-                      className="h-8 text-sm"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="max-h-60 overflow-y-auto p-1">
-                    {filteredCategories.length === 0 ? (
-                      <p className="py-6 text-center text-sm text-muted-foreground">No categories found.</p>
-                    ) : (
-                      filteredCategories.map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() => {
-                            setValue("category", cat, { shouldValidate: true });
-                            setCatOpen(false);
-                            setCatSearch("");
-                          }}
-                          className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-                        >
-                          <Check
-                            className={`size-3.5 shrink-0 ${categoryValue === cat ? "opacity-100" : "opacity-0"}`}
-                          />
-                          {cat}
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
+            <CategoryCombobox
+              value={categoryValue}
+              onChange={(v) => setValue("category", v, { shouldValidate: true })}
+            />
             {errors.category && (
               <p className="text-xs text-destructive">{errors.category.message}</p>
             )}
@@ -433,64 +351,7 @@ function NewBlogForm() {
                 (optional · press Enter or comma · custom tags allowed)
               </span>
             </Label>
-            <div className="relative">
-              <div className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                {tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="gap-1 pr-1 text-xs">
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      className="rounded hover:text-destructive"
-                      aria-label={`Remove ${tag}`}
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </Badge>
-                ))}
-                {tags.length < 10 && (
-                  <input
-                    id="tagInput"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleTagKeyDown}
-                    onBlur={() => setTimeout(addTag, 150)}
-                    placeholder={tags.length === 0 ? "Search or type a tag…" : ""}
-                    className="min-w-32 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                    autoComplete="off"
-                  />
-                )}
-              </div>
-
-              {tagInput.trim().length > 0 && tags.length < 10 && (() => {
-                const suggestions = ALL_TAGS.filter(
-                  (t) =>
-                    t.toLowerCase().includes(tagInput.toLowerCase()) &&
-                    !tags.includes(t)
-                ).slice(0, 8);
-                if (suggestions.length === 0) return null;
-                return (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md">
-                    {suggestions.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          if (!tags.includes(s) && tags.length < 10) {
-                            setTags((prev) => [...prev, s]);
-                          }
-                          setTagInput("");
-                        }}
-                        className="flex w-full items-center px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                );
-              })()}
-            </div>
+            <TagsInput tags={tags} setTags={setTags} />
             <p className="text-xs text-muted-foreground">
               {tags.length}/10 tags · Type anything to search suggestions, or enter a custom tag
             </p>

@@ -1,17 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback, use } from "react";
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
   ArrowLeft, Loader2, Star, Send, Trash2, CheckCheck,
-  Tag, User, Clock, MessageSquare, X, ChevronsUpDown, Check,
+  Tag, User, Clock, MessageSquare,
   Pencil, Save, HardDrive, Cloud, CloudOff,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
-import * as Popover from "@radix-ui/react-popover";
 import { useRequireReviewer } from "@/hooks/use-require-reviewer";
 import { useAutoSave } from "@/hooks/use-autosave";
 import { reviewerApi, type ReviewerBlogDetail, type FeedbackEntry } from "@/lib/api/reviewer";
@@ -24,10 +23,11 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/utils/html";
-import { BLOG_CATEGORIES, BLOG_TAGS } from "@/lib/utils/blogCategories";
+import { CategoryCombobox } from "@/components/blog/category-combobox";
+import { TagsInput } from "@/components/blog/tags-input";
+import { BLOG_CATEGORIES } from "@/lib/utils/blogCategories";
 
 const CATEGORIES = BLOG_CATEGORIES;
-const ALL_TAGS = BLOG_TAGS;
 
 function toSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-").replace(/-+/g, "-");
@@ -48,9 +48,6 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
   const [category, setCategory] = useState("");
   const [otherCategory, setOtherCategory] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
-  const [catOpen, setCatOpen] = useState(false);
-  const [catSearch, setCatSearch] = useState("");
 
   // Review fields
   const [rating, setRating] = useState(0);
@@ -88,24 +85,7 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
       .finally(() => setLoadingBlog(false));
   }, [blogId, user]);
 
-  // Tag helpers
-  const addTag = useCallback(() => {
-    const tag = tagInput.trim();
-    if (tag && !tags.includes(tag) && tags.length < 10) setTags((p) => [...p, tag]);
-    setTagInput("");
-  }, [tagInput, tags]);
-
-  const removeTag = (t: string) => setTags((p) => p.filter((x) => x !== t));
-
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); }
-    if (e.key === "Backspace" && !tagInput && tags.length) setTags((p) => p.slice(0, -1));
-  };
-
   const slug = toSlug(title);
-  const filteredCategories = catSearch
-    ? CATEGORIES.filter((c) => c.toLowerCase().includes(catSearch.toLowerCase()))
-    : CATEGORIES;
 
   const effectiveCategory = category === "Other" ? otherCategory.trim() : category;
   const buildDraftPayload = () => ({ slug, title, content, category: effectiveCategory, tags });
@@ -191,10 +171,6 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
   if (authLoading || loadingBlog) return <ReviewSkeleton />;
   if (!user || !blog) return null;
 
-  const tagSuggestions = tagInput.trim()
-    ? ALL_TAGS.filter((t) => t.toLowerCase().includes(tagInput.toLowerCase()) && !tags.includes(t)).slice(0, 8)
-    : [];
-
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
       {/* Header */}
@@ -236,48 +212,7 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
             {/* Category */}
             <div className="space-y-1.5">
               <Label>Category</Label>
-              <Popover.Root open={catOpen} onOpenChange={setCatOpen}>
-                <Popover.Trigger asChild>
-                  <button
-                    type="button"
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <span className={category ? "text-foreground" : "text-muted-foreground"}>
-                      {category || "Select category…"}
-                    </span>
-                    <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
-                  </button>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Content
-                    className="z-50 w-[var(--radix-popover-trigger-width)] overflow-hidden rounded-md border border-border bg-popover shadow-md"
-                    sideOffset={4}
-                  >
-                    <div className="border-b border-border p-2">
-                      <Input
-                        placeholder="Search…"
-                        value={catSearch}
-                        onChange={(e) => setCatSearch(e.target.value)}
-                        className="h-8 text-sm"
-                        autoFocus
-                      />
-                    </div>
-                    <div className="max-h-56 overflow-y-auto p-1">
-                      {filteredCategories.map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() => { setCategory(cat); setCatOpen(false); setCatSearch(""); }}
-                          className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent"
-                        >
-                          <Check className={`size-3.5 shrink-0 ${category === cat ? "opacity-100" : "opacity-0"}`} />
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  </Popover.Content>
-                </Popover.Portal>
-              </Popover.Root>
+              <CategoryCombobox value={category} onChange={setCategory} />
               {category === "Other" && (
                 <div className="space-y-1">
                   <Input
@@ -293,43 +228,7 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
             {/* Tags */}
             <div className="space-y-1.5">
               <Label>Tags <span className="text-xs font-normal text-muted-foreground">(optional · Enter or comma)</span></Label>
-              <div className="relative">
-                <div className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 focus-within:ring-2 focus-within:ring-ring">
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="gap-1 pr-1 text-xs">
-                      {tag}
-                      <button type="button" onClick={() => removeTag(tag)} className="rounded hover:text-destructive" aria-label={`Remove ${tag}`}>
-                        <X className="size-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                  {tags.length < 10 && (
-                    <input
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={handleTagKeyDown}
-                      onBlur={() => setTimeout(addTag, 150)}
-                      placeholder={tags.length === 0 ? "Add tags…" : ""}
-                      className="min-w-24 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                      autoComplete="off"
-                    />
-                  )}
-                </div>
-                {tagSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md">
-                    {tagSuggestions.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onMouseDown={(e) => { e.preventDefault(); setTags((p) => [...p, s]); setTagInput(""); }}
-                        className="flex w-full px-3 py-2 text-sm hover:bg-accent"
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <TagsInput tags={tags} setTags={setTags} />
               <p className="text-xs text-muted-foreground">{tags.length}/10 tags</p>
             </div>
           </div>

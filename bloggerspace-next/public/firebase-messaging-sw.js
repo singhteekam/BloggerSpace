@@ -19,15 +19,23 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 // Shown when a push arrives while the site is closed / in the background.
+//
+// The backend sends DATA-ONLY messages (no `notification` block) so the browser does
+// NOT auto-display anything — this handler renders the single notification. (A
+// `notification` block would be auto-shown AND fire this handler → two notifications.)
+// `tag` + `renotify` collapse any same-type pushes into one entry as a safety net.
 messaging.onBackgroundMessage((payload) => {
-  const title = (payload.notification && payload.notification.title) || "BloggerSpace";
-  const body = (payload.notification && payload.notification.body) || "";
-  const link = (payload.data && payload.data.link) || "/";
+  const d = payload.data || {};
+  const title = d.title || "BloggerSpace";
+  const body = d.body || "";
+  const link = d.link || "/";
   self.registration.showNotification(title, {
     body,
     icon: "/brand/logo128x128.png",
     badge: "/brand/logo128x128.png",
     data: { link },
+    tag: d.type || "bloggerspace",
+    renotify: true,
   });
 });
 

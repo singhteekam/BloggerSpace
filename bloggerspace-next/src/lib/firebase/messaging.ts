@@ -76,14 +76,16 @@ export async function requestPushToken(): Promise<string | null> {
   }
 }
 
-/** Foreground message handler — shows a toast when a push arrives while the tab is open. */
+/** Foreground message handler — shows a toast when a push arrives while the tab is open.
+ *  Reads from `data` because the backend sends data-only messages (see messaging notes). */
 export async function onForegroundMessage(cb: (title: string, body: string, link?: string) => void) {
   const messaging = await getMessagingInstance();
   if (!messaging) return () => {};
   return onMessage(messaging, (payload) => {
-    const title = payload.notification?.title ?? "BloggerSpace";
-    const body = payload.notification?.body ?? "";
-    const link = (payload.data?.link as string | undefined) ?? undefined;
+    const d = payload.data ?? {};
+    const title = (d.title as string | undefined) ?? "BloggerSpace";
+    const body = (d.body as string | undefined) ?? "";
+    const link = (d.link as string | undefined) ?? undefined;
     cb(title, body, link);
   });
 }

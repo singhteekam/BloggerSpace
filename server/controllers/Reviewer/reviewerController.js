@@ -208,7 +208,12 @@ exports.awaitingAuthorBlogs = async (req, res) => {
       const blogs = await Blog.find({
         status: "AWAITING_AUTHOR",
         currentReviewer: req.query.email,
-      }).populate("authorDetails", "fullName email userName _id").sort({ lastUpdatedAt: -1 }).lean();
+      })
+        // List view only needs card fields — drop the heavy HTML body, comments and
+        // likes arrays. The full content is loaded separately when a blog is opened
+        // (editPendingBlog), so excluding them here just shrinks the payload.
+        .select("-content -comments -blogLikes")
+        .populate("authorDetails", "fullName email userName _id").sort({ lastUpdatedAt: -1 }).lean();
       res.json(blogs);
     } else {
       res.status(400).json({ error: "Missing credentials" });
@@ -225,7 +230,12 @@ exports.pendingReviewBlogs = async (req, res) => {
       const pendingBlogs = await Blog.find({
         status: "UNDER_REVIEW",
         currentReviewer: req.query.email,
-      }).populate("authorDetails", "fullName email userName _id").sort({ lastUpdatedAt: -1 }).lean();
+      })
+        // List view only needs card fields — drop the heavy HTML body, comments and
+        // likes arrays. The full content is loaded separately when a blog is opened
+        // (editPendingBlog), so excluding them here just shrinks the payload.
+        .select("-content -comments -blogLikes")
+        .populate("authorDetails", "fullName email userName _id").sort({ lastUpdatedAt: -1 }).lean();
       res.json(pendingBlogs);
     } else {
       res.status(500).json({ error: "Failed to fetch pending blogs" });

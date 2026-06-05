@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, BookOpen, MessageSquare, Trash2, Gem, BadgeCheck,
   CalendarDays, Mail, Loader2, CheckCheck, Clock, Sparkles, Undo2, History, Star,
+  ShieldCheck, ShieldX, RotateCw, Power, AlertCircle,
 } from "lucide-react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { useAdminConfig } from "@/hooks/use-admin-config";
@@ -139,6 +140,13 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
         targetUserId={targetUserId}
         targetUserName={user.fullName}
         onGranted={() => qc.invalidateQueries({ queryKey: ["admin-user-content", adminId, targetUserId] })}
+      />
+
+      <AccountSection
+        adminId={adminId}
+        targetUserId={targetUserId}
+        user={user}
+        onUpdated={() => qc.invalidateQueries({ queryKey: ["admin-user-content", adminId, targetUserId] })}
       />
 
       <Separator className="mb-6" />
@@ -780,6 +788,183 @@ function Empty({ icon, msg }: { icon: React.ReactNode; msg: string }) {
     <div className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
       <div className="flex size-12 items-center justify-center rounded-full bg-muted">{icon}</div>
       <p className="text-sm">{msg}</p>
+    </div>
+  );
+}
+
+/* ─── Account & verification management (admin-only controls) ─────────── */
+type AccountBody = { reverifyNow?: boolean; isVerified?: boolean; status?: "ACTIVE" | "INACTIVE" };
+
+function AccountSection({
+  adminId, targetUserId, user, onUpdated,
+}: {
+  adminId: string;
+  targetUserId: string;
+  user: UserContent["user"];
+  onUpdated: () => void;
+}) {
+  const [confirm, setConfirm] = useState<
+    | null
+    | { title: string; desc: string; confirmLabel: string; destructive?: boolean; body: AccountBody }
+  >(null);
+
+  const mutation = useMutation({
+    mutationFn: (body: AccountBody) => adminApi.updateUserAccount(targetUserId, adminId, body),
+    onSuccess: (res) => {
+      toast.success(res.data.message);
+      setConfirm(null);
+      onUpdated();
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.error ?? "Failed.") : "Error."),
+  });
+
+  const isEmailAuth = !user.authType || user.authType === "Email";
+  const isActive = (user.status ?? "ACTIVE").toUpperCase() === "ACTIVE";
+  const verified = !!user.isVerified;
+  const daysAgo = user.lastVerifiedAt
+    ? Math.max(0, Math.floor((Date.now() - new Date(user.lastVerifiedAt).getTime()) / 86_400_000))
+    : null;
+
+  return (
+    <div className="mb-6 rounded-xl border border-border bg-card p-5">
+      <h2 className="mb-4 flex items-center gap-2 font-semibold text-foreground">
+        <ShieldCheck className="size-4 text-primary" />Account &amp; verification
+      </h2>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {/* Account status */}
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/20 p-3">
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-muted-foreground">Account status</p>
+            <Badge
+              variant="outline"
+              className={`mt-1 ${isActive
+                ? "text-green-700 border-green-300 dark:text-green-400 dark:border-green-700"
+                : "text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700"}`}
+            >
+              {isActive ? "Active" : "Inactive"}
+            </Badge>
+          </div>
+          <Button
+            variant="outline" size="sm" className="shrink-0 gap-1.5"
+            onClick={() =>
+              setConfirm(
+                isActive
+                  ? {
+                      title: "Deactivate account?",
+                      desc: `${user.fullName} won't be able to sign in until reactivated.`,
+                      confirmLabel: "Deactivate",
+                      destructive: true,
+                      body: { status: "INACTIVE" },
+                    }
+                  : {
+                      title: "Activate account?",
+                      desc: `${user.fullName} will be able to sign in again.`,
+                      confirmLabel: "Activate",
+                      body: { status: "ACTIVE" },
+                    },
+              )
+            }
+          >
+            <Power className="size-3.5" />{isActive ? "Deactivate" : "Activate"}
+          </Button>
+        </div>
+
+        {/* Email verified */}
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/20 p-3">
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-muted-foreground">Email verified</p>
+            <Badge
+              variant="outline"
+              className={`mt-1 ${verified
+                ? "text-green-700 border-green-300 dark:text-green-400 dark:border-green-700"
+                : "text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700"}`}
+            >
+              {verified ? "Verified" : "Not verified"}
+            </Badge>
+          </div>
+          <Button
+            variant="outline" size="sm" className="shrink-0 gap-1.5"
+            onClick={() =>
+              setConfirm(
+                verified
+                  ? {
+                      title: "Mark as unverified?",
+                      desc: `Clears the email-verified flag for ${user.fullName}.`,
+                      confirmLabel: "Mark unverified",
+                      destructive: true,
+                      body: { isVerified: false },
+                    }
+                  : {
+                      title: "Mark as verified?",
+                      desc: `Sets ${user.fullName} as email-verified without an OTP.`,
+                      confirmLabel: "Mark verified",
+                      body: { isVerified: true },
+                    },
+              )
+            }
+          >
+            {verified ? <ShieldX className="size-3.5" /> : <ShieldCheck className="size-3.5" />}
+            {verified ? "Unverify" : "Verify"}
+          </Button>
+        </div>
+      </div>
+
+      {/* Periodic re-verification */}
+      <div className="mt-3 flex flex-col gap-2 rounded-lg border border-border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-xs font-medium text-muted-foreground">Periodic re-verification</p>
+          {!isEmailAuth ? (
+            <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+              <ShieldCheck className="size-3 text-green-600 dark:text-green-400" />
+              Auto-verified via {user.authType} (no manual re-verify needed)
+            </p>
+          ) : user.lastVerifiedAt ? (
+            <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="size-3" />
+              Last verified {formatDate(user.lastVerifiedAt)}
+              {daysAgo !== null && <> ({daysAgo}d ago)</>}
+            </p>
+          ) : (
+            <p className="mt-1 flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+              <AlertCircle className="size-3" />Never re-verified
+            </p>
+          )}
+        </div>
+        {isEmailAuth && (
+          <Button
+            variant="outline" size="sm" className="shrink-0 gap-1.5"
+            disabled={mutation.isPending}
+            onClick={() => mutation.mutate({ reverifyNow: true })}
+          >
+            {mutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <RotateCw className="size-3.5" />}
+            Reverify now
+          </Button>
+        )}
+      </div>
+
+      {/* Confirm dialog (status / verified changes) */}
+      <Dialog.Root open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-6 shadow-xl">
+            <Dialog.Title className="font-serif text-lg font-semibold">{confirm?.title}</Dialog.Title>
+            <Dialog.Description className="mt-2 text-sm text-muted-foreground">{confirm?.desc}</Dialog.Description>
+            <div className="mt-5 flex justify-end gap-2">
+              <Dialog.Close asChild><Button variant="outline" size="sm">Cancel</Button></Dialog.Close>
+              <Button
+                variant={confirm?.destructive ? "destructive" : "default"}
+                size="sm" disabled={mutation.isPending}
+                onClick={() => confirm && mutation.mutate(confirm.body)}
+                className="gap-1.5"
+              >
+                {mutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
+                {confirm?.confirmLabel}
+              </Button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

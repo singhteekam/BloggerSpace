@@ -675,17 +675,18 @@ function LogsTab({ userId }: { userId: string }) {
 function DateInput({ value, onChange, min, max, className }: {
   value: string; onChange: (v: string) => void; min?: string; max?: string; className?: string;
 }) {
-  const [focused, setFocused] = useState(false);
+  // Always a native date input. We previously swapped type text→date on focus to
+  // show a "dd/mm/yyyy" placeholder, but switching the type mid-click made the
+  // browser drop that first click — so the picker didn't open and a second click
+  // was needed. A native date input already renders the locale format mask when
+  // empty and opens on a single click, so keep it as one type throughout.
   return (
     <Input
-      type={focused || value ? 'date' : 'text'}
-      placeholder={!focused && !value ? 'dd/mm/yyyy' : undefined}
+      type="date"
       value={value}
       min={min}
       max={max}
       className={className}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
       onChange={(e) => onChange(e.target.value)}
     />
   );

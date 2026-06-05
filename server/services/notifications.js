@@ -36,6 +36,13 @@ async function getTrendingUnsentBlogs(count, windowDays) {
 }
 
 // Build the FCM multicast payload for a single digest notification.
+//
+// IMPORTANT — this is a DATA-ONLY message (no `notification` / `webpush.notification`
+// block). A notification block is auto-displayed by the browser AND still triggers the
+// service worker's onBackgroundMessage, which renders a SECOND notification — that double
+// render was the cause of every push arriving twice. With data-only, the service worker
+// renders exactly one notification and fully controls the click target (the deep link).
+// FCM requires every value in `data` to be a string.
 function buildDigestMessage(blogs) {
   const top = blogs[0];
   const extra = blogs.length - 1;
@@ -44,16 +51,12 @@ function buildDigestMessage(blogs) {
     extra > 0
       ? `${top.title} & ${extra} more trending read${extra > 1 ? "s" : ""}`
       : top.title;
-  // Deep-link: single blog → that post; multiple → the blogs listing.
+  // Deep-link: a single-blog digest opens that post directly; a multi-blog digest
+  // opens the blogs listing (one push can only have one click target).
   const link = blogs.length === 1 ? `${SITE_URL}/blogs/${top.slug}` : `${SITE_URL}/blogs`;
 
   return {
-    notification: { title, body },
-    webpush: {
-      notification: { title, body, icon: "/assets/logo128x128.png", badge: "/assets/logo128x128.png" },
-      fcmOptions: { link },
-    },
-    data: { link, type: "trending-digest", count: String(blogs.length) },
+    data: { title, body, link, type: "trending-digest", count: String(blogs.length) },
   };
 }
 
@@ -136,8 +139,8 @@ async function runNotificationCycle({ force = false, trigger = "scheduled" } = {
 
   // Audit trail: record exactly what was delivered, to whom, and when.
   await NotificationLog.create({
-    title: message.notification.title,
-    body: message.notification.body,
+    title: message.data.title,
+    body: message.data.body,
     link: message.data.link,
     blogs: blogs.map((b) => ({ blogId: b._id, title: b.title, slug: b.slug })),
     recipients: tokens.length,
@@ -159,17 +162,14 @@ async function runNotificationCycle({ force = false, trigger = "scheduled" } = {
 async function sendTestToTokens(tokens) {
   const list = (tokens || []).filter(Boolean);
   if (list.length === 0) return { ok: false, reason: "no-tokens" };
+  // Data-only (see buildDigestMessage) so the service worker shows exactly one.
   const message = {
-    notification: { title: "🔔 Test notification", body: "Push notifications are working correctly." },
-    webpush: {
-      notification: {
-        title: "🔔 Test notification",
-        body: "Push notifications are working correctly.",
-        icon: "/assets/logo128x128.png",
-      },
-      fcmOptions: { link: `${SITE_URL}/blogs` },
+    data: {
+      title: "🔔 Test notification",
+      body: "Push notifications are working correctly.",
+      link: `${SITE_URL}/blogs`,
+      type: "test",
     },
-    data: { link: `${SITE_URL}/blogs`, type: "test" },
   };
   const { success, failure, invalid } = await sendToTokens(message, list);
   const pruned = await pruneInvalidTokens(invalid);

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import {
-  ArrowLeft, Loader2, Save, Globe, FileMinus, X, Cloud, CloudOff,
+  ArrowLeft, Loader2, Save, Globe, FileMinus, Cloud, CloudOff,
   Sparkles, Eye, HardDrive, AlertTriangle,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -21,9 +21,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BLOG_CATEGORIES, BLOG_TAGS } from "@/lib/utils/blogCategories";
-
-const ALL_TAGS = BLOG_TAGS;
+import { CategoryCombobox } from "@/components/blog/category-combobox";
+import { TagsInput } from "@/components/blog/tags-input";
+import { BLOG_CATEGORIES } from "@/lib/utils/blogCategories";
 
 function toSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-").replace(/-+/g, "-");
@@ -47,7 +47,6 @@ function EditBlogEditor({ blogId, adminId }: { blogId: string; adminId: string }
   const [category, setCategory] = useState("");
   const [otherCategory, setOtherCategory] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
   const [content, setContent] = useState("");
   const [editorKey, setEditorKey] = useState(0);
 
@@ -86,22 +85,6 @@ function EditBlogEditor({ blogId, adminId }: { blogId: string; adminId: string }
 
   const authorName = blog?.authorDetails?.fullName || blog?.authorDetails?.email || "Admin";
 
-  const tagSuggestions = tagInput.trim().length > 0
-    ? ALL_TAGS.filter((t) => t.toLowerCase().includes(tagInput.toLowerCase()) && !tags.includes(t)).slice(0, 8)
-    : [];
-
-  const addTag = useCallback(() => {
-    const tag = tagInput.trim();
-    if (tag && !tags.includes(tag) && tags.length < 10) setTags((p) => [...p, tag]);
-    setTagInput("");
-  }, [tagInput, tags]);
-
-  const removeTag = (tag: string) => setTags((p) => p.filter((t) => t !== tag));
-
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); }
-    if (e.key === "Backspace" && !tagInput && tags.length) setTags((p) => p.slice(0, -1));
-  };
 
   const generateWithAI = async () => {
     if (!title.trim() || title.trim().length < 3) {
@@ -264,15 +247,7 @@ function EditBlogEditor({ blogId, adminId }: { blogId: string; adminId: string }
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="category">Category *</Label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="">Select a category…</option>
-                {BLOG_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <CategoryCombobox id="category" value={category} onChange={setCategory} />
               {category === "Other" && (
                 <div className="space-y-1">
                   <Input
@@ -289,40 +264,7 @@ function EditBlogEditor({ blogId, adminId }: { blogId: string; adminId: string }
               <Label htmlFor="tagInput">
                 Tags <span className="text-xs font-normal text-muted-foreground">(optional)</span>
               </Label>
-              <div className="relative">
-                <div className="flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 focus-within:ring-1 focus-within:ring-ring">
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="gap-1 pr-1 text-xs">
-                      {tag}
-                      <button type="button" onClick={() => removeTag(tag)} className="rounded hover:text-destructive" aria-label={`Remove ${tag}`}>
-                        <X className="size-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                  {tags.length < 10 && (
-                    <input
-                      id="tagInput"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={handleTagKeyDown}
-                      onBlur={() => setTimeout(addTag, 150)}
-                      placeholder={tags.length === 0 ? "Add tags…" : ""}
-                      className="min-w-24 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                      autoComplete="off"
-                    />
-                  )}
-                </div>
-                {tagSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md">
-                    {tagSuggestions.map((s) => (
-                      <button key={s} type="button"
-                        onMouseDown={(e) => { e.preventDefault(); if (!tags.includes(s) && tags.length < 10) setTags((p) => [...p, s]); setTagInput(""); }}
-                        className="flex w-full items-center px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
-                      >{s}</button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <TagsInput tags={tags} setTags={setTags} />
             </div>
           </div>
 

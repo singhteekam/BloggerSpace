@@ -27,6 +27,7 @@ const {
   deleteUserAccount,
   deactivateUserAccount,
   reactivateUserAccount,
+  updateUserAccountByAdmin,
   getCommunityPosts,
   deleteCommunityPost,
   deleteCommentFromPost,
@@ -128,6 +129,7 @@ router.get("/dashboard/deletedusers", adminMiddleware, getDeletedUsers);
 router.put("/dashboard/deleteuser/:id", adminMiddleware, deleteUserAccount);
 router.patch("/dashboard/deactivateuser/:id", adminMiddleware, deactivateUserAccount);
 router.patch("/dashboard/reactivateuser/:id", adminMiddleware, reactivateUserAccount);
+router.patch("/dashboard/user/:id/account", adminMiddleware, updateUserAccountByAdmin);
 
 // ── Push notification controls ──────────────────────────────────
 router.get("/notifications/config", adminMiddleware, getNotificationConfig);

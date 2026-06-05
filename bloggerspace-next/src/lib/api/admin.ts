@@ -261,6 +261,18 @@ export const adminApi = {
   reactivateUser: (targetUserId: string, adminId: string) =>
     api.patch<{ message: string }>(`/api/admin/dashboard/reactivateuser/${targetUserId}`, {}, { params: p(adminId) }),
 
+  // Manual account controls from the user profile page. Send any subset of:
+  // { reverifyNow, isVerified, status }. Returns the updated account fields.
+  updateUserAccount: (
+    targetUserId: string,
+    adminId: string,
+    body: { reverifyNow?: boolean; isVerified?: boolean; status?: "ACTIVE" | "INACTIVE" },
+  ) =>
+    api.patch<{
+      message: string;
+      user: { isVerified: boolean; status: string; lastVerifiedAt: string | null; reverifyAttempts: number };
+    }>(`/api/admin/dashboard/user/${targetUserId}/account`, body, { params: p(adminId) }),
+
   // ── Community ─────────────────────────────────────────────────────
   getCommunityPosts: (userId: string, page = 1, search = "") =>
     api.get<{ posts: CommunityPost[]; total: number; page: number; pages: number }>(
@@ -589,6 +601,11 @@ export type UserContent = {
     createdAt: string;
     role: string;
     isVerified: boolean;
+    status?: string;
+    authType?: string;
+    lastVerifiedAt?: string | null;
+    reverifyAttempts?: number;
+    lastLogin?: string | null;
     reviewedBlogs?: {
       BlogTitle: string;
       BlogSlug: string;

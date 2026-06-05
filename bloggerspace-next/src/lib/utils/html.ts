@@ -53,13 +53,25 @@ export function formatDocSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-/** Format a date string to "12 Jan 2025" */
+/** Format a date string to "12 Jan 2025"
+ *
+ * NOTE on timezone: every app model (Blog, User, Comment, Review, Gems, …) stores
+ * dates ALREADY in IST — the backend saves `new Date(now + 330*60000)`, i.e. the IST
+ * wall-clock time baked into a UTC instant. So the stored value's UTC components ARE
+ * the intended IST date. We therefore format with `timeZone: "UTC"` to read those
+ * components verbatim; using the runtime's local zone would re-add +5:30 and roll
+ * evening-IST timestamps to the next day (the "4 Jun shows as 5 Jun" bug). This also
+ * makes server (UTC) and client (IST) render identically.
+ * (Analytics VisitorLog timestamps are true UTC and are formatted separately with
+ * `timeZone: IST` in the analytics page — do not route those through here.)
+ */
 export function formatDate(dateStr: string): string {
   try {
     return new Date(dateStr).toLocaleDateString("en-IN", {
       day: "numeric",
       month: "short",
       year: "numeric",
+      timeZone: "UTC",
     });
   } catch {
     return "";

@@ -208,6 +208,13 @@ a img, button img, [role="button"] img {
     font-size: 1.0625rem;
     line-height: 1.8;
     color: var(--foreground);
+    /* Long unbroken strings (pasted URLs, hashes) must wrap instead of forcing the
+       content box wider than the viewport — otherwise the whole page scrolls
+       horizontally on mobile. `min-width: 0` lets the prose shrink inside its flex/
+       grid parent so the break can actually take effect. */
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
 
     p { margin: 1.25em 0; }
     h1, h2, h3, h4 {
@@ -258,6 +265,10 @@ a img, button img, [role="button"] img {
       color: var(--primary);
       text-decoration: underline;
       text-underline-offset: 3px;
+      /* A pasted long URL as link text has no break opportunities; allow it to
+         break anywhere so it can't push the layout past the viewport width. */
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
     a:hover { opacity: 0.8; }
 

@@ -1,22 +1,20 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { X, Eye, Pencil, Clock, ChevronsUpDown, Check, HardDrive, AlertTriangle } from "lucide-react";
-import * as Popover from "@radix-ui/react-popover";
+import { Eye, Pencil, Clock, HardDrive, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { communityApi } from "@/lib/api/community";
-import { BLOG_CATEGORIES, BLOG_TAGS } from "@/lib/utils/blogCategories";
+import { CategoryCombobox } from "@/components/blog/category-combobox";
+import { TagsInput } from "@/components/blog/tags-input";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-const ALL_TAGS = BLOG_TAGS;
 
 function slugify(text: string) {
   return text
@@ -34,47 +32,15 @@ export default function NewCommunityPostPage() {
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [mode, setMode] = useState<"edit" | "preview">("edit");
   const [otherCategory, setOtherCategory] = useState("");
-  const [catOpen, setCatOpen] = useState(false);
-  const [catSearch, setCatSearch] = useState("");
 
   useEffect(() => {
     if (!isLoading && !user) router.replace("/login");
   }, [user, isLoading, router]);
 
-  const addTag = useCallback(() => {
-    const tag = tagInput.trim();
-    if (tag && !tags.includes(tag) && tags.length < 10) {
-      setTags((prev) => [...prev, tag]);
-    }
-    setTagInput("");
-  }, [tagInput, tags]);
-
-  const tagSuggestions =
-    tagInput.trim().length > 0
-      ? ALL_TAGS.filter(
-          (t) =>
-            t.toLowerCase().includes(tagInput.toLowerCase()) &&
-            !tags.includes(t),
-        ).slice(0, 8)
-      : [];
-
   if (isLoading || !user) return null;
-
-  const removeTag = (tag: string) =>
-    setTags((prev) => prev.filter((t) => t !== tag));
-
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addTag();
-    }
-    if (e.key === "Backspace" && !tagInput && tags.length)
-      setTags((prev) => prev.slice(0, -1));
-  };
 
   const submitPost = async () => {
     const plainText = content.replace(/<[^>]+>/g, "").trim();
@@ -109,9 +75,6 @@ export default function NewCommunityPostPage() {
   const previewReady =
     topic.trim() && effectiveCategoryDisplay && content.replace(/<[^>]+>/g, "").trim();
 
-  const filteredCategories = catSearch
-    ? BLOG_CATEGORIES.filter((c) => c.toLowerCase().includes(catSearch.toLowerCase()))
-    : BLOG_CATEGORIES;
 
   const contentBytes = new Blob([content]).size;
   const contentKb = (contentBytes / 1024).toFixed(1);
@@ -279,59 +242,7 @@ export default function NewCommunityPostPage() {
             {/* Category combobox */}
             <div className="space-y-1.5">
               <Label>Category *</Label>
-              <Popover.Root open={catOpen} onOpenChange={setCatOpen}>
-                <Popover.Trigger asChild>
-                  <button
-                    type="button"
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  >
-                    <span className={category ? "text-foreground" : "text-muted-foreground"}>
-                      {category || "Select category…"}
-                    </span>
-                    <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
-                  </button>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Content
-                    className="z-50 w-(--radix-popover-trigger-width) overflow-hidden rounded-md border border-border bg-popover shadow-md"
-                    sideOffset={4}
-                    align="start"
-                  >
-                    <div className="border-b border-border p-2">
-                      <Input
-                        placeholder="Search categories…"
-                        value={catSearch}
-                        onChange={(e) => setCatSearch(e.target.value)}
-                        className="h-8 text-sm"
-                        autoFocus
-                      />
-                    </div>
-                    <div className="max-h-60 overflow-y-auto p-1">
-                      {filteredCategories.length === 0 ? (
-                        <p className="py-6 text-center text-sm text-muted-foreground">No categories found.</p>
-                      ) : (
-                        filteredCategories.map((cat) => (
-                          <button
-                            key={cat}
-                            type="button"
-                            onClick={() => {
-                              setCategory(cat);
-                              setCatOpen(false);
-                              setCatSearch("");
-                            }}
-                            className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-                          >
-                            <Check
-                              className={`size-3.5 shrink-0 ${category === cat ? "opacity-100" : "opacity-0"}`}
-                            />
-                            {cat}
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  </Popover.Content>
-                </Popover.Portal>
-              </Popover.Root>
+              <CategoryCombobox value={category} onChange={setCategory} />
               {category === "Other" && (
                 <div className="mt-2 space-y-1">
                   <Input
@@ -352,59 +263,7 @@ export default function NewCommunityPostPage() {
                   (optional)
                 </span>
               </Label>
-              <div className="relative">
-                <div className="flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 focus-within:ring-1 focus-within:ring-ring">
-                  {tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="gap-1 pr-1 text-xs"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="rounded hover:text-destructive"
-                        aria-label={`Remove ${tag}`}
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                  {tags.length < 10 && (
-                    <input
-                      id="communityTagInput"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={handleTagKeyDown}
-                      onBlur={() => setTimeout(addTag, 150)}
-                      placeholder={tags.length === 0 ? "Add tags…" : ""}
-                      className="min-w-24 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                      autoComplete="off"
-                    />
-                  )}
-                </div>
-
-                {tagSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md">
-                    {tagSuggestions.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          if (!tags.includes(s) && tags.length < 10)
-                            setTags((prev) => [...prev, s]);
-                          setTagInput("");
-                        }}
-                        className="flex w-full items-center px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <TagsInput tags={tags} setTags={setTags} id="communityTagInput" />
             </div>
           </div>
 
