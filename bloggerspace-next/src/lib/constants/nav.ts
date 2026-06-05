@@ -43,12 +43,14 @@ export const userMenuNav: NavItem[] = [
 ];
 
 /** Reviewer dropdown items */
+// A reviewer is just a regular user + the review dashboard, so every link below the
+// dashboard points to the standard user pages (no separate reviewer profile/settings).
 export const reviewerMenuNav: NavItem[] = [
   { title: "Dashboard", href: "/reviewer/dashboard", icon: LayoutDashboard },
   { title: "My Profile", href: "/bloggerspace/profile", icon: UserIcon },
   { title: "My Blogs", href: "/bloggerspace/myblogs", icon: BookOpen },
-  { title: "Settings", href: "/reviewer/settings", icon: Settings },
-  { title: "Change Password", href: "/reviewer/changepassword", icon: Lock },
+  { title: "Settings", href: "/bloggerspace/settings", icon: Settings },
+  { title: "Change Password", href: "/bloggerspace/security", icon: Lock },
 ];
 
 /** Admin dropdown items */

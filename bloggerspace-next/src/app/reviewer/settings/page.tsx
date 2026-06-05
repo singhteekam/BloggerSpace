@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Settings for reviewers lives on the profile page. */
-export default function ReviewerSettingsPage() {
-  redirect("/reviewer/profile");
+// Reviewers are regular users — account settings live on the standard user page.
+export default function ReviewerSettingsRedirect() {
+  redirect("/bloggerspace/settings");
 }

@@ -128,6 +128,10 @@ export const userApi = {
       { optIn },
     ),
 
+  // Reviewer asks an admin to revoke their reviewer access (emails the admin).
+  requestReviewerRevoke: () =>
+    api.post<{ message: string }>("/api/users/reviewer/revoke-request"),
+
   addReadingHistory: (data: { blogId?: number; slug: string; title: string; category: string }) =>
     api.post<{ ok: boolean; deduped?: boolean }>("/api/users/reading-history", data),
 

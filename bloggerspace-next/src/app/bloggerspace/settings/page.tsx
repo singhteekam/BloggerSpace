@@ -72,6 +72,21 @@ export default function SettingsPage() {
     onError: () => toast.error("Couldn't update preference. Try again."),
   });
 
+  const [revokeOpen, setRevokeOpen] = useState(false);
+  const revokeMutation = useMutation({
+    mutationFn: () => userApi.requestReviewerRevoke(),
+    onSuccess: (res) => {
+      toast.success(res.data.message);
+      setRevokeOpen(false);
+    },
+    onError: (err) =>
+      toast.error(
+        isAxiosError(err)
+          ? (err.response?.data?.message ?? "Failed to send the request.")
+          : "Something went wrong.",
+      ),
+  });
+
   const handleDeactivate = async () => {
     if (!user) return;
     setDeactivating(true);
@@ -253,6 +268,58 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
+
+      {/* Reviewer access — only shown to reviewers */}
+      {user.role?.toLowerCase() === "reviewer" && (
+        <section className="mb-8">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            Reviewer access
+          </h2>
+          <div className="rounded-xl border border-border bg-card p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <Shield className="size-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Step down as reviewer</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Request an admin to revoke your reviewer access. Your account and blogs are kept —
+                    you&apos;ll simply continue as a regular user once the admin actions it.
+                  </p>
+                </div>
+              </div>
+
+              <Dialog open={revokeOpen} onOpenChange={setRevokeOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="shrink-0">
+                    Request revoke
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Request reviewer access revoke?</DialogTitle>
+                    <DialogDescription>
+                      We&apos;ll notify an admin that you&apos;d like your reviewer access removed.
+                      Once they action it, you&apos;ll continue as a regular user — your account and
+                      published blogs stay exactly as they are.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setRevokeOpen(false)} disabled={revokeMutation.isPending}>
+                      Cancel
+                    </Button>
+                    <Button onClick={() => revokeMutation.mutate()} disabled={revokeMutation.isPending} className="gap-1.5">
+                      {revokeMutation.isPending && <Loader2 className="size-4 animate-spin" />}
+                      Send request
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Danger zone */}
       <section>

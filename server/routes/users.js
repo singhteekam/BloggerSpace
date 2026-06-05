@@ -22,6 +22,7 @@ const {
   setNewsletterOptIn,
   newsletterUnsubscribe,
   newsletterResubscribe,
+  requestReviewerRevoke,
   addReadingHistory,
   getReadingHistory,
   setReadingHistoryEnabled,
@@ -220,6 +221,9 @@ router.patch("/updateusername", authenticate, updateUserPersonalDetails);
 
 // Newsletter opt-in toggle
 router.patch("/newsletter-optin", authenticate, setNewsletterOptIn);
+
+// A reviewer requests the admin to revoke their reviewer access (emails the admin).
+router.post("/reviewer/revoke-request", authenticate, requestReviewerRevoke);
 
 // Reading history
 router.post("/reading-history", authenticate, addReadingHistory);

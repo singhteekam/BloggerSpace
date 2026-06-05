@@ -1264,6 +1264,45 @@ async function setNewsletterByToken(req, res, optIn) {
 exports.newsletterUnsubscribe = (req, res) => setNewsletterByToken(req, res, false);
 exports.newsletterResubscribe = (req, res) => setNewsletterByToken(req, res, true);
 
+// A reviewer asks the admin to revoke their reviewer access (they want to go back to
+// being a normal user). We don't change the role here — we email the admin, who removes
+// the reviewer role from the Team-management panel (which also reassigns their blogs).
+exports.requestReviewerRevoke = async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    if (!userId) return res.status(401).json({ message: "Please login." });
+    const user = await User.findById(userId).select("fullName userName email role");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.role !== "reviewer") {
+      return res.status(400).json({ message: "You are not a reviewer." });
+    }
+
+    const adminEmail = process.env.EMAIL;
+    if (adminEmail) {
+      sendEmail(
+        adminEmail,
+        "Reviewer access revoke request — BloggerSpace",
+        `<div class="content">
+          <h2>A reviewer wants to step down</h2>
+          <p>The reviewer below has requested that their reviewer access be revoked. They'll
+          continue as a regular user afterwards.</p>
+          <div class="info-box">
+            <strong>Name:</strong> ${user.fullName || "—"}<br>
+            <strong>Username:</strong> @${user.userName || "—"}<br>
+            <strong>Email:</strong> ${user.email}
+          </div>
+          <p>Action it from <strong>Admin → Team management → Reviewers</strong> (Remove from reviewer role).</p>
+        </div>`,
+      ).catch((e) => logger.error("Reviewer revoke request email failed: " + e));
+    }
+
+    return res.json({ message: "Request sent. An admin will review it shortly." });
+  } catch (error) {
+    logger.error("requestReviewerRevoke error: " + error);
+    return res.status(500).json({ error: "Failed to send the request." });
+  }
+};
+
 // Add to SavedBlogs
 exports.addBlogToSavedBlogs = async (req, res) => {
   try {
