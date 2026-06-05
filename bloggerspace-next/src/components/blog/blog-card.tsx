@@ -78,7 +78,11 @@ export function BlogCard({ blog }: BlogCardProps) {
             </span>
             <span className="flex items-center gap-1">
               <MessageSquare className="size-3.5" />
-              {blog.comments?.length ?? 0}
+              {/* Total comments = top-level + every nested reply (not just threads). */}
+              {(blog.comments ?? []).reduce(
+                (n, c) => n + 1 + (c.commentReplies?.length ?? 0),
+                0,
+              )}
             </span>
           </div>
         </div>

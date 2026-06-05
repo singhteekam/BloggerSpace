@@ -14,6 +14,13 @@ const replyCommentSchema= new mongoose.Schema(
       ref: User,
       required: true,
     },
+    // True when the reply was posted by an Admin. Admins aren't in the User
+    // collection, so `replyCommentUser` can't be populated for them — this flag lets
+    // the read path keep + label admin replies instead of dropping them as orphans.
+    isAdminReply: {
+      type: Boolean,
+      default: false,
+    },
     commentLikes: {
       type: Array,
       default: [],

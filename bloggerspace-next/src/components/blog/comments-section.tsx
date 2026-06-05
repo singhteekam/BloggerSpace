@@ -388,7 +388,9 @@ function ReplyCard({
     setLikeCount(reply.commentLikes?.length ?? 0);
   }, [userId, reply.commentLikes]);
 
-  const displayName = reply.replyCommentUser.userName ?? reply.replyCommentUser.email ?? "Unknown";
+  const displayName = reply.isAdmin
+    ? "Admin"
+    : (reply.replyCommentUser.userName ?? reply.replyCommentUser.email ?? "Unknown");
 
   const handleLike = async () => {
     if (!userId) { toast.error("Sign in to like."); return; }
@@ -414,7 +416,7 @@ function ReplyCard({
       <UserAvatar src={reply.replyCommentUser.profilePicture} name={displayName} size="xs" />
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
-          <AuthorName name={displayName} userName={reply.replyCommentUser.userName} isAdmin={false} small />
+          <AuthorName name={displayName} userName={reply.replyCommentUser.userName} isAdmin={reply.isAdmin} small />
           {reply.createdAt && (
             <span className="text-[10px] text-muted-foreground">{formatDate(reply.createdAt)}</span>
           )}

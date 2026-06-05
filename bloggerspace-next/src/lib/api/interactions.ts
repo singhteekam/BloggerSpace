@@ -3,9 +3,10 @@ import { api } from "./client";
 export type CommentReply = {
   _id: string;
   replyCommentContent: string;
+  isAdmin?: boolean;
   replyCommentUser: {
-    email: string;
-    userName: string;
+    email: string | null;
+    userName: string | null;
     profilePicture?: string;
   };
   commentLikes: string[];

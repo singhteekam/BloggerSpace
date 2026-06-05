@@ -1079,6 +1079,7 @@ exports.postNewBlogReplyComment = async (req, res) => {
     blog.comments[commentIdx].commentReplies.push({
       replyCommentContent,
       replyCommentUser: req.query.userId,
+      isAdminReply: req.userRole === "Admin",
     });
 
     await blog.save();
@@ -1097,15 +1098,19 @@ exports.postNewBlogReplyComment = async (req, res) => {
         commentLikes: comment.commentLikes,
         createdAt: comment.createdAt,
         commentReplies: (comment.commentReplies || [])
-          .filter((r) => r.replyCommentUser != null)
+          // Keep admin replies even though their author can't be populated from User.
+          .filter((r) => r.isAdminReply || r.replyCommentUser != null)
           .map((r) => ({
             _id: r._id,
             replyCommentContent: r.replyCommentContent,
-            replyCommentUser: {
-              email: r.replyCommentUser.email,
-              userName: r.replyCommentUser.userName,
-              profilePicture: r.replyCommentUser.profilePicture,
-            },
+            isAdmin: r.isAdminReply || false,
+            replyCommentUser: r.isAdminReply
+              ? { email: null, userName: null, profilePicture: undefined }
+              : {
+                  email: r.replyCommentUser.email,
+                  userName: r.replyCommentUser.userName,
+                  profilePicture: r.replyCommentUser.profilePicture,
+                },
             commentLikes: r.commentLikes,
             createdAt: r.createdAt,
           })),
@@ -1222,15 +1227,19 @@ exports.viewBlogComments = async (req, res) => {
         commentLikes: comment.commentLikes,
         createdAt: comment.createdAt,
         commentReplies: (comment.commentReplies || [])
-          .filter((r) => r.replyCommentUser != null)
+          // Keep admin replies even though their author can't be populated from User.
+          .filter((r) => r.isAdminReply || r.replyCommentUser != null)
           .map((r) => ({
             _id: r._id,
             replyCommentContent: r.replyCommentContent,
-            replyCommentUser: {
-              email: r.replyCommentUser.email,
-              userName: r.replyCommentUser.userName,
-              profilePicture: r.replyCommentUser.profilePicture,
-            },
+            isAdmin: r.isAdminReply || false,
+            replyCommentUser: r.isAdminReply
+              ? { email: null, userName: null, profilePicture: undefined }
+              : {
+                  email: r.replyCommentUser.email,
+                  userName: r.replyCommentUser.userName,
+                  profilePicture: r.replyCommentUser.profilePicture,
+                },
             commentLikes: r.commentLikes,
             createdAt: r.createdAt,
           })),
