@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { api } from "@/lib/api/client";
 import { authStorage } from "@/lib/api/auth-storage";
 import { userApi } from "@/lib/api/user";
 
@@ -14,11 +13,8 @@ type Props = {
 
 export function BlogViewTracker({ slug, blogId, title, category }: Props) {
   useEffect(() => {
-    const key = `bs_viewed_${slug}`;
-    if (!sessionStorage.getItem(key)) {
-      sessionStorage.setItem(key, "1");
-      api.patch("/api/blogs/updateblogviews", { blogSlug: slug }).catch(() => {});
-    }
+    // Note: the per-session view increment now lives in <LiveViewCount> (so it can
+    // render the fresh total). This component only records reading history.
 
     // Record reading history for logged-in users only (auth-gated to avoid 401s).
     const histKey = `bs_history_${slug}`;

@@ -185,7 +185,7 @@ export const userApi = {
     api.patch<{ message: string }>(`/api/users/unfollow/${targetId}`),
 
   getFollowStatus: (targetId: string, viewerId?: string) =>
-    api.get<{ isFollowing: boolean }>(`/api/users/followstatus/${targetId}`, {
+    api.get<{ isFollowing: boolean; followersCount: number }>(`/api/users/followstatus/${targetId}`, {
       params: viewerId ? { viewerId } : {},
     }),
 

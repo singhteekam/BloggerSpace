@@ -266,11 +266,22 @@ export const adminApi = {
   updateUserAccount: (
     targetUserId: string,
     adminId: string,
-    body: { reverifyNow?: boolean; isVerified?: boolean; status?: "ACTIVE" | "INACTIVE" },
+    body: {
+      reverifyNow?: boolean;
+      isVerified?: boolean;
+      status?: "ACTIVE" | "INACTIVE";
+      clearProfilePicture?: boolean;
+    },
   ) =>
     api.patch<{
       message: string;
-      user: { isVerified: boolean; status: string; lastVerifiedAt: string | null; reverifyAttempts: number };
+      user: {
+        isVerified: boolean;
+        status: string;
+        lastVerifiedAt: string | null;
+        reverifyAttempts: number;
+        profilePicture?: string;
+      };
     }>(`/api/admin/dashboard/user/${targetUserId}/account`, body, { params: p(adminId) }),
 
   // ── Community ─────────────────────────────────────────────────────
@@ -405,6 +416,12 @@ export const adminApi = {
 
   deleteComment: (postId: string, commentId: string, userId: string) =>
     api.delete<{ message: string }>(`/api/admin/community/${postId}/comment/${commentId}`, { params: p(userId) }),
+
+  deleteReply: (postId: string, commentId: string, replyId: string, userId: string) =>
+    api.delete<{ message: string }>(
+      `/api/admin/community/${postId}/comment/${commentId}/reply/${replyId}`,
+      { params: p(userId) },
+    ),
 
   // ── Blog comment moderation (inline on the blog page) ──────────────────────
   deleteBlogComment: (userId: string, slug: string, commentId: string) =>
@@ -581,6 +598,14 @@ export type GemsTransaction = {
   createdAt: string;
 };
 
+export type PostReply = {
+  _id: string;
+  content: string;
+  author: { _id: string; fullName: string; userName: string; email: string } | null;
+  likes: number;
+  createdAt: string;
+};
+
 export type PostComment = {
   _id: string;
   content: string;
@@ -588,6 +613,7 @@ export type PostComment = {
   likes: number;
   createdAt: string;
   repliesCount: number;
+  replies?: PostReply[];
 };
 
 export type UserContent = {

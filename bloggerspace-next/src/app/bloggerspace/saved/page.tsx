@@ -141,11 +141,13 @@ export default function SavedBlogsPage() {
                   variant="ghost"
                   size="icon"
                   className="size-8 text-muted-foreground hover:text-destructive"
-                  disabled={remove.isPending}
+                  // Scope the spinner to the row actually being removed — `isPending`
+                  // alone is shared, so every button would spin on a single click.
+                  disabled={remove.isPending && remove.variables === blog.slug}
                   onClick={() => remove.mutate(blog.slug)}
                   aria-label="Remove from saved"
                 >
-                  {remove.isPending ? (
+                  {remove.isPending && remove.variables === blog.slug ? (
                     <Loader2 className="size-3.5 animate-spin" />
                   ) : (
                     <Trash2 className="size-3.5" />

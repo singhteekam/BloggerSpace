@@ -515,6 +515,25 @@ exports.addBlogViewsCounter = async (req, res) => {
   }
 };
 
+// Lightweight live read of a published blog's current view count (no increment).
+// The blog page is ISR-cached for days, so its server-rendered "N views" can lag;
+// the client calls this on mount to show an always-fresh number. Backend-only —
+// adds no Vercel ISR Writes / Fast Origin Transfer.
+exports.getBlogViews = async (req, res) => {
+  try {
+    const blog = await Blog.findOne({
+      slug: req.params.blogSlug,
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    })
+      .select("blogViews")
+      .lean();
+    if (!blog) return res.status(404).json({ error: "blog not found" });
+    res.json({ blogViews: blog.blogViews ?? 0 });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 exports.viewBlogRoute = async (req, res) => {
   try {
     logger.debug("Searching for blog: " + req.params.blogSlug);

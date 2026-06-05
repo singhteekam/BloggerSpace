@@ -29,6 +29,13 @@ export function FollowButton({ targetId, initialFollowing, onCountChange, classN
     false;
   const followKey = ["followStatus", targetId, uid] as const;
 
+  // Keep a live follower count (LiveFollowerCount, keyed by targetId) in sync when
+  // this viewer follows/unfollows — only adjusts the cache if a count is mounted.
+  const bumpFollowerCount = (delta: number) =>
+    qc.setQueryData<number>(["followerCount", targetId], (c) =>
+      typeof c === "number" ? Math.max(0, c + delta) : c,
+    );
+
   const { data: following = seeded, isFetched } = useQuery({
     queryKey: followKey,
     queryFn: () =>
@@ -47,12 +54,14 @@ export function FollowButton({ targetId, initialFollowing, onCountChange, classN
     onMutate: (wasFollowing: boolean) => {
       qc.setQueryData(followKey, !wasFollowing);
       interactionCache.setFollowing(uid, targetId, !wasFollowing);
+      bumpFollowerCount(wasFollowing ? -1 : 1);
       onCountChange?.(wasFollowing ? -1 : 1);
       return { wasFollowing };
     },
     onError: (_e, wasFollowing) => {
       qc.setQueryData(followKey, wasFollowing);
       interactionCache.setFollowing(uid, targetId, wasFollowing);
+      bumpFollowerCount(wasFollowing ? 1 : -1);
       onCountChange?.(wasFollowing ? 1 : -1);
       toast.error("Failed. Try again.");
     },

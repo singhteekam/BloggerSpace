@@ -1012,10 +1012,13 @@ exports.reactivateUserAccount = async (req, res) => {
 //                          completing a periodic re-verification).
 //   isVerified  : bool  -> sets the email-verified flag directly.
 //   status      : "ACTIVE" | "INACTIVE" -> sets the account status directly.
+//   clearProfilePicture : true -> removes the user's profile photo (moderation of
+//                          inappropriate uploads). Clears the stored reference so it
+//                          no longer shows anywhere (avatar falls back to initials).
 // Dates follow the app-wide IST convention (now + IST_OFFSET baked into a UTC instant).
 exports.updateUserAccountByAdmin = async (req, res) => {
   const { id } = req.params;
-  const { reverifyNow, isVerified, status } = req.body || {};
+  const { reverifyNow, isVerified, status, clearProfilePicture } = req.body || {};
   try {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -1027,6 +1030,11 @@ exports.updateUserAccountByAdmin = async (req, res) => {
       user.reverifyAttempts = 0;
       user.reverifyLockedUntil = null;
       changes.push("re-verified");
+    }
+
+    if (clearProfilePicture === true) {
+      user.profilePicture = "";
+      changes.push("profile picture removed");
     }
 
     if (typeof isVerified === "boolean") {
@@ -1055,6 +1063,7 @@ exports.updateUserAccountByAdmin = async (req, res) => {
         status: user.status,
         lastVerifiedAt: user.lastVerifiedAt,
         reverifyAttempts: user.reverifyAttempts,
+        profilePicture: user.profilePicture,
       },
     });
   } catch (error) {
@@ -2216,6 +2225,28 @@ exports.deleteCommentFromPost = async (req, res) => {
   }
 };
 
+// Delete a single nested reply from a community comment (moderation).
+exports.deleteReplyFromPost = async (req, res) => {
+  const { postId, commentId, replyId } = req.params;
+  try {
+    const post = await Community.findById(postId);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+    const comment = post.communityPostComments.id(commentId);
+    if (!comment) return res.status(404).json({ error: "Comment not found" });
+    const before = comment.replyCommunityPostComments.length;
+    comment.replyCommunityPostComments = comment.replyCommunityPostComments.filter(
+      (r) => r._id.toString() !== replyId
+    );
+    if (comment.replyCommunityPostComments.length === before)
+      return res.status(404).json({ error: "Reply not found" });
+    await post.save();
+    res.json({ message: "Reply deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting reply:", error);
+    res.status(500).json({ error: "Failed to delete reply" });
+  }
+};
+
 // ─── Blog comment moderation (admin) ──────────────────────────────────────────
 // Delete a top-level comment (and its nested replies) from a blog.
 exports.deleteBlogComment = async (req, res) => {
@@ -2477,25 +2508,43 @@ exports.updateGems = async (req, res) => {
 // ─── Community post comments (admin view) ────────────────────────────────────
 exports.getPostComments = async (req, res) => {
   const { postId } = req.params;
+  // Content is stored base64+deflate-compressed; fall back to the raw string if it
+  // isn't actually compressed (older/plain entries).
+  const decode = (raw) => {
+    const str = raw ?? "";
+    try {
+      return pako.inflate(Buffer.from(str, "base64"), { to: "string" });
+    } catch {
+      return str;
+    }
+  };
   try {
     const post = await Community.findById(postId)
       .populate("communityPostComments.replyCommunityPostAuthor", "fullName email userName")
+      .populate(
+        "communityPostComments.replyCommunityPostComments.nestedReplyCommunityPostAuthor",
+        "fullName email userName",
+      )
       .lean();
     if (!post) return res.status(404).json({ error: "Post not found" });
 
     const comments = post.communityPostComments.map((c) => {
-      let content = c.replyCommunityPostContent ?? "";
-      try {
-        const buf = Buffer.from(content, "base64");
-        content = pako.inflate(buf, { to: "string" });
-      } catch {}
+      // Nested replies — surfaced so the admin can read & moderate them.
+      const replies = (c.replyCommunityPostComments || []).map((r) => ({
+        _id: r._id,
+        content: decode(r.nestedReplyCommunityPostContent),
+        author: r.nestedReplyCommunityPostAuthor,
+        likes: r.nestedReplyCommunityPostLikes?.length ?? 0,
+        createdAt: r.createdAt,
+      }));
       return {
         _id: c._id,
-        content,
+        content: decode(c.replyCommunityPostContent),
         author: c.replyCommunityPostAuthor,
         likes: c.replyCommunityPostLikes?.length ?? 0,
         createdAt: c.createdAt,
-        repliesCount: c.replyCommunityPostComments?.length ?? 0,
+        repliesCount: replies.length,
+        replies,
       };
     });
 

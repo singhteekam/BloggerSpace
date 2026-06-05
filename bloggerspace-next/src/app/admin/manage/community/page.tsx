@@ -12,7 +12,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useEffect, useRef } from "react";
 import { useRequireAdmin } from "@/hooks/use-require-admin";
 import { useDebounce } from "@/hooks/use-debounce";
-import { adminApi, type CommunityPost, type PostComment } from "@/lib/api/admin";
+import { adminApi, type CommunityPost, type PostComment, type PostReply } from "@/lib/api/admin";
 import { RefreshButton } from "@/components/ui/refresh-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -79,6 +79,16 @@ function CommunityManagement({ adminId }: { adminId: string }) {
     onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.error ?? "Failed.") : "Error."),
   });
 
+  const deleteReplyMutation = useMutation({
+    mutationFn: ({ postId, commentId, replyId }: { postId: string; commentId: string; replyId: string }) =>
+      adminApi.deleteReply(postId, commentId, replyId, adminId),
+    onSuccess: (_data, { postId }) => {
+      toast.success("Reply deleted.");
+      qc.invalidateQueries({ queryKey: ["admin-post-comments", postId] });
+    },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.error ?? "Failed.") : "Error."),
+  });
+
   const posts = data?.pages.flatMap((p) => p.posts) ?? [];
   const total = data?.pages[0]?.total ?? 0;
 
@@ -113,6 +123,9 @@ function CommunityManagement({ adminId }: { adminId: string }) {
               deletingPost={deleteMutation.isPending}
               onDeleteComment={(commentId) => deleteCommentMutation.mutate({ postId: post._id, commentId })}
               deletingComment={deleteCommentMutation.isPending}
+              onDeleteReply={(commentId, replyId) =>
+                deleteReplyMutation.mutate({ postId: post._id, commentId, replyId })}
+              deletingReply={deleteReplyMutation.isPending}
             />
           ))}
           <div ref={sentinelRef} className="h-1" />
@@ -129,6 +142,7 @@ function CommunityManagement({ adminId }: { adminId: string }) {
 
 function PostCard({
   post, adminId, onDeletePost, deletingPost, onDeleteComment, deletingComment,
+  onDeleteReply, deletingReply,
 }: {
   post: CommunityPost & Record<string, unknown>;
   adminId: string;
@@ -136,6 +150,8 @@ function PostCard({
   deletingPost: boolean;
   onDeleteComment: (commentId: string) => void;
   deletingComment: boolean;
+  onDeleteReply: (commentId: string, replyId: string) => void;
+  deletingReply: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const docSize = formatDocSize(new TextEncoder().encode(JSON.stringify(post)).length);
@@ -216,6 +232,8 @@ function PostCard({
                   comment={comment}
                   onDelete={() => onDeleteComment(comment._id)}
                   deleting={deletingComment}
+                  onDeleteReply={(replyId) => onDeleteReply(comment._id, replyId)}
+                  deletingReply={deletingReply}
                 />
               ))}
             </div>
@@ -226,44 +244,114 @@ function PostCard({
   );
 }
 
+function commentToText(html: string) {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function CommentRow({
-  comment, onDelete, deleting,
-}: { comment: PostComment; onDelete: () => void; deleting: boolean }) {
-  const plainText = comment.content
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 200);
+  comment, onDelete, deleting, onDeleteReply, deletingReply,
+}: {
+  comment: PostComment;
+  onDelete: () => void;
+  deleting: boolean;
+  onDeleteReply: (replyId: string) => void;
+  deletingReply: boolean;
+}) {
+  const replies = comment.replies ?? [];
+  const [showReplies, setShowReplies] = useState(false);
+
+  const fullText = commentToText(comment.content);
+  const plainText = fullText.slice(0, 200);
 
   const authorName = comment.author
     ? (comment.author.fullName ?? comment.author.userName ?? "Unknown")
     : "Deleted user";
 
   return (
-    <div className="flex items-start gap-3 px-4 py-3">
-      <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-        <User className="size-3.5" />
+    <div className="px-4 py-3">
+      <div className="flex items-start gap-3">
+        <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+          <User className="size-3.5" />
+        </div>
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-medium">{authorName}</span>
+            {comment.author?.userName && (
+              <span className="text-xs text-muted-foreground">@{comment.author.userName}</span>
+            )}
+            <span className="text-xs text-muted-foreground">{formatDate(comment.createdAt)}</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {plainText || <em>Empty comment</em>}
+            {fullText.length > 200 && "…"}
+          </p>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            {comment.likes > 0 && (
+              <span className="flex items-center gap-0.5"><Heart className="size-3" />{comment.likes}</span>
+            )}
+            {replies.length > 0 && (
+              <button
+                onClick={() => setShowReplies((v) => !v)}
+                className="flex items-center gap-0.5 hover:text-foreground transition-colors"
+              >
+                <MessageCircle className="size-3" />
+                {replies.length} repl{replies.length !== 1 ? "ies" : "y"}
+                {showReplies ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+              </button>
+            )}
+          </div>
+        </div>
+        <DeleteCommentButton onConfirm={onDelete} isPending={deleting} />
+      </div>
+
+      {/* Nested replies — indented, each independently deletable. */}
+      {showReplies && replies.length > 0 && (
+        <div className="mt-2 ml-10 space-y-1 border-l border-border/60 pl-3">
+          {replies.map((reply) => (
+            <ReplyRow
+              key={reply._id}
+              reply={reply}
+              onDelete={() => onDeleteReply(reply._id)}
+              deleting={deletingReply}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReplyRow({
+  reply, onDelete, deleting,
+}: { reply: PostReply; onDelete: () => void; deleting: boolean }) {
+  const fullText = commentToText(reply.content);
+  const plainText = fullText.slice(0, 200);
+  const authorName = reply.author
+    ? (reply.author.fullName ?? reply.author.userName ?? "Unknown")
+    : "Deleted user";
+
+  return (
+    <div className="flex items-start gap-2 py-1.5">
+      <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        <User className="size-3" />
       </div>
       <div className="min-w-0 flex-1 space-y-0.5">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-medium">{authorName}</span>
-          {comment.author?.userName && (
-            <span className="text-xs text-muted-foreground">@{comment.author.userName}</span>
+          {reply.author?.userName && (
+            <span className="text-[11px] text-muted-foreground">@{reply.author.userName}</span>
           )}
-          <span className="text-xs text-muted-foreground">{formatDate(comment.createdAt)}</span>
+          <span className="text-[11px] text-muted-foreground">{formatDate(reply.createdAt)}</span>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          {plainText || <em>Empty comment</em>}
-          {comment.content.replace(/<[^>]+>/g, "").length > 200 && "…"}
+          {plainText || <em>Empty reply</em>}
+          {fullText.length > 200 && "…"}
         </p>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          {comment.likes > 0 && (
-            <span className="flex items-center gap-0.5"><Heart className="size-3" />{comment.likes}</span>
-          )}
-          {comment.repliesCount > 0 && (
-            <span className="flex items-center gap-0.5"><MessageCircle className="size-3" />{comment.repliesCount} repl{comment.repliesCount !== 1 ? "ies" : "y"}</span>
-          )}
-        </div>
+        {reply.likes > 0 && (
+          <span className="flex items-center gap-0.5 text-[11px] text-muted-foreground">
+            <Heart className="size-3" />{reply.likes}
+          </span>
+        )}
       </div>
       <DeleteCommentButton onConfirm={onDelete} isPending={deleting} />
     </div>

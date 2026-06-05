@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { UserAvatar } from "@/components/user/user-avatar";
 import { formatDate } from "@/lib/utils/html";
 import * as Dialog from "@radix-ui/react-dialog";
 import type { UserContent } from "@/lib/api/admin";
@@ -104,10 +105,14 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
         </Button>
 
         {/* User header */}
-        <div className="flex items-start gap-4 rounded-xl border border-border bg-card p-5">
-          <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary">
-            {user.fullName?.[0]?.toUpperCase() ?? "?"}
-          </div>
+        <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 sm:flex-row sm:items-start">
+          <ProfilePhoto
+            adminId={adminId}
+            targetUserId={targetUserId}
+            src={user.profilePicture}
+            name={user.fullName}
+            onUpdated={() => qc.invalidateQueries({ queryKey: ["admin-user-content", adminId, targetUserId] })}
+          />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-serif text-xl font-semibold">{user.fullName}</h1>
@@ -120,7 +125,7 @@ function UserProfile({ adminId, targetUserId }: { adminId: string; targetUserId:
               <span className="flex items-center gap-1"><CalendarDays className="size-3" />Joined {formatDate(user.createdAt)}</span>
             </div>
           </div>
-          <div className="flex shrink-0 flex-col items-end gap-2">
+          <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-end">
             <div className="flex items-center gap-1.5 rounded-lg bg-primary/5 px-3 py-2">
               <Gem className="size-4 text-primary" />
               <span className="font-semibold text-primary">{user.gems ?? 0}</span>
@@ -525,7 +530,7 @@ function ReviewedTabContent({
               ? (localScores[entry.blogId] ?? (entry as ReviewedEntry & { reviewScore?: number | null }).reviewScore ?? null)
               : null;
           return (
-            <div key={i} className="flex items-center justify-between gap-4 px-4 py-3">
+            <div key={i} className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2 mb-0.5">
                   <p className="font-medium text-sm line-clamp-1">{entry.BlogTitle}</p>
@@ -544,7 +549,7 @@ function ReviewedTabContent({
                   <Clock className="size-3" />Reviewed {formatDate(entry.BlogReviewedTime)}
                 </p>
               </div>
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="flex flex-wrap items-center gap-1.5 sm:shrink-0 sm:justify-end">
                 {entry.blogId && (
                   <Button
                     variant={existingScore != null ? "ghost" : "outline"}
@@ -788,6 +793,63 @@ function Empty({ icon, msg }: { icon: React.ReactNode; msg: string }) {
     <div className="flex flex-col items-center gap-3 py-16 text-center text-muted-foreground">
       <div className="flex size-12 items-center justify-center rounded-full bg-muted">{icon}</div>
       <p className="text-sm">{msg}</p>
+    </div>
+  );
+}
+
+/* ─── Profile photo with admin remove (moderation of inappropriate uploads) ─── */
+function ProfilePhoto({
+  adminId, targetUserId, src, name, onUpdated,
+}: {
+  adminId: string;
+  targetUserId: string;
+  src?: string;
+  name: string;
+  onUpdated: () => void;
+}) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const mutation = useMutation({
+    mutationFn: () => adminApi.updateUserAccount(targetUserId, adminId, { clearProfilePicture: true }),
+    onSuccess: () => { toast.success("Profile photo removed."); setConfirmOpen(false); onUpdated(); },
+    onError: (err) => toast.error(isAxiosError(err) ? (err.response?.data?.error ?? "Failed.") : "Error."),
+  });
+
+  return (
+    <div className="flex shrink-0 flex-col items-center gap-1.5">
+      <UserAvatar src={src} name={name} size="lg" />
+      {src && (
+        <>
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(true)}
+            className="flex items-center gap-1 text-[11px] text-muted-foreground transition-colors hover:text-destructive"
+          >
+            <Trash2 className="size-3" />Remove
+          </button>
+          <Dialog.Root open={confirmOpen} onOpenChange={setConfirmOpen}>
+            <Dialog.Portal>
+              <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+              <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-card p-6 shadow-xl">
+                <Dialog.Title className="font-serif text-lg font-semibold">Remove profile photo?</Dialog.Title>
+                <Dialog.Description className="mt-2 text-sm text-muted-foreground">
+                  {name}&apos;s profile photo will be removed everywhere it appears. Their avatar
+                  falls back to initials. Use this to take down inappropriate images.
+                </Dialog.Description>
+                <div className="mt-5 flex justify-end gap-2">
+                  <Dialog.Close asChild><Button variant="outline" size="sm">Cancel</Button></Dialog.Close>
+                  <Button
+                    variant="destructive" size="sm" disabled={mutation.isPending}
+                    onClick={() => mutation.mutate()} className="gap-1.5"
+                  >
+                    {mutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+                    Remove photo
+                  </Button>
+                </div>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
+        </>
+      )}
     </div>
   );
 }

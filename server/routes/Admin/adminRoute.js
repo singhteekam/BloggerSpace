@@ -31,6 +31,7 @@ const {
   getCommunityPosts,
   deleteCommunityPost,
   deleteCommentFromPost,
+  deleteReplyFromPost,
   adminNewBlog,
   adminSaveAsDraftBlog,
   adminDraftBlogs,
@@ -181,6 +182,7 @@ router.delete("/savedblogs/remove/:blogSlug", adminMiddleware, removeBlogFromAdm
 // Community comment management
 router.get("/community/:postId/comments", adminMiddleware, getPostComments);
 router.delete("/community/:postId/comment/:commentId", adminMiddleware, deleteCommentFromPost);
+router.delete("/community/:postId/comment/:commentId/reply/:replyId", adminMiddleware, deleteReplyFromPost);
 
 // Blog comment moderation (admin) — delete a comment or a reply inline
 router.delete("/blogs/:slug/comment/:commentId/reply/:replyId", adminMiddleware, deleteBlogReply);

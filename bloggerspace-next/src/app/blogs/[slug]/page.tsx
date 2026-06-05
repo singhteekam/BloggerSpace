@@ -8,10 +8,12 @@ import { BackToBlogs } from "@/components/blog/back-to-blogs";
 import { BlogActions } from "@/components/blog/blog-actions";
 import { CommentsSection } from "@/components/blog/comments-section";
 import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
+import { LiveViewCount } from "@/components/blog/live-view-count";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { NewsletterCta } from "@/components/blog/newsletter-cta";
 import { BlogSidebar } from "@/components/blog/blog-sidebar";
 import { FollowButton } from "@/components/user/follow-button";
+import { LiveFollowerCount } from "@/components/user/live-follower-count";
 import { UserAvatar } from "@/components/user/user-avatar";
 import { fetchBlogBySlug, fetchRelatedBlogs, fetchTopBlogs, fetchBlogs } from "@/lib/api/blogs";
 import { fetchPublicProfile } from "@/lib/api/user";
@@ -148,7 +150,7 @@ export default async function BlogDetailPage({ params }: Props) {
                 )}
                 <span className="flex items-center gap-1">
                   <Eye className="size-3.5" />
-                  {blog.blogViews ?? 0} views
+                  <LiveViewCount slug={blog.slug} initial={blog.blogViews ?? 0} />
                 </span>
                 {readingTime(blog.content) && (
                   <span className="flex items-center gap-1">
@@ -230,7 +232,7 @@ export default async function BlogDetailPage({ params }: Props) {
                     <p className="text-sm text-muted-foreground">
                       BloggerSpace author
                       {authorProfile && (
-                        <> · {authorProfile.followersCount} follower{authorProfile.followersCount !== 1 ? "s" : ""}</>
+                        <> · <LiveFollowerCount targetId={authorProfile._id} initialCount={authorProfile.followersCount} /></>
                       )}
                     </p>
                   </div>

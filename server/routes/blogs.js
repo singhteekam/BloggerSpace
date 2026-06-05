@@ -22,6 +22,7 @@ const {
   isUniqueTitle,
   isUniqueSlug,
   addBlogViewsCounter,
+  getBlogViews,
   postNewBlogReplyComment,
   fetchAllBlogs,
   fetchBlogsByCategory,
@@ -75,6 +76,10 @@ router.get("/:blogId/related", fetchRelatedBlogs);
 // router.get("/relatedblogs/:blogId", fetchRelatedBlogs);
 
 router.get("/:blogSlug", viewBlogRoute);
+
+// Lightweight live read of a blog's current view count (no increment). Two path
+// segments, so it never collides with the single-segment "/:blogSlug" above.
+router.get("/:blogSlug/views", getBlogViews);
 
 router.get("/fetchblog/:blogId", fetchBlogByBlogId);
 

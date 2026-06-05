@@ -1031,13 +1031,17 @@ exports.getFollowStatus = async (req, res) => {
   try {
     const { targetId } = req.params;
     const viewerId = req.query.viewerId;
-    if (!viewerId) return res.json({ isFollowing: false });
 
     const target = await User.findById(targetId).select("followers").lean();
     if (!target) return res.status(404).json({ message: "User not found" });
 
-    const isFollowing = target.followers.some((id) => id.toString() === viewerId);
-    res.json({ isFollowing });
+    // Always return the live follower count (used to keep the author card's count
+    // fresh on the ISR-cached blog page). isFollowing only applies to a logged-in viewer.
+    const followersCount = target.followers?.length ?? 0;
+    const isFollowing = viewerId
+      ? target.followers.some((id) => id.toString() === viewerId)
+      : false;
+    res.json({ isFollowing, followersCount });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
