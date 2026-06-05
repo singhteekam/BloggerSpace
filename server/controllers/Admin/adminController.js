@@ -301,8 +301,6 @@ exports.saveEditedInReviewBlog = async (req, res) => {
       _id: new mongoose.Types.ObjectId(req.params.id),
     }).populate("authorDetails").exec();
 
-    console.log("Line 156", blog.authorDetails._id);
-
     if (!blog) {
       return res.status(404).json({ error: "blog not found" });
     }
@@ -350,10 +348,12 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     // refreshes on its own ISR timer — so we only purge the live blog + author profile.
     revalidate({ slug: blog.slug, username: blog.authorDetails?.userName });
 
-    // Sending mail to author
-    const receiver = blog.authorDetails.email;
-    const subject = "Your blog is live on BloggerSpace!";
-    const html = `
+    // Sending mail to author (skipped when the author account no longer exists,
+    // e.g. it was deleted after the blog went into review — avoids a null crash).
+    if (blog.authorDetails?.email) {
+      const receiver = blog.authorDetails.email;
+      const subject = "Your blog is live on BloggerSpace!";
+      const html = `
       <div class="content">
         <h2>Congratulations, ${blog.authorDetails.fullName}!</h2>
         <p>Your blog has passed review and is now <strong>live</strong> on BloggerSpace. 🎉</p>
@@ -366,13 +366,14 @@ exports.saveEditedInReviewBlog = async (req, res) => {
       </div>
     `;
 
-    sendEmail(receiver, subject, html)
-      .then((response) => {
-        console.log(`Email sent to ${receiver}:`, response);
-      })
-      .catch((error) => {
-        console.error("Error sending email:", error);
-      });
+      sendEmail(receiver, subject, html)
+        .then((response) => {
+          console.log(`Email sent to ${receiver}:`, response);
+        })
+        .catch((error) => {
+          console.error("Error sending email:", error);
+        });
+    }
 
     // Sending mail to admin
     const receiver2 = process.env.EMAIL;
@@ -383,7 +384,7 @@ exports.saveEditedInReviewBlog = async (req, res) => {
         <p>A blog has been published successfully.</p>
         <div class="info-box">
           <strong>Title:</strong> ${title}<br>
-          <strong>Author:</strong> ${blog.authorDetails.fullName}
+          <strong>Author:</strong> ${blog.authorDetails?.fullName ?? "Unknown"}
         </div>
         <p><a class="btn" href="${process.env.FRONTEND_URL}/blogs/${slug}">View live blog</a></p>
       </div>

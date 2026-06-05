@@ -1,21 +1,9 @@
-/** Strip HTML tags and collapse whitespace — safe for server use (no DOM needed).
- *
- * Used for card excerpts and for the SEO / social (OpenGraph) meta description, so it
- * must yield readable PROSE — never raw source. Code blocks, <style>/<script>, and the
- * RawHtml extension's opaque blocks have text content that is markup/CSS/JS; if a post
- * opens with one of those, a naive strip would surface that code as the description
- * (bad in Google snippets and link previews). So we drop those blocks first, then strip
- * the remaining tags. A post that is ALL code returns "" — callers should fall back. */
+/** Strip HTML tags and collapse whitespace — safe for server use (no DOM needed). */
 export function htmlToText(html: string, maxLength = 160): string {
   // Blog content is stored pako-compressed (base64). Compressed strings contain
   // no HTML tags, so they would produce garbled excerpts — return empty instead.
   if (!html || !html.includes("<")) return "";
   return html
-    // Remove non-prose blocks (order matters: <pre> wraps its <code>).
-    .replace(/<pre[\s\S]*?<\/pre>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<code[\s\S]*?<\/code>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&[a-z]+;/gi, " ")
     .replace(/\s+/g, " ")

@@ -44,11 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = await fetchBlogBySlug(slug);
   if (!data) return { title: "Post not found" };
   const { blog } = data;
-  // htmlToText drops code/style blocks, so a code-only post yields "" — fall back to a
-  // clean, readable description instead of leaking raw source into snippets/previews.
-  const description =
-    htmlToText(blog.content, 160) ||
-    `Read "${blog.title}"${blog.category ? ` — ${blog.category}` : ""} on ${siteConfig.fullName}.`;
+  const description = htmlToText(blog.content, 160);
   const authorName = blog.authorDetails?.fullName ?? blog.authorDetails?.userName ?? "BloggerSpace";
   const canonicalUrl = `${siteConfig.url}/blogs/${slug}`;
   return {
