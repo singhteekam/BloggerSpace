@@ -9,6 +9,7 @@ const sendEmail = require("../../services/mailer");
 const removeDuplicates = require("../../utils/removeDuplicates");
 const validateUsername = require("../../utils/validateUsername");
 const { checkBlogDuplicate } = require("../../utils/checkBlogDuplicate");
+const { notifyEmail } = require("../../utils/notify");
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -456,7 +457,7 @@ exports.feedbackToAuthor = async (req, res) => {
     });
     await blog.save();
 
-    const receiver1 = blog.authorDetails.email;
+    const receiver1 = notifyEmail(blog.authorDetails); // null if author missing / self-deleted
     const receiver2 = req.query.email;
     const subject = "Reviewer feedback on your blog — BloggerSpace";
     const authorHtml = `
@@ -479,7 +480,7 @@ exports.feedbackToAuthor = async (req, res) => {
       </div>`;
 
     res.json({ message: "Feedback sent successfully" });
-    await sendEmail(receiver1, subject, authorHtml);
+    if (receiver1) await sendEmail(receiver1, subject, authorHtml);
     await sendEmail(receiver2, subject, reviewerHtml);
   } catch (error) {
     console.error("Failed to send feedback:", error);

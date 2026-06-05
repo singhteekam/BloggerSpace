@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Blog = require("../models/Blog");
 const User = require("../models/User");
+const Admin = require("../models/Admin");
 const pako = require("pako");
 
 // Null out authorDetails for any blog whose author has deleted their account, so
@@ -17,6 +18,7 @@ function anonymiseDeletedAuthors(blogs) {
 }
 const sendEmail = require("../services/mailer");
 const { checkBlogDuplicate } = require("../utils/checkBlogDuplicate");
+const { notifyEmail } = require("../utils/notify");
 const { GoogleGenAI } = require("@google/genai");
 const logger = require("./../utils/Logging/logs.js");
 
@@ -944,10 +946,11 @@ exports.saveEditedBlog = async (req, res) => {
     await blog.save();
     logger.debug("Blog updated successfully. Title: " + blog.title);
 
-    // Sending mail to author
-    const receiver = blog.authorDetails.email;
-    const subject = `Blog ${verb} for review — BloggerSpace`;
-    const html = `
+    // Sending mail to author (skipped when missing / self-deleted — avoids a null crash)
+    const receiver = notifyEmail(blog.authorDetails);
+    if (receiver) {
+      const subject = `Blog ${verb} for review — BloggerSpace`;
+      const html = `
       <div class="content">
         <h2>Blog ${verb}!</h2>
         <p>Hi ${blog.authorDetails.fullName}, your blog has been ${verb} and is now pending review.</p>
@@ -960,15 +963,16 @@ exports.saveEditedBlog = async (req, res) => {
       </div>
     `;
 
-    sendEmail(receiver, subject, html)
-      .then((response) => {
-        console.log(`Email sent to ${receiver}:`, response);
-        logger.debug("Email sent to writer:" + response);
-      })
-      .catch((error) => {
-        console.error("Error sending email:", error);
-        logger.error("Error sending email:" + error);
-      });
+      sendEmail(receiver, subject, html)
+        .then((response) => {
+          console.log(`Email sent to ${receiver}:`, response);
+          logger.debug("Email sent to writer:" + response);
+        })
+        .catch((error) => {
+          console.error("Error sending email:", error);
+          logger.error("Error sending email:" + error);
+        });
+    }
 
     // Sending mail to admin
     const blogLink = `${process.env.REVIEWER_PANEL_URL}/${slug}`;
@@ -1203,10 +1207,7 @@ exports.toggleReplyLike = async (req, res) => {
 
 exports.viewBlogComments = async (req, res) => {
   try {
-    const blog = await Blog.findOne({ slug: req.params.blogSlug })
-      .populate("comments.user", "email userName profilePicture")
-      .populate("comments.commentReplies.replyCommentUser", "email userName profilePicture")
-      .exec();
+    const blog = await Blog.findOne({ slug: req.params.blogSlug }).lean();
 
     if (!blog) {
       logger.error(
@@ -1215,35 +1216,77 @@ exports.viewBlogComments = async (req, res) => {
       return res.status(404).json({ message: "blog not found" });
     }
 
-    const comments = blog.comments
-      .filter((comment) => comment.isAdminComment || comment.user != null)
-      .map((comment) => ({
-        _id: comment._id,
-        content: comment.content,
-        userEmail: comment.isAdminComment ? null : comment.user.email,
-        userName: comment.isAdminComment ? null : comment.user.userName,
-        profilePicture: comment.isAdminComment ? undefined : comment.user.profilePicture,
-        isAdmin: comment.isAdminComment || false,
-        commentLikes: comment.commentLikes,
-        createdAt: comment.createdAt,
-        commentReplies: (comment.commentReplies || [])
-          // Keep admin replies even though their author can't be populated from User.
-          .filter((r) => r.isAdminReply || r.replyCommentUser != null)
-          .map((r) => ({
-            _id: r._id,
-            replyCommentContent: r.replyCommentContent,
-            isAdmin: r.isAdminReply || false,
-            replyCommentUser: r.isAdminReply
-              ? { email: null, userName: null, profilePicture: undefined }
-              : {
-                  email: r.replyCommentUser.email,
-                  userName: r.replyCommentUser.userName,
-                  profilePicture: r.replyCommentUser.profilePicture,
+    const rawComments = blog.comments || [];
+
+    // Resolve comment & reply authors in one pass. Admins are NOT in the User
+    // collection, so their ids never populate — we look the leftover ids up in the
+    // Admin collection and label them "Admin". This makes admin comments/replies show
+    // whether or not the isAdminComment/isAdminReply flag was stored (old or new data).
+    const authorIds = new Set();
+    for (const c of rawComments) {
+      if (c.user) authorIds.add(c.user.toString());
+      for (const r of c.commentReplies || []) {
+        if (r.replyCommentUser) authorIds.add(r.replyCommentUser.toString());
+      }
+    }
+    const idList = [...authorIds].map((s) => new mongoose.Types.ObjectId(s));
+    const [users, admins] = await Promise.all([
+      idList.length
+        ? User.find({ _id: { $in: idList } }).select("email userName profilePicture").lean()
+        : [],
+      idList.length ? Admin.find({ _id: { $in: idList } }).select("_id").lean() : [],
+    ]);
+    const userMap = new Map(users.map((u) => [u._id.toString(), u]));
+    const adminSet = new Set(admins.map((a) => a._id.toString()));
+
+    // Display shape for an author id, or null when the author is a deleted/unknown user
+    // (caller drops that comment/reply — same as the previous behaviour).
+    const resolveAuthor = (id, isAdminFlag) => {
+      const key = id ? id.toString() : null;
+      const u = key ? userMap.get(key) : null;
+      if (u) {
+        return { isAdmin: false, email: u.email, userName: u.userName, profilePicture: u.profilePicture };
+      }
+      if (isAdminFlag || (key && adminSet.has(key))) {
+        return { isAdmin: true, email: null, userName: null, profilePicture: undefined };
+      }
+      return null;
+    };
+
+    const comments = rawComments
+      .map((comment) => {
+        const author = resolveAuthor(comment.user, comment.isAdminComment);
+        if (!author) return null;
+        return {
+          _id: comment._id,
+          content: comment.content,
+          userEmail: author.email,
+          userName: author.userName,
+          profilePicture: author.profilePicture,
+          isAdmin: author.isAdmin,
+          commentLikes: comment.commentLikes,
+          createdAt: comment.createdAt,
+          commentReplies: (comment.commentReplies || [])
+            .map((r) => {
+              const ra = resolveAuthor(r.replyCommentUser, r.isAdminReply);
+              if (!ra) return null;
+              return {
+                _id: r._id,
+                replyCommentContent: r.replyCommentContent,
+                isAdmin: ra.isAdmin,
+                replyCommentUser: {
+                  email: ra.email,
+                  userName: ra.userName,
+                  profilePicture: ra.profilePicture,
                 },
-            commentLikes: r.commentLikes,
-            createdAt: r.createdAt,
-          })),
-      }));
+                commentLikes: r.commentLikes,
+                createdAt: r.createdAt,
+              };
+            })
+            .filter(Boolean),
+        };
+      })
+      .filter(Boolean);
 
     res.json(comments);
   } catch (error) {

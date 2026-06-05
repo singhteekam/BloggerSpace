@@ -6,6 +6,7 @@ const fs = require("fs");
 const Blog = require("../models/Blog");
 const sendEmail = require("../services/mailer");
 const { revalidate } = require("../utils/revalidate");
+const { notifyEmail } = require("../utils/notify");
 
 // Lazily build the Google Sheets client on first use. `googleapis` is a very
 // heavy require and reading the service-account file happens synchronously — doing
@@ -222,9 +223,8 @@ router.get("/autopublish", async (req, res) => {
       // its own ISR timer (no per-publish churn — key for bulk auto-publish runs).
       revalidate({ slug: blog.slug, username: blog.authorDetails?.userName });
 
-      console.log(blog.authorDetails.email);
-
-      const receiver = blog.authorDetails.email;
+      const receiver = notifyEmail(blog.authorDetails); // null if author missing / self-deleted
+      if (receiver) {
       const subject = "Published!!";
       const html = `
   <div class="content">
@@ -242,6 +242,7 @@ router.get("/autopublish", async (req, res) => {
         .catch((error) => {
           console.error("Error sending email:", error);
         });
+      }
 
       // Sending mail to admin
       const receiver2 = process.env.EMAIL;

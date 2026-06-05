@@ -25,6 +25,7 @@ const User = require("../models/User");
 const AdminConfig = require("../models/AdminConfig");
 const { deductGems, awardGems } = require("../utils/gemsLedger");
 const sendEmail = require("../services/mailer");
+const { notifyEmail } = require("../utils/notify");
 
 const IST_OFFSET = 330;
 const istNow = () => new Date(new Date().getTime() + IST_OFFSET * 60000);
@@ -314,12 +315,13 @@ exports.fulfillRedemption = async (req, res) => {
     request.fulfillmentNote = (note ?? "").toString().trim().slice(0, 500);
     await request.save();
 
-    // Best-effort email to user
-    const user = await User.findById(request.userId).select("email fullName userName").lean();
-    if (user?.email) {
+    // Best-effort email to user (skipped when missing / self-deleted)
+    const user = await User.findById(request.userId).select("email fullName userName status").lean();
+    const to = notifyEmail(user);
+    if (to) {
       const methodLabel = METHOD_LABELS[request.method] || "gift card";
       sendEmail(
-        user.email,
+        to,
         `Your redemption has been fulfilled — ${request.gemsAmount} gems`,
         `<div class="content">
           <h2>Your redemption is on its way!</h2>
@@ -380,11 +382,12 @@ exports.rejectRedemption = async (req, res) => {
       session.endSession();
     }
 
-    // Best-effort email
-    const user = await User.findById(request.userId).select("email fullName userName").lean();
-    if (user?.email) {
+    // Best-effort email (skipped when missing / self-deleted)
+    const user = await User.findById(request.userId).select("email fullName userName status").lean();
+    const to = notifyEmail(user);
+    if (to) {
       sendEmail(
-        user.email,
+        to,
         `Your redemption request was not approved`,
         `<div class="content">
           <h2>Redemption request update</h2>

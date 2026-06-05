@@ -54,9 +54,11 @@ export function CommentsSection({ slug, initialCount }: Props) {
     if (!text) return;
     setSubmitting(true);
     try {
-      const res = await interactionsApi.postComment(slug, user._id, text);
-      setComments(res.data);
+      await interactionsApi.postComment(slug, user._id, text);
       setNewComment("");
+      // Re-fetch from the canonical endpoint so the list is always correct (handles
+      // admin authorship + keeps existing replies intact).
+      loadComments();
     } catch (err) {
       toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed to post comment.") : "Error.");
     } finally {
@@ -113,9 +115,10 @@ export function CommentsSection({ slug, initialCount }: Props) {
     if (!text) return;
     setReplySubmitting(true);
     try {
-      const res = await interactionsApi.postReply(slug, user._id, replyingTo.commentId, text);
-      setComments(res.data);
+      await interactionsApi.postReply(slug, user._id, replyingTo.commentId, text);
       closeReply();
+      // Re-fetch so admin replies (and any author) render correctly + immediately.
+      loadComments();
     } catch (err) {
       toast.error(isAxiosError(err) ? (err.response?.data?.message ?? "Failed to post reply.") : "Error.");
     } finally {
@@ -123,13 +126,19 @@ export function CommentsSection({ slug, initialCount }: Props) {
     }
   };
 
+  // Total = top-level comments + every nested reply (not just comment threads).
+  const totalCommentCount = comments.reduce(
+    (n, c) => n + 1 + (c.commentReplies?.length ?? 0),
+    0,
+  );
+
   return (
     <section className="mx-auto max-w-3xl px-6 py-10">
       <h2 className="mb-6 flex items-center gap-2 font-serif text-xl font-semibold tracking-tight">
         <MessageSquare className="size-5 text-muted-foreground" />
         Comments
         <span className="ml-1 text-sm font-normal text-muted-foreground">
-          ({loading ? initialCount : comments.length})
+          ({loading ? initialCount : totalCommentCount})
         </span>
       </h2>
 

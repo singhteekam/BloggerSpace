@@ -18,6 +18,7 @@ const AdminConfig = require("../../models/AdminConfig");
 const ReviewScore = require("../../models/ReviewScore");
 const { uploadImageToGitHub } = require("../../utils/uploadImageToGitHub");
 const { checkBlogDuplicate } = require("../../utils/checkBlogDuplicate");
+const { notifyEmail } = require("../../utils/notify");
 const IST_OFFSET = 330;
 
 // Default caps if no AdminConfig doc exists yet (defensive — Phase 1 lazily
@@ -348,10 +349,10 @@ exports.saveEditedInReviewBlog = async (req, res) => {
     // refreshes on its own ISR timer — so we only purge the live blog + author profile.
     revalidate({ slug: blog.slug, username: blog.authorDetails?.userName });
 
-    // Sending mail to author (skipped when the author account no longer exists,
-    // e.g. it was deleted after the blog went into review — avoids a null crash).
-    if (blog.authorDetails?.email) {
-      const receiver = blog.authorDetails.email;
+    // Notify the author — skipped when the account is missing or self-deleted, so we
+    // never email someone who closed their account and never crash on a null author.
+    const receiver = notifyEmail(blog.authorDetails);
+    if (receiver) {
       const subject = "Your blog is live on BloggerSpace!";
       const html = `
       <div class="content">
@@ -773,13 +774,14 @@ exports.discardAnyBlog = async (req, res) => {
     await blog.save();
     // No longer public — purge its page (will 404 next request) + the admin listing.
     // Home is on its own ISR timer, so we don't churn it per discard.
-    await blog.populate("authorDetails", "userName fullName email");
+    await blog.populate("authorDetails", "userName fullName email status");
     revalidate({ slug: blog.slug, username: blog.authorDetails?.userName, paths: ["/adminblogs"] });
     res.json({ message: "Blog discarded successfully" });
 
     // Notify the author + admin that the blog was discarded (non-blocking).
     const author = blog.authorDetails;
-    if (author?.email) {
+    const authorEmail = notifyEmail(author); // null when missing / self-deleted
+    if (authorEmail) {
       const authorHtml = `
         <div class="content">
           <h2>Hi ${author.fullName || "there"},</h2>
@@ -788,7 +790,7 @@ exports.discardAnyBlog = async (req, res) => {
           <p>If you believe this was a mistake or have questions, reach us at
             <a href="mailto:${process.env.EMAIL}">${process.env.EMAIL}</a>.</p>
         </div>`;
-      sendEmail(author.email, "Your blog was discarded — BloggerSpace", authorHtml)
+      sendEmail(authorEmail, "Your blog was discarded — BloggerSpace", authorHtml)
         .catch((e) => console.error("Discard email (author) failed:", e));
     }
     const adminHtml = `
@@ -947,10 +949,24 @@ exports.deleteUserAccount = async (req, res) => {
 
     const userEmail = user.email;
     const userName = user.fullName;
+    const publicUserName = user.userName;
     const wasReviewer = user.role === "reviewer";
+
+    // Capture their live blog slugs BEFORE orphaning them, so we can purge the cached
+    // pages afterwards (the name must disappear at once, not within the ISR window).
+    const authoredSlugs = await Blog.find({
+      authorDetails: id,
+      status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] },
+    })
+      .select("slug")
+      .lean();
 
     // Permanently delete user from DB
     await User.findByIdAndDelete(id);
+
+    // Orphan their blogs so nothing dangles — authorDetails is optional, and reads
+    // render a null author as "Anonymous" (non-clickable). Content stays live (SEO kept).
+    await Blog.updateMany({ authorDetails: id }, { $set: { authorDetails: null } });
 
     // If they were a reviewer, reassign any UNDER_REVIEW blogs back to pending
     if (wasReviewer) {
@@ -959,6 +975,13 @@ exports.deleteUserAccount = async (req, res) => {
         { $set: { currentReviewer: "", status: "PENDING_REVIEW", lastUpdatedAt: new Date() } }
       );
     }
+
+    // Purge the now-anonymous blog pages + the removed profile immediately (mirrors the
+    // self-delete flow) so cached pages don't keep showing the old author for days.
+    revalidate({
+      username: publicUserName,
+      paths: authoredSlugs.map((b) => `/blogs/${b.slug}`),
+    });
 
     const receiver = req.query.useremail || userEmail;
     const subject = "Your BloggerSpace account has been removed";
@@ -1816,7 +1839,7 @@ exports.awardGems = async (req, res) => {
   const { authorGems, reviewerAwards } = req.body;
   const adminId = req.query.userId;
   try {
-    const blog = await Blog.findById(blogId).populate("authorDetails", "email fullName userName");
+    const blog = await Blog.findById(blogId).populate("authorDetails", "email fullName userName status");
     if (!blog) return res.status(404).json({ error: "Blog not found" });
     if (!["PUBLISHED", "ADMIN_PUBLISHED"].includes(blog.status))
       return res.status(400).json({ error: "Gems can only be awarded to published blogs" });
@@ -1881,20 +1904,22 @@ exports.awardGems = async (req, res) => {
     };
     await blog.save();
 
-    // Send email to author
-    if (aGems > 0 && blog.authorDetails && blog.authorDetails.email) {
+    // Send email to author (skipped when the author is missing / self-deleted)
+    const authorEmail = notifyEmail(blog.authorDetails);
+    if (aGems > 0 && authorEmail) {
       sendEmail(
-        blog.authorDetails.email,
+        authorEmail,
         `You earned ${aGems} gems on BloggerSpace!`,
         `<div class="content"><h2>Congratulations, ${blog.authorDetails.fullName || blog.authorDetails.userName}!</h2><p>Admin has awarded you <b>${aGems} gems</b> for your published blog: <b>${blog.title}</b>.</p><p>Keep writing quality content to earn more!</p></div>`
       ).catch(() => {});
     }
-    // Send email to each reviewer
+    // Send email to each reviewer (skipped when missing / self-deleted)
     for (const award of validReviewerAwards) {
       User.findById(award.userId).then((reviewer) => {
-        if (reviewer && reviewer.email) {
+        const reviewerEmail = notifyEmail(reviewer);
+        if (reviewerEmail) {
           sendEmail(
-            reviewer.email,
+            reviewerEmail,
             `You earned ${award.gems} gems on BloggerSpace!`,
             `<div class="content"><h2>Well done, ${reviewer.fullName || reviewer.userName}!</h2><p>Admin has awarded you <b>${award.gems} gems</b> for reviewing the blog: <b>${blog.title}</b>.</p></div>`
           ).catch(() => {});
@@ -1977,10 +2002,11 @@ exports.grantGems = async (req, res) => {
       note: cleanNote,
     });
 
-    // Send appreciation email (best-effort — log failure but don't fail request)
-    if (targetUser.email) {
+    // Send appreciation email (best-effort — skipped when missing / self-deleted)
+    const targetEmail = notifyEmail(targetUser);
+    if (targetEmail) {
       sendEmail(
-        targetUser.email,
+        targetEmail,
         `You received ${amt} gems on BloggerSpace!`,
         `<div class="content">
           <h2>You earned ${amt} gems!</h2>
@@ -2420,7 +2446,7 @@ exports.updateGems = async (req, res) => {
   const { authorGems, reviewerAwards } = req.body;
   const adminId = req.query.userId;
   try {
-    const blog = await Blog.findById(blogId).populate("authorDetails", "email fullName userName");
+    const blog = await Blog.findById(blogId).populate("authorDetails", "email fullName userName status");
     if (!blog) return res.status(404).json({ error: "Blog not found" });
     if (!blog.gems || !blog.gems.awarded)
       return res.status(400).json({ error: "No gems awarded yet — use award first" });

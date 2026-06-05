@@ -288,7 +288,13 @@ export default async function BlogDetailPage({ params }: Props) {
             <Separator />
 
             {/* Comments */}
-            <CommentsSection slug={blog.slug} initialCount={blog.comments?.length ?? 0} />
+            <CommentsSection
+              slug={blog.slug}
+              initialCount={(blog.comments ?? []).reduce(
+                (n, c) => n + 1 + (c.commentReplies?.length ?? 0),
+                0,
+              )}
+            />
           </div>
 
           {/* ── Sidebar ── */}
