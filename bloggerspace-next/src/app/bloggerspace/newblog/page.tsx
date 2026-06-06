@@ -79,6 +79,7 @@ function NewBlogForm() {
   const [slug, setSlug] = useState("");
   const [titleStatus, setTitleStatus] = useState<"idle" | "checking" | "available" | "taken">("idle");
   const [loadingEdit, setLoadingEdit] = useState(false);
+  const [blogStatus, setBlogStatus] = useState<string | null>(null);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -112,10 +113,14 @@ function NewBlogForm() {
     });
   }, [user, editId, titleValue, categoryValue, otherCategory, content, tags]);
 
+  // Only DRAFT and AWAITING_AUTHOR are user-editable; everything else (PENDING_REVIEW,
+  // UNDER_REVIEW, PUBLISHED, …) means the blog has already moved past the author's hands.
+  const isEditable = !editId || blogStatus === null || blogStatus === "DRAFT" || blogStatus === "AWAITING_AUTHOR";
+
   const { autoSaveStatus, lastSavedAt } = useAutoSave(
     autoSaveFn,
     { title: titleValue, category: categoryValue, otherCategory, tags, content },
-    { canSave: !!editId && !!user && !!titleValue && !!categoryValue },
+    { canSave: !!editId && !!user && !!titleValue && !!categoryValue && isEditable },
   );
 
   // Slug
@@ -162,6 +167,7 @@ function NewBlogForm() {
         setTags(blog.tags ?? []);
         setSlug(blog.slug);
         setContent(blog.content);
+        setBlogStatus(blog.status ?? null);
         setEditorKey((k) => k + 1);
         const author = blog.authorDetails;
         if (author) {
@@ -419,13 +425,26 @@ function NewBlogForm() {
           </div>
         </div>
 
+        {/* Read-only notice when blog is past the author's edit window */}
+        {editId && !isEditable && (
+          <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-900/10">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-500" />
+            <div>
+              <p className="text-sm font-medium text-foreground">Already submitted for review</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                This blog is currently in <span className="font-medium">{blogStatus}</span> status and cannot be edited. You can only edit blogs that are in <span className="font-medium">Draft</span> or <span className="font-medium">Awaiting revision</span> status.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Action bar */}
         <div className="flex items-center justify-between border-t border-border pt-6 gap-4 flex-wrap">
           <div className="flex items-center gap-3">
             <Button
               type="button"
               variant="outline"
-              disabled={isSavingDraft || isSubmitting}
+              disabled={isSavingDraft || isSubmitting || !isEditable}
               onClick={saveDraft}
               className="gap-2"
             >
@@ -441,7 +460,7 @@ function NewBlogForm() {
 
           <Button
             type="button"
-            disabled={isSavingDraft || isSubmitting}
+            disabled={isSavingDraft || isSubmitting || !isEditable}
             onClick={submitForReview}
             className="gap-2"
           >
