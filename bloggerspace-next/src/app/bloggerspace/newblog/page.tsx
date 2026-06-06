@@ -207,8 +207,8 @@ function NewBlogForm() {
     setIsSavingDraft(true);
     try {
       if (editId) {
-        await blogWriteApi.update(editId, { slug, title: data.title, content, category: effectiveCategory, tags });
-        toast.success("Changes saved.");
+        await blogWriteApi.updateDraft(editId, { slug, title: data.title, content, category: effectiveCategory, tags });
+        toast.success("Changes saved as draft.");
       } else {
         await blogWriteApi.saveDraft(buildPayload(data));
         toast.success("Saved as draft.");

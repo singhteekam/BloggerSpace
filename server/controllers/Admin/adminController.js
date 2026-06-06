@@ -1011,6 +1011,22 @@ exports.deactivateUserAccount = async (req, res) => {
     user.status = "INACTIVE";
     await user.save();
     res.json({ message: "Account deactivated successfully." });
+
+    // Notify the user by email after responding (non-blocking)
+    if (user.email) {
+      const html = `
+        <div class="content">
+          <h2>Your account has been deactivated</h2>
+          <p>Hi ${user.fullName || user.userName || "there"},</p>
+          <p>Your BloggerSpace account has been deactivated by an administrator.</p>
+          <div class="info-box">
+            You will not be able to sign in until your account is reactivated.
+            If you believe this was done in error or need assistance, please contact our support team.
+          </div>
+          <p><a class="btn" href="mailto:${process.env.EMAIL}">Contact Support</a></p>
+        </div>`;
+      sendEmail(user.email, "Your BloggerSpace account has been deactivated", html).catch(console.error);
+    }
   } catch (error) {
     res.status(500).json({ error: "Failed to deactivate account" });
   }
@@ -1385,12 +1401,18 @@ exports.adminBlogEdit = async (req, res) => {
 
     const blogObj = blog.toObject();
     blogObj.content = decompressedContent;
+    const seenReviewerIds = new Set();
     blogObj.reviewedBy = rawReviewedBy
       .filter((r) => r?.ReviewedBy?.Role !== "Admin" && r?.ReviewedBy?.Id)
       .map((r) => ({
         reviewerId: r.ReviewedBy.Id.toString(),
         reviewerName: nameMap.get(r.ReviewedBy.Id.toString()),
-      }));
+      }))
+      .filter((r) => {
+        if (seenReviewerIds.has(r.reviewerId)) return false;
+        seenReviewerIds.add(r.reviewerId);
+        return true;
+      });
 
     // Review history timeline — every action (incl. Admin), newest entries last
     // as stored. Excludes the heavy `Revision` snapshot. Names resolved for all

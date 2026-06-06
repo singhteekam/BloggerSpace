@@ -28,7 +28,10 @@ function createApiClient(): AxiosInstance {
       if (error.response?.status === 401 && authStorage.getToken()) {
         authStorage.clear();
         const isAdminPath = window.location.pathname.startsWith("/admin");
-        window.location.href = isAdminPath ? "/admin/login" : "/login";
+        const msg = error.response.data?.message ?? "";
+        const isDeactivated = msg === "Account deactivated. Please contact support.";
+        const loginBase = isAdminPath ? "/admin/login" : "/login";
+        window.location.href = isDeactivated ? `${loginBase}?reason=deactivated` : loginBase;
         return Promise.reject(error);
       }
 

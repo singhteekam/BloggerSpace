@@ -277,6 +277,19 @@ exports.saveEditedPendingBlog = async (req, res) => {
       return res.status(404).json({ error: "blog not found" });
     }
 
+    // Only allow submission when the blog is actively assigned for review or
+    // awaiting author revision (reviewer can send additional feedback if the
+    // author hasn't updated yet).
+    if (!["UNDER_REVIEW", "AWAITING_AUTHOR"].includes(blog.status)) {
+      return res.status(409).json({
+        error: "already_reviewed",
+        message: "This blog has already been reviewed and is no longer under review.",
+      });
+    }
+    if (blog.currentReviewer && blog.currentReviewer !== req.query.email) {
+      return res.status(403).json({ error: "not_assigned", message: "You are not the assigned reviewer for this blog." });
+    }
+
     // Guard against a duplicate title/slug — but only validate a field if the
     // reviewer actually CHANGED it from the original (an unchanged title must not
     // be re-checked, so a legacy duplicate can't block the review).

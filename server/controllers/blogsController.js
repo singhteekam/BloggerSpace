@@ -902,6 +902,8 @@ exports.saveEditedBlog = async (req, res) => {
   try {
     // const { id } = req.params;
     const { slug, title, content, category } = req.body;
+    // draft=true: save content only, preserve current status (no review submission)
+    const isDraft = req.query.draft === "true";
 
     // Find the blog by ID
     const blog = await Blog.findById({
@@ -928,23 +930,32 @@ exports.saveEditedBlog = async (req, res) => {
       "base64"
     );
 
-    // Only a revision sent back from the reviewer (AWAITING_AUTHOR) is a true
-    // RE-submission; a draft going to review for the first time is a submission.
-    const isResubmission = blog.status === "AWAITING_AUTHOR";
-    const verb = isResubmission ? "resubmitted" : "submitted";
-    const Verb = isResubmission ? "Resubmitted" : "Submitted";
-
     // Update the blog fields
     blog.slug = slug;
     blog.title = title;
     blog.content = compressedContent;
     blog.category = category;
-    if (isResubmission) blog.status = "UNDER_REVIEW";
-    else blog.status = "PENDING_REVIEW";
+
+    if (!isDraft) {
+      // Only a revision sent back from the reviewer (AWAITING_AUTHOR) is a true
+      // RE-submission; a draft going to review for the first time is a submission.
+      const isResubmission = blog.status === "AWAITING_AUTHOR";
+      if (isResubmission) blog.status = "UNDER_REVIEW";
+      else blog.status = "PENDING_REVIEW";
+    }
 
     // Save the updated blog
     await blog.save();
     logger.debug("Blog updated successfully. Title: " + blog.title);
+
+    // Draft saves skip email notifications — the blog hasn't moved to review yet.
+    if (isDraft) {
+      return res.json({ message: "blog updated successfully" });
+    }
+
+    const isResubmission = blog.status === "UNDER_REVIEW";
+    const verb = isResubmission ? "resubmitted" : "submitted";
+    const Verb = isResubmission ? "Resubmitted" : "Submitted";
 
     // Sending mail to author (skipped when missing / self-deleted — avoids a null crash)
     const receiver = notifyEmail(blog.authorDetails);

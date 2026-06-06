@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Loader2, Star, Send, Trash2, CheckCheck,
   Tag, User, Clock, MessageSquare,
-  Pencil, Save, HardDrive, Cloud, CloudOff,
+  Pencil, Save, HardDrive, Cloud, CloudOff, AlertTriangle,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRequireReviewer } from "@/hooks/use-require-reviewer";
@@ -171,6 +171,8 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
   if (authLoading || loadingBlog) return <ReviewSkeleton />;
   if (!user || !blog) return null;
 
+  const isReviewable = blog.status === "UNDER_REVIEW" || blog.status === "AWAITING_AUTHOR";
+
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
       {/* Header */}
@@ -181,6 +183,19 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
         <Badge variant="secondary" className="text-xs">{blog.status}</Badge>
         <AutoSaveIndicator status={autoSaveStatus} lastSavedAt={lastSavedAt} />
       </div>
+
+      {/* Already-reviewed notice */}
+      {!isReviewable && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-900/10">
+          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-500" />
+          <div>
+            <p className="text-sm font-medium text-foreground">No review actions available</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Current status: <span className="font-medium">{blog.status}</span>. This blog has already been submitted or published. No further review actions can be taken.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         {/* ── Left: metadata + editor ─────────────────────────────── */}
@@ -291,13 +306,13 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
             <p className="text-sm font-medium text-foreground">Actions</p>
 
             {/* Save draft */}
-            <Button variant="outline" className="w-full gap-2" disabled={savingDraft} onClick={handleSaveDraft}>
+            <Button variant="outline" className="w-full gap-2" disabled={savingDraft || !isReviewable} onClick={handleSaveDraft}>
               {savingDraft ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
               Save as draft
             </Button>
 
             {/* Submit */}
-            <Button className="w-full gap-2" disabled={savingEdits} onClick={handleSaveEdits}>
+            <Button className="w-full gap-2" disabled={savingEdits || !isReviewable} onClick={handleSaveEdits}>
               {savingEdits ? <Loader2 className="size-4 animate-spin" /> : <CheckCheck className="size-4" />}
               Save edits &amp; submit
             </Button>
@@ -305,7 +320,7 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
             {/* Feedback dialog */}
             <Dialog.Root open={feedbackOpen} onOpenChange={setFeedbackOpen}>
               <Dialog.Trigger asChild>
-                <Button variant="outline" className="w-full gap-2">
+                <Button variant="outline" className="w-full gap-2" disabled={!isReviewable}>
                   <MessageSquare className="size-4" />Send feedback to author
                 </Button>
               </Dialog.Trigger>
@@ -335,7 +350,7 @@ export default function ReviewBlogPage({ params }: { params: Promise<{ id: strin
             {/* Discard dialog */}
             <Dialog.Root open={discardOpen} onOpenChange={setDiscardOpen}>
               <Dialog.Trigger asChild>
-                <Button variant="ghost" className="w-full gap-2 text-destructive hover:text-destructive">
+                <Button variant="ghost" className="w-full gap-2 text-destructive hover:text-destructive" disabled={!isReviewable}>
                   <Trash2 className="size-4" />Discard blog
                 </Button>
               </Dialog.Trigger>

@@ -870,6 +870,7 @@ exports.loggedInUserInfo = async (req, res) => {
       userName: user.userName,
       email: user.email,
       isVerified: user.isVerified,
+      status: user.status ?? "ACTIVE",
       profilePicture: user.profilePicture,
       savedBlogs: user.savedBlogs,
       role: user.role ?? "user",

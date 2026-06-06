@@ -60,4 +60,7 @@ export const blogWriteApi = {
 
   update: (blogId: string, payload: BlogEditPayload) =>
     api.put<{ message: string }>(`/api/blogs/editblog/save/${blogId}`, payload),
+
+  updateDraft: (blogId: string, payload: BlogEditPayload) =>
+    api.put<{ message: string }>(`/api/blogs/editblog/save/${blogId}?draft=true`, payload),
 };

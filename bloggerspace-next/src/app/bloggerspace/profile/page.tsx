@@ -237,6 +237,18 @@ export default function MyProfilePage() {
               <span>Joined {joinedDate}</span>
             </p>
           )}
+          {profile?.status && (
+            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <ShieldCheck className="size-3.5 shrink-0" />
+              <span>Status: </span>
+              <Badge
+                variant="secondary"
+                className={`px-1.5 py-0 text-[11px] ${profile.status === "ACTIVE" ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"}`}
+              >
+                {profile.status}
+              </Badge>
+            </p>
+          )}
         </div>
       </div>
 

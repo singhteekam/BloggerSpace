@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, Mail, KeyRound, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, KeyRound, ArrowLeft, ShieldAlert } from "lucide-react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { FaGoogle, FaGithub } from "react-icons/fa";
@@ -37,9 +37,11 @@ const otpVerifySchema = z.object({
 });
 type OtpVerifyForm = z.infer<typeof otpVerifySchema>;
 
-export default function LoginPage() {
+function LoginContent() {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isDeactivated = searchParams.get("reason") === "deactivated";
   const [showPass, setShowPass] = useState(false);
   const [mode, setMode] = useState<LoginMode>("password");
   const [otpEmail, setOtpEmail] = useState("");
@@ -145,6 +147,19 @@ export default function LoginPage() {
         <div className="mb-8 flex justify-center">
           <Logo />
         </div>
+
+        {/* Account deactivated banner — shown when redirected from a 401 deactivation */}
+        {isDeactivated && (
+          <div className="mb-4 flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-destructive" />
+            <div>
+              <p className="text-sm font-medium text-destructive">Account deactivated</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Your account has been deactivated. Please contact support for reactivation.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
 
@@ -343,5 +358,13 @@ export default function LoginPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   );
 }
