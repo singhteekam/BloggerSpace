@@ -12,7 +12,7 @@ export async function fetchRecommendedBlogs(userId?: string): Promise<Recommende
   });
   return res.data;
 }
-const LIMIT = 9;
+const LIMIT = 6;
 
 export async function fetchBlogs(page = 1): Promise<BlogListResponse> {
   try {

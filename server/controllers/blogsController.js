@@ -305,7 +305,7 @@ exports.fetchTopViewedBlogs = async (req, res) => {
 exports.getRecommendedBlogs = async (req, res) => {
   try {
     const userId = req.query.userId;
-    const LIMIT = 6;
+    const LIMIT = 4;
     const PUBLISHED = { status: { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] } };
     const SELECT = "title slug category tags content status blogViews blogLikes comments createdAt lastUpdatedAt blogScore authorDetails";
 
@@ -390,7 +390,7 @@ exports.fetchRelatedBlogs = async (req, res) => {
     }
 
     const PUBLISHED = { $in: ["PUBLISHED", "ADMIN_PUBLISHED"] };
-    const LIMIT = 6;
+    const LIMIT = 4;
     const SELECT = "title slug blogViews blogLikes category tags createdAt";
 
     // Title keywords (escaped for safe regex; stop-words + short words dropped).
