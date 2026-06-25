@@ -372,7 +372,8 @@ function NewBlogForm() {
               type="button"
               size="sm"
               variant="outline"
-              disabled={isGenerating || !titleValue || titleValue.trim().length < 3}
+              // disabled={isGenerating || !titleValue || titleValue.trim().length < 3}
+              disabled={true}
               onClick={generateWithAI}
               className="gap-1.5 text-xs h-7"
             >
