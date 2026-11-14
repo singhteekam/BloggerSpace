@@ -14,6 +14,8 @@ import { websiteJsonLd, organizationJsonLd, personJsonLd } from "@/lib/utils/jso
 import { BASE_KEYWORDS } from "@/lib/seo/page-metadata";
 import "./globals.css";
 
+import Script from 'next/script';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -41,9 +43,9 @@ export const metadata: Metadata = {
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  // other: {
-  //   "google-adsense-account": "ca-pub-XXXXXXXXXXXXXXXX",
-  // },
+  other: {
+    "google-adsense-account": "ca-pub-8423788364292375",
+  },
   keywords: [...siteConfig.keywords, ...BASE_KEYWORDS],
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.url }],
   creator: siteConfig.author.name,
@@ -106,6 +108,17 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${crimsonPro.variable} h-full antialiased`}
     >
+
+      <head>
+        <Script
+          id="adsense-script"
+          async
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8423788364292375"
+          crossOrigin="anonymous"
+        />
+      </head>
+
       <body className="min-h-full bg-background font-sans text-foreground">
         <script
           type="application/ld+json"
